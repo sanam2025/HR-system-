@@ -134,6 +134,7 @@ export default function EmployeeProfile() {
         )}
       </div>
 
+
       {/* Attendance */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-card">
         <div className="px-6 py-4 border-b border-gray-100">
