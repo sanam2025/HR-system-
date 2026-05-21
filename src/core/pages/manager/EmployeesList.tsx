@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { mockEmployees } from '../../../data/mockData';
-import EmployeeCard from '../manager/EmployeeCard';
+import EmployeeCard from './components/EmployeeCard';
 import { Search } from 'lucide-react';
 
 export default function EmployeesList() {
