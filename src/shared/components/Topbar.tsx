@@ -1,6 +1,12 @@
 import { Menu } from 'lucide-react';
 
-export default function Topbar({ title, onToggleSidebar }: { title: string; onToggleSidebar: () => void }) {
+export default function Topbar({
+  title,
+  onToggleSidebar,
+}: {
+  title: string;
+  onToggleSidebar: () => void;
+}) {
   return (
     <header className="h-16 bg-white border-b border-gray-100 flex items-center px-6 gap-4 sticky top-0 z-[60]">
       <button
