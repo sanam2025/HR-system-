@@ -8,28 +8,24 @@ const statusColor: Record<string, string> = {
   'إجازة': 'bg-blue-50 text-blue-700',
 };
 
-interface Employee {
-  id: number;
-  name: string;
-  title: string;
-  avatar: string;
-  todayStatus: string;
-  avgRating: number;
-  tasksCount: number;
-  leaveBalance: number;
-}
-
-type EmployeeCardProps = {
-  employee: Employee;
-};
-
 function renderStars(rating: number) {
   return Array.from({ length: 5 }, (_, i) => (
     <span key={i} className={i < Math.round(rating) ? 'text-gold' : 'text-gray-200'}>★</span>
   ));
 }
 
-export default function EmployeeCard({ employee }: EmployeeCardProps) {
+interface Employee {
+  id: number;
+  name: string;
+  title: string;
+  avatar: string;
+  avgRating: number;
+  todayStatus: string;
+  tasksCount: number;
+  leaveBalance: number;
+}
+
+export default function EmployeeCard({ employee }: { employee: Employee }) {
   const navigate = useNavigate();
 
   return (

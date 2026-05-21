@@ -1,9 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ManagerLayout from './core/layout/ManagerLayout';
-import EmployeesList from './core/pages/manager/EmployeesList';
-import EmployeeProfile from './core/pages/manager/EmployeeProfile';
 
-// ── Placeholder pages ──────────────────────────────────────────────────────
+// ── Placeholder pages ─────
 function Page({ title }: { title: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '64px' }}>
@@ -19,8 +17,8 @@ function App() {
           <Route path="/" element={<Navigate to="/manager" replace />} />
           <Route path="/manager" element={<ManagerLayout />}>
             <Route index element={<Page title="Dashboard" />} />
-            <Route path="employees" element={<EmployeesList />} />
-            <Route path="employees/:id" element={<EmployeeProfile />} />
+            <Route path="employees" element={<Page title="Employees" />} />
+            <Route path="employees/:id" element={<Page title="Employee Profile" />} />
             <Route path="tasks" element={<Page title="Tasks" />} />
             <Route path="leaves" element={<Page title="Leaves" />} />
             <Route path="overtime" element={<Page title="Overtime" />} />
