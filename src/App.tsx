@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ManagerLayout from './shared/layouts/ManagerLayout';
-import EmployeesList from './core/pages/manager/EmployeesList';
-import EmployeeProfile from './core/pages/manager/EmployeeProfile';
+import EmployeesList from './core/pages/manager/components/EmployeesList';
+import EmployeeProfile from './core/pages/manager/components/EmployeeProfile';
 import TasksBoard from './core/pages/Tasks/TasksBoard';
 
 // ── Placeholder ───

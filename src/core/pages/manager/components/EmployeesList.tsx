@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { mockEmployees } from '../../../data/mockData';
-import EmployeeCard from './components/EmployeeCard';
+import { mockEmployees } from '../../../../data/mockData';
+import EmployeeCard from './EmployeeCard';
 import { Search } from 'lucide-react';
 
 export default function EmployeesList() {
@@ -8,10 +8,10 @@ export default function EmployeesList() {
   const [filter, setFilter] = useState('all');
 
   const filterOptions = [
-    { key: 'all',     label: 'All' },
+    { key: 'all', label: 'All' },
     { key: 'Present', label: 'Present' },
-    { key: 'Absent',  label: 'Absent' },
-    { key: 'Late',    label: 'Late' },
+    { key: 'Absent', label: 'Absent' },
+    { key: 'Late', label: 'Late' },
   ];
 
   const filtered = mockEmployees.filter(e => {

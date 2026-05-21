@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { mockEmployees, mockTasks, mockAttendance } from '../../../data/mockData';
+import { mockEmployees, mockTasks, mockAttendance } from '../../../../data/mockData';
 import { ArrowLeft, Phone, Mail, Calendar, Star, CheckSquare, Clock } from 'lucide-react';
 
 const taskStatusColors: { [key: string]: string } = {
