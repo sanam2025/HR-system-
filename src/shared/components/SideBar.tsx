@@ -1,35 +1,41 @@
 import { NavLink } from 'react-router-dom';
-import {
-  LayoutDashboard, Users, CheckSquare, CalendarOff,
-  Clock, BarChart2, Briefcase, ChevronRight, ChevronLeft, TrendingUp,
-} from 'lucide-react';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
-interface SidebarProps {
-  open: boolean;
-  onToggle: () => void;
+// ── Types ──────────────────────────────────────────────────────────────────
+export interface NavItem {
+  label: string;
+  icon: LucideIcon;
+  path: string;
+  exact?: boolean;
 }
 
-const navItems = [
-  { label: 'لوحة التحكم',    icon: LayoutDashboard, path: '/manager',             exact: true  },
-  { label: 'الموظفون',       icon: Users,           path: '/manager/employees',   exact: false },
-  { label: 'المهام',         icon: CheckSquare,     path: '/manager/tasks',       exact: false },
-  { label: 'الإجازات',       icon: CalendarOff,     path: '/manager/leaves',      exact: false },
-  { label: 'العمل الإضافي',  icon: Clock,           path: '/manager/overtime',    exact: false },
-  { label: 'الحضور',         icon: BarChart2,       path: '/manager/attendance',  exact: false },
-  { label: 'التقييم الدوري', icon: TrendingUp,      path: '/manager/evaluation',  exact: false },
-  { label: 'التوظيف',        icon: Briefcase,       path: '/manager/recruitment', exact: false },
-];
+export interface SidebarProps {
+  open: boolean;
+  onToggle: () => void;
+  navItems: NavItem[];
+  brand?: { logo?: string; title?: string; subtitle?: string };
+  user?: { avatar: string; name: string; role: string };
+  navSectionLabel?: string;
+}
 
-export default function Sidebar({ open, onToggle }: SidebarProps) {
+// ── Component ──────────────────────────────────────────────────────────────
+export default function Sidebar({
+  open,
+  onToggle,
+  navItems,
+  brand = { logo: '🏢', title: 'HR System', subtitle: 'Damascus University' },
+  user  = { avatar: 'U', name: 'User', role: '' },
+  navSectionLabel = 'Main Menu',
+}: SidebarProps) {
   return (
     <>
-      {/* Mobile overlay */}
       {open && (
         <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={onToggle} />
       )}
 
       <aside className={`
-        fixed top-0 right-0 h-screen z-50 flex flex-col
+        fixed top-0 left-0 h-screen z-50 flex flex-col
         bg-dark-sidebar shadow-[0_4px_20px_rgba(0,0,0,0.15)]
         transition-all duration-300
         ${open ? 'w-64' : 'w-0 overflow-hidden md:w-16'}
@@ -38,12 +44,12 @@ export default function Sidebar({ open, onToggle }: SidebarProps) {
         {/* Logo */}
         <div className="flex items-center gap-3 px-5 py-6 border-b border-white/10">
           <div className="w-9 h-9 bg-green rounded-xl flex items-center justify-center text-lg flex-shrink-0">
-            🏢
+            {brand.logo ?? '🏢'}
           </div>
           {open && (
             <div>
-              <p className="text-white font-bold text-sm leading-tight">HR System</p>
-              <p className="text-white/40 text-[10px]">جامعة دمشق</p>
+              <p className="text-white font-bold text-sm leading-tight">{brand.title}</p>
+              <p className="text-white/40 text-[10px]">{brand.subtitle}</p>
             </div>
           )}
         </div>
@@ -51,12 +57,12 @@ export default function Sidebar({ open, onToggle }: SidebarProps) {
         {/* User */}
         <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10">
           <div className="w-9 h-9 rounded-full bg-green flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-            م
+            {user.avatar}
           </div>
           {open && (
             <div className="overflow-hidden">
-              <p className="text-white text-xs font-semibold truncate">محمد أحمد</p>
-              <p className="text-gold text-[10px]">مدير القسم</p>
+              <p className="text-white text-xs font-semibold truncate">{user.name}</p>
+              <p className="text-gold text-[10px]">{user.role}</p>
             </div>
           )}
         </div>
@@ -65,7 +71,7 @@ export default function Sidebar({ open, onToggle }: SidebarProps) {
         <nav className="flex-1 py-3 overflow-y-auto scrollbar-hide">
           {open && (
             <p className="px-5 py-2 text-white/30 text-[10px] font-bold uppercase tracking-widest">
-              القائمة الرئيسية
+              {navSectionLabel}
             </p>
           )}
           {navItems.map((item) => {
@@ -74,11 +80,11 @@ export default function Sidebar({ open, onToggle }: SidebarProps) {
               <NavLink
                 key={item.path}
                 to={item.path}
-                end={item.exact}
+                end={item.exact ?? false}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-5 py-2.5 text-sm cursor-pointer transition-all duration-200
                   ${isActive
-                    ? 'bg-green/25 text-white border-r-[3px] border-green'
+                    ? 'bg-green/25 text-white border-l-[3px] border-green'
                     : 'text-white/65 hover:bg-white/5 hover:text-white'
                   }`
                 }
@@ -95,7 +101,7 @@ export default function Sidebar({ open, onToggle }: SidebarProps) {
           onClick={onToggle}
           className="flex items-center justify-center py-4 text-white/40 hover:text-white transition-colors border-t border-white/10"
         >
-          {open ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+          {open ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
         </button>
       </aside>
     </>

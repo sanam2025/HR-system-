@@ -2,10 +2,10 @@ import { useNavigate } from 'react-router-dom';
 import { CheckSquare, Calendar } from 'lucide-react';
 
 const statusColor: Record<string, string> = {
-  'حاضر': 'bg-green-50 text-green-700',
-  'غائب': 'bg-red-50 text-red-600',
-  'تأخير': 'bg-yellow-50 text-yellow-700',
-  'إجازة': 'bg-blue-50 text-blue-700',
+  'Present': 'bg-green-50 text-green-700',
+  'Absent': 'bg-red-50 text-red-600',
+  'Late': 'bg-yellow-50 text-yellow-700',
+  'Leave': 'bg-blue-50 text-blue-700',
 };
 
 function renderStars(rating: number) {
@@ -55,11 +55,11 @@ export default function EmployeeCard({ employee }: { employee: Employee }) {
       <div className="flex gap-4 mt-4 pt-4 border-t border-gray-100">
         <div className="flex items-center gap-1.5 text-xs text-brown">
           <CheckSquare size={13} className="text-green" />
-          <span>{employee.tasksCount} مهام</span>
+          <span>{employee.tasksCount} Tasks</span>
         </div>
         <div className="flex items-center gap-1.5 text-xs text-brown">
           <Calendar size={13} className="text-gold" />
-          <span>{employee.leaveBalance} رصيد إجازة</span>
+          <span>{employee.leaveBalance} Leaves</span>
         </div>
       </div>
     </div>

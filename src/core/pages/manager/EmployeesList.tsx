@@ -8,14 +8,14 @@ export default function EmployeesList() {
   const [filter, setFilter] = useState('all');
 
   const filterOptions = [
-    { key: 'all',    label: 'الكل' },
-    { key: 'حاضر',  label: 'حاضر' },
-    { key: 'غائب',  label: 'غائب' },
-    { key: 'تأخير', label: 'تأخير' },
+    { key: 'all',     label: 'All' },
+    { key: 'Present', label: 'Present' },
+    { key: 'Absent',  label: 'Absent' },
+    { key: 'Late',    label: 'Late' },
   ];
 
   const filtered = mockEmployees.filter(e => {
-    const matchSearch = e.name.includes(query) || e.title.includes(query);
+    const matchSearch = e.name.toLowerCase().includes(query.toLowerCase()) || e.title.toLowerCase().includes(query.toLowerCase());
     const matchFilter = filter === 'all' || e.todayStatus === filter;
     return matchSearch && matchFilter;
   });
@@ -25,8 +25,8 @@ export default function EmployeesList() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-extrabold text-dark">قائمة الموظفين</h2>
-          <p className="text-sm text-brown mt-1">{mockEmployees.length} موظف</p>
+          <h2 className="text-xl font-extrabold text-dark">Employee List</h2>
+          <p className="text-sm text-brown mt-1">{mockEmployees.length} employees</p>
         </div>
       </div>
 
@@ -36,7 +36,7 @@ export default function EmployeesList() {
           <Search size={16} className="text-gray-400 flex-shrink-0" />
           <input
             type="text"
-            placeholder="ابحث عن موظف..."
+            placeholder="Search for an employee..."
             value={query}
             onChange={e => setQuery(e.target.value)}
             className="flex-1 outline-none text-sm bg-transparent text-dark placeholder:text-gray-400"
@@ -63,8 +63,8 @@ export default function EmployeesList() {
       {filtered.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
           <div className="text-5xl mb-4 opacity-40">👤</div>
-          <p className="font-semibold text-gray-500 text-lg">لا يوجد موظفون</p>
-          <p className="text-sm mt-1">حاول تغيير كلمة البحث أو الفلتر</p>
+          <p className="font-semibold text-gray-500 text-lg">No employees found</p>
+          <p className="text-sm mt-1">Try changing the search query or filter</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">

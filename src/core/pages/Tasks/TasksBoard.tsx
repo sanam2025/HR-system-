@@ -3,22 +3,22 @@ import { mockTasks, mockEmployees } from '../../../data/mockData';
 import { Plus, X } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 
-// ── أنواع ──────────────────────────────────────────────────────────────────
+// ── Types ──────────────────────────────────────────────────────────────────
 type Task = typeof mockTasks[number] & { rating: number | null };
 
-const STATUSES = ['جديدة', 'قيد التنفيذ', 'مكتملة', 'متأخرة'];
+const STATUSES = ['New', 'In Progress', 'Completed', 'Late'];
 
 const colConfig: Record<string, { label: string; topColor: string; badge: string; dot: string }> = {
-  'جديدة':       { label: 'جديدة',       topColor: '#3b82f6', badge: '#eff6ff', dot: '#3b82f6' },
-  'قيد التنفيذ': { label: 'قيد التنفيذ', topColor: '#f59e0b', badge: '#fffbeb', dot: '#f59e0b' },
-  'مكتملة':      { label: 'مكتملة',      topColor: '#22c55e', badge: '#f0fdf4', dot: '#22c55e' },
-  'متأخرة':      { label: 'متأخرة',      topColor: '#ef4444', badge: '#fef2f2', dot: '#ef4444' },
+  'New':         { label: 'New',         topColor: '#3b82f6', badge: '#eff6ff', dot: '#3b82f6' },
+  'In Progress': { label: 'In Progress', topColor: '#f59e0b', badge: '#fffbeb', dot: '#f59e0b' },
+  'Completed':   { label: 'Completed',   topColor: '#22c55e', badge: '#f0fdf4', dot: '#22c55e' },
+  'Late':        { label: 'Late',        topColor: '#ef4444', badge: '#fef2f2', dot: '#ef4444' },
 };
 
 const priorityDot: Record<string, string> = {
-  'عالية':   '#ef4444',
-  'متوسطة':  '#f59e0b',
-  'منخفضة':  '#22c55e',
+  'High':   '#ef4444',
+  'Medium': '#f59e0b',
+  'Low':    '#22c55e',
 };
 
 // ── Star Rating ─────────────────────────────────────────────────────────────
@@ -39,21 +39,21 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
   );
 }
 
-// ── الكومبوننت الرئيسي ────────────────────────────────────────────────────
+// ── Component ──────────────────────────────────────────────────────────────
 export default function TasksBoard() {
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [showCreate, setShowCreate] = useState(false);
   const [showEval, setShowEval] = useState<Task | null>(null);
   const [evalRating, setEvalRating] = useState(0);
   const [evalNote, setEvalNote] = useState('');
-  const [form, setForm] = useState({ title: '', assigneeId: '', priority: 'متوسطة', dueDate: '', description: '' });
+  const [form, setForm] = useState({ title: '', assigneeId: '', priority: 'Medium', dueDate: '', description: '' });
 
-  const ratingLabels = ['', 'ضعيف', 'مقبول', 'جيد', 'جيد جداً', 'ممتاز'];
+  const ratingLabels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.assigneeId || !form.dueDate) {
-      toast.error('يرجى ملء جميع الحقول المطلوبة');
+      toast.error('Please fill in all required fields');
       return;
     }
     const assignee = mockEmployees.find(emp => emp.id === Number(form.assigneeId));
@@ -61,53 +61,53 @@ export default function TasksBoard() {
       id: Date.now(), ...form,
       assigneeId: Number(form.assigneeId),
       assigneeName: assignee?.name || '',
-      status: 'جديدة', rating: null,
+      status: 'New', rating: null,
       createdAt: new Date().toISOString().split('T')[0],
     }, ...prev]);
     setShowCreate(false);
-    setForm({ title: '', assigneeId: '', priority: 'متوسطة', dueDate: '', description: '' });
-    toast.success('تم إنشاء المهمة بنجاح');
+    setForm({ title: '', assigneeId: '', priority: 'Medium', dueDate: '', description: '' });
+    toast.success('Task created successfully');
   };
 
   const handleEvaluate = () => {
     if (!showEval) return;
-    if (!evalRating) { toast.error('يرجى اختيار تقييم للمهمة'); return; }
-    setTasks(prev => prev.map(t => t.id === showEval.id ? { ...t, rating: evalRating, status: 'مكتملة' } : t));
-    toast.success('تم تقييم المهمة بنجاح');
+    if (!evalRating) { toast.error('Please select a rating for the task'); return; }
+    setTasks(prev => prev.map(t => t.id === showEval.id ? { ...t, rating: evalRating, status: 'Completed' } : t));
+    toast.success('Task rated successfully');
     setShowEval(null); setEvalRating(0); setEvalNote('');
   };
 
   return (
-    <div dir="rtl" style={{ fontFamily: 'inherit' }}>
+    <div dir="ltr" style={{ fontFamily: 'inherit' }}>
       <Toaster position="top-center" />
 
-      {/* ── رأس الصفحة ── */}
+      {/* ── Header ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1a2332', margin: 0 }}>لوحة المهام</h2>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>{tasks.length} مهمة نشطة</p>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1a2332', margin: 0 }}>Tasks Board</h2>
+          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>{tasks.length} active tasks</p>
         </div>
 
-        {/* زر مهمة جديدة - نفس الشكل بالصورة */}
+        {/* Create Task Button */}
         <button
           onClick={() => setShowCreate(true)}
           style={{
             display: 'flex', alignItems: 'center', gap: 8,
-            background: '#1a6644', color: '#fff',
+            background: '#4A7C59', color: '#fff',
             border: 'none', borderRadius: 10, padding: '10px 20px',
             fontSize: 14, fontWeight: 700, cursor: 'pointer',
-            boxShadow: '0 4px 14px rgba(26,102,68,.3)',
+            boxShadow: '0 4px 14px rgba(74,124,89,.3)',
             transition: 'background .2s, transform .15s',
           }}
-          onMouseEnter={e => (e.currentTarget.style.background = '#155436')}
-          onMouseLeave={e => (e.currentTarget.style.background = '#1a6644')}
+          onMouseEnter={e => (e.currentTarget.style.background = '#3a6347')}
+          onMouseLeave={e => (e.currentTarget.style.background = '#4A7C59')}
         >
           <Plus size={16} strokeWidth={2.5} />
-          مهمة جديدة
+          New Task
         </button>
       </div>
 
-      {/* ── لوحة كانبان ── */}
+      {/* ── Kanban Grid ── */}
       <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 12 }}>
         {STATUSES.map(status => {
           const cfg = colConfig[status];
@@ -121,7 +121,7 @@ export default function TasksBoard() {
               padding: 16,
               display: 'flex', flexDirection: 'column', gap: 12,
             }}>
-              {/* عنوان العمود */}
+              {/* Column Header */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#1a2332' }}>{cfg.label}</span>
                 <span style={{
@@ -133,9 +133,9 @@ export default function TasksBoard() {
                 </span>
               </div>
 
-              {/* البطاقات */}
+              {/* Task Cards */}
               {colTasks.length === 0 && (
-                <p style={{ textAlign: 'center', color: '#d1d5db', fontSize: 13, padding: '20px 0' }}>لا توجد مهام</p>
+                <p style={{ textAlign: 'center', color: '#d1d5db', fontSize: 13, padding: '20px 0' }}>No tasks found</p>
               )}
 
               {colTasks.map(task => (
@@ -187,7 +187,7 @@ export default function TasksBoard() {
                     </div>
                   )}
 
-                  {task.status === 'مكتملة' && !task.rating && (
+                  {task.status === 'Completed' && !task.rating && (
                     <button
                       onClick={() => { setShowEval(task); setEvalRating(0); }}
                       style={{
@@ -196,7 +196,7 @@ export default function TasksBoard() {
                         border: '1px solid #fde68a', borderRadius: 8, padding: '6px 0',
                         cursor: 'pointer', transition: 'background .2s',
                       }}>
-                      تقييم المهمة
+                      Rate Task
                     </button>
                   )}
                 </div>
@@ -206,26 +206,26 @@ export default function TasksBoard() {
         })}
       </div>
 
-      {/* ══ مودال إنشاء مهمة جديدة ══════════════════════════════════════════ */}
+      {/* ── Create Task Modal ══════════════════════════════════════════════ */}
       {showCreate && (
         <div style={{
           position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 16,
         }}>
-          <div dir="rtl" style={{
+          <div style={{
             background: '#fff', borderRadius: 20,
             width: '100%', maxWidth: 520,
             boxShadow: '0 20px 60px rgba(0,0,0,.18)',
             overflow: 'hidden',
             animation: 'slideUp .25s ease',
           }}>
-            {/* رأس المودال */}
+            {/* Modal Header */}
             <div style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '18px 24px 0',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: '#1a2332' }}>إنشاء مهمة جديدة</h3>
+                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: '#1a2332' }}>Create New Task</h3>
                 <Plus size={20} style={{ color: '#1a2332' }} strokeWidth={2.8} />
               </div>
               <button onClick={() => setShowCreate(false)} style={{
@@ -234,57 +234,57 @@ export default function TasksBoard() {
                 <X size={18} style={{ color: '#9ca3af' }} strokeWidth={1.8} />
               </button>
             </div>
-            {/* الخط الفاصل */}
+            {/* Divider */}
             <div style={{ height: 1, background: '#e5e7eb', marginTop: 14 }} />
 
             <form onSubmit={handleCreate} style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {/* عنوان المهمة */}
+              {/* Task Title */}
               <div>
-                <label style={labelStyle}>عنوان المهمة <span style={{ color: '#ef4444' }}>*</span></label>
+                <label style={labelStyle}>Task Title <span style={{ color: '#ef4444' }}>*</span></label>
                 <input
                   style={inputStyle}
-                  placeholder="أدخل عنوان المهمة..."
+                  placeholder="Enter task title..."
                   value={form.title}
                   onChange={e => setForm({ ...form, title: e.target.value })}
                 />
               </div>
 
-              {/* تعيين إلى + الأولوية - RTL: تعيين إلى يمين، الأولوية يسار */}
+              {/* Assignee + Priority */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
-                  <label style={labelStyle}>تعيين إلى <span style={{ color: '#ef4444' }}>*</span></label>
+                  <label style={labelStyle}>Assignee <span style={{ color: '#ef4444' }}>*</span></label>
                   <select style={inputStyle} value={form.assigneeId}
                     onChange={e => setForm({ ...form, assigneeId: e.target.value })}>
-                    <option value="">اختر موظفاً...</option>
+                    <option value="">Select Employee...</option>
                     {mockEmployees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={labelStyle}>الأولوية</label>
+                  <label style={labelStyle}>Priority</label>
                   <select style={inputStyle} value={form.priority}
                     onChange={e => setForm({ ...form, priority: e.target.value })}>
-                    {['عالية', 'متوسطة', 'منخفضة'].map(p => <option key={p} value={p}>{p}</option>)}
+                    {['High', 'Medium', 'Low'].map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
               </div>
 
-              {/* تاريخ التسليم */}
+              {/* Due Date */}
               <div>
-                <label style={labelStyle}>تاريخ التسليم <span style={{ color: '#ef4444' }}>*</span></label>
+                <label style={labelStyle}>Due Date <span style={{ color: '#ef4444' }}>*</span></label>
                 <input type="date" style={inputStyle} value={form.dueDate}
                   onChange={e => setForm({ ...form, dueDate: e.target.value })} />
               </div>
 
-              {/* الوصف */}
+              {/* Description */}
               <div>
-                <label style={labelStyle}>الوصف</label>
+                <label style={labelStyle}>Description</label>
                 <textarea style={{ ...inputStyle, resize: 'none', height: 90 }}
-                  placeholder="وصف تفصيلي للمهمة..."
+                  placeholder="Detailed description of the task..."
                   value={form.description}
                   onChange={e => setForm({ ...form, description: e.target.value })} />
               </div>
 
-              {/* الأزرار - في RTL: إلغاء على اليمين، إنشاء على اليسار */}
+              {/* Action Buttons */}
               <div style={{ display: 'flex', gap: 12, paddingTop: 4 }}>
                 <button type="button" onClick={() => setShowCreate(false)} style={{
                   padding: '12px 22px', background: '#fff', color: '#374151',
@@ -292,18 +292,18 @@ export default function TasksBoard() {
                   fontSize: 14, fontWeight: 600, cursor: 'pointer',
                   fontFamily: 'inherit',
                 }}>
-                  إلغاء
+                  Cancel
                 </button>
                 <button type="submit" style={{
-                  flex: 1, background: '#1a6644', color: '#fff',
+                  flex: 1, background: '#4A7C59', color: '#fff',
                   border: 'none', borderRadius: 10, padding: '12px 0',
                   fontSize: 15, fontWeight: 700, cursor: 'pointer',
-                  boxShadow: '0 4px 14px rgba(26,102,68,.3)',
+                  boxShadow: '0 4px 14px rgba(74,124,89,.3)',
                   transition: 'background .2s', fontFamily: 'inherit',
                 }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#155436')}
-                  onMouseLeave={e => (e.currentTarget.style.background = '#1a6644')}>
-                  إنشاء وتعيين المهمة
+                  onMouseEnter={e => (e.currentTarget.style.background = '#3a6347')}
+                  onMouseLeave={e => (e.currentTarget.style.background = '#4A7C59')}>
+                  Create & Assign Task
                 </button>
               </div>
             </form>
@@ -311,7 +311,7 @@ export default function TasksBoard() {
         </div>
       )}
 
-      {/* ══ مودال تقييم مهمة ════════════════════════════════════════════════ */}
+      {/* ── Rate Task Modal ════════════════════════════════════════════════ */}
       {showEval && (
         <div style={{
           position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)',
@@ -327,7 +327,7 @@ export default function TasksBoard() {
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '18px 24px 0',
             }}>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#1a2332' }}>تقييم المهمة</h3>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#1a2332' }}>Rate Task</h3>
               <button onClick={() => setShowEval(null)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
                 <X size={20} style={{ color: '#3b82f6' }} />
               </button>
@@ -340,30 +340,30 @@ export default function TasksBoard() {
                 <p style={{ margin: '4px 0 0', fontSize: 13, color: '#6b7280' }}>{showEval.assigneeName}</p>
               </div>
               <div>
-                <label style={labelStyle}>التقييم</label>
+                <label style={labelStyle}>Rating</label>
                 <StarRating value={evalRating} onChange={setEvalRating} />
                 {evalRating > 0 && <p style={{ margin: '4px 0 0', fontSize: 12, color: '#d97706' }}>{ratingLabels[evalRating]}</p>}
               </div>
               <div>
-                <label style={labelStyle}>ملاحظات</label>
+                <label style={labelStyle}>Notes</label>
                 <textarea style={{ ...inputStyle, resize: 'none', height: 80 }}
-                  placeholder="أضف ملاحظات حول أداء الموظف..."
+                  placeholder="Add feedback about performance..."
                   value={evalNote} onChange={e => setEvalNote(e.target.value)} />
               </div>
               <div style={{ display: 'flex', gap: 12 }}>
                 <button onClick={handleEvaluate} style={{
-                  flex: 1, background: '#1a6644', color: '#fff',
+                  flex: 1, background: '#4A7C59', color: '#fff',
                   border: 'none', borderRadius: 10, padding: '12px 0',
                   fontSize: 14, fontWeight: 700, cursor: 'pointer',
                 }}>
-                  حفظ التقييم
+                  Save Rating
                 </button>
                 <button onClick={() => setShowEval(null)} style={{
                   padding: '12px 22px', background: '#fff', color: '#374151',
                   border: '1.5px solid #d1d5db', borderRadius: 10,
                   fontSize: 14, fontWeight: 600, cursor: 'pointer',
                 }}>
-                  إلغاء
+                  Cancel
                 </button>
               </div>
             </div>
@@ -376,7 +376,7 @@ export default function TasksBoard() {
   );
 }
 
-// ── أنماط مشتركة ────────────────────────────────────────────────────────────
+// ── Shared Styles ───────────────────────────────────────────────────────────
 const labelStyle: React.CSSProperties = {
   display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6,
 };
@@ -385,5 +385,5 @@ const inputStyle: React.CSSProperties = {
   border: '1.5px solid #d1d5db', borderRadius: 10,
   background: '#fff', color: '#1a2332',
   outline: 'none', boxSizing: 'border-box',
-  fontFamily: 'inherit', direction: 'rtl',
+  fontFamily: 'inherit', direction: 'ltr',
 };
