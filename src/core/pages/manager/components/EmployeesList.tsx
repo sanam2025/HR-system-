@@ -15,7 +15,8 @@ export default function EmployeesList() {
   ];
 
   const filtered = mockEmployees.filter(e => {
-    const matchSearch = e.name.toLowerCase().includes(query.toLowerCase()) || e.title.toLowerCase().includes(query.toLowerCase());
+    const matchSearch = e.name.toLowerCase().includes(query.toLowerCase())
+     || e.title.toLowerCase().includes(query.toLowerCase());
     const matchFilter = filter === 'all' || e.todayStatus === filter;
     return matchSearch && matchFilter;
   });

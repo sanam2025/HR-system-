@@ -3,6 +3,7 @@ import ManagerLayout from './shared/layouts/ManagerLayout';
 import EmployeesList from './core/pages/manager/components/EmployeesList';
 import EmployeeProfile from './core/pages/manager/components/EmployeeProfile';
 import TasksBoard from './core/pages/Tasks/TasksBoard';
+import AttendanceView       from './core/pages/Attendance/AttendanceView';
 
 // ── Placeholder ───
 function Page({ title }: { title: string }) {
@@ -27,7 +28,7 @@ function App() {
           <Route path="tasks" element={<TasksBoard />} />
           <Route path="leaves" element={<Page title="Leaves" />} />
           <Route path="overtime" element={<Page title="Overtime" />} />
-          <Route path="attendance" element={<Page title="Attendance" />} />
+          <Route path="attendance" element={<AttendanceView />} />
           <Route path="evaluation" element={<Page title="Evaluation" />} />
           <Route path="recruitment" element={<Page title="Recruitment" />} />
         </Route>
