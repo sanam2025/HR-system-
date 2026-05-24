@@ -5,6 +5,7 @@ import EmployeeProfile from './core/pages/manager/components/EmployeeProfile';
 import TasksBoard from './core/pages/Tasks/TasksBoard';
 import AttendanceView       from './core/pages/Attendance/AttendanceView';
 import LeaveRequests         from './core/pages/Leaves/LeaveRequests';
+import OvertimeRequests      from './core/pages/Leaves/OvertimeRequests';
 
 // ── Placeholder ───
 function Page({ title }: { title: string }) {
@@ -28,7 +29,7 @@ function App() {
           <Route path="employees/:id" element={<EmployeeProfile />} />
           <Route path="tasks" element={<TasksBoard />} />
           <Route path="leaves" element={<LeaveRequests />} />
-          <Route path="overtime" element={<Page title="Overtime" />} />
+          <Route path="overtime" element={<OvertimeRequests />} />
           <Route path="attendance" element={<AttendanceView />} />
           <Route path="evaluation" element={<Page title="Evaluation" />} />
           <Route path="recruitment" element={<Page title="Recruitment" />} />
