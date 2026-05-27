@@ -6,8 +6,7 @@ import TasksBoard from './core/pages/Tasks/TasksBoard';
 import AttendanceView       from './core/pages/Attendance/AttendanceView';
 import LeaveRequests         from './core/pages/Leaves/LeaveRequests';
 import OvertimeRequests      from './core/pages/Leaves/OvertimeRequests';
-import PeriodicEvaluation from './core/pages/Evaluation/PeriodicEvaluation';
-import { LanguageProvider } from './i18n/translations/LanguageContext';
+import PeriodicEvaluation from './core/pages/Evaluation/PeriodicEvaluation'
 
 // ── Placeholder ───
 function Page({ title }: { title: string }) {
@@ -20,27 +19,25 @@ function Page({ title }: { title: string }) {
 
 function App() {
   return (
-    <LanguageProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Navigate to="/manager" replace />} />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/manager" replace />} />
 
-          {/* ── Manager ── */}
-          <Route path="/manager" element={<ManagerLayout />}>
-            <Route index element={<Page title="Dashboard" />} />
-            <Route path="employees" element={<EmployeesList />} />
-            <Route path="employees/:id" element={<EmployeeProfile />} />
-            <Route path="tasks" element={<TasksBoard />} />
-            <Route path="leaves" element={<LeaveRequests />} />
-            <Route path="overtime" element={<OvertimeRequests />} />
-            <Route path="attendance" element={<AttendanceView />} />
-            <Route path="evaluation" element={<PeriodicEvaluation />} />
-            <Route path="recruitment" element={<Page title="Recruitment" />} />
-          </Route>
-          <Route path="*" element={<Navigate to="/manager" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </LanguageProvider>
+        {/* ── Manager ── */}
+        <Route path="/manager" element={<ManagerLayout />}>
+          <Route index element={<Page title="Dashboard" />} />
+          <Route path="employees" element={<EmployeesList />} />
+          <Route path="employees/:id" element={<EmployeeProfile />} />
+          <Route path="tasks" element={<TasksBoard />} />
+          <Route path="leaves" element={<LeaveRequests />} />
+          <Route path="overtime" element={<OvertimeRequests />} />
+          <Route path="attendance" element={<AttendanceView />} />
+          <Route path="evaluation" element={<PeriodicEvaluation />} />
+          <Route path="recruitment" element={<Page title="Recruitment" />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/manager" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
