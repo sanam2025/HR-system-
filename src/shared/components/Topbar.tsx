@@ -10,9 +10,9 @@ interface TopbarProps {
 export default function Topbar({
   title,
   onToggleSidebar,
-  user = { avatar: 'M', name: 'Mohamed Ahmed' },
+  user = { avatar: 'M', name: 'Mohamed Ahmed', role: '' },
 }: TopbarProps) {
-  const { lang, toggleLang, isRTL } = useLanguage();
+  const { lang, toggleLang } = useLanguage();
 
   return (
     <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-6 sticky top-0 z-[60]">
