@@ -6,6 +6,7 @@ import TasksBoard from './core/pages/Tasks/TasksBoard';
 import AttendanceView       from './core/pages/Attendance/AttendanceView';
 import LeaveRequests         from './core/pages/Leaves/LeaveRequests';
 import OvertimeRequests      from './core/pages/Leaves/OvertimeRequests';
+import PeriodicEvaluation from './core/pages/Evaluation/PeriodicEvaluation'
 
 // ── Placeholder ───
 function Page({ title }: { title: string }) {
@@ -31,7 +32,7 @@ function App() {
           <Route path="leaves" element={<LeaveRequests />} />
           <Route path="overtime" element={<OvertimeRequests />} />
           <Route path="attendance" element={<AttendanceView />} />
-          <Route path="evaluation" element={<Page title="Evaluation" />} />
+          <Route path="evaluation" element={<PeriodicEvaluation />} />
           <Route path="recruitment" element={<Page title="Recruitment" />} />
         </Route>
         <Route path="*" element={<Navigate to="/manager" replace />} />
