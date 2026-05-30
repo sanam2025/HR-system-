@@ -1,31 +1,35 @@
-// shared/components/StatCard.tsx
-import React from 'react';
+// core/modules/HR/components/StatCard.tsx
+import React from "react";
 
 interface StatCardProps {
   title: string;
-  value: number;
-  color: 'blue' | 'green' | 'yellow' | 'gray' | 'red' | 'purple';
+  value: string | number;
   icon: React.ReactNode;
+  color: "blue" | "green" | "orange" | "red" | "teal" | "purple";
+  onClick?: () => void;  // إضافة خاصية الضغط
 }
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, color, icon }) => {
-  const colorClasses = {
-    blue: 'border-blue-500 bg-blue-100 text-blue-600',
-    green: 'border-green-500 bg-green-100 text-green-600',
-    yellow: 'border-yellow-500 bg-yellow-100 text-yellow-600',
-    gray: 'border-gray-500 bg-gray-100 text-gray-600',
-    red: 'border-red-500 bg-red-100 text-red-600',
-    purple: 'border-purple-500 bg-purple-100 text-purple-600'
-  };
+const colorClasses = {
+  blue: "bg-blue-50 text-blue-600",
+  green: "bg-emerald-50 text-emerald-600",
+  orange: "bg-orange-50 text-orange-600",
+  purple: "bg-purple-50 text-purple-600",
+  red: "bg-red-50 text-red-600",
+  teal: "bg-teal-50 text-teal-600",
+};
 
+export const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color, onClick }) => {
   return (
-    <div className={`bg-white rounded-lg shadow-sm p-6 border-r-4 ${colorClasses[color].split(' ')[0]}`}>
+    <div 
+      onClick={onClick}
+      className={`bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all ${onClick ? 'cursor-pointer hover:scale-[1.02]' : ''}`}
+    >
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-600 mb-1">{title}</p>
-          <p className={`text-3xl font-bold text-${color}-600`}>{value}</p>
+          <p className="text-sm text-gray-500 mb-1">{title}</p>
+          <p className="text-2xl font-bold text-gray-900">{value}</p>
         </div>
-        <div className={`${colorClasses[color].split(' ')[1]} p-3 rounded-full`}>
+        <div className={`${colorClasses[color]} p-3 rounded-xl`}>
           {icon}
         </div>
       </div>

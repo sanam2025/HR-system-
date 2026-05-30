@@ -3,12 +3,12 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "../components/SideBar";
 import {
   LayoutDashboard, // للـ Dashboard
-  Briefcase, // للـ Job
   Users, // للـ Employee
   MessageSquareWarning, // للـ Complaints
   CalendarDays, // للـ Leaves
   DollarSign, // للـ Payroll
-  UserPlus, // للـ Recruitment
+  UserPlus,
+  Clock, // للـ Recruitment
 } from "lucide-react";
 import { useState } from "react";
 
@@ -16,17 +16,18 @@ export default function HRLayout() {
   const [open, setOpen] = useState(true);
   const hrSideBar = [
     { path: "/Hr", label: "Dashboard", icon: LayoutDashboard, exact: true },
-    { path: "Job", label: "Job", icon: Briefcase, exact: false },
     { path: "employees", label: "Employee", icon: Users, exact: false },
+    { path: "Recruitment", label: "Recruitment", icon: UserPlus, exact: false },
+    { path: "Attendance", label: "Attendance", icon: Clock, exact: false },
+    { path: "Leaves", label: "Leaves", icon: CalendarDays, exact: false },
+    { path: "Payroll", label: "Payroll", icon: DollarSign, exact: false },
+
     {
       path: "Complaints",
       label: "Complaints",
       icon: MessageSquareWarning,
       exact: false,
     },
-    { path: "Leaves", label: "Leaves", icon: CalendarDays, exact: false },
-    { path: "Payroll", label: "Payroll", icon: DollarSign, exact: false },
-    { path: "Recruitment", label: "Recruitment", icon: UserPlus, exact: false },
   ];
 
   return (
