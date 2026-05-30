@@ -2,19 +2,28 @@ import { useState } from 'react';
 import { mockEmployees } from '../../../../data/mockData';
 import EmployeeCard from './EmployeeCard';
 import { Search } from 'lucide-react';
+import { useLanguage } from '../../../../i18n/translations/LanguageContext';
 
 export default function EmployeesList() {
+  const { t } = useLanguage();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
 
   const filterOptions = [
-    { key: 'all', label: 'All' },
-    { key: 'Present', label: 'Present' },
-    { key: 'Absent', label: 'Absent' },
-    { key: 'Late', label: 'Late' },
+    { key: 'all', label: t.employees.filterAll },
+    { key: 'Present', label: t.employees.status.present },
+    { key: 'Absent', label: t.employees.status.absent },
+    { key: 'Late', label: t.employees.status.late },
   ];
 
-  const filtered = mockEmployees.filter(e => {
+  const arToEnEmpStatus: Record<string, string> = { 'حاضر': 'Present', 'غائب': 'Absent', 'تأخير': 'Late' };
+  
+  const normalizedEmployees = mockEmployees.map(e => ({
+    ...e,
+    todayStatus: arToEnEmpStatus[e.todayStatus] || e.todayStatus
+  }));
+
+  const filtered = normalizedEmployees.filter(e => {
     const matchSearch = e.name.toLowerCase().includes(query.toLowerCase())
      || e.title.toLowerCase().includes(query.toLowerCase());
     const matchFilter = filter === 'all' || e.todayStatus === filter;
@@ -26,8 +35,8 @@ export default function EmployeesList() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-extrabold text-dark">Employee List</h2>
-          <p className="text-sm text-brown mt-1">{mockEmployees.length} employees</p>
+          <h2 className="text-xl font-extrabold text-dark">{t.employees.listTitle}</h2>
+          <p className="text-sm text-brown mt-1">{mockEmployees.length} {t.employees.employeesCount}</p>
         </div>
       </div>
 
@@ -37,7 +46,7 @@ export default function EmployeesList() {
           <Search size={16} className="text-gray-400 flex-shrink-0" />
           <input
             type="text"
-            placeholder="Search for an employee..."
+            placeholder={t.employees.searchPlaceholder}
             value={query}
             onChange={e => setQuery(e.target.value)}
             className="flex-1 outline-none text-sm bg-transparent text-dark placeholder:text-gray-400"
@@ -64,8 +73,8 @@ export default function EmployeesList() {
       {filtered.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
           <div className="text-5xl mb-4 opacity-40">👤</div>
-          <p className="font-semibold text-gray-500 text-lg">No employees found</p>
-          <p className="text-sm mt-1">Try changing the search query or filter</p>
+          <p className="font-semibold text-gray-500 text-lg">{t.employees.noEmployees}</p>
+          <p className="text-sm mt-1">{t.employees.tryChanging}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">

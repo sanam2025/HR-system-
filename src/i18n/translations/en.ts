@@ -1,0 +1,327 @@
+const en = {
+  // ── Navigation ─
+  nav: {
+    dashboard: 'Dashboard',
+    employees: 'Employees',
+    tasks: 'Tasks',
+    leaves: 'Leave Requests',
+    overtime: 'Overtime',
+    attendance: 'Attendance',
+    evaluation: 'Periodic Review',
+    recruitment: 'Recruitment',
+    mainMenu: 'Main Menu',
+  },
+
+  // ── Common ──
+  common: {
+    viewAll: 'View All',
+    days: 'Days',
+    approve: 'Approve',
+    reject: 'Reject',
+  },
+
+  // ── Dashboard ──
+  dashboard: {
+    totalEmployees: 'Total Employees',
+    presentToday: 'Present Today',
+    avgPerformance: 'Avg Performance',
+    outOf: 'out of 5',
+    attendanceRate: 'Attendance Rate',
+    thisMonth: 'This Month',
+    pendingTasks: 'Pending Tasks',
+    completedThisMonth: 'Completed This Month',
+    performanceChart: 'Performance Over Time',
+    avgRating: 'Average Rating',
+    attendanceChart: 'Attendance Rate',
+    attendancePct: 'Attendance %',
+    pendingTasksList: 'Recent Pending Tasks',
+    pendingLeavesList: 'Pending Leave Requests',
+    noPendingLeaves: 'No pending leave requests',
+    pendingLeaves: 'Pending Leaves',
+    pendingOvertime: 'Pending Overtime',
+    completedTasks: 'Completed Tasks',
+    presentEmployees: 'Present Employees'
+  },
+
+  // ── Sidebar / Topbar ─
+  layout: {
+    systemName: 'HR System',
+    university: 'University of Damascus',
+    managerRole: 'Department Manager',
+    userName: 'Mohamed Ahmed',
+    userAvatar: 'M',
+  },
+
+  // ── Tasks ──
+  tasks: {
+    boardTitle: 'Tasks Board',
+    activeTasks: 'active tasks',
+    newTask: 'New Task',
+    columns: {
+      new: 'New',
+      inProgress: 'In Progress',
+      completed: 'Completed',
+      late: 'Late',
+    },
+    noTasks: 'No tasks found',
+    rateTask: 'Rate Task',
+    createModal: {
+      title: 'Create New Task',
+      taskTitle: 'Task Title',
+      taskTitlePlaceholder: 'Enter task title...',
+      assignee: 'Assignee',
+      selectEmployee: 'Select Employee...',
+      priority: 'Priority',
+      dueDate: 'Due Date',
+      description: 'Description',
+      descriptionPlaceholder: 'Detailed description of the task...',
+      cancel: 'Cancel',
+      createBtn: 'Create & Assign Task',
+      requiredError: 'Please fill in all required fields',
+      success: 'Task created successfully',
+    },
+    rateModal: {
+      title: 'Rate Task',
+      rating: 'Rating',
+      notes: 'Notes',
+      notesPlaceholder: 'Add feedback about performance...',
+      saveBtn: 'Save Rating',
+      cancel: 'Cancel',
+      error: 'Please select a rating for the task',
+      success: 'Task rated successfully',
+      ratings: {
+        poor: 'Poor',
+        fair: 'Fair',
+        good: 'Good',
+        veryGood: 'Very Good',
+        excellent: 'Excellent'
+      }
+    },
+    priorities: {
+      high: 'High',
+      medium: 'Medium',
+      low: 'Low'
+    }
+  },
+
+  // ── Employees ──
+  employees: {
+    listTitle: 'Employee List',
+    employeesCount: 'employees',
+    searchPlaceholder: 'Search for an employee...',
+    filterAll: 'All',
+    status: {
+      present: 'Present',
+      absent: 'Absent',
+      late: 'Late',
+      leave: 'Leave'
+    },
+    noEmployees: 'No employees found',
+    tryChanging: 'Try changing the search query or filter',
+    tasks: 'Tasks',
+    leaves: 'Leaves'
+  },
+
+  // ── Employee Profile ──
+  employeeProfile: {
+    notFound: 'Employee not found',
+    back: 'Back',
+    backToList: 'Back to List',
+    today: 'Today',
+    joinDate: 'Join Date:',
+    leaveBalance: 'Leave Balance',
+    days: 'Days',
+    totalTasks: 'Total Tasks',
+    avgRating: 'Avg Rating',
+    activeTasks: 'Active Tasks',
+    noTasks: 'No tasks assigned',
+    dueDate: 'Due Date:',
+    attendanceRecord: 'Attendance Record',
+    checkIn: 'Check-In:',
+    checkOut: '— Check-Out:',
+    delay: 'Delay',
+    mins: 'mins'
+  },
+
+  // ── Leaves ──
+  leaves: {
+    title: 'Leave Requests',
+    pendingReview: 'pending requests awaiting your review',
+    pendingAttention: 'pending requests need attention',
+    tabs: {
+      all: 'All',
+      pending: 'Pending',
+      approved: 'Approved',
+      rejected: 'Rejected'
+    },
+    types: {
+      annual: 'Annual',
+      sick: 'Sick',
+      emergency: 'Emergency',
+      unpaid: 'Unpaid'
+    },
+    noRequests: 'No leave requests found',
+    requestedOn: 'Requested on:',
+    days: 'days',
+    reason: 'Reason:',
+    remainingBalance: 'Remaining balance:',
+    insufficientBalance: '(Insufficient balance)',
+    approveBtn: 'Approve',
+    rejectBtn: 'Reject',
+    confirmModal: {
+      approveTitle: 'Confirm Approval',
+      rejectTitle: 'Confirm Rejection',
+      approveDesc: 'Are you sure you want to approve this leave request? This action cannot be undone.',
+      rejectDesc: 'Are you sure you want to reject this leave request? This action cannot be undone.',
+      confirm: 'Confirm',
+      cancel: 'Cancel'
+    },
+    toast: {
+      approved: 'Request approved successfully',
+      rejected: 'Request rejected successfully'
+    },
+    toasts: {
+      approved: 'Request approved successfully',
+      rejected: 'Request rejected successfully'
+    }
+  },
+
+  // ── Overtime ──
+  overtime: {
+    title: 'Overtime Requests',
+    subtitle: 'pending requests',
+    pendingRequests: 'pending requests',
+    pendingAlert: 'requests awaiting your action',
+    awaitingAction: 'requests awaiting your action',
+    tabs: {
+      all: 'All',
+      pending: 'Pending',
+      approved: 'Approved',
+      rejected: 'Rejected'
+    },
+    noRequests: 'No overtime requests',
+    requestedOn: 'Requested on',
+    hours: 'hours',
+    hoursLabel: 'hours',
+    date: 'Date',
+    dateLabel: 'Date',
+    reason: 'Reason',
+    reasonLabel: 'Reason',
+    approveBtn: 'Approve',
+    rejectBtn: 'Reject',
+    confirmModal: {
+      approveTitle: 'Confirm Approval',
+      rejectTitle: 'Confirm Rejection',
+      approveDesc: 'Are you sure you want to approve this overtime request? This action cannot be undone.',
+      rejectDesc: 'Are you sure you want to reject this overtime request? This action cannot be undone.',
+      confirm: 'Confirm',
+      cancel: 'Cancel'
+    },
+    toast: {
+      approved: 'Request approved successfully',
+      rejected: 'Request rejected successfully'
+    },
+    toasts: {
+      approved: 'Request approved successfully',
+      rejected: 'Request rejected successfully'
+    }
+  },
+
+  // ── Attendance ──
+  attendance: {
+    title: 'Attendance Overview',
+    subtitle: 'Track employee attendance records',
+    stats: {
+      present: 'Present Days',
+      absent: 'Absent Days',
+      late: 'Late Days'
+    },
+    searchPlaceholder: 'Search employees...',
+    recordsTitle: 'Attendance Records:',
+    columns: {
+      date: 'Date',
+      status: 'Status',
+      checkIn: 'Check In',
+      checkOut: 'Check Out',
+      delay: 'Delay (min)',
+      earlyLeave: 'Early Leave (min)'
+    },
+    noRecords: 'No attendance records found',
+    min: 'min'
+  },
+
+  // ── Evaluation ──
+  evaluation: {
+    title: 'Periodic Evaluation',
+    subtitle: 'Comprehensive evaluation of performance, attendance, and behavior',
+    errorIncomplete: 'Please fill in all fields and rate all criteria',
+    successMsg: 'Evaluation submitted successfully!',
+    criteria: {
+      performance: 'Performance Quality & Productivity',
+      attendance: 'Discipline & Attendance',
+      behavior: 'Professional Behavior & Interaction',
+      teamwork: 'Teamwork & Collaboration',
+      initiative: 'Initiative & Creativity'
+    },
+    successCard: {
+      title: 'Evaluation Submitted!',
+      thankYou: 'Thank you for evaluating',
+      avgRating: 'Overall Average Rating',
+      evaluateAnother: 'Evaluate Another Employee'
+    },
+    form: {
+      selectEmployee: 'Select Employee *',
+      selectPlaceholder: '-- Select an Employee --',
+      evalMonth: 'Evaluation Month *',
+      scaleHint: '1 = Poor  –  5 = Excellent',
+      avgRating: 'Overall Average Rating',
+      notes: 'Additional Notes',
+      notesPlaceholder: 'Add your detailed notes about the employee\'s performance...',
+      submit: 'Submit Evaluation to HR'
+    }
+  },
+
+  // ── Recruitment ──
+  recruitment: {
+    title: 'Recruitment & Candidates',
+    subtitle: 'Manage job vacancies and evaluate candidates',
+    tabVacancy: 'Job Vacancy Request',
+    tabCandidates: 'Candidate Evaluation',
+    vacancy: {
+      title: 'Request New Job Vacancy',
+      positionTitle: 'Position Title',
+      positionPlaceholder: 'e.g., Senior React Developer',
+      count: 'Number of Positions',
+      reason: 'Reason for Request',
+      reasonPlaceholder: 'Why is this position needed?',
+      requirements: 'Key Requirements',
+      requirementsPlaceholder: 'Required skills, experience...',
+      deadline: 'Target Hiring Date',
+      submitBtn: 'Submit Request to HR',
+      successTitle: 'Request Sent!',
+      successNote: 'Your request for',
+      successNote2: 'has been submitted to the HR department.',
+      sendAnother: 'Send Another Request',
+      toasts: {
+        fillAll: 'Please fill in the title and reason',
+        success: 'Vacancy request sent successfully'
+      }
+    },
+    candidates: {
+      title: 'Top Candidates Ranking',
+      sendRanking: 'Submit Final Ranking',
+      moveHint: 'Use the arrows to rank candidates based on your preference.',
+      experience: 'years exp.',
+      interviewScore: 'Interview',
+      cvScore: 'CV Score',
+      totalScore: 'Overall',
+      successTitle: 'Ranking Submitted!',
+      successNote: 'Thank you. The HR department will process the offers based on your ranking.',
+      toasts: {
+        success: 'Candidate ranking submitted successfully'
+      }
+    }
+  },
+};
+
+export default en;

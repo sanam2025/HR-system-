@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { mockEmployees } from '../../../data/mockData';
-import { Send, Star } from 'lucide-react';
+import { Send } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
+import { useLanguage } from '../../../i18n/translations/LanguageContext';
 
 interface RatingRowProps {
   label: string;
@@ -37,6 +38,7 @@ function RatingRow({ label, icon, value, onChange }: RatingRowProps) {
 }
 
 export default function PeriodicEvaluation() {
+  const { t } = useLanguage();
   const [selectedEmp, setSelectedEmp] = useState('');
   const [month, setMonth] = useState('');
   const [ratings, setRatings] = useState<Record<RatingKey, number>>({
@@ -57,21 +59,21 @@ export default function PeriodicEvaluation() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedEmp || !month || Object.values(ratings).some(v => v === 0)) {
-      toast.error('Please fill in all fields and rate all criteria');
+      toast.error(t.evaluation.errorIncomplete);
       return;
     }
     setSubmitted(true);
-    toast.success('Evaluation submitted successfully!', { duration: 4000 });
+    toast.success(t.evaluation.successMsg, { duration: 4000 });
   };
 
   const employee = mockEmployees.find(e => e.id === Number(selectedEmp));
 
   const criteriaKeys: Array<{ key: RatingKey; label: string; icon: string }> = [
-    { key: 'performance', label: 'Performance Quality & Productivity', icon: '📊' },
-    { key: 'attendance', label: 'Discipline & Attendance', icon: '🛡️' },
-    { key: 'behavior', label: 'Professional Behavior & Interaction', icon: '💚' },
-    { key: 'teamwork', label: 'Teamwork & Collaboration', icon: '🏠' },
-    { key: 'initiative', label: 'Initiative & Creativity', icon: '💡' },
+    { key: 'performance', label: t.evaluation.criteria.performance, icon: '📊' },
+    { key: 'attendance', label: t.evaluation.criteria.attendance, icon: '🛡️' },
+    { key: 'behavior', label: t.evaluation.criteria.behavior, icon: '💚' },
+    { key: 'teamwork', label: t.evaluation.criteria.teamwork, icon: '🏠' },
+    { key: 'initiative', label: t.evaluation.criteria.initiative, icon: '💡' },
   ];
 
   /* ── shared input style ── */
@@ -88,9 +90,9 @@ export default function PeriodicEvaluation() {
 
       {/* ── Header ── */}
       <div className="text-center">
-        <h2 className="text-2xl font-extrabold text-[#4A4E4A]">Periodic Evaluation</h2>
+        <h2 className="text-2xl font-extrabold text-[#4A4E4A]">{t.evaluation.title}</h2>
         <p className="text-sm text-[#6B6358] mt-1">
-          Comprehensive evaluation of performance, attendance, and behavior
+          {t.evaluation.subtitle}
         </p>
       </div>
 
@@ -98,12 +100,12 @@ export default function PeriodicEvaluation() {
         /* ── Success Card ── */
         <div className="bg-white rounded-2xl border border-[#4A7C59]/20 shadow-md p-10 text-center">
           <div className="text-6xl mb-4">✅</div>
-          <h3 className="text-xl font-bold text-[#4A7C59] mb-2">Evaluation Submitted!</h3>
+          <h3 className="text-xl font-bold text-[#4A7C59] mb-2">{t.evaluation.successCard.title}</h3>
           <p className="text-[#6B6358] text-sm mb-6">
-            Thank you for evaluating <strong>{employee?.name}</strong>
+            {t.evaluation.successCard.thankYou} <strong>{employee?.name}</strong>
           </p>
           <p className="text-3xl font-extrabold text-[#C4A66A] mb-1">{avgRating} ★</p>
-          <p className="text-xs text-gray-400 mb-6">Overall Average Rating</p>
+          <p className="text-xs text-gray-400 mb-6">{t.evaluation.successCard.avgRating}</p>
           <button
             onClick={() => {
               setSubmitted(false);
@@ -114,7 +116,7 @@ export default function PeriodicEvaluation() {
             }}
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#4A7C59] text-white text-sm font-semibold hover:bg-[#3a6347] transition-colors duration-150"
           >
-            Evaluate Another Employee
+            {t.evaluation.successCard.evaluateAnother}
           </button>
         </div>
       ) : (
@@ -126,13 +128,13 @@ export default function PeriodicEvaluation() {
           {/* Employee & Month */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={labelCls}>Select Employee *</label>
+              <label className={labelCls}>{t.evaluation.form.selectEmployee}</label>
               <select
                 className={inputCls}
                 value={selectedEmp}
                 onChange={e => setSelectedEmp(e.target.value)}
               >
-                <option value="">-- Select an Employee --</option>
+                <option value="">{t.evaluation.form.selectPlaceholder}</option>
                 {mockEmployees.map(emp => (
                   <option key={emp.id} value={emp.id}>
                     {emp.name}
@@ -141,7 +143,7 @@ export default function PeriodicEvaluation() {
               </select>
             </div>
             <div>
-              <label className={labelCls}>Evaluation Month *</label>
+              <label className={labelCls}>{t.evaluation.form.evalMonth}</label>
               <input
                 type="month"
                 className={inputCls}
@@ -153,7 +155,7 @@ export default function PeriodicEvaluation() {
 
           {/* Scale hint */}
           <p className="text-xs text-gray-400 text-center">
-            1 = Poor &nbsp;–&nbsp; 5 = Excellent
+            {t.evaluation.form.scaleHint}
           </p>
 
           {/* Rating Criteria */}
@@ -172,29 +174,28 @@ export default function PeriodicEvaluation() {
           {/* Average Badge */}
           {Number(avgRating) > 0 && (
             <div className="bg-[#C4A66A]/10 border border-[#C4A66A]/25 rounded-xl p-4 text-center">
-              <p className="text-xs text-[#6B6358] font-semibold mb-1">Overall Average Rating</p>
+              <p className="text-xs text-[#6B6358] font-semibold mb-1">{t.evaluation.form.avgRating}</p>
               <p className="text-3xl font-extrabold text-[#C4A66A]">{avgRating} ★</p>
             </div>
           )}
 
           {/* Additional Notes */}
           <div>
-            <label className={labelCls}>Additional Notes</label>
+            <label className={labelCls}>{t.evaluation.form.notes}</label>
             <textarea
               className={`${inputCls} resize-none h-28`}
-              placeholder="Add your detailed notes about the employee's performance..."
+              placeholder={t.evaluation.form.notesPlaceholder}
               value={notes}
               onChange={e => setNotes(e.target.value)}
             />
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
             className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#4A7C59] text-white text-sm font-semibold hover:bg-[#3a6347] active:scale-[0.99] transition-all duration-150 shadow-sm"
           >
             <Send size={15} />
-            Submit Evaluation to HR
+            {t.evaluation.form.submit}
           </button>
         </form>
       )}

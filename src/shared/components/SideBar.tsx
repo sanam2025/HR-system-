@@ -3,7 +3,7 @@ import { ChevronRight, ChevronLeft } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useLanguage } from '../../i18n/translations/LanguageContext';
 
-// ── Types ──────────────────────────────────────────────────────────────────
+// ── Types ──
 export interface NavItem {
   label: string;
   icon: LucideIcon;
@@ -20,22 +20,20 @@ export interface SidebarProps {
   navSectionLabel?: string;
 }
 
-// ── Component ──────────────────────────────────────────────────────────────
+// ── Component ──
 export default function Sidebar({
   open,
   onToggle,
   navItems,
-  brand = { logo: '🏢', title: 'HR System', subtitle: 'Damascus University' },
-  user = { avatar: 'U', name: 'User', role: '' },
-  navSectionLabel = 'Main Menu',
+  brand = { logo: '🏢', title: 'HR System', subtitle: 'جامعة دمشق' },
+  user  = { avatar: 'م', name: 'مستخدم', role: '' },
+  navSectionLabel = 'القائمة الرئيسية',
 }: SidebarProps) {
-  const { lang, toggleLang, t, isRTL } = useLanguage();
-
-  // Dynamic Translations
-  const displayTitle = brand.title === 'HR System' ? (t.layout?.systemName || brand.title) : brand.title;
-  const displaySubtitle = (brand.subtitle === 'Damascus University' || brand.subtitle === 'University of Damascus') ? (t.layout?.university || brand.subtitle) : brand.subtitle;
-  const displayRole = user.role === 'Department Manager' ? (t.layout?.managerRole || user.role) : user.role;
-  const translatedSectionLabel = navSectionLabel === 'Main Menu' ? (t.nav?.mainMenu || navSectionLabel) : navSectionLabel;
+  const { isRTL } = useLanguage();
+  
+  const ToggleIcon = open 
+    ? (isRTL ? ChevronRight : ChevronLeft) 
+    : (isRTL ? ChevronLeft : ChevronRight);
 
   return (
     <>
@@ -57,8 +55,8 @@ export default function Sidebar({
           </div>
           {open && (
             <div>
-              <p className="text-white font-bold text-sm leading-tight">{displayTitle}</p>
-              <p className="text-white/40 text-[10px]">{displaySubtitle}</p>
+              <p className="text-white font-bold text-sm leading-tight">{brand.title}</p>
+              <p className="text-white/40 text-[10px]">{brand.subtitle}</p>
             </div>
           )}
         </div>
@@ -71,7 +69,7 @@ export default function Sidebar({
           {open && (
             <div className="overflow-hidden">
               <p className="text-white text-xs font-semibold truncate">{user.name}</p>
-              <p className="text-gold text-[10px]">{displayRole}</p>
+              <p className="text-gold text-[10px]">{user.role}</p>
             </div>
           )}
         </div>
@@ -80,14 +78,11 @@ export default function Sidebar({
         <nav className="flex-1 py-3 overflow-y-auto scrollbar-hide">
           {open && (
             <p className="px-5 py-2 text-white/30 text-[10px] font-bold uppercase tracking-widest">
-              {translatedSectionLabel}
+              {navSectionLabel}
             </p>
           )}
           {navItems.map((item) => {
             const Icon = item.icon;
-            const translationKey = item.label.toLowerCase() as keyof typeof t.nav;
-            const translatedLabel = t.nav?.[translationKey] || item.label;
-
             return (
               <NavLink
                 key={item.path}
@@ -96,13 +91,13 @@ export default function Sidebar({
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-5 py-2.5 text-sm cursor-pointer transition-all duration-200
                   ${isActive
-                    ? 'bg-green/25 text-white border-s-[3px] border-green'
+                    ? 'bg-green/25 text-white border-r-[3px] border-green'
                     : 'text-white/65 hover:bg-white/5 hover:text-white'
                   }`
                 }
               >
                 <Icon size={18} className="flex-shrink-0" />
-                {open && <span className="flex-1 truncate">{translatedLabel}</span>}
+                {open && <span className="flex-1 truncate">{item.label}</span>}
               </NavLink>
             );
           })}
@@ -113,7 +108,7 @@ export default function Sidebar({
           onClick={onToggle}
           className="flex items-center justify-center py-4 text-white/40 hover:text-white transition-colors border-t border-white/10"
         >
-          {open ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+          <ToggleIcon size={20} />
         </button>
       </aside>
     </>

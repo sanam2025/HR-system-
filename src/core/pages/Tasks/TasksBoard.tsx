@@ -2,26 +2,20 @@ import { useState } from 'react';
 import { mockTasks, mockEmployees } from '../../../data/mockData';
 import { Plus, X } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
+import { useLanguage } from '../../../i18n/translations/LanguageContext';
 
-// ── Types ──────────────────────────────────────────────────────────────────
+// ── Types ────
 type Task = typeof mockTasks[number] & { rating: number | null };
 
 const STATUSES = ['New', 'In Progress', 'Completed', 'Late'];
 
-const colConfig: Record<string, { label: string; topColor: string; badge: string; dot: string }> = {
-  'New':         { label: 'New',         topColor: '#3b82f6', badge: '#eff6ff', dot: '#3b82f6' },
-  'In Progress': { label: 'In Progress', topColor: '#f59e0b', badge: '#fffbeb', dot: '#f59e0b' },
-  'Completed':   { label: 'Completed',   topColor: '#22c55e', badge: '#f0fdf4', dot: '#22c55e' },
-  'Late':        { label: 'Late',        topColor: '#ef4444', badge: '#fef2f2', dot: '#ef4444' },
-};
-
 const priorityDot: Record<string, string> = {
-  'High':   '#ef4444',
+  'High': '#ef4444',
   'Medium': '#f59e0b',
-  'Low':    '#22c55e',
+  'Low': '#22c55e',
 };
 
-// ── Star Rating ─────────────────────────────────────────────────────────────
+// ── Star Rating ──
 function StarRating({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   const [hover, setHover] = useState(0);
   return (
@@ -30,8 +24,10 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
         <button key={n} type="button"
           onMouseEnter={() => setHover(n)} onMouseLeave={() => setHover(0)}
           onClick={() => onChange(n)}
-          style={{ fontSize: 26, background: 'none', border: 'none', cursor: 'pointer',
-            color: n <= (hover || value) ? '#d97706' : '#d1d5db', transition: 'color .15s' }}>
+          style={{
+            fontSize: 26, background: 'none', border: 'none', cursor: 'pointer',
+            color: n <= (hover || value) ? '#d97706' : '#d1d5db', transition: 'color .15s'
+          }}>
           ★
         </button>
       ))}
@@ -39,21 +35,36 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
   );
 }
 
-// ── Component ──────────────────────────────────────────────────────────────
+// ── Component ────
+const arToEnStatus: Record<string, string> = { 'جديدة': 'New', 'قيد التنفيذ': 'In Progress', 'مكتملة': 'Completed', 'متأخرة': 'Late' };
+const arToEnPriority: Record<string, string> = { 'عالية': 'High', 'متوسطة': 'Medium', 'منخفضة': 'Low' };
+
 export default function TasksBoard() {
-  const [tasks, setTasks] = useState<Task[]>(mockTasks);
+  const { t } = useLanguage();
+  const [tasks, setTasks] = useState<Task[]>(() => mockTasks.map(task => ({
+    ...task,
+    status: arToEnStatus[task.status] || task.status,
+    priority: arToEnPriority[task.priority] || task.priority
+  })));
   const [showCreate, setShowCreate] = useState(false);
   const [showEval, setShowEval] = useState<Task | null>(null);
   const [evalRating, setEvalRating] = useState(0);
   const [evalNote, setEvalNote] = useState('');
   const [form, setForm] = useState({ title: '', assigneeId: '', priority: 'Medium', dueDate: '', description: '' });
 
-  const ratingLabels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+  const ratingLabels = ['', t.tasks.rateModal.ratings.poor, t.tasks.rateModal.ratings.fair, t.tasks.rateModal.ratings.good, t.tasks.rateModal.ratings.veryGood, t.tasks.rateModal.ratings.excellent];
+
+  const colConfig: Record<string, { label: string; topColor: string; badge: string; dot: string }> = {
+    'New': { label: t.tasks.columns.new, topColor: '#3b82f6', badge: '#eff6ff', dot: '#3b82f6' },
+    'In Progress': { label: t.tasks.columns.inProgress, topColor: '#f59e0b', badge: '#fffbeb', dot: '#f59e0b' },
+    'Completed': { label: t.tasks.columns.completed, topColor: '#22c55e', badge: '#f0fdf4', dot: '#22c55e' },
+    'Late': { label: t.tasks.columns.late, topColor: '#ef4444', badge: '#fef2f2', dot: '#ef4444' },
+  };
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.assigneeId || !form.dueDate) {
-      toast.error('Please fill in all required fields');
+      toast.error(t.tasks.createModal.requiredError);
       return;
     }
     const assignee = mockEmployees.find(emp => emp.id === Number(form.assigneeId));
@@ -66,26 +77,26 @@ export default function TasksBoard() {
     }, ...prev]);
     setShowCreate(false);
     setForm({ title: '', assigneeId: '', priority: 'Medium', dueDate: '', description: '' });
-    toast.success('Task created successfully');
+    toast.success(t.tasks.createModal.success);
   };
 
   const handleEvaluate = () => {
     if (!showEval) return;
-    if (!evalRating) { toast.error('Please select a rating for the task'); return; }
+    if (!evalRating) { toast.error(t.tasks.rateModal.error); return; }
     setTasks(prev => prev.map(t => t.id === showEval.id ? { ...t, rating: evalRating, status: 'Completed' } : t));
-    toast.success('Task rated successfully');
+    toast.success(t.tasks.rateModal.success);
     setShowEval(null); setEvalRating(0); setEvalNote('');
   };
 
   return (
-    <div dir="ltr" style={{ fontFamily: 'inherit' }}>
+    <div style={{ fontFamily: 'inherit' }}>
       <Toaster position="top-center" />
 
       {/* ── Header ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1a2332', margin: 0 }}>Tasks Board</h2>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>{tasks.length} active tasks</p>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1a2332', margin: 0 }}>{t.tasks.boardTitle}</h2>
+          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>{tasks.length} {t.tasks.activeTasks}</p>
         </div>
 
         {/* Create Task Button */}
@@ -103,7 +114,7 @@ export default function TasksBoard() {
           onMouseLeave={e => (e.currentTarget.style.background = '#4A7C59')}
         >
           <Plus size={16} strokeWidth={2.5} />
-          New Task
+          {t.tasks.newTask}
         </button>
       </div>
 
@@ -135,7 +146,7 @@ export default function TasksBoard() {
 
               {/* Task Cards */}
               {colTasks.length === 0 && (
-                <p style={{ textAlign: 'center', color: '#d1d5db', fontSize: 13, padding: '20px 0' }}>No tasks found</p>
+                <p style={{ textAlign: 'center', color: '#d1d5db', fontSize: 13, padding: '20px 0' }}>{t.tasks.noTasks}</p>
               )}
 
               {colTasks.map(task => (
@@ -196,7 +207,7 @@ export default function TasksBoard() {
                         border: '1px solid #fde68a', borderRadius: 8, padding: '6px 0',
                         cursor: 'pointer', transition: 'background .2s',
                       }}>
-                      Rate Task
+                      {t.tasks.rateTask}
                     </button>
                   )}
                 </div>
@@ -206,7 +217,7 @@ export default function TasksBoard() {
         })}
       </div>
 
-      {/* ── Create Task Modal ══════════════════════════════════════════════ */}
+      {/* ── Create Task Modal ═══ */}
       {showCreate && (
         <div style={{
           position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)',
@@ -225,7 +236,7 @@ export default function TasksBoard() {
               padding: '18px 24px 0',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: '#1a2332' }}>Create New Task</h3>
+                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: '#1a2332' }}>{t.tasks.createModal.title}</h3>
                 <Plus size={20} style={{ color: '#1a2332' }} strokeWidth={2.8} />
               </div>
               <button onClick={() => setShowCreate(false)} style={{
@@ -240,10 +251,10 @@ export default function TasksBoard() {
             <form onSubmit={handleCreate} style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
               {/* Task Title */}
               <div>
-                <label style={labelStyle}>Task Title <span style={{ color: '#ef4444' }}>*</span></label>
+                <label style={labelStyle}>{t.tasks.createModal.taskTitle} <span style={{ color: '#ef4444' }}>*</span></label>
                 <input
                   style={inputStyle}
-                  placeholder="Enter task title..."
+                  placeholder={t.tasks.createModal.taskTitlePlaceholder}
                   value={form.title}
                   onChange={e => setForm({ ...form, title: e.target.value })}
                 />
@@ -252,34 +263,36 @@ export default function TasksBoard() {
               {/* Assignee + Priority */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
-                  <label style={labelStyle}>Assignee <span style={{ color: '#ef4444' }}>*</span></label>
+                  <label style={labelStyle}>{t.tasks.createModal.assignee} <span style={{ color: '#ef4444' }}>*</span></label>
                   <select style={inputStyle} value={form.assigneeId}
                     onChange={e => setForm({ ...form, assigneeId: e.target.value })}>
-                    <option value="">Select Employee...</option>
+                    <option value="">{t.tasks.createModal.selectEmployee}</option>
                     {mockEmployees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={labelStyle}>Priority</label>
+                  <label style={labelStyle}>{t.tasks.createModal.priority}</label>
                   <select style={inputStyle} value={form.priority}
                     onChange={e => setForm({ ...form, priority: e.target.value })}>
-                    {['High', 'Medium', 'Low'].map(p => <option key={p} value={p}>{p}</option>)}
+                    <option value="High">{t.tasks.priorities.high}</option>
+                    <option value="Medium">{t.tasks.priorities.medium}</option>
+                    <option value="Low">{t.tasks.priorities.low}</option>
                   </select>
                 </div>
               </div>
 
               {/* Due Date */}
               <div>
-                <label style={labelStyle}>Due Date <span style={{ color: '#ef4444' }}>*</span></label>
+                <label style={labelStyle}>{t.tasks.createModal.dueDate} <span style={{ color: '#ef4444' }}>*</span></label>
                 <input type="date" style={inputStyle} value={form.dueDate}
                   onChange={e => setForm({ ...form, dueDate: e.target.value })} />
               </div>
 
               {/* Description */}
               <div>
-                <label style={labelStyle}>Description</label>
+                <label style={labelStyle}>{t.tasks.createModal.description}</label>
                 <textarea style={{ ...inputStyle, resize: 'none', height: 90 }}
-                  placeholder="Detailed description of the task..."
+                  placeholder={t.tasks.createModal.descriptionPlaceholder}
                   value={form.description}
                   onChange={e => setForm({ ...form, description: e.target.value })} />
               </div>
@@ -292,7 +305,7 @@ export default function TasksBoard() {
                   fontSize: 14, fontWeight: 600, cursor: 'pointer',
                   fontFamily: 'inherit',
                 }}>
-                  Cancel
+                  {t.tasks.createModal.cancel}
                 </button>
                 <button type="submit" style={{
                   flex: 1, background: '#4A7C59', color: '#fff',
@@ -303,7 +316,7 @@ export default function TasksBoard() {
                 }}
                   onMouseEnter={e => (e.currentTarget.style.background = '#3a6347')}
                   onMouseLeave={e => (e.currentTarget.style.background = '#4A7C59')}>
-                  Create & Assign Task
+                  {t.tasks.createModal.createBtn}
                 </button>
               </div>
             </form>
@@ -327,7 +340,7 @@ export default function TasksBoard() {
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '18px 24px 0',
             }}>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#1a2332' }}>Rate Task</h3>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#1a2332' }}>{t.tasks.rateModal.title}</h3>
               <button onClick={() => setShowEval(null)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
                 <X size={20} style={{ color: '#3b82f6' }} />
               </button>
@@ -340,14 +353,14 @@ export default function TasksBoard() {
                 <p style={{ margin: '4px 0 0', fontSize: 13, color: '#6b7280' }}>{showEval.assigneeName}</p>
               </div>
               <div>
-                <label style={labelStyle}>Rating</label>
+                <label style={labelStyle}>{t.tasks.rateModal.rating}</label>
                 <StarRating value={evalRating} onChange={setEvalRating} />
                 {evalRating > 0 && <p style={{ margin: '4px 0 0', fontSize: 12, color: '#d97706' }}>{ratingLabels[evalRating]}</p>}
               </div>
               <div>
-                <label style={labelStyle}>Notes</label>
+                <label style={labelStyle}>{t.tasks.rateModal.notes}</label>
                 <textarea style={{ ...inputStyle, resize: 'none', height: 80 }}
-                  placeholder="Add feedback about performance..."
+                  placeholder={t.tasks.rateModal.notesPlaceholder}
                   value={evalNote} onChange={e => setEvalNote(e.target.value)} />
               </div>
               <div style={{ display: 'flex', gap: 12 }}>
@@ -356,14 +369,14 @@ export default function TasksBoard() {
                   border: 'none', borderRadius: 10, padding: '12px 0',
                   fontSize: 14, fontWeight: 700, cursor: 'pointer',
                 }}>
-                  Save Rating
+                  {t.tasks.rateModal.saveBtn}
                 </button>
                 <button onClick={() => setShowEval(null)} style={{
                   padding: '12px 22px', background: '#fff', color: '#374151',
                   border: '1.5px solid #d1d5db', borderRadius: 10,
                   fontSize: 14, fontWeight: 600, cursor: 'pointer',
                 }}>
-                  Cancel
+                  {t.tasks.rateModal.cancel}
                 </button>
               </div>
             </div>
@@ -385,5 +398,5 @@ const inputStyle: React.CSSProperties = {
   border: '1.5px solid #d1d5db', borderRadius: 10,
   background: '#fff', color: '#1a2332',
   outline: 'none', boxSizing: 'border-box',
-  fontFamily: 'inherit', direction: 'ltr',
+  fontFamily: 'inherit',
 };
