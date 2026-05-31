@@ -3,9 +3,12 @@ import { mockCandidates } from '../../../data/mockData';
 import { Send, ClipboardList, Trophy } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
+import en from '../../../i18n/translations/en';
+
+type RecruitmentTranslation = typeof en.recruitment;
 
 // ── Job Vacancy Request ───────
-function JobVacancyRequest({ r }: { r: any }) {
+function JobVacancyRequest({ r }: { r: RecruitmentTranslation }) {
   const v = r.vacancy;
 
   const [form, setForm] = useState({ title: '', count: 1, reason: '', requirements: '', deadline: '' });
@@ -64,7 +67,7 @@ function JobVacancyRequest({ r }: { r: any }) {
 }
 
 // ── Candidate Evaluation ───
-function CandidateEvaluation({ r }: { r: any }) {
+function CandidateEvaluation({ r }: { r: RecruitmentTranslation }) {
   const cd = r.candidates;
 
   const [candidates, setCandidates] = useState(mockCandidates.map((c, i) => ({ ...c, rank: i + 1 })));
