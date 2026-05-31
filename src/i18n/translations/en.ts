@@ -55,7 +55,7 @@ const en = {
   // ── Tasks ──
   tasks: {
     boardTitle: 'Tasks Board',
-    activeTasks: 'active tasks',
+    activeTasks: 'total tasks',
     newTask: 'New Task',
     columns: {
       new: 'New',

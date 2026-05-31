@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import type { NavItem } from '../components/SideBar';
 import Sidebar from '../components/SideBar';
 import Topbar from '../components/Topbar';
+import { useLanguage } from '../../i18n/translations/LanguageContext';
 
 // ── Types ───
 interface AppLayoutProps {
@@ -24,6 +25,7 @@ export default function AppLayout({
   defaultTitle = 'لوحة التحكم',
 }: AppLayoutProps) {
   const location = useLocation();
+  const { isRTL, dir } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const basePath = '/' + location.pathname.split('/').slice(1, 3).join('/');
@@ -32,8 +34,10 @@ export default function AppLayout({
     pageTitles[basePath] ||
     defaultTitle;
 
+  const sidebarSize = sidebarOpen ? 256 : 64;
+
   return (
-    <div className="flex min-h-screen bg-surface" dir="rtl">
+    <div className="flex min-h-screen bg-surface" dir={dir}>
       <Sidebar
         open={sidebarOpen}
         onToggle={() => setSidebarOpen(v => !v)}
@@ -44,7 +48,10 @@ export default function AppLayout({
       />
       <div
         className="flex flex-col flex-1 min-h-screen transition-all duration-300"
-        style={{ marginRight: sidebarOpen ? 256 : 64 }}
+        style={isRTL
+          ? { marginRight: sidebarSize }
+          : { marginLeft: sidebarSize }
+        }
       >
         <Topbar
           title={title}

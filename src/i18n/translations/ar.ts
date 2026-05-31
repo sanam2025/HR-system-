@@ -56,7 +56,7 @@ const ar = {
   // ── Tasks ──
   tasks: {
     boardTitle: 'لوحة المهام',
-    activeTasks: 'مهام نشطة',
+    activeTasks: 'مهمة إجمالية',
     newTask: 'مهمة جديدة',
     columns: {
       new: 'جديدة',
