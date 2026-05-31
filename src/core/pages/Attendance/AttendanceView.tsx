@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { mockEmployees, mockAttendance } from '../../../data/mockData';
 import { Search } from 'lucide-react';
-import { useLanguage } from '../../../i18n/translations/LanguageContext';
 
 const statusColors = {
   'Present': 'bg-green-50 text-green-700',
@@ -10,7 +9,6 @@ const statusColors = {
 };
 
 export default function AttendanceView() {
-  const { t } = useLanguage();
   const [selectedEmp, setSelectedEmp] = useState(mockEmployees[0].id);
   const [query, setQuery] = useState('');
 
@@ -24,16 +22,16 @@ export default function AttendanceView() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-extrabold text-dark">{t.attendance.title}</h2>
-        <p className="text-sm text-brown mt-1">{t.attendance.subtitle}</p>
+        <h2 className="text-xl font-extrabold text-dark">Attendance Overview</h2>
+        <p className="text-sm text-brown mt-1">Track employee attendance records</p>
       </div>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { label: t.attendance.stats.present, value: present, icon: '✅', bg: 'bg-green-50 text-green-700' },
-          { label: t.attendance.stats.absent, value: absent, icon: '❌', bg: 'bg-red-50 text-red-600' },
-          { label: t.attendance.stats.late, value: late, icon: '⚠️', bg: 'bg-yellow-50 text-yellow-700' },
+          { label: 'Present Days', value: present, icon: '✅', bg: 'bg-green-50 text-green-700' },
+          { label: 'Absent Days', value: absent, icon: '❌', bg: 'bg-red-50 text-red-600' },
+          { label: 'Late Days', value: late, icon: '⚠️', bg: 'bg-yellow-50 text-yellow-700' },
         ].map(s => (
           <div key={s.label} className={`rounded-2xl p-5 ${s.bg} flex items-center gap-4`}>
             <span className="text-3xl">{s.icon}</span>
@@ -52,7 +50,7 @@ export default function AttendanceView() {
             <Search size={14} className="text-gray-400" />
             <input
               type="text"
-              placeholder={t.attendance.searchPlaceholder}
+              placeholder="Search employees..."
               value={query}
               onChange={e => setQuery(e.target.value)}
               className="flex-1 outline-none text-sm bg-transparent"
@@ -86,15 +84,15 @@ export default function AttendanceView() {
         <div className="md:col-span-3 bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100">
             <h3 className="font-bold text-dark">
-              {t.attendance.recordsTitle} <span className="text-green">{employee?.name}</span>
+              Attendance Records: <span className="text-green">{employee?.name}</span>
             </h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50 text-xs font-bold text-brown uppercase tracking-wide">
-                  {[t.attendance.columns.date, t.attendance.columns.status, t.attendance.columns.checkIn, t.attendance.columns.checkOut, t.attendance.columns.delay, t.attendance.columns.earlyLeave].map((h, i) => (
-                    <th key={i} className="px-5 py-3 text-left rtl:text-right">{h}</th>
+                  {['Date', 'Status', 'Check In', 'Check Out', 'Delay (min)', 'Early Leave (min)'].map(h => (
+                    <th key={h} className="px-5 py-3 text-left">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -102,7 +100,7 @@ export default function AttendanceView() {
                 {mockAttendance.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="text-center py-12 text-gray-400">
-                      {t.attendance.noRecords}
+                      No attendance records found
                     </td>
                   </tr>
                 ) : (
@@ -111,21 +109,21 @@ export default function AttendanceView() {
                       <td className="px-5 py-3.5 text-sm text-brown">{rec.date}</td>
                       <td className="px-5 py-3.5">
                         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusColors[rec.status as keyof typeof statusColors] || ''}`}>
-                          {t.employees.status[rec.status.toLowerCase() as keyof typeof t.employees.status] || rec.status}
+                          {rec.status}
                         </span>
                       </td>
                       <td className="px-5 py-3.5 text-sm text-dark">{rec.checkIn || '—'}</td>
                       <td className="px-5 py-3.5 text-sm text-dark">{rec.checkOut || '—'}</td>
                       <td className="px-5 py-3.5 text-sm">
                         {rec.delay > 0 ? (
-                          <span className="text-red-500 font-semibold">{rec.delay} {t.attendance.min}</span>
+                          <span className="text-red-500 font-semibold">{rec.delay} min</span>
                         ) : (
                           <span className="text-gray-300">—</span>
                         )}
                       </td>
                       <td className="px-5 py-3.5 text-sm">
                         {rec.earlyLeave > 0 ? (
-                          <span className="text-orange-500 font-semibold">{rec.earlyLeave} {t.attendance.min}</span>
+                          <span className="text-orange-500 font-semibold">{rec.earlyLeave} min</span>
                         ) : (
                           <span className="text-gray-300">—</span>
                         )}

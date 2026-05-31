@@ -3,9 +3,8 @@ import { Outlet, useLocation } from 'react-router-dom';
 import type { NavItem } from '../components/SideBar';
 import Sidebar from '../components/SideBar';
 import Topbar from '../components/Topbar';
-import { useLanguage } from '../../i18n/translations/LanguageContext';
 
-// ── Types ──────────────────────────────────────────────────────────────────
+// ── Types ───
 interface AppLayoutProps {
   navItems: NavItem[];
   pageTitles: Record<string, string>;
@@ -15,18 +14,17 @@ interface AppLayoutProps {
   defaultTitle?: string;
 }
 
-// ── Component ──────────────────────────────────────────────────────────────
+// ── Component ──
 export default function AppLayout({
   navItems,
   pageTitles,
   brand,
   user,
   navSectionLabel,
-  defaultTitle = 'Dashboard',
+  defaultTitle = 'لوحة التحكم',
 }: AppLayoutProps) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { dir, isRTL } = useLanguage();
 
   const basePath = '/' + location.pathname.split('/').slice(1, 3).join('/');
   const title =
@@ -35,7 +33,7 @@ export default function AppLayout({
     defaultTitle;
 
   return (
-    <div className="flex min-h-screen bg-surface" dir={dir}>
+    <div className="flex min-h-screen bg-surface" dir="rtl">
       <Sidebar
         open={sidebarOpen}
         onToggle={() => setSidebarOpen(v => !v)}
@@ -46,15 +44,11 @@ export default function AppLayout({
       />
       <div
         className="flex flex-col flex-1 min-h-screen transition-all duration-300"
-        style={{
-          marginLeft: !isRTL ? (sidebarOpen ? 256 : 64) : 0,
-          marginRight: isRTL ? (sidebarOpen ? 256 : 64) : 0,
-        }}
+        style={{ marginRight: sidebarOpen ? 256 : 64 }}
       >
         <Topbar
           title={title}
           onToggleSidebar={() => setSidebarOpen(v => !v)}
-          user={user}
         />
         <main className="flex-1 p-6 overflow-y-auto">
           <Outlet />
