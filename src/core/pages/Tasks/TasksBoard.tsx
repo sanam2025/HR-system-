@@ -47,7 +47,7 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
 
 // ── Component ──
 export default function TasksBoard() {
-  const { t, dir, isRTL } = useLanguage();
+  const { t, dir } = useLanguage();
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [showCreate, setShowCreate] = useState(false);
   const [showEval, setShowEval] = useState<Task | null>(null);
