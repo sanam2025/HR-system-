@@ -51,9 +51,6 @@ export default function Dashboard() {
     month: lang === 'en' ? (chartMonths[row.month] || row.month) : row.month,
   }));
 
-
-  console.log('Chart Data:', chartData);
-
   return (
     <div className="space-y-6">
       {/* ── Stat Cards ── */}
@@ -66,39 +63,35 @@ export default function Dashboard() {
 
       {/* ── Charts ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-card" style={{ minWidth: 0 }}>
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-card">
           <h2 className="font-bold text-dark text-base mb-5">{d.performanceChart}</h2>
-          <div className="h-[300px]" dir="ltr">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorRating" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4A7C59" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#4A7C59" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} domain={[0, 5]} />
-                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Area type="monotone" dataKey="avgRating" name={d.avgRating} stroke="#4A7C59" strokeWidth={3} fillOpacity={1} fill="url(#colorRating)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+          <ResponsiveContainer width="100%" height={220}>
+            <AreaChart data={chartData}>
+              <defs>
+                <linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%"  stopColor="#4A7C59" stopOpacity={0.15} />
+                  <stop offset="95%" stopColor="#4A7C59" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+              <YAxis domain={[3, 5]} tick={{ fontSize: 12 }} />
+              <Tooltip />
+              <Area type="monotone" dataKey="avgRating" name={d.avgRating} stroke="#4A7C59" fill="url(#gGreen)" strokeWidth={2} dot={{ r: 4, fill: '#4A7C59' }} />
+            </AreaChart>
+          </ResponsiveContainer>
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-card" style={{ minWidth: 0 }}>
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-card">
           <h2 className="font-bold text-dark text-base mb-5">{d.attendanceChart}</h2>
-          <div className="h-[300px]" dir="ltr">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} domain={[0, 100]} />
-                <Tooltip cursor={{ fill: '#f3f4f6' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Bar dataKey="attendance" name={d.attendancePct} fill="#C4A66A" radius={[4, 4, 0, 0]} maxBarSize={40} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+              <YAxis domain={[70, 100]} tick={{ fontSize: 12 }} />
+              <Tooltip />
+              <Bar dataKey="attendance" name={d.attendancePct} fill="#C4A66A" radius={[6, 6, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
