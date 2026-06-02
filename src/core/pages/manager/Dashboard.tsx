@@ -69,7 +69,7 @@ export default function Dashboard() {
             <AreaChart data={chartData}>
               <defs>
                 <linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#4A7C59" stopOpacity={0.15} />
+                  <stop offset="5%" stopColor="#4A7C59" stopOpacity={0.15} />
                   <stop offset="95%" stopColor="#4A7C59" stopOpacity={0} />
                 </linearGradient>
               </defs>
