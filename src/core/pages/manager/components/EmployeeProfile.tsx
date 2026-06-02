@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { mockEmployees, mockTasks, mockAttendance, mockPerformanceChart } from '@/data/mockData';
+import { mockEmployees, mockTasks, mockAttendance, mockPerformanceChart } from '../../../../data/mockData';
 import { ArrowRight, ArrowLeft, Phone, Mail, Calendar, Star, CheckSquare, Clock } from 'lucide-react';
-import { useLanguage } from '@/i18n/LanguageContext';
+import { useLanguage } from '../../../../i18n/translations/LanguageContext';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const taskStatusColors: Record<string, string> = {

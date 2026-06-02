@@ -1,9 +1,9 @@
-import { mockDashboardStats, mockTasks, mockLeaveRequests, mockPerformanceChart } from '@/data/mockData';
-import { Users, CheckSquare, Calendar, TrendingUp } from 'lucide-react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { mockDashboardStats, mockTasks, mockLeaveRequests, mockPerformanceChart } from '../../../data/mockData';
+import { Users, CheckSquare, Calendar, TrendingUp, ArrowLeft, ArrowRight } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useNavigate } from 'react-router-dom';
-import { useLanguage } from '@/i18n/LanguageContext';
+import { useLanguage } from '../../../i18n/translations/LanguageContext';
+import type { LucideIcon } from 'lucide-react';
 
 const taskStatusColors: Record<string, string> = {
   'جديدة': 'bg-blue-50 text-blue-700',
@@ -19,7 +19,16 @@ const taskStatusEn: Record<string, string> = {
   'متأخرة': 'Late',
 };
 
-function StatCard({ icon: Icon, label, value, sub, iconBg, iconColor }: any) {
+interface StatCardProps {
+  icon: LucideIcon;
+  label: string;
+  value: string | number;
+  sub?: string;
+  iconBg: string;
+  iconColor: string;
+}
+
+function StatCard({ icon: Icon, label, value, sub, iconBg, iconColor }: StatCardProps) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5 flex items-center gap-4 shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200">
       <div className={`rounded-2xl flex items-center justify-center flex-shrink-0 ${iconBg}`} style={{ width: 52, height: 52 }}>

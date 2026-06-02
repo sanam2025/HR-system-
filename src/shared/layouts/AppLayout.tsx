@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import type { NavItem } from '../components/SideBar';
 import Sidebar from '../components/SideBar';
 import Topbar from '../components/Topbar';
 import { useLanguage } from '../../i18n/translations/LanguageContext';
 
-// ── Types ───
 interface AppLayoutProps {
   navItems: NavItem[];
   pageTitles: Record<string, string>;
@@ -15,7 +14,6 @@ interface AppLayoutProps {
   defaultTitle?: string;
 }
 
-// ── Component ──
 export default function AppLayout({
   navItems,
   pageTitles,
@@ -25,8 +23,10 @@ export default function AppLayout({
   defaultTitle = 'لوحة التحكم',
 }: AppLayoutProps) {
   const location = useLocation();
-  const { isRTL, dir } = useLanguage();
+  const { dir } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
+
+  const toggleSidebar = useCallback(() => setSidebarOpen(open => !open), []);
 
   const basePath = '/' + location.pathname.split('/').slice(1, 3).join('/');
   const title =
@@ -34,26 +34,18 @@ export default function AppLayout({
     pageTitles[basePath] ||
     defaultTitle;
 
-  const sidebarSize = sidebarOpen ? 256 : 64;
-
   return (
     <div className="flex min-h-screen bg-surface" dir={dir}>
       <Sidebar
         open={sidebarOpen}
-        onToggle={() => setSidebarOpen(v => !v)}
+        onToggle={toggleSidebar}
         navItems={navItems}
         brand={brand}
         user={user}
         navSectionLabel={navSectionLabel}
       />
-      <div
-        className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${sidebarOpen ? 'md:ms-64' : 'md:ms-16'
-          }`}
-      >
-        <Topbar
-          title={title}
-          onToggleSidebar={() => setSidebarOpen(v => !v)}
-        />
+      <div className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${sidebarOpen ? 'md:ms-64' : 'md:ms-16'}`}>
+        <Topbar title={title} onToggleSidebar={toggleSidebar} />
         <main className="flex-1 p-6 overflow-x-hidden overflow-y-auto">
           <Outlet />
         </main>

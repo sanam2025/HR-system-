@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { mockTasks, mockEmployees } from '../../../data/mockData';
 import { Plus, X } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
-import { useLanguage } from '../../../i18n/LanguageContext';
+import { useLanguage } from '../../../i18n/translations/LanguageContext';
 
 // ── Types ──
 type Task = typeof mockTasks[number] & { rating: number | null };
@@ -12,32 +12,40 @@ const STATUSES = ['جديدة', 'قيد التنفيذ', 'مكتملة', 'متأ
 type Status = typeof STATUSES[number];
 
 const colConfig: Record<Status, { topColor: string; badge: string; labelKey: 'new' | 'inProgress' | 'completed' | 'late' }> = {
-  'جديدة':       { topColor: '#3b82f6', badge: '#eff6ff', labelKey: 'new' },
+  'جديدة': { topColor: '#3b82f6', badge: '#eff6ff', labelKey: 'new' },
   'قيد التنفيذ': { topColor: '#f59e0b', badge: '#fffbeb', labelKey: 'inProgress' },
-  'مكتملة':      { topColor: '#22c55e', badge: '#f0fdf4', labelKey: 'completed' },
-  'متأخرة':      { topColor: '#ef4444', badge: '#fef2f2', labelKey: 'late' },
+  'مكتملة': { topColor: '#22c55e', badge: '#f0fdf4', labelKey: 'completed' },
+  'متأخرة': { topColor: '#ef4444', badge: '#fef2f2', labelKey: 'late' },
 };
 
 const priorityDot: Record<string, string> = {
-  'عالية':    '#ef4444',
-  'متوسطة':  '#f59e0b',
-  'منخفضة':  '#22c55e',
-  'High':    '#ef4444',
-  'Medium':  '#f59e0b',
-  'Low':     '#22c55e',
+  'عالية': '#ef4444',
+  'متوسطة': '#f59e0b',
+  'منخفضة': '#22c55e',
+  'High': '#ef4444',
+  'Medium': '#f59e0b',
+  'Low': '#22c55e',
 };
 
-// ── Star Rating ──
-function StarRating({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+interface StarRatingProps {
+  value: number;
+  onChange: (v: number) => void;
+}
+
+function StarRating({ value, onChange }: StarRatingProps) {
   const [hover, setHover] = useState(0);
   return (
-    <div style={{ display: 'flex', gap: 4 }}>
+    <div className="flex gap-1">
       {[1, 2, 3, 4, 5].map(n => (
-        <button key={n} type="button"
-          onMouseEnter={() => setHover(n)} onMouseLeave={() => setHover(0)}
+        <button
+          key={n}
+          type="button"
+          onMouseEnter={() => setHover(n)}
+          onMouseLeave={() => setHover(0)}
           onClick={() => onChange(n)}
-          style={{ fontSize: 26, background: 'none', border: 'none', cursor: 'pointer',
-            color: n <= (hover || value) ? '#d97706' : '#d1d5db', transition: 'color .15s' }}>
+          className={`text-2xl bg-transparent border-none cursor-pointer transition-colors duration-150 ${n <= (hover || value) ? 'text-amber-600' : 'text-gray-300'
+            }`}
+        >
           ★
         </button>
       ))}
@@ -45,7 +53,6 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
   );
 }
 
-// ── Component ──
 export default function TasksBoard() {
   const { t, dir } = useLanguage();
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
@@ -65,7 +72,7 @@ export default function TasksBoard() {
   ];
 
   const priorityOptions = [
-    { value: 'عالية',   label: t.tasks.priorities.high },
+    { value: 'عالية', label: t.tasks.priorities.high },
     { value: 'متوسطة', label: t.tasks.priorities.medium },
     { value: 'منخفضة', label: t.tasks.priorities.low },
   ];
@@ -97,140 +104,84 @@ export default function TasksBoard() {
     setShowEval(null); setEvalRating(0); setEvalNote('');
   };
 
-  const labelStyle: React.CSSProperties = {
-    display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6,
-  };
-
-  const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '10px 12px', fontSize: 14,
-    border: '1.5px solid #d1d5db', borderRadius: 10,
-    background: '#fff', color: '#1a2332',
-    outline: 'none', boxSizing: 'border-box',
-    fontFamily: 'inherit',
-  };
-
   return (
-    <div dir={dir} style={{ fontFamily: 'inherit' }}>
+    <div dir={dir}>
       <Toaster position="top-center" />
 
-      {/* ── Header ── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1a2332', margin: 0 }}>{t.tasks.boardTitle}</h2>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>{tasks.length} {t.tasks.activeTasks}</p>
+          <h2 className="text-xl font-extrabold text-dark">{t.tasks.boardTitle}</h2>
+          <p className="text-sm text-gray-500 mt-1">{tasks.length} {t.tasks.activeTasks}</p>
         </div>
-
         <button
           onClick={() => setShowCreate(true)}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            background: '#4A7C59', color: '#fff',
-            border: 'none', borderRadius: 10, padding: '10px 20px',
-            fontSize: 14, fontWeight: 700, cursor: 'pointer',
-            boxShadow: '0 4px 14px rgba(74,124,89,.3)',
-            transition: 'background .2s',
-          }}
-          onMouseEnter={e => (e.currentTarget.style.background = '#3a6347')}
-          onMouseLeave={e => (e.currentTarget.style.background = '#4A7C59')}
+          className="flex items-center gap-2 bg-green text-white border-none rounded-xl px-5 py-2.5 text-sm font-bold cursor-pointer shadow-[0_4px_14px_rgba(74,124,89,.3)] hover:bg-green-dark transition-colors duration-200"
         >
           <Plus size={16} strokeWidth={2.5} />
           {t.tasks.newTask}
         </button>
       </div>
 
-      {/* ── Kanban Grid ── */}
+      {/* Kanban Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 pb-3">
         {STATUSES.map(status => {
           const cfg = colConfig[status];
           const colTasks = tasks.filter(tk => tk.status === status);
           return (
-            <div key={status} className="bg-[#f8fafc] rounded-2xl p-4 flex flex-col gap-3" style={{
-              borderTop: `4px solid ${cfg.topColor}`,
-            }}>
+            <div key={status} className="bg-[#f8fafc] rounded-2xl p-4 flex flex-col gap-3" style={{ borderTop: `4px solid ${cfg.topColor}` }}>
               {/* Column Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: 700, fontSize: 14, color: '#1a2332' }}>
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-sm text-dark">
                   {t.tasks.columns[cfg.labelKey]}
                 </span>
-                <span style={{
-                  fontSize: 12, fontWeight: 700,
-                  background: cfg.badge, color: cfg.topColor,
-                  borderRadius: 20, padding: '2px 10px',
-                }}>
+                <span
+                  className="text-xs font-bold rounded-full px-2.5 py-0.5"
+                  style={{ background: cfg.badge, color: cfg.topColor }}
+                >
                   {colTasks.length}
                 </span>
               </div>
 
-              {/* Empty state */}
               {colTasks.length === 0 && (
-                <p style={{ textAlign: 'center', color: '#d1d5db', fontSize: 13, padding: '20px 0' }}>
-                  {t.tasks.noTasks}
-                </p>
+                <p className="text-center text-gray-300 text-sm py-5">{t.tasks.noTasks}</p>
               )}
 
               {/* Task Cards */}
               {colTasks.map(task => (
-                <div key={task.id} style={{
-                  background: '#fff', borderRadius: 14,
-                  border: '1px solid #e5e7eb',
-                  padding: 14,
-                  boxShadow: '0 1px 4px rgba(0,0,0,.05)',
-                  transition: 'box-shadow .2s, transform .2s',
-                  cursor: 'pointer',
-                }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,.1)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,.05)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
+                <div
+                  key={task.id}
+                  className="bg-white rounded-2xl border border-gray-200 p-3.5 cursor-pointer shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200"
                 >
-                  {/* Title + Priority dot */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                    <span style={{
-                      width: 8, height: 8, borderRadius: '50%', flexShrink: 0, marginTop: 5,
-                      background: priorityDot[task.priority] || '#9ca3af',
-                    }} />
-                    <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#1a2332', lineHeight: 1.5 }}>
-                      {task.title}
-                    </p>
+                  <div className="flex items-start gap-2">
+                    <span
+                      className="w-2 h-2 rounded-full flex-shrink-0 mt-1.5"
+                      style={{ background: priorityDot[task.priority] || '#9ca3af' }}
+                    />
+                    <p className="text-sm font-semibold text-dark leading-relaxed">{task.title}</p>
                   </div>
 
-                  {/* Assignee + Date */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <div style={{
-                        width: 26, height: 26, borderRadius: '50%',
-                        background: '#dcfce7', color: '#16a34a',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 10, fontWeight: 700,
-                      }}>
+                  <div className="flex items-center justify-between mt-3">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-[10px] font-bold">
                         {task.assigneeName?.[0]}
                       </div>
-                      <span style={{ fontSize: 12, color: '#6b7280' }}>{task.assigneeName}</span>
+                      <span className="text-xs text-gray-500">{task.assigneeName}</span>
                     </div>
-                    <span style={{ fontSize: 11, color: '#9ca3af' }}>{task.dueDate}</span>
+                    <span className="text-[11px] text-gray-400">{task.dueDate}</span>
                   </div>
 
-                  {/* Star rating display */}
                   {task.rating && (
-                    <div style={{ marginTop: 8, fontSize: 13, color: '#d97706', fontWeight: 700 }}>
+                    <div className="mt-2 text-sm text-amber-600 font-bold">
                       {'★'.repeat(task.rating)}{'☆'.repeat(5 - task.rating)}
                     </div>
                   )}
 
-                  {/* Rate button for completed unrated tasks */}
                   {task.status === 'مكتملة' && !task.rating && (
                     <button
                       onClick={() => { setShowEval(task); setEvalRating(0); }}
-                      style={{
-                        marginTop: 10, width: '100%', fontSize: 12, fontWeight: 600,
-                        background: '#fefce8', color: '#92400e',
-                        border: '1px solid #fde68a', borderRadius: 8, padding: '6px 0',
-                        cursor: 'pointer', transition: 'background .2s',
-                      }}>
+                      className="mt-2.5 w-full text-xs font-semibold bg-yellow-50 text-yellow-900 border border-yellow-200 rounded-lg py-1.5 cursor-pointer hover:bg-yellow-100 transition-colors"
+                    >
                       {t.tasks.rateTask}
                     </button>
                   )}
@@ -241,93 +192,76 @@ export default function TasksBoard() {
         })}
       </div>
 
-      {/* ── Create Task Modal ══ */}
+      {/* Create Task Modal */}
       {showCreate && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 16,
-        }}>
-          <div dir={dir} style={{
-            background: '#fff', borderRadius: 20,
-            width: '100%', maxWidth: 520,
-            boxShadow: '0 20px 60px rgba(0,0,0,.18)',
-            overflow: 'hidden',
-            animation: 'slideUp .25s ease',
-          }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '18px 24px 0',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: '#1a2332' }}>{t.tasks.createModal.title}</h3>
-                <Plus size={20} style={{ color: '#1a2332' }} strokeWidth={2.8} />
+        <div className="fixed inset-0 bg-black/45 flex items-center justify-center z-50 p-4">
+          <div dir={dir} className="bg-white rounded-2xl w-full max-w-lg shadow-modal overflow-hidden animate-slide-up">
+            <div className="flex items-center justify-between px-6 pt-5">
+              <div className="flex items-center gap-1.5">
+                <h3 className="text-base font-semibold text-dark">{t.tasks.createModal.title}</h3>
+                <Plus size={20} className="text-dark" strokeWidth={2.8} />
               </div>
-              <button onClick={() => setShowCreate(false)} style={{
-                background: 'none', border: 'none', cursor: 'pointer', padding: 4, borderRadius: 6,
-              }}>
-                <X size={18} style={{ color: '#9ca3af' }} strokeWidth={1.8} />
+              <button onClick={() => setShowCreate(false)} className="p-1 rounded-md bg-transparent border-none cursor-pointer hover:bg-gray-100 transition-colors">
+                <X size={18} className="text-gray-400" strokeWidth={1.8} />
               </button>
             </div>
-            <div style={{ height: 1, background: '#e5e7eb', marginTop: 14 }} />
+            <div className="h-px bg-gray-200 mt-3.5" />
 
-            <form onSubmit={handleCreate} style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <form onSubmit={handleCreate} className="px-6 py-6 flex flex-col gap-4">
               <div>
-                <label style={labelStyle}>{t.tasks.createModal.taskTitle} <span style={{ color: '#ef4444' }}>*</span></label>
-                <input style={inputStyle} placeholder={t.tasks.createModal.taskTitlePlaceholder}
-                  value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
+                <label className="form-label">{t.tasks.createModal.taskTitle} <span className="text-red-500">*</span></label>
+                <input
+                  className="form-input"
+                  placeholder={t.tasks.createModal.taskTitlePlaceholder}
+                  value={form.title}
+                  onChange={e => setForm({ ...form, title: e.target.value })}
+                />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label style={labelStyle}>{t.tasks.createModal.assignee} <span style={{ color: '#ef4444' }}>*</span></label>
-                  <select style={inputStyle} value={form.assigneeId}
-                    onChange={e => setForm({ ...form, assigneeId: e.target.value })}>
+                  <label className="form-label">{t.tasks.createModal.assignee} <span className="text-red-500">*</span></label>
+                  <select
+                    className="form-input"
+                    value={form.assigneeId}
+                    onChange={e => setForm({ ...form, assigneeId: e.target.value })}
+                  >
                     <option value="">{t.tasks.createModal.selectEmployee}</option>
                     {mockEmployees.map(emp => <option key={emp.id} value={emp.id}>{emp.name}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label style={labelStyle}>{t.tasks.createModal.priority}</label>
-                  <select style={inputStyle} value={form.priority}
-                    onChange={e => setForm({ ...form, priority: e.target.value })}>
-                    {priorityOptions.map(p => (
-                      <option key={p.value} value={p.value}>{p.label}</option>
-                    ))}
+                  <label className="form-label">{t.tasks.createModal.priority}</label>
+                  <select
+                    className="form-input"
+                    value={form.priority}
+                    onChange={e => setForm({ ...form, priority: e.target.value })}
+                  >
+                    {priorityOptions.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
                   </select>
                 </div>
               </div>
 
               <div>
-                <label style={labelStyle}>{t.tasks.createModal.dueDate} <span style={{ color: '#ef4444' }}>*</span></label>
-                <input type="date" style={inputStyle} value={form.dueDate}
-                  onChange={e => setForm({ ...form, dueDate: e.target.value })} />
+                <label className="form-label">{t.tasks.createModal.dueDate} <span className="text-red-500">*</span></label>
+                <input type="date" className="form-input" value={form.dueDate} onChange={e => setForm({ ...form, dueDate: e.target.value })} />
               </div>
 
               <div>
-                <label style={labelStyle}>{t.tasks.createModal.description}</label>
-                <textarea style={{ ...inputStyle, resize: 'none', height: 90 }}
+                <label className="form-label">{t.tasks.createModal.description}</label>
+                <textarea
+                  className="form-input resize-none h-24"
                   placeholder={t.tasks.createModal.descriptionPlaceholder}
                   value={form.description}
-                  onChange={e => setForm({ ...form, description: e.target.value })} />
+                  onChange={e => setForm({ ...form, description: e.target.value })}
+                />
               </div>
 
-              <div style={{ display: 'flex', gap: 12, paddingTop: 4 }}>
-                <button type="submit" style={{
-                  flex: 1, background: '#4A7C59', color: '#fff',
-                  border: 'none', borderRadius: 10, padding: '12px 0',
-                  fontSize: 15, fontWeight: 700, cursor: 'pointer',
-                  boxShadow: '0 4px 14px rgba(74,124,89,.3)',
-                  transition: 'background .2s', fontFamily: 'inherit',
-                }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#3a6347')}
-                  onMouseLeave={e => (e.currentTarget.style.background = '#4A7C59')}>
+              <div className="flex gap-3 pt-1">
+                <button type="submit" className="flex-1 btn btn-primary">
                   {t.tasks.createModal.createBtn}
                 </button>
-                <button type="button" onClick={() => setShowCreate(false)} style={{
-                  padding: '12px 22px', background: '#fff', color: '#374151',
-                  border: '1.5px solid #d1d5db', borderRadius: 10,
-                  fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-                }}>
+                <button type="button" onClick={() => setShowCreate(false)} className="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg text-sm font-semibold cursor-pointer hover:bg-gray-50 transition-colors">
                   {t.tasks.createModal.cancel}
                 </button>
               </div>
@@ -336,60 +270,44 @@ export default function TasksBoard() {
         </div>
       )}
 
-      {/* ── Rate Task Modal ═══ */}
+      {/* Rate Task Modal */}
       {showEval && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,.45)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 16,
-        }}>
-          <div dir={dir} style={{
-            background: '#fff', borderRadius: 20,
-            width: '100%', maxWidth: 440,
-            boxShadow: '0 20px 60px rgba(0,0,0,.18)',
-            overflow: 'hidden',
-          }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '18px 24px 0',
-            }}>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#1a2332' }}>{t.tasks.rateModal.title}</h3>
-              <button onClick={() => setShowEval(null)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                <X size={20} style={{ color: '#3b82f6' }} />
+        <div className="fixed inset-0 bg-black/45 flex items-center justify-center z-50 p-4">
+          <div dir={dir} className="bg-white rounded-2xl w-full max-w-md shadow-modal overflow-hidden">
+            <div className="flex items-center justify-between px-6 pt-5">
+              <h3 className="text-lg font-extrabold text-dark">{t.tasks.rateModal.title}</h3>
+              <button onClick={() => setShowEval(null)} className="bg-transparent border-none cursor-pointer">
+                <X size={20} className="text-blue-500" />
               </button>
             </div>
-            <div style={{ height: 3, background: '#3b82f6', marginTop: 14, marginInline: 24, borderRadius: 4 }} />
+            <div className="h-[3px] bg-blue-500 mt-3.5 mx-6 rounded-full" />
 
-            <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div style={{ background: '#f8fafc', borderRadius: 12, padding: 14 }}>
-                <p style={{ margin: 0, fontWeight: 600, color: '#1a2332' }}>{showEval.title}</p>
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#6b7280' }}>{showEval.assigneeName}</p>
+            <div className="px-6 py-6 flex flex-col gap-4">
+              <div className="bg-[#f8fafc] rounded-xl p-3.5">
+                <p className="font-semibold text-dark">{showEval.title}</p>
+                <p className="text-sm text-gray-500 mt-1">{showEval.assigneeName}</p>
               </div>
               <div>
-                <label style={labelStyle}>{t.tasks.rateModal.rating}</label>
+                <label className="form-label">{t.tasks.rateModal.rating}</label>
                 <StarRating value={evalRating} onChange={setEvalRating} />
                 {evalRating > 0 && (
-                  <p style={{ margin: '4px 0 0', fontSize: 12, color: '#d97706' }}>{ratingLabels[evalRating]}</p>
+                  <p className="text-xs text-amber-600 mt-1">{ratingLabels[evalRating]}</p>
                 )}
               </div>
               <div>
-                <label style={labelStyle}>{t.tasks.rateModal.notes}</label>
-                <textarea style={{ ...inputStyle, resize: 'none', height: 80 }}
+                <label className="form-label">{t.tasks.rateModal.notes}</label>
+                <textarea
+                  className="form-input resize-none h-20"
                   placeholder={t.tasks.rateModal.notesPlaceholder}
-                  value={evalNote} onChange={e => setEvalNote(e.target.value)} />
+                  value={evalNote}
+                  onChange={e => setEvalNote(e.target.value)}
+                />
               </div>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <button onClick={handleEvaluate} style={{
-                  flex: 1, background: '#4A7C59', color: '#fff',
-                  border: 'none', borderRadius: 10, padding: '12px 0',
-                  fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                }}>
+              <div className="flex gap-3">
+                <button onClick={handleEvaluate} className="flex-1 btn btn-primary">
                   {t.tasks.rateModal.saveBtn}
                 </button>
-                <button onClick={() => setShowEval(null)} style={{
-                  padding: '12px 22px', background: '#fff', color: '#374151',
-                  border: '1.5px solid #d1d5db', borderRadius: 10,
-                  fontSize: 14, fontWeight: 600, cursor: 'pointer',
-                }}>
+                <button onClick={() => setShowEval(null)} className="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg text-sm font-semibold cursor-pointer hover:bg-gray-50 transition-colors">
                   {t.tasks.rateModal.cancel}
                 </button>
               </div>
