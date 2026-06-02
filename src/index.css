@@ -1,19 +1,23 @@
-/* Google Fonts - must be FIRST */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap');
+/* ========================================
+   GOOGLE FONTS
+   ======================================== */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap");
 
 @import "tailwindcss";
 
 @theme {
-  /* ── Custom Colors ─── */
-  --color-green:        #4A7C59;
-  --color-green-dark:   #3a6347;
-  --color-gold:         #C4A66A;
-  --color-dark:         #4A4E4A;
+  --color-green: #4a7c59;
+  --color-green-dark: #3a6347;
+  --color-gold: #c4a66a;
+  --color-dark: #4a4e4a;
   --color-dark-sidebar: #2e312e;
-  --color-surface:      #f4f4f2;
-  --color-brown:        #6B6358;
+  --color-surface: #f4f4f2;
+  --color-brown: #6b6358;
 }
 
+/* ========================================
+   BASE STYLES
+   ======================================== */
 @layer base {
   * {
     box-sizing: border-box;
@@ -22,198 +26,415 @@
   }
 
   body {
-    font-family: 'Tajawal', 'Inter', sans-serif;
+    font-family: "Tajawal", "Inter", sans-serif;
     background-color: #f1f5f9;
     color: #1e293b;
   }
 
-  .scrollbar-hide::-webkit-scrollbar { display: none; }
-  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
+/* ========================================
+   ANIMATIONS
+   ======================================== */
 @layer utilities {
   @keyframes slide-up {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   @keyframes fade-in {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
-  .animate-slide-up { animation: slide-up 0.2s ease-out; }
-  .animate-fade-in  { animation: fade-in 0.15s ease-out; }
-  .shadow-modal { box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
-}
-/* shared/components/DataTable.css */
-.data-table-container {
-  overflow-x: auto;
-  background-color: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-}
-
-.data-table {
-  min-width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-.data-table thead {
-  background-color: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.data-table th {
-  padding: 0.75rem 1.5rem;
-  text-align: right;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.data-table td {
-  padding: 1rem 1.5rem;
-  white-space: nowrap;
-  font-size: 0.875rem;
-  color: #111827;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.data-table tbody tr {
-  transition: background-color 0.2s ease;
-  cursor: pointer;
-}
-
-.data-table tbody tr:hover {
-  background-color: #f9fafb;
-}
-
-.data-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .data-table th,
-  .data-table td {
-    padding: 0.75rem 1rem;
+  .animate-slide-up {
+    animation: slide-up 0.2s ease-out;
+  }
+  .animate-fade-in {
+    animation: fade-in 0.15s ease-out;
+  }
+  .shadow-modal {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   }
 }
-/* core/modules/HR/Components/Special_Components/EmployeeFilters.css */
-.filters-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS
+   ======================================== */
+:root {
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
 }
 
-.filter-input {
-  flex: 1;
-  min-width: 250px;
-  padding: 0.625rem 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.75rem;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-  outline: none;
+/* ========================================
+   RESPONSIVE STATS CARDS GRID
+   ======================================== */
+/* قاعدة واحدة تشتغل على جميع البطاقات */
+.stats-grid,
+.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4,
+.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-5,
+.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 {
+  display: grid !important;
+  gap: 1rem !important;
 }
 
-.filter-input:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+/* موبايل صغير */
+@media (max-width: 480px) {
+  .stats-grid,
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4,
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-5,
+  .grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
 }
 
-.filter-select {
-  padding: 0.625rem 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.75rem;
-  font-size: 0.875rem;
-  background-color: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  outline: none;
+/* موبايل متوسط */
+@media (min-width: 481px) and (max-width: 640px) {
+  .stats-grid,
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4,
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-5,
+  .grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem !important;
+  }
 }
 
-.filter-select:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+/* تابلت */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .stats-grid,
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4,
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-5,
+  .grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 1.25rem !important;
+  }
 }
 
+/* ديسكتوب */
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .stats-grid,
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4,
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-5,
+  .grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 1.25rem !important;
+  }
+}
+
+/* شاشة كبيرة */
+@media (min-width: 1281px) {
+  .stats-grid,
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4,
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-5,
+  .grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 {
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 1.5rem !important;
+  }
+}
+
+/* ========================================
+   RESPONSIVE STATS CARD STYLES
+   ======================================== */
+.stat-card,
+.bg-white.rounded-2xl,
+.bg-white.rounded-xl {
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+/* موبايل صغير */
+@media (max-width: 480px) {
+  .stat-card,
+  .bg-white.rounded-2xl,
+  .bg-white.rounded-xl {
+    padding: 0.75rem !important;
+  }
+
+  .stat-card-title,
+  .text-sm.text-gray-500 {
+    font-size: 0.65rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .stat-card-value,
+  .text-2xl.font-bold,
+  .text-3xl.font-bold {
+    font-size: 1rem !important;
+  }
+
+  .stat-card-icon,
+  .p-3.rounded-2xl {
+    padding: 0.5rem !important;
+  }
+
+  .stat-card-icon svg,
+  .p-3.rounded-2xl svg {
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+}
+
+/* موبايل متوسط */
+@media (min-width: 481px) and (max-width: 640px) {
+  .stat-card,
+  .bg-white.rounded-2xl,
+  .bg-white.rounded-xl {
+    padding: 1rem !important;
+  }
+
+  .stat-card-value,
+  .text-2xl.font-bold {
+    font-size: 1.25rem !important;
+  }
+}
+
+/* ========================================
+   RESPONSIVE FILTERS
+   ======================================== */
 @media (max-width: 768px) {
+  .filters-container,
+  .flex.gap-4,
+  .flex.flex-wrap.gap-4 {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+
   .filter-input,
-  .filter-select {
-    width: 100%;
+  input[type="text"],
+  select {
+    width: 100% !important;
+    min-width: auto !important;
   }
 }
-/* shared/components/StatCard.css */
-.stat-card {
-  background-color: white;
-  border-radius: 1rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-  border-right-width: 4px;
+
+/* ========================================
+   RESPONSIVE TABLES
+   ======================================== */
+/* شاشات تابلت وأصغر */
+@media (max-width: 768px) {
+  .overflow-x-auto {
+    overflow-x: auto !important;
+  }
+
+  table,
+  .w-full {
+    min-width: 600px !important;
+  }
+
+  th,
+  td {
+    white-space: nowrap !important;
+  }
 }
 
-.stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+/* موبايل صغير - تحويل الجدول إلى بطاقات */
+@media (max-width: 480px) {
+  .data-table thead,
+  table thead {
+    display: none !important;
+  }
+
+  .data-table tbody tr,
+  table tbody tr {
+    display: block !important;
+    margin-bottom: 1rem !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0.75rem !important;
+    background: white !important;
+    padding: 0.5rem !important;
+  }
+
+  .data-table tbody td,
+  table tbody td {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0.5rem 0.75rem !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    white-space: normal !important;
+  }
+
+  .data-table tbody td:last-child,
+  table tbody td:last-child {
+    border-bottom: none !important;
+  }
 }
 
-.stat-card-title {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-bottom: 0.5rem;
+/* ========================================
+   RESPONSIVE SIDEBAR
+   ======================================== */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-open,
+  .sidebar-closed {
+    width: 260px !important;
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+  }
 }
 
-.stat-card-value {
-  font-size: 1.875rem;
-  font-weight: 700;
+/* ========================================
+   RESPONSIVE TYPOGRAPHY
+   ======================================== */
+@media (max-width: 640px) {
+  h1,
+  .text-2xl.font-bold {
+    font-size: 1.25rem !important;
+  }
+
+  h2,
+  .text-xl.font-semibold {
+    font-size: 1.125rem !important;
+  }
+
+  .text-sm {
+    font-size: 0.75rem !important;
+  }
+
+  .text-xs {
+    font-size: 0.65rem !important;
+  }
 }
 
-.stat-card-icon {
-  padding: 0.75rem;
-  border-radius: 9999px;
-}
-/* components/Sidebar.css أو في Sidebar component نفسه */
-.sidebar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  height: 100vh;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 50;
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+/* ========================================
+   RESPONSIVE PADDING & MARGIN
+   ======================================== */
+@media (max-width: 640px) {
+  .p-6 {
+    padding: 1rem !important;
+  }
+
+  .px-6 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .py-4 {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+
+  .gap-5 {
+    gap: 0.75rem !important;
+  }
+
+  .mb-8 {
+    margin-bottom: 1rem !important;
+  }
 }
 
-.sidebar-open {
-  width: 260px;
+/* ========================================
+   RESPONSIVE MODAL
+   ======================================== */
+@media (max-width: 640px) {
+  .fixed.inset-0 .bg-white.rounded-2xl {
+    width: 95% !important;
+    margin: 1rem !important;
+    max-height: calc(100vh - 2rem) !important;
+  }
 }
 
-.sidebar-closed {
-  width: 80px;
+/* ========================================
+   FIX FOR OVERFLOW ISSUES
+   ======================================== */
+.container,
+main,
+div[class*="p-"],
+div[class*="m-"] {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
 }
 
-.sidebar-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  margin: 4px 12px;
-  border-radius: 12px;
-  color: #94a3b8;
-  transition: all 0.2s ease;
+/* منع أي عنصر من الخروج عن الحاوية */
+img,
+svg,
+video,
+canvas {
+  max-width: 100% !important;
+  height: auto !important;
 }
 
-.sidebar-item:hover {
-  background-color: rgba(59, 130, 246, 0.1);
-  color: #60a5fa;
+/* تحسين عرض البطاقات */
+.flex.items-center.justify-between {
+  gap: 0.5rem !important;
+  flex-wrap: wrap !important;
 }
 
-.sidebar-item-active {
-  background-color: #3b82f6;
-  color: white;
+@media (max-width: 480px) {
+  .flex.items-center.justify-between {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+}
+
+/* ========================================
+   CLEAN & MINIMAL STYLES
+   ======================================== */
+/* إزالة أي تأثيرات غير مرغوب فيها */
+*:focus {
+  outline: none !important;
+}
+
+button {
+  cursor: pointer !important;
+}
+
+a {
+  text-decoration: none !important;
+}
+
+/* تحسين readability */
+.text-gray-500 {
+  color: #6b7280 !important;
+}
+
+.text-gray-600 {
+  color: #4b5563 !important;
+}
+
+.text-gray-700 {
+  color: #374151 !important;
+}
+
+.text-gray-800 {
+  color: #1f2937 !important;
+}
+
+.text-gray-900 {
+  color: #111827 !important;
 }

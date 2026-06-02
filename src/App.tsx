@@ -1,27 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import ManagerLayout from "./shared/layouts/ManagerLayout";
-import EmployeesList from "./core/pages/manager/EmployeesList";
-import EmployeeProfile from "./core/pages/manager/EmployeeProfile";
-import TasksBoard from "./core/pages/Tasks/TasksBoard";
+// TasksBoard removed because routes are handled by HRRoute. Keep import removed to avoid unused variable error.
 import HRRoute from "./shared/routes/HRRoute";
 
-// ── Placeholder ───
-function Page({ title }: { title: string }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "200px",
-      }}
-    >
-      <p style={{ fontSize: "24px", fontWeight: "bold", color: "#9ca3af" }}>
-        {title}
-      </p>
-    </div>
-  );
-}
+// Placeholder components were removed as routes are handled by HRRoute
 
 function App() {
   return (
