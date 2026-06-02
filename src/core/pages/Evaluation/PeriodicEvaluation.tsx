@@ -125,8 +125,7 @@ export default function PeriodicEvaluation() {
           onSubmit={handleSubmit}
           className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 space-y-6"
         >
-          {/* Employee & Month */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>{t.evaluation.form.selectEmployee}</label>
               <select

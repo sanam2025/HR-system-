@@ -26,7 +26,7 @@ export default function AppLayout({
 }: AppLayoutProps) {
   const location = useLocation();
   const { isRTL, dir } = useLanguage();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
 
   const basePath = '/' + location.pathname.split('/').slice(1, 3).join('/');
   const title =
@@ -47,17 +47,17 @@ export default function AppLayout({
         navSectionLabel={navSectionLabel}
       />
       <div
-        className="flex flex-col flex-1 min-h-screen transition-all duration-300"
-        style={isRTL
-          ? { marginRight: sidebarSize }
-          : { marginLeft: sidebarSize }
-        }
+        className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${
+          sidebarOpen 
+            ? (isRTL ? 'md:mr-64' : 'md:ml-64') 
+            : (isRTL ? 'md:mr-16' : 'md:ml-16')
+        }`}
       >
         <Topbar
           title={title}
           onToggleSidebar={() => setSidebarOpen(v => !v)}
         />
-        <main className="flex-1 p-6 overflow-y-auto">
+        <main className="flex-1 p-6 overflow-x-hidden overflow-y-auto">
           <Outlet />
         </main>
       </div>

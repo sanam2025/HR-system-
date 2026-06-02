@@ -37,7 +37,7 @@ function JobVacancyRequest({ r }: { r: RecruitmentTranslation }) {
         <ClipboardList className="text-[#6B6358]" size={20} />
         {v.title}
       </h3>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="form-label">{v.positionTitle} <span className="text-red-500">*</span></label>
           <input className="form-input" placeholder={v.positionPlaceholder} value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />

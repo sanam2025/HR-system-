@@ -139,18 +139,13 @@ export default function TasksBoard() {
       </div>
 
       {/* ── Kanban Grid ── */}
-      <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 12 }}>
+      <div className="flex flex-col lg:flex-row gap-4 overflow-x-auto pb-3">
         {STATUSES.map(status => {
           const cfg = colConfig[status];
           const colTasks = tasks.filter(tk => tk.status === status);
           return (
-            <div key={status} style={{
-              minWidth: 270, flex: '0 0 270px',
-              background: '#f8fafc',
-              borderRadius: 16,
+            <div key={status} className="flex-1 lg:min-w-[270px] lg:flex-none bg-[#f8fafc] rounded-2xl p-4 flex flex-col gap-3" style={{
               borderTop: `4px solid ${cfg.topColor}`,
-              padding: 16,
-              display: 'flex', flexDirection: 'column', gap: 12,
             }}>
               {/* Column Header */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

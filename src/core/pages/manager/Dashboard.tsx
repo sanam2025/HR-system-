@@ -54,7 +54,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       {/* ── Stat Cards ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard icon={CheckSquare} label={d.pendingTasks} value={stats.pendingTasks} sub={`${stats.completedTasksThisMonth} ${d.completedThisMonth}`} iconBg="bg-red-50" iconColor="text-red-500" />
         <StatCard icon={Calendar} label={d.attendanceRate} value={`${stats.attendanceRate}%`} sub={d.thisMonth} iconBg="bg-brown/10" iconColor="text-brown" />
         <StatCard icon={TrendingUp} label={d.avgPerformance} value={`★${stats.avgPerformance}`} sub={d.outOf} iconBg="bg-gold/10" iconColor="text-gold" />
@@ -149,7 +149,7 @@ export default function Dashboard() {
       </div>
 
       {/* ── Quick Stats ── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: d.pendingLeaves, value: stats.pendingLeaves, icon: '🗓️', color: 'text-yellow-600 bg-yellow-50', path: '/manager/leaves' },
           { label: d.pendingOvertime, value: stats.pendingOvertime, icon: '⏰', color: 'text-blue-600 bg-blue-50', path: '/manager/overtime' },
