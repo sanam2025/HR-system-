@@ -47,11 +47,8 @@ export default function AppLayout({
         navSectionLabel={navSectionLabel}
       />
       <div
-        className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${
-          sidebarOpen 
-            ? (isRTL ? 'md:mr-64' : 'md:ml-64') 
-            : (isRTL ? 'md:mr-16' : 'md:ml-16')
-        }`}
+        className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${sidebarOpen ? 'md:ms-64' : 'md:ms-16'
+          }`}
       >
         <Topbar
           title={title}

@@ -42,7 +42,7 @@ export default function Sidebar({
       )}
 
       <aside className={`
-        fixed top-0 ${isRTL ? 'right-0' : 'left-0'} h-screen z-50 flex flex-col
+        fixed top-0 start-0 h-screen z-50 flex flex-col
         bg-dark-sidebar shadow-[0_4px_20px_rgba(0,0,0,0.15)]
         transition-all duration-300
         ${open ? 'w-64' : 'w-0 overflow-hidden md:w-16'}
