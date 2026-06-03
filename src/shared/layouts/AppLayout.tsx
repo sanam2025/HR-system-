@@ -46,7 +46,7 @@ export default function AppLayout({
       />
       <div className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${sidebarOpen ? 'md:ms-64' : 'md:ms-16'}`}>
         <Topbar title={title} onToggleSidebar={toggleSidebar} />
-        <main className="flex-1 p-6 overflow-x-hidden overflow-y-auto">
+        <main className="flex-1 p-6 pb-16 overflow-x-hidden overflow-y-auto">
           <Outlet />
         </main>
       </div>
