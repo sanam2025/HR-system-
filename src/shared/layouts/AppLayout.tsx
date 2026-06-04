@@ -1,59 +1,44 @@
-import { useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
-import type { NavItem } from '../components/SideBar';
-import Sidebar from '../components/SideBar';
-import Topbar from '../components/Topbar';
+import { useState } from "react";
+import Sidebar from "../components/SideBar";
+import Topbar from "../components/Topbar";
+import { Outlet, useLocation } from "react-router-dom";
+import type { NavItem } from "../components/SideBar";
 
-// ── Types ──────────────────────────────────────────────────────────────────
-interface AppLayoutProps {
-  navItems: NavItem[];
-  pageTitles: Record<string, string>;
-  brand?: { logo?: string; title?: string; subtitle?: string };
-  user?: { avatar: string; name: string; role: string };
-  navSectionLabel?: string;
-  defaultTitle?: string;
-}
-
-// ── Component ──────────────────────────────────────────────────────────────
 export default function AppLayout({
   navItems,
   pageTitles,
   brand,
   user,
-  navSectionLabel,
-  defaultTitle = 'Dashboard',
-}: AppLayoutProps) {
-  const location = useLocation();
+  navSectionLabel = "Main Menu",
+}: {
+  navItems: NavItem[];
+  pageTitles: Record<string, string>;
+  brand?: { logo?: string; title?: string; subtitle?: string };
+  user?: { avatar: string; name: string; role: string };
+  navSectionLabel?: string;
+}) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
-  const basePath = '/' + location.pathname.split('/').slice(1, 3).join('/');
-  const title =
-    pageTitles[location.pathname] ||
-    pageTitles[basePath] ||
-    defaultTitle;
+  const location = useLocation();
+  const currentTitle = pageTitles[location.pathname] ?? "";
 
   return (
-    <div className="flex min-h-screen bg-surface" dir="ltr">
-      <Sidebar
-        open={sidebarOpen}
-        onToggle={() => setSidebarOpen(v => !v)}
-        navItems={navItems}
-        brand={brand}
-        user={user}
-        navSectionLabel={navSectionLabel}
-      />
-      <div
-        className="flex flex-col flex-1 min-h-screen transition-all duration-300"
-        style={{ marginLeft: sidebarOpen ? 256 : 64 }}
-      >
-        <Topbar
-          title={title}
-          onToggleSidebar={() => setSidebarOpen(v => !v)}
+    <div className="flex h-screen bg-surface">
+        <Sidebar
+          open={sidebarOpen}
+          onToggle={() => setSidebarOpen(!sidebarOpen)}
+          navItems={navItems}
+          user={user}
+          brand={brand}
+          navSectionLabel={navSectionLabel}
         />
-        <main className="flex-1 p-6 overflow-y-auto">
-          <Outlet />
-        </main>
-      </div>
+        <div className={`flex-1 flex flex-col overflow-hidden ${sidebarOpen ? 'ml-64' : 'ml-0 md:ml-16'}`}>
+          <Topbar title={currentTitle} onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+          <main className="flex-1 overflow-y-auto bg-beige">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+              <Outlet />
+            </div>
+          </main>
+        </div>
     </div>
   );
 }

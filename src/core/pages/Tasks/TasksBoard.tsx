@@ -12,7 +12,7 @@ const colConfig: Record<string, { label: string; topColor: string; badge: string
   'New':         { label: 'New',         topColor: '#3b82f6', badge: '#eff6ff', dot: '#3b82f6' },
   'In Progress': { label: 'In Progress', topColor: '#f59e0b', badge: '#fffbeb', dot: '#f59e0b' },
   'Completed':   { label: 'Completed',   topColor: '#22c55e', badge: '#f0fdf4', dot: '#22c55e' },
-  'Late':        { label: 'Late',        topColor: '#ef4444', badge: '#fef2f2', dot: '#ef4444' },
+  'Late':        { label: 'Late',      topColor: '#ef4444', badge: '#fef2f2', dot: '#ef4444' },
 };
 
 const priorityDot: Record<string, string> = {

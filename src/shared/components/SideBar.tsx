@@ -42,7 +42,7 @@ export default function Sidebar({
       `}>
 
         {/* Logo */}
-        <div className="flex items-center gap-3 px-5 py-6 border-b border-white/10">
+        <div className="flex items-center gap-3 px-5 py-6 border-b border-white/10 animate-fade-in">
           <div className="w-9 h-9 bg-green rounded-xl flex items-center justify-center text-lg flex-shrink-0">
             {brand.logo ?? '🏢'}
           </div>
@@ -55,7 +55,7 @@ export default function Sidebar({
         </div>
 
         {/* User */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10">
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10 animate-fade-in">
           <div className="w-9 h-9 rounded-full bg-green flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
             {user.avatar}
           </div>
@@ -74,18 +74,19 @@ export default function Sidebar({
               {navSectionLabel}
             </p>
           )}
-          {navItems.map((item) => {
+          {navItems.map((item, i) => {
             const Icon = item.icon;
             return (
               <NavLink
                 key={item.path}
                 to={item.path}
                 end={item.exact ?? false}
+                style={{ animationDelay: `${i * 0.06}s` }}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-5 py-2.5 text-sm cursor-pointer transition-all duration-200
+                  `flex items-center gap-3 px-5 py-2.5 text-sm cursor-pointer transition-all duration-200 animate-slide-in-left
                   ${isActive
                     ? 'bg-green/25 text-white border-l-[3px] border-green'
-                    : 'text-white/65 hover:bg-white/5 hover:text-white'
+                    : 'text-white/65 hover:bg-white/5 hover:text-white hover:translate-x-0.5'
                   }`
                 }
               >

@@ -7,11 +7,16 @@
   /* ── Custom Colors ─── */
   --color-green:        #4A7C59;
   --color-green-dark:   #3a6347;
+  --color-green-light:  #e8f0e4;
+  --color-green-muted:  #6b8f71;
   --color-gold:         #C4A66A;
   --color-dark:         #4A4E4A;
   --color-dark-sidebar: #2e312e;
   --color-surface:      #f4f4f2;
+  --color-beige:        #f7f5f0;
+  --color-beige-dark:   #e8e3d8;
   --color-brown:        #6B6358;
+  --color-brown-light:  #d4cfc4;
 }
 
 @layer base {
@@ -41,7 +46,28 @@
     to   { opacity: 1; }
   }
 
-  .animate-slide-up { animation: slide-up 0.2s ease-out; }
-  .animate-fade-in  { animation: fade-in 0.15s ease-out; }
-  .shadow-modal { box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+  @keyframes scale-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  @keyframes slide-up-stagger {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slide-in-left {
+    from { opacity: 0; transform: translateX(-16px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.6; }
+  }
+
+  .animate-slide-up         { animation: slide-up 0.35s ease-out; }
+  .animate-fade-in          { animation: fade-in 0.3s ease-out; }
+  .animate-scale-in         { animation: scale-in 0.45s ease-out; }
+  .animate-slide-up-stagger { animation: slide-up-stagger 0.5s ease-out forwards; }
+  .animate-slide-in-left    { animation: slide-in-left 0.4s ease-out forwards; }
+  .animate-pulse-soft       { animation: pulse-soft 3s ease-in-out infinite; }
+  .shadow-modal             { box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
 }
