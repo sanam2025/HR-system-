@@ -3,14 +3,12 @@ import React from "react";
 import { Eye, Edit, DollarSign, FileText, CheckCircle } from "lucide-react";
 import type { PayrollRecord, PayrollStatus } from "../../types/payroll.types";
 import { statusConfig, formatSalary } from "../../types/payroll.types";
-
 interface PayrollTableRowProps {
   record: PayrollRecord;
   onView: (record: PayrollRecord) => void;
   onEdit: (record: PayrollRecord) => void;
   onStatusChange: (record: PayrollRecord, status: PayrollStatus) => void;
 }
-
 const actionButtons: Record<
   PayrollStatus,
   { label: string; icon: React.ReactNode; color: string }
@@ -36,7 +34,6 @@ const actionButtons: Record<
     color: "text-emerald-600 hover:bg-emerald-50",
   },
 };
-
 export const PayrollTableRow: React.FC<PayrollTableRowProps> = ({
   record,
   onView,
@@ -45,7 +42,6 @@ export const PayrollTableRow: React.FC<PayrollTableRowProps> = ({
 }) => {
   const status = statusConfig[record.status];
   const action = actionButtons[record.status];
-
   const handleActionClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (record.status === "issued") {
@@ -56,7 +52,6 @@ export const PayrollTableRow: React.FC<PayrollTableRowProps> = ({
       onStatusChange(record, "issued");
     }
   };
-
   return (
     <tr className="hover:bg-gray-50/50 transition-colors cursor-pointer group">
       <td className="px-5 py-3.5">
@@ -135,5 +130,4 @@ export const PayrollTableRow: React.FC<PayrollTableRowProps> = ({
     </tr>
   );
 };
-
 export default PayrollTableRow;

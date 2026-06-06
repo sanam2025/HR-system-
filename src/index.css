@@ -175,9 +175,34 @@ svg {
 button {
   cursor: pointer !important;
 }
+
 /* ========================================
    MODAL STYLES (DO NOT CHANGE)
    ======================================== */
 .fixed.inset-0 {
   z-index: 99999 !important;
+}
+/* ========================================
+   SIDEBAR FIX - ONLY THIS
+   ======================================== */
+
+/* فقط للشاشات الصغيرة - تعديل عرض السايد بار والمحتوى */
+@media (max-width: 768px) {
+  .fixed.left-0 {
+    width: 70px !important;
+  }
+
+  main {
+    margin-left: 70px !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .fixed.left-0 {
+    width: 80px !important;
+  }
+
+  main {
+    margin-left: 80px !important;
+  }
 }

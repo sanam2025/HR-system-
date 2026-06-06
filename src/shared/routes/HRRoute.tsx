@@ -20,7 +20,7 @@ const route = createBrowserRouter([
       { path: "leaves", element: <Leaves /> },
       { path: "recruitment", element: <Recruitment /> },
       { path: "payroll", element: <Payroll /> },
-      { path: "Attendance", element: <Attendance /> },
+     
     ],
   },
 ]);

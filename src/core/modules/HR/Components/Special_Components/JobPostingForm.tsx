@@ -1,7 +1,15 @@
 // core/modules/HR/Components/Special_Components/JobPostingForm.tsx
 import React, { useState } from "react";
-import { X, Briefcase, Building2, Users, User, AlertCircle, Send } from "lucide-react";
-import type{ JobPostingData } from "../../types/recruitment.types";
+import {
+  X,
+  Briefcase,
+  Building2,
+  Users,
+  User,
+  AlertCircle,
+  Send,
+} from "lucide-react";
+import type { JobPostingData } from "../../types/recruitment.types";
 
 interface JobPostingFormProps {
   isOpen: boolean;
@@ -24,7 +32,11 @@ const priorities = [
   { value: "low" as const, label: "Low", color: "text-green-600" },
 ];
 
-export const JobPostingForm: React.FC<JobPostingFormProps> = ({ isOpen, onClose, onSubmit }) => {
+export const JobPostingForm: React.FC<JobPostingFormProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+}) => {
   const [formData, setFormData] = useState<JobPostingData>({
     jobTitle: "",
     department: "",
@@ -36,9 +48,13 @@ export const JobPostingForm: React.FC<JobPostingFormProps> = ({ isOpen, onClose,
     deadline: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -59,13 +75,18 @@ export const JobPostingForm: React.FC<JobPostingFormProps> = ({ isOpen, onClose,
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" dir="ltr">
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      dir="ltr"
+    >
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex justify-between items-center">
+        <div className="sticky top-0 bg-white z-40 border-b border-gray-100 px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Briefcase className="w-5 h-5 text-blue-600" />
-            <h2 className="text-xl font-semibold text-gray-800">Post New Job Opening</h2>
+            <h2 className="text-xl font-semibold text-gray-800">
+              Post New Job Opening
+            </h2>
           </div>
           <button
             onClick={onClose}
@@ -111,8 +132,10 @@ export const JobPostingForm: React.FC<JobPostingFormProps> = ({ isOpen, onClose,
                 className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white"
               >
                 <option value="">Select Department</option>
-                {departments.map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
+                {departments.map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept}
+                  </option>
                 ))}
               </select>
             </div>
@@ -149,8 +172,10 @@ export const JobPostingForm: React.FC<JobPostingFormProps> = ({ isOpen, onClose,
                   onChange={handleChange}
                   className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none bg-white"
                 >
-                  {priorities.map(p => (
-                    <option key={p.value} value={p.value}>{p.label}</option>
+                  {priorities.map((p) => (
+                    <option key={p.value} value={p.value}>
+                      {p.label}
+                    </option>
                   ))}
                 </select>
               </div>
