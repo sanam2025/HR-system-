@@ -1,13 +1,7 @@
 // core/modules/HR/pages/Dashboard.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Users,
-  Calendar,
-  AlertCircle,
-  TrendingUp,
-  DollarSign,
-} from "lucide-react";
+import { Users, Calendar, TrendingUp, DollarSign } from "lucide-react";
 import StatCard from "../Components/common_Components/StatCard";
 import LeaveRequestItem from "../Components/Special_Components/LeaveRequestItem";
 
@@ -16,7 +10,6 @@ import LeaveRequestItem from "../Components/Special_Components/LeaveRequestItem"
 const statsData = {
   totalEmployees: 6,
   pendingLeaves: 2,
-  pendingComplaints: 2,
   attendanceRate: "88.5%",
   payrollCost: "4,520,000 SYP",
 };
@@ -38,7 +31,6 @@ export default function Dashboard() {
   // Navigation functions
   const goToEmployees = () => navigate("/Hr/employees");
   const goToLeaves = () => navigate("/Hr/leaves");
-  const goToComplaints = () => navigate("/Hr/complaints");
   const goToAttendance = () => navigate("/Hr/attendance");
   const goToPayroll = () => navigate("/Hr/payroll");
 
@@ -54,15 +46,8 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {/* Stats Grid - 5 Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 mb-8">
-        <StatCard
-          title="Pending Leave Requests"
-          value={statsData.pendingLeaves}
-          icon={<Calendar className="w-5 h-5" />}
-          color="orange"
-          onClick={goToLeaves}
-        />
+      {/* Stats Grid - 4 Cards (بدون شكاوى) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         <StatCard
           title="Total Employees"
           value={statsData.totalEmployees}
@@ -71,18 +56,18 @@ export default function Dashboard() {
           onClick={goToEmployees}
         />
         <StatCard
+          title="Pending Leave Requests"
+          value={statsData.pendingLeaves}
+          icon={<Calendar className="w-5 h-5" />}
+          color="orange"
+          onClick={goToLeaves}
+        />
+        <StatCard
           title="Payroll Cost"
           value={statsData.payrollCost}
           icon={<DollarSign className="w-5 h-5" />}
           color="green"
           onClick={goToPayroll}
-        />
-        <StatCard
-          title="Pending Complaints"
-          value={statsData.pendingComplaints}
-          icon={<AlertCircle className="w-5 h-5" />}
-          color="red"
-          onClick={goToComplaints}
         />
         <StatCard
           title="Attendance Rate"

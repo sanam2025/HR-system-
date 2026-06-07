@@ -1,4 +1,5 @@
 // core/modules/HR/types/employee.types.ts
+
 export type EmployeeStatus = 'active' | 'inactive' | 'onLeave';
 
 export interface Employee {
@@ -11,6 +12,13 @@ export interface Employee {
   status: EmployeeStatus;
   joinDate?: string;
   phone?: string;
-  // إضافة Index Signature
-  [key: string]: string | EmployeeStatus | undefined;
+}
+
+export interface EmployeeEvaluation {
+  id: string;
+  employeeId: string;
+  rating: number;
+  comments: string;
+  evaluatedBy: string;
+  evaluationDate: string;
 }
