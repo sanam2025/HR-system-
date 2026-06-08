@@ -236,6 +236,20 @@ const ar = {
     },
     searchPlaceholder: 'ابحث عن الموظفين...',
     recordsTitle: 'سجلات الحضور:',
+    tabs: {
+      byEmployee: 'حسب الموظف',
+      generalReport: 'تقرير الحضور العام'
+    },
+    filter: {
+      fromDate: 'من تاريخ',
+      toDate: 'إلى تاريخ',
+      status: 'الحالة',
+      all: 'الكل',
+      present: 'حاضر',
+      absent: 'غائب',
+      late: 'متأخر'
+    },
+    employeeCol: 'الموظف',
     columns: {
       date: 'التاريخ',
       status: 'الحالة',
@@ -289,6 +303,9 @@ const ar = {
       title: 'طلب شاغر وظيفي جديد',
       positionTitle: 'المسمى الوظيفي',
       positionPlaceholder: 'مثال: مطور واجهات أمامية...',
+      description: 'الوصف الوظيفي',
+      descriptionPlaceholder: 'اكتب وصفاً تفصيلياً للوظيفة والمهام المطلوبة...',
+      experience: 'سنوات الخبرة المطلوبة',
       count: 'العدد المطلوب',
       reason: 'سبب الطلب',
       reasonPlaceholder: 'لماذا نحتاج هذا الشاغر؟',

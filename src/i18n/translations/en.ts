@@ -239,6 +239,20 @@ const en = {
     },
     searchPlaceholder: 'Search employees...',
     recordsTitle: 'Attendance Records:',
+    tabs: {
+      byEmployee: 'By Employee',
+      generalReport: 'General Report'
+    },
+    filter: {
+      fromDate: 'From Date',
+      toDate: 'To Date',
+      status: 'Status',
+      all: 'All',
+      present: 'Present',
+      absent: 'Absent',
+      late: 'Late'
+    },
+    employeeCol: 'Employee',
     columns: {
       date: 'Date',
       status: 'Status',
@@ -292,6 +306,9 @@ const en = {
       title: 'Request New Job Vacancy',
       positionTitle: 'Position Title',
       positionPlaceholder: 'e.g., Senior React Developer',
+      description: 'Job Description',
+      descriptionPlaceholder: 'Describe the role, responsibilities and expectations...',
+      experience: 'Required Years of Experience',
       count: 'Number of Positions',
       reason: 'Reason for Request',
       reasonPlaceholder: 'Why is this position needed?',
