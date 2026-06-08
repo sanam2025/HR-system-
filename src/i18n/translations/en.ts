@@ -232,6 +232,7 @@ const en = {
     title: 'Attendance Overview',
     subtitle: 'Track employee attendance records',
     stats: {
+      total: 'Total Days',
       present: 'Present Days',
       absent: 'Absent Days',
       late: 'Late Days'
