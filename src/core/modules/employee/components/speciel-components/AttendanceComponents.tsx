@@ -15,8 +15,8 @@ export function AlertBannerCard({
 
 export function RequestLeaveCard() {
   return (
-    <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <h3 className="text-sm font-semibold text-dark mb-4">Request Leave</h3>
+    <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+      <h3 className="text-sm font-semibold text-dark mb-3 sm:mb-4">Request Leave</h3>
       <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
         <div>
           <label htmlFor="leave-type" className="block text-xs text-gray-500 mb-1">
@@ -98,8 +98,8 @@ function PendingRequestCard({ request, index }: { request: LeaveRequest; index: 
 
 export function PendingRequestsCard({ requests }: { requests: LeaveRequest[] }) {
   return (
-    <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <h3 className="text-sm font-semibold text-dark mb-4">Pending Requests</h3>
+    <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+      <h3 className="text-sm font-semibold text-dark mb-3 sm:mb-4">Pending Requests</h3>
       <div className="space-y-3">
         {requests.map((req, i) => (
           <PendingRequestCard key={req.id} request={req} index={i} />
@@ -111,10 +111,10 @@ export function PendingRequestsCard({ requests }: { requests: LeaveRequest[] }) 
 
 export function RecentAttendanceLogCard({ log }: { log: AttendanceLogEntry[] }) {
   return (
-    <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <h3 className="text-sm font-semibold text-dark mb-4">Recent Attendance Log</h3>
+    <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+      <h3 className="text-sm font-semibold text-dark mb-3 sm:mb-4">Recent Attendance Log</h3>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-xs sm:text-sm">
           <thead>
             <tr className="border-b border-gray-100">
               <th scope="col" className="text-left py-2.5 text-xs text-gray-400 font-medium">Date</th>

@@ -27,15 +27,15 @@ function LeaveProgressSection({
 
 export function DailyAttendanceCard({ data }: { data: DailyAttendance }) {
   return (
-    <article className="bg-white rounded-2xl p-5 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md animate-scale-in">
-      <header className="flex items-center justify-between mb-4">
+    <article className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md animate-scale-in">
+      <header className="flex items-center justify-between mb-3 sm:mb-4">
         <div className="flex items-center gap-2 text-gray-500 text-sm">
           <Clock size={16} aria-hidden="true" />
           <span>Daily Attendance</span>
         </div>
         <Badge variant="warning">{data.status}</Badge>
       </header>
-      <p className="text-3xl font-bold text-dark mb-4" aria-live="polite">
+      <p className="text-2xl sm:text-3xl font-bold text-dark mb-3 sm:mb-4" aria-live="polite">
         <time>{data.currentTime}</time>
       </p>
       <div className="flex gap-3 w-full">
@@ -60,8 +60,8 @@ export function DailyAttendanceCard({ data }: { data: DailyAttendance }) {
 
 export function LeaveBalanceCard({ data }: { data: LeaveBalance }) {
   return (
-    <article className="bg-white rounded-2xl p-5 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md animate-scale-in">
-      <header className="flex items-center gap-2 text-gray-500 text-sm mb-4">
+    <article className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md animate-scale-in">
+      <header className="flex items-center gap-2 text-gray-500 text-sm mb-3 sm:mb-4">
         <Calendar size={16} aria-hidden="true" />
         <span>Leave Balance</span>
       </header>
@@ -112,8 +112,8 @@ function TaskItem({ task, index }: { task: EmployeeTask; index: number }) {
 
 export function RecentTasksCard({ tasks }: { tasks: EmployeeTask[] }) {
   return (
-    <article className="bg-white rounded-2xl p-5 shadow-sm border border-gray-50 w-full transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <h3 className="text-sm font-semibold text-dark mb-4">Recent Tasks</h3>
+    <article className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-50 w-full transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+      <h3 className="text-sm font-semibold text-dark mb-3 sm:mb-4">Recent Tasks</h3>
       <div className="space-y-3">
         {tasks.map((task, i) => (
           <TaskItem key={task.id} task={task} index={i} />
@@ -132,8 +132,8 @@ export function RecentTasksCard({ tasks }: { tasks: EmployeeTask[] }) {
 
 export function AnnouncementsCard({ announcements }: { announcements: Announcement[] }) {
   return (
-    <article className="bg-green rounded-2xl p-5 shadow-sm text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <h3 className="text-sm font-semibold mb-4 text-white/90">Announcements</h3>
+    <article className="bg-green rounded-2xl p-4 sm:p-5 shadow-sm text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+      <h3 className="text-sm font-semibold mb-3 sm:mb-4 text-white/90">Announcements</h3>
       <div className="space-y-3">
         {announcements.map((ann) => (
           <div key={ann.id} className="border-b border-white/10 pb-2 last:border-0">

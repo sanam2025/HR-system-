@@ -30,8 +30,8 @@ function PayslipRow({
 
 export function PayslipCard({ data }: { data: Payslip }) {
   return (
-    <article className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50 w-full transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md animate-scale-in">
-      <header className="flex items-center justify-between mb-5">
+    <article className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50 w-full transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md animate-scale-in">
+      <header className="flex items-center justify-between mb-4 sm:mb-5">
         <div>
           <h3 className="text-sm font-semibold text-dark">Monthly Payslip</h3>
           <p className="text-xs text-gray-400">{data.month} {data.year}</p>
@@ -44,15 +44,15 @@ export function PayslipCard({ data }: { data: Payslip }) {
           <Download size={18} className="text-green" />
         </button>
       </header>
-      <div className="space-y-4 mb-5">
+      <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-5">
         <PayslipRow label="Basic Salary" amount={data.basicSalary} amountColor="text-dark" />
         <PayslipRow label="Bonuses & Allowances" amount={data.bonuses} amountColor="text-green" prefix="+" />
         <PayslipRow label="Deductions" amount={data.deductions} amountColor="text-red-500" prefix="-" />
       </div>
-      <footer className="flex items-center justify-between pt-4 border-t border-gray-100">
+      <footer className="flex items-center justify-between pt-3 sm:pt-4 border-t border-gray-100">
         <div>
           <p className="text-xs text-gray-400">Net Amount</p>
-          <p className="text-xl font-bold text-green-dark whitespace-nowrap">{formatCurrency(data.netAmount)}</p>
+          <p className="text-lg sm:text-xl font-bold text-green-dark whitespace-nowrap">{formatCurrency(data.netAmount)}</p>
         </div>
         <div className="w-10 h-10 rounded-xl bg-green-light flex items-center justify-center flex-shrink-0" aria-hidden="true">
           <Wallet size={20} className="text-green" />
@@ -80,8 +80,8 @@ function TaskCard({ task, index }: { task: AssignedTask; index: number }) {
 
 export function AssignedTasksCard({ tasks }: { tasks: AssignedTask[] }) {
   return (
-    <article className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <h3 className="text-sm font-semibold text-dark mb-4">Assigned Tasks</h3>
+    <article className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+      <h3 className="text-sm font-semibold text-dark mb-3 sm:mb-4">Assigned Tasks</h3>
       <div className="space-y-3">
         {tasks.map((task, i) => (
           <TaskCard key={task.id} task={task} index={i} />

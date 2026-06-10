@@ -4,9 +4,9 @@ import { mockProfileData } from "../data/mockEmployeeData";
 export default function EmployeeProfile() {
   const data = mockProfileData;
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in">
       <ProfileHeader profile={data.profile} />
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="lg:col-span-2">
           <PersonalDetailsCard details={data.personalDetails} />
         </div>

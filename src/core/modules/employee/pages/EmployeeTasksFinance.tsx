@@ -4,7 +4,7 @@ import { mockTasksFinanceData } from "../data/mockEmployeeData";
 export default function EmployeeTasksFinance() {
   const data = mockTasksFinanceData;
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-xl sm:text-2xl font-bold text-dark">Tasks & Financial Services</h1>
@@ -14,7 +14,7 @@ export default function EmployeeTasksFinance() {
           Submit Resignation Request
         </button>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <PayslipCard data={data.payslip} />
         <AssignedTasksCard tasks={data.assignedTasks} />
       </div>

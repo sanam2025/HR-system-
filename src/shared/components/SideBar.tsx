@@ -15,7 +15,7 @@ export interface SidebarProps {
   onToggle: () => void;
   navItems: NavItem[];
   brand?: { logo?: string; title?: string; subtitle?: string };
-  user?: { avatar: string; name: string; role: string };
+  user?: { avatar: string; name: string;role: string };
   navSectionLabel?: string;
 }
 

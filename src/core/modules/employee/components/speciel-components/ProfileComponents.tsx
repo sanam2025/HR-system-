@@ -19,24 +19,24 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 
 export function ProfileHeader({ profile }: { profile: EmployeeProfile }) {
   return (
-    <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50 flex items-center gap-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md animate-scale-in">
+    <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md animate-scale-in">
       <div
-        className="w-20 h-20 rounded-2xl bg-green flex items-center justify-center text-white text-2xl font-bold flex-shrink-0"
+        className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-green flex items-center justify-center text-white text-xl sm:text-2xl font-bold flex-shrink-0"
         aria-label={`${profile.fullName}'s avatar`}
       >
         {profile.avatar}
       </div>
-      <div className="flex-1 min-w-0">
-        <h2 className="text-xl font-bold text-dark truncate">{profile.fullName}</h2>
+      <div className="flex-1 min-w-0 text-center sm:text-left">
+        <h2 className="text-lg sm:text-xl font-bold text-dark truncate">{profile.fullName}</h2>
         <p className="text-green font-medium text-sm">{profile.jobTitle}</p>
-        <div className="flex gap-2 mt-2">
+        <div className="flex gap-2 mt-2 justify-center sm:justify-start flex-wrap">
           <Badge>{profile.employeeId}</Badge>
           <Badge>{profile.department}</Badge>
         </div>
       </div>
         <button
           type="button"
-          className="px-5 py-2.5 bg-green text-white rounded-xl text-sm font-medium hover:bg-green-dark transition-colors flex-shrink-0 active:scale-[0.97] transition-transform duration-100"
+          className="w-full sm:w-auto px-5 py-2.5 bg-green text-white rounded-xl text-sm font-medium hover:bg-green-dark transition-colors flex-shrink-0 active:scale-[0.97] transition-transform duration-100"
           aria-label="Edit profile"
         >
           Edit Profile
@@ -47,9 +47,9 @@ export function ProfileHeader({ profile }: { profile: EmployeeProfile }) {
 
 export function PersonalDetailsCard({ details }: { details: Record<string, string> }) {
   return (
-    <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <h3 className="text-sm font-semibold text-dark mb-4">Personal Details</h3>
-      <div className="grid grid-cols-2 gap-x-8 gap-y-5 pl-1">
+    <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+      <h3 className="text-sm font-semibold text-dark mb-3 sm:mb-4">Personal Details</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 sm:gap-x-8 gap-y-4 sm:gap-y-5 pl-1">
         {Object.entries(details).map(([key, value]) => (
           <DetailRow key={key} label={key} value={value} />
         ))}
@@ -77,8 +77,8 @@ function DocumentItem({ doc, index }: { doc: Document; index: number }) {
 
 export function DocumentsCard({ documents }: { documents: Document[] }) {
   return (
-    <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <header className="flex items-center justify-between mb-4">
+    <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+      <header className="flex items-center justify-between mb-3 sm:mb-4">
         <h3 className="text-sm font-semibold text-dark">Documents</h3>
         <button
           type="button"
@@ -99,8 +99,8 @@ export function DocumentsCard({ documents }: { documents: Document[] }) {
 
 export function EmploymentStatusCard({ status }: { status: EmploymentStatus }) {
   return (
-    <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <h3 className="text-sm font-semibold text-dark mb-5">Employment Status</h3>
+    <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+      <h3 className="text-sm font-semibold text-dark mb-4 sm:mb-5">Employment Status</h3>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div>
           <p className="text-xs text-gray-400 mb-1">Join Date</p>
