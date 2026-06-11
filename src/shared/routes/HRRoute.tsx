@@ -11,6 +11,7 @@ import AllApplicants from "../../core/modules/HR/pages/AllApplicants";
 import AcceptedCandidates from "../../core/modules/HR/pages/AcceptedCandidates";
 import Terminations from "../../core/modules/HR/pages/Terminations";
 import Resignations from "../../core/modules/HR/pages/Resignations";
+import Contracts from "../../core/modules/HR/pages/Contracts";
 
 
 const route = createBrowserRouter([
@@ -30,6 +31,7 @@ const route = createBrowserRouter([
       { path: "accepted-candidates", element: <AcceptedCandidates /> },
      { path: "terminations", element: <Terminations /> },
      { path: "resignations", element: <Resignations /> },
+     { path: "contracts", element: <Contracts /> },
     ],
   },
 ]);

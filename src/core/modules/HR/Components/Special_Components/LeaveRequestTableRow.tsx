@@ -29,8 +29,12 @@ export const LeaveRequestTableRow: React.FC<LeaveRequestTableRowProps> = ({
 
   const handleStatusClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const newStatus: LeaveStatus = request.status === "pending" ? "approved" : 
-                                   request.status === "approved" ? "rejected" : "pending";
+    const newStatus: LeaveStatus =
+      request.status === "pending"
+        ? "approved"
+        : request.status === "approved"
+          ? "rejected"
+          : "pending";
     onStatusChange(request, newStatus);
   };
 
@@ -39,18 +43,26 @@ export const LeaveRequestTableRow: React.FC<LeaveRequestTableRowProps> = ({
   return (
     <tr className="hover:bg-gray-50/50 transition-colors cursor-pointer group">
       <td className="px-5 py-3.5">
-        <span className="text-sm font-medium text-gray-800">{request.employeeName}</span>
+        <span className="text-sm font-medium text-gray-800">
+          {request.employeeName}
+        </span>
       </td>
-      <td className="px-5 py-3.5 text-sm text-gray-600">{request.department}</td>
+      <td className="px-5 py-3.5 text-sm text-gray-600">
+        {request.department}
+      </td>
       <td className="px-5 py-3.5">
-        <span className={`inline-flex px-2.5 py-1 rounded-lg text-xs font-medium ${leaveType.className}`}>
+        <span
+          className={`inline-flex px-2.5 py-1 rounded-lg text-xs font-medium ${leaveType.className}`}
+        >
           {leaveType.label}
         </span>
       </td>
       <td className="px-5 py-3.5">
         <div>
           <span className="text-sm text-gray-600">{dateRange}</span>
-          <div className="text-xs text-gray-400 mt-0.5">{request.duration} days</div>
+          <div className="text-xs text-gray-400 mt-0.5">
+            {request.duration} days
+          </div>
         </div>
       </td>
       <td className="px-5 py-3.5 text-sm text-gray-600">{request.reason}</td>

@@ -24,8 +24,8 @@ export default function Sidebar({
   open,
   onToggle,
   navItems,
-  brand = { logo: "🏢", title: "HR System", subtitle: "Damascus University" },
-  user = { avatar: "U", name: "User", role: "" },
+  brand = { logo: "👩‍💻", title: "HR System", subtitle: "" },
+  user = { avatar: "HR", name: "soulaf", role: "" },
   navSectionLabel = "Main Menu",
 }: SidebarProps) {
   return (

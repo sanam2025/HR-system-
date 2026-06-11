@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 import JobPostingForm from "../Components/Special_Components/JobPostingForm";
 import type { RecruitmentRequest, JobPostingData } from "../types/recruitment.types";
 
-// ============= Data (Static) =============
-const recruitmentRequests: RecruitmentRequest[] = [
+// ============= Constants (رفع البيانات خارج المكون) =============
+const RECRUITMENT_DATA: RecruitmentRequest[] = [
   {
     id: "1",
     jobTitle: "Web Developer",
@@ -37,10 +37,10 @@ const recruitmentRequests: RecruitmentRequest[] = [
     status: "pending",
     recommendedCount: 0,
   },
-];
+] as const;
 
 // قائمة المهارات للفلترة
-const skillsList = [
+const SKILLS_LIST = [
   "All Skills",
   "React",
   "TypeScript",
@@ -49,16 +49,90 @@ const skillsList = [
   "JavaScript",
   "MongoDB",
   "Tailwind CSS",
-];
+] as const;
 
+// ============= Helper Functions =============
+const getStatusBadge = (status: string) => {
+  const isApproved = status === "approved";
+  return {
+    label: isApproved ? "Approved" : "Pending",
+    className: isApproved 
+      ? "bg-emerald-100 text-emerald-700" 
+      : "bg-amber-100 text-amber-700"
+  };
+};
+
+const getStats = (requests: RecruitmentRequest[]) => ({
+  total: requests.length,
+  approved: requests.filter(r => r.status === "approved").length,
+  pending: requests.filter(r => r.status === "pending").length,
+  rejected: requests.filter(r => r.status === "rejected").length,
+});
+
+// ============= Stats Cards Component =============
+const StatsCards: React.FC<{ stats: ReturnType<typeof getStats> }> = ({ stats }) => {
+  const STATS_CONFIG = [
+    { label: "Total Requests", value: stats.total, color: "text-gray-800" },
+    { label: "Approved", value: stats.approved, color: "text-emerald-600" },
+    { label: "Pending", value: stats.pending, color: "text-amber-600" },
+    { label: "Rejected", value: stats.rejected, color: "text-gray-600" },
+  ] as const;
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      {STATS_CONFIG.map(({ label, value, color }) => (
+        <div key={label} className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+          <p className="text-xs text-gray-400 uppercase tracking-wider">{label}</p>
+          <p className={`text-2xl font-bold ${color} mt-1`}>{value}</p>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// ============= Table Row Component =============
+const RecruitmentTableRow: React.FC<{ 
+  request: RecruitmentRequest; 
+  onRecommend: (jobTitle: string) => void;
+}> = ({ request, onRecommend }) => {
+  const statusBadge = getStatusBadge(request.status);
+
+  return (
+    <tr className="hover:bg-gray-50/50 transition-colors">
+      <td className="px-5 py-3.5 text-sm font-medium text-gray-800">{request.jobTitle}</td>
+      <td className="px-5 py-3.5 text-sm text-gray-600">{request.department}</td>
+      <td className="px-5 py-3.5 text-sm text-gray-600">{request.requiredCount}</td>
+      <td className="px-5 py-3.5 text-sm text-gray-600">{request.requester}</td>
+      <td className="px-5 py-3.5">
+        <span className={`inline-flex px-2.5 py-1 rounded-lg text-xs font-medium ${statusBadge.className}`}>
+          {statusBadge.label}
+        </span>
+      </td>
+      <td className="px-5 py-3.5">
+        <span className="inline-flex items-center gap-1 text-sm text-green-600">
+          <ThumbsUp className="w-4 h-4" /> {request.recommendedCount || 0}
+        </span>
+      </td>
+      <td className="px-5 py-3.5">
+        <button
+          onClick={() => onRecommend(request.jobTitle)}
+          className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+        >
+          Recommend
+        </button>
+      </td>
+    </tr>
+  );
+};
+
+// ============= Main Component =============
 export default function Recruitment() {
   const navigate = useNavigate();
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const stats = getStats(RECRUITMENT_DATA as RecruitmentRequest[]);
 
-  const handleViewAllApplicants = () => {
-    navigate("/Hr/all-applicants");
-  };
-
+  const handleViewAllApplicants = () => navigate("/Hr/all-applicants");
+  
   const handleRecommend = (jobTitle: string) => {
     alert(`✅ ${jobTitle} position has been recommended for review!`);
   };
@@ -68,9 +142,6 @@ export default function Recruitment() {
     setIsFormOpen(false);
     alert(`✅ Job "${formData.jobTitle}" has been posted successfully!`);
   };
-
-  // بدون فلترة (static)
-  const filteredRequests = recruitmentRequests;
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
@@ -98,26 +169,9 @@ export default function Recruitment() {
       </div>
 
       {/* Stats Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-          <p className="text-xs text-gray-400 uppercase tracking-wider">Total Requests</p>
-          <p className="text-2xl font-bold text-gray-800 mt-1">{recruitmentRequests.length}</p>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-          <p className="text-xs text-gray-400 uppercase tracking-wider">Approved</p>
-          <p className="text-2xl font-bold text-emerald-600 mt-1">{recruitmentRequests.filter(r => r.status === "approved").length}</p>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-          <p className="text-xs text-gray-400 uppercase tracking-wider">Pending</p>
-          <p className="text-2xl font-bold text-amber-600 mt-1">{recruitmentRequests.filter(r => r.status === "pending").length}</p>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-          <p className="text-xs text-gray-400 uppercase tracking-wider">Rejected</p>
-          <p className="text-2xl font-bold text-gray-600 mt-1">{recruitmentRequests.filter(r => r.status === "rejected").length}</p>
-        </div>
-      </div>
+      <StatsCards stats={stats} />
 
-      {/* Filters - فلتر المهارة فقط (Static UI) */}
+      {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex items-center gap-2">
@@ -125,10 +179,8 @@ export default function Recruitment() {
             <span className="text-sm text-gray-600">Filter by skill:</span>
           </div>
           <select className="px-4 py-2 border border-gray-200 rounded-lg text-sm min-w-[180px] bg-white">
-            {skillsList.map((skill) => (
-              <option key={skill} value={skill}>
-                {skill}
-              </option>
+            {SKILLS_LIST.map((skill) => (
+              <option key={skill} value={skill}>{skill}</option>
             ))}
           </select>
           <button
@@ -156,31 +208,12 @@ export default function Recruitment() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {filteredRequests.map((request) => (
-                <tr key={request.id} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-5 py-3.5 text-sm font-medium text-gray-800">{request.jobTitle}</td>
-                  <td className="px-5 py-3.5 text-sm text-gray-600">{request.department}</td>
-                  <td className="px-5 py-3.5 text-sm text-gray-600">{request.requiredCount}</td>
-                  <td className="px-5 py-3.5 text-sm text-gray-600">{request.requester}</td>
-                  <td className="px-5 py-3.5">
-                    <span className={`inline-flex px-2.5 py-1 rounded-lg text-xs font-medium ${request.status === "approved" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
-                      {request.status === "approved" ? "Approved" : "Pending"}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span className="inline-flex items-center gap-1 text-sm text-green-600">
-                      <ThumbsUp className="w-4 h-4" /> {request.recommendedCount || 0}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <button
-                      onClick={() => handleRecommend(request.jobTitle)}
-                      className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
-                    >
-                      Recommend
-                    </button>
-                  </td>
-                </tr>
+              {(RECRUITMENT_DATA as RecruitmentRequest[]).map((request) => (
+                <RecruitmentTableRow
+                  key={request.id}
+                  request={request}
+                  onRecommend={handleRecommend}
+                />
               ))}
             </tbody>
           </table>

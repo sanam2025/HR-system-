@@ -9,7 +9,8 @@ import {
   UserPlus,
   Clock,
   UsersRound,
-  LogOut, // للاستقالات
+  LogOut,
+  FileText, // للاستقالات
 } from "lucide-react";
 import { useState } from "react";
 
@@ -25,7 +26,8 @@ export default function HRLayout() {
     { path: "Payroll", label: "Payroll", icon: DollarSign, exact: false },
     { path: "accepted-candidates", label: "Accepted Candidates", icon: Users, exact: false },
     { path: "terminations", label: "Terminations", icon: Users, exact: false },
-    { path: "resignations", label: "Resignations", icon: LogOut, exact: false }, // جديد
+    { path: "resignations", label: "Resignations", icon: LogOut, exact: false },
+    { path: "contracts", label: "Contracts", icon: FileText, exact: false }, // 
   ];
 
   return (

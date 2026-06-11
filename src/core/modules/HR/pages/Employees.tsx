@@ -4,8 +4,8 @@ import { Download, Star } from "lucide-react";
 import EvaluationModal from "../Components/Special_Components/EvaluationModal";
 import type { Employee } from "../types/employee.types";
 
-// ============= Data (Static) =============
-const employees: Employee[] = [
+// ============= Constants (رفع البيانات خارج المكون) =============
+const EMPLOYEES_DATA: Employee[] = [
   {
     id: "1",
     employeeNumber: "DU-2019-001",
@@ -94,34 +94,85 @@ const employees: Employee[] = [
     joinDate: "2016-09-01",
     phone: "011-8901234",
   },
-];
+] as const;
 
+// ============= Table Columns Configuration =============
+const TABLE_COLUMNS = [
+  { key: "employeeNumber", label: "Employee Number", className: "text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider" },
+  { key: "employee", label: "Employee", className: "text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider" },
+  { key: "department", label: "Department", className: "text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider" },
+  { key: "jobTitle", label: "Job Title", className: "text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider" },
+  { key: "actions", label: "Actions", className: "text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider" },
+] as const;
+
+// ============= Helper Functions =============
+const getStatusText = (status: string): string => {
+  if (status === "active") return "Active";
+  if (status === "onLeave") return "On Leave";
+  return "Inactive";
+};
+
+const exportToCSV = (employees: Employee[]) => {
+  const headers = ["Employee Number", "Name", "Email", "Department", "Job Title", "Status"];
+  const rows = employees.map(emp => [
+    emp.employeeNumber,
+    emp.name,
+    emp.email,
+    emp.department,
+    emp.jobTitle,
+    getStatusText(emp.status),
+  ]);
+  
+  const csvContent = [headers, ...rows].map(row => row.join(",")).join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.href = url;
+  link.setAttribute("download", "employees.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
+// ============= Employee Row Component =============
+const EmployeeRow: React.FC<{ employee: Employee; onEvaluate: (employee: Employee) => void }> = ({ 
+  employee, 
+  onEvaluate 
+}) => {
+  return (
+    <tr className="hover:bg-gray-50/50 transition-colors">
+      <td className="px-5 py-3.5">
+        <span className="text-sm font-medium text-gray-800">{employee.employeeNumber}</span>
+      </td>
+      <td className="px-5 py-3.5">
+        <div>
+          <div className="text-sm font-medium text-gray-800">{employee.name}</div>
+          <div className="text-xs text-gray-400 mt-0.5">{employee.email}</div>
+        </div>
+      </td>
+      <td className="px-5 py-3.5 text-sm text-gray-600">{employee.department}</td>
+      <td className="px-5 py-3.5 text-sm text-gray-600">{employee.jobTitle}</td>
+      <td className="px-5 py-3.5">
+        <button
+          onClick={() => onEvaluate(employee)}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-yellow-50 text-yellow-700 rounded-lg hover:bg-yellow-100 transition-colors"
+        >
+          <Star className="w-4 h-4" />
+          Evaluate
+        </button>
+      </td>
+    </tr>
+  );
+};
+
+// ============= Main Component =============
 export default function Employees() {
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [isEvaluationOpen, setIsEvaluationOpen] = useState(false);
 
-  const handleExportData = () => {
-    const headers = ["Employee Number", "Name", "Email", "Department", "Job Title", "Status"];
-    const rows = employees.map(emp => [
-      emp.employeeNumber,
-      emp.name,
-      emp.email,
-      emp.department,
-      emp.jobTitle,
-      emp.status === "active" ? "Active" : emp.status === "onLeave" ? "On Leave" : "Inactive"
-    ]);
-    
-    const csvContent = [headers, ...rows].map(row => row.join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.href = url;
-    link.setAttribute("download", "employees.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    
+  const handleExport = () => {
+    exportToCSV(EMPLOYEES_DATA as Employee[]);
     alert("Data exported successfully");
   };
 
@@ -133,6 +184,7 @@ export default function Employees() {
   const handleSaveEvaluation = (employeeId: string, rating: number, comments: string) => {
     console.log("Evaluation saved:", { employeeId, rating, comments });
     alert(`✅ Evaluation saved for ${selectedEmployee?.name}\nRating: ${rating}/5\nComments: ${comments || "No comments"}`);
+    setIsEvaluationOpen(false);
   };
 
   return (
@@ -153,7 +205,7 @@ export default function Employees() {
             <p className="text-gray-500 mt-1 text-sm">Manage university employee data and records.</p>
           </div>
           <button
-            onClick={handleExportData}
+            onClick={handleExport}
             className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-sm"
           >
             <Download className="w-4 h-4" />
@@ -162,12 +214,10 @@ export default function Employees() {
         </div>
       </div>
 
-      {/* Stats Cards - Removed */}
-
       {/* Results Summary */}
       <div className="flex justify-between items-center mb-4">
         <p className="text-sm text-gray-500">
-          Showing <span className="font-semibold text-gray-900">{employees.length}</span> employees
+          Showing <span className="font-semibold text-gray-900">{EMPLOYEES_DATA.length}</span> employees
         </p>
       </div>
 
@@ -177,37 +227,20 @@ export default function Employees() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/30">
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Employee Number</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Employee</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Department</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Job Title</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
+                {TABLE_COLUMNS.map((col) => (
+                  <th key={col.key} className={col.className}>
+                    {col.label}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {employees.map((employee) => (
-                <tr key={employee.id} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-5 py-3.5">
-                    <span className="text-sm font-medium text-gray-800">{employee.employeeNumber}</span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <div>
-                      <div className="text-sm font-medium text-gray-800">{employee.name}</div>
-                      <div className="text-xs text-gray-400 mt-0.5">{employee.email}</div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-600">{employee.department}</td>
-                  <td className="px-5 py-3.5 text-sm text-gray-600">{employee.jobTitle}</td>
-                  <td className="px-5 py-3.5">
-                    <button
-                      onClick={() => handleEvaluate(employee)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-yellow-50 text-yellow-700 rounded-lg hover:bg-yellow-100 transition-colors"
-                    >
-                      <Star className="w-4 h-4" />
-                      Evaluate
-                    </button>
-                  </td>
-                </tr>
+              {(EMPLOYEES_DATA as Employee[]).map((employee) => (
+                <EmployeeRow
+                  key={employee.id}
+                  employee={employee}
+                  onEvaluate={handleEvaluate}
+                />
               ))}
             </tbody>
           </table>
