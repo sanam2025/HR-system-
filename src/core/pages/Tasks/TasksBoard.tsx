@@ -101,7 +101,9 @@ export default function TasksBoard() {
     if (!evalRating) { toast.error(t.tasks.rateModal.error); return; }
     setTasks(prev => prev.map(tk => tk.id === showEval.id ? { ...tk, rating: evalRating, status: 'مكتملة' } : tk));
     toast.success(t.tasks.rateModal.success);
-    setShowEval(null); setEvalRating(0); setEvalNote('');
+    setShowEval(null);
+    setEvalRating(0);
+    setEvalNote('');
   };
 
   return (
@@ -316,7 +318,6 @@ export default function TasksBoard() {
         </div>
       )}
 
-      <style>{`@keyframes slideUp { from { opacity:0; transform:translateY(30px) } to { opacity:1; transform:translateY(0) } }`}</style>
     </div>
   );
 }

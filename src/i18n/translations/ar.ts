@@ -311,6 +311,7 @@ const ar = {
       reasonPlaceholder: 'لماذا نحتاج هذا الشاغر؟',
       requirements: 'المتطلبات الأساسية',
       requirementsPlaceholder: 'المهارات المطلوبة، الخبرة...',
+      requirementsHint: 'ابحث عن مهارة واضغط عليها لإضافتها',
       deadline: 'تاريخ التوظيف المستهدف',
       submitBtn: 'إرسال الطلب للموارد البشرية',
       successTitle: 'تم إرسال الطلب!',

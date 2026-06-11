@@ -1,10 +1,16 @@
+/**
+ * @deprecated هذا المكوّن غير مستخدم حالياً.
+ * استخدم `shared/components/SideBar.tsx` بدلاً منه، والذي يدعم RTL و useLanguage.
+ * تم الإبقاء على هذا الملف مؤقتاً ريثما يُنقل ما يحتاجه إلى الملف الصحيح.
+ *
+ * @see src/shared/components/SideBar.tsx
+ */
 import { NavLink } from 'react-router-dom';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
-// ── Types ───
+// ── Types ──
 
-/** عنصر واحد في القائمة الجانبية */
 export interface NavItem {
   label: string;
   icon: LucideIcon;
@@ -12,19 +18,13 @@ export interface NavItem {
   exact?: boolean;
 }
 
-/** معلومات الشعار */
 export interface SidebarBrand {
-  /** إيموجي أو حرف يظهر داخل المربع */
   logo?: string;
-  /** اسم النظام */
   title?: string;
-  /** اسم الجهة / الشركة */
   subtitle?: string;
 }
 
-/** معلومات المستخدم الحالي */
 export interface SidebarUser {
-  /** الحرف الأول أو الرمز */
   avatar: string;
   name: string;
   role: string;
@@ -33,17 +33,13 @@ export interface SidebarUser {
 export interface SidebarProps {
   open: boolean;
   onToggle: () => void;
-  /** قائمة عناصر التنقل — تُمرَّر من الـ Layout الأب */
   navItems: NavItem[];
-  /** معلومات الشعار (اختيارية) */
   brand?: SidebarBrand;
-  /** معلومات المستخدم (اختيارية) */
   user?: SidebarUser;
-  /** عنوان قسم القائمة (اختياري) */
   navSectionLabel?: string;
 }
 
-// ── Component ───
+// ── Component ──
 
 export default function Sidebar({
   open,

@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
+import { LanguageProvider } from './i18n/translations/LanguageContext';
 import ManagerLayout from './shared/layouts/ManagerLayout';
 import Dashboard from './core/pages/manager/Dashboard';
 import EmployeesList from './core/pages/manager/components/EmployeesList';
@@ -8,35 +9,38 @@ import AttendanceView from './core/pages/Attendance/AttendanceView';
 import LeaveRequests from './core/pages/Leaves/LeaveRequests';
 import OvertimeRequests from './core/pages/Leaves/OvertimeRequests';
 import PeriodicEvaluation from './core/pages/Evaluation/PeriodicEvaluation';
-import { LanguageProvider } from './i18n/translations/LanguageContext';
 import Recruitment from './core/pages/Recruitment/Recruitment';
 
+const router = createBrowserRouter([
+    {
+        path: '/',
+        element: <Navigate to="/manager" replace />,
+    },
+    {
+        path: '/manager',
+        element: <ManagerLayout />,
+        children: [
+            { index: true, element: <Dashboard /> },
+            { path: 'employees', element: <EmployeesList /> },
+            { path: 'employees/:id', element: <EmployeeProfile /> },
+            { path: 'tasks', element: <TasksBoard /> },
+            { path: 'leaves', element: <LeaveRequests /> },
+            { path: 'overtime', element: <OvertimeRequests /> },
+            { path: 'attendance', element: <AttendanceView /> },
+            { path: 'evaluation', element: <PeriodicEvaluation /> },
+            { path: 'recruitment', element: <Recruitment /> },
+        ],
+    },
+    {
+        path: '*',
+        element: <Navigate to="/manager" replace />,
+    },
+]);
 
-
-function App() {
+export default function AppRoutes() {
     return (
         <LanguageProvider>
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<Navigate to="/manager" replace />} />
-
-                    {/* ── Manager ── */}
-                    <Route path="/manager" element={<ManagerLayout />}>
-                        <Route index element={<Dashboard />} />
-                        <Route path="employees" element={<EmployeesList />} />
-                        <Route path="employees/:id" element={<EmployeeProfile />} />
-                        <Route path="tasks" element={<TasksBoard />} />
-                        <Route path="leaves" element={<LeaveRequests />} />
-                        <Route path="overtime" element={<OvertimeRequests />} />
-                        <Route path="attendance" element={<AttendanceView />} />
-                        <Route path="evaluation" element={<PeriodicEvaluation />} />
-                        <Route path="recruitment" element={<Recruitment />} />
-                    </Route>
-                    <Route path="*" element={<Navigate to="/manager" replace />} />
-                </Routes>
-            </BrowserRouter>
+            <RouterProvider router={router} />
         </LanguageProvider>
     );
 }
-
-export default App;

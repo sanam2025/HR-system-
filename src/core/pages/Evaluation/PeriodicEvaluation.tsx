@@ -4,6 +4,22 @@ import { Send } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
 
+// ── Types ──
+
+type RatingKey = 'performance' | 'attendance' | 'behavior' | 'teamwork' | 'initiative';
+
+type Ratings = Record<RatingKey, number>;
+
+const DEFAULT_RATINGS: Ratings = {
+  performance: 0,
+  attendance:  0,
+  behavior:    0,
+  teamwork:    0,
+  initiative:  0,
+};
+
+// ── Sub-components ──
+
 interface RatingRowProps {
   label: string;
   icon: string;
@@ -11,14 +27,12 @@ interface RatingRowProps {
   onChange: (value: number) => void;
 }
 
-type RatingKey = 'performance' | 'attendance' | 'behavior' | 'teamwork' | 'initiative';
-
 function RatingRow({ label, icon, value, onChange }: RatingRowProps) {
   return (
     <div className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
       <div className="flex items-center gap-3">
         <span className="text-xl w-7 text-center">{icon}</span>
-        <span className="text-sm font-semibold text-[#4A4E4A]">{label}</span>
+        <span className="text-sm font-semibold text-dark">{label}</span>
       </div>
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map(n => (
@@ -26,8 +40,9 @@ function RatingRow({ label, icon, value, onChange }: RatingRowProps) {
             key={n}
             type="button"
             onClick={() => onChange(n)}
-            className={`text-xl transition-all duration-150 hover:scale-110 ${n <= value ? 'text-[#C4A66A]' : 'text-gray-300'
-              } hover:text-[#C4A66A]`}
+            className={`text-xl transition-all duration-150 hover:scale-110 hover:text-gold ${
+              n <= value ? 'text-gold' : 'text-gray-300'
+            }`}
           >
             ★
           </button>
@@ -37,24 +52,31 @@ function RatingRow({ label, icon, value, onChange }: RatingRowProps) {
   );
 }
 
+// ── Page ──
+
 export default function PeriodicEvaluation() {
   const { t } = useLanguage();
+
   const [selectedEmp, setSelectedEmp] = useState('');
-  const [month, setMonth] = useState('');
-  const [ratings, setRatings] = useState<Record<RatingKey, number>>({
-    performance: 0,
-    attendance: 0,
-    behavior: 0,
-    teamwork: 0,
-    initiative: 0,
-  });
-  const [notes, setNotes] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [month, setMonth]             = useState('');
+  const [ratings, setRatings]         = useState<Ratings>(DEFAULT_RATINGS);
+  const [notes, setNotes]             = useState('');
+  const [submitted, setSubmitted]     = useState(false);
 
   const ratingValues = Object.values(ratings).filter(Boolean);
   const avgRating = ratingValues.length
     ? (ratingValues.reduce((a, b) => a + b, 0) / ratingValues.length).toFixed(1)
     : 0;
+
+  const employee = mockEmployees.find(e => e.id === Number(selectedEmp));
+
+  const criteriaKeys: Array<{ key: RatingKey; label: string; icon: string }> = [
+    { key: 'performance', label: t.evaluation.criteria.performance, icon: '📊' },
+    { key: 'attendance',  label: t.evaluation.criteria.attendance,  icon: '🛡️' },
+    { key: 'behavior',    label: t.evaluation.criteria.behavior,    icon: '💚' },
+    { key: 'teamwork',    label: t.evaluation.criteria.teamwork,    icon: '🏠' },
+    { key: 'initiative',  label: t.evaluation.criteria.initiative,  icon: '💡' },
+  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,86 +88,63 @@ export default function PeriodicEvaluation() {
     toast.success(t.evaluation.successMsg, { duration: 4000 });
   };
 
-  const employee = mockEmployees.find(e => e.id === Number(selectedEmp));
-
-  const criteriaKeys: Array<{ key: RatingKey; label: string; icon: string }> = [
-    { key: 'performance', label: t.evaluation.criteria.performance, icon: '📊' },
-    { key: 'attendance', label: t.evaluation.criteria.attendance, icon: '🛡️' },
-    { key: 'behavior', label: t.evaluation.criteria.behavior, icon: '💚' },
-    { key: 'teamwork', label: t.evaluation.criteria.teamwork, icon: '🏠' },
-    { key: 'initiative', label: t.evaluation.criteria.initiative, icon: '💡' },
-  ];
-
-  /* ── shared input style ── */
-  const inputCls =
-    'w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-[#4A4E4A] ' +
-    'placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4A7C59]/30 focus:border-[#4A7C59] ' +
-    'transition-all duration-150';
-
-  const labelCls = 'block mb-1.5 text-xs font-semibold text-[#6B6358] uppercase tracking-wide';
+  const handleReset = () => {
+    setSubmitted(false);
+    setSelectedEmp('');
+    setRatings(DEFAULT_RATINGS);
+    setNotes('');
+    setMonth('');
+  };
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       <Toaster position="top-center" />
 
-      {/* ── Header ── */}
+      {/* Header */}
       <div className="text-center">
-        <h2 className="text-2xl font-extrabold text-[#4A4E4A]">{t.evaluation.title}</h2>
-        <p className="text-sm text-[#6B6358] mt-1">
-          {t.evaluation.subtitle}
-        </p>
+        <h2 className="text-2xl font-extrabold text-dark">{t.evaluation.title}</h2>
+        <p className="text-sm text-brown mt-1">{t.evaluation.subtitle}</p>
       </div>
 
       {submitted ? (
-        /* ── Success Card ── */
-        <div className="bg-white rounded-2xl border border-[#4A7C59]/20 shadow-md p-10 text-center">
+        /* Success Card */
+        <div className="bg-white rounded-2xl border border-green/20 shadow-md p-10 text-center">
           <div className="text-6xl mb-4">✅</div>
-          <h3 className="text-xl font-bold text-[#4A7C59] mb-2">{t.evaluation.successCard.title}</h3>
-          <p className="text-[#6B6358] text-sm mb-6">
+          <h3 className="text-xl font-bold text-green mb-2">{t.evaluation.successCard.title}</h3>
+          <p className="text-brown text-sm mb-6">
             {t.evaluation.successCard.thankYou} <strong>{employee?.name}</strong>
           </p>
-          <p className="text-3xl font-extrabold text-[#C4A66A] mb-1">{avgRating} ★</p>
+          <p className="text-3xl font-extrabold text-gold mb-1">{avgRating} ★</p>
           <p className="text-xs text-gray-400 mb-6">{t.evaluation.successCard.avgRating}</p>
           <button
-            onClick={() => {
-              setSubmitted(false);
-              setSelectedEmp('');
-              setRatings({ performance: 0, attendance: 0, behavior: 0, teamwork: 0, initiative: 0 });
-              setNotes('');
-              setMonth('');
-            }}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#4A7C59] text-white text-sm font-semibold hover:bg-[#3a6347] transition-colors duration-150"
+            onClick={handleReset}
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-green text-white text-sm font-semibold hover:bg-green-dark transition-colors duration-150"
           >
             {t.evaluation.successCard.evaluateAnother}
           </button>
         </div>
       ) : (
-        /* ── Main Form ── */
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 space-y-6"
-        >
+        /* Main Form */
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelCls}>{t.evaluation.form.selectEmployee}</label>
+              <label className="form-label">{t.evaluation.form.selectEmployee}</label>
               <select
-                className={inputCls}
+                className="form-input"
                 value={selectedEmp}
                 onChange={e => setSelectedEmp(e.target.value)}
               >
                 <option value="">{t.evaluation.form.selectPlaceholder}</option>
                 {mockEmployees.map(emp => (
-                  <option key={emp.id} value={emp.id}>
-                    {emp.name}
-                  </option>
+                  <option key={emp.id} value={emp.id}>{emp.name}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className={labelCls}>{t.evaluation.form.evalMonth}</label>
+              <label className="form-label">{t.evaluation.form.evalMonth}</label>
               <input
                 type="month"
-                className={inputCls}
+                className="form-input"
                 value={month}
                 onChange={e => setMonth(e.target.value)}
               />
@@ -153,9 +152,7 @@ export default function PeriodicEvaluation() {
           </div>
 
           {/* Scale hint */}
-          <p className="text-xs text-gray-400 text-center">
-            {t.evaluation.form.scaleHint}
-          </p>
+          <p className="text-xs text-gray-400 text-center">{t.evaluation.form.scaleHint}</p>
 
           {/* Rating Criteria */}
           <div className="divide-y divide-gray-100">
@@ -172,17 +169,17 @@ export default function PeriodicEvaluation() {
 
           {/* Average Badge */}
           {Number(avgRating) > 0 && (
-            <div className="bg-[#C4A66A]/10 border border-[#C4A66A]/25 rounded-xl p-4 text-center">
-              <p className="text-xs text-[#6B6358] font-semibold mb-1">{t.evaluation.form.avgRating}</p>
-              <p className="text-3xl font-extrabold text-[#C4A66A]">{avgRating} ★</p>
+            <div className="bg-gold/10 border border-gold/25 rounded-xl p-4 text-center">
+              <p className="text-xs text-brown font-semibold mb-1">{t.evaluation.form.avgRating}</p>
+              <p className="text-3xl font-extrabold text-gold">{avgRating} ★</p>
             </div>
           )}
 
-          {/* Additional Notes */}
+          {/* Notes */}
           <div>
-            <label className={labelCls}>{t.evaluation.form.notes}</label>
+            <label className="form-label">{t.evaluation.form.notes}</label>
             <textarea
-              className={`${inputCls} resize-none h-28`}
+              className="form-input resize-none h-28"
               placeholder={t.evaluation.form.notesPlaceholder}
               value={notes}
               onChange={e => setNotes(e.target.value)}
@@ -191,7 +188,7 @@ export default function PeriodicEvaluation() {
 
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-[#4A7C59] text-white text-sm font-semibold hover:bg-[#3a6347] active:scale-[0.99] transition-all duration-150 shadow-sm"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-green text-white text-sm font-semibold hover:bg-green-dark active:scale-[0.99] transition-all duration-150 shadow-sm"
           >
             <Send size={15} />
             {t.evaluation.form.submit}

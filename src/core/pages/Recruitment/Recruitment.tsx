@@ -3,9 +3,9 @@ import { mockCandidates } from '../../../data/mockData';
 import { Send, ClipboardList, Trophy } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
-import en from '../../../i18n/translations/en';
 
-type RecruitmentTranslation = typeof en.recruitment;
+import type ar from '../../../i18n/translations/ar';
+type RecruitmentTranslation = typeof ar['recruitment'];
 
 const SKILL_OPTIONS = [
   'React', 'TypeScript', 'JavaScript', 'Node.js', 'Python', 'Java', 'C#', 'C++',
@@ -144,7 +144,7 @@ function JobVacancyRequest({ r }: { r: RecruitmentTranslation }) {
         </div>
 
         {form.skills.length === 0 && (
-          <p className="text-xs text-gray-400 mt-1.5">ابحث عن مهارة واضغط عليها لإضافتها</p>
+          <p className="text-xs text-gray-400 mt-1.5">{v.requirementsHint}</p>
         )}
       </div>
 

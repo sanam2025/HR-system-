@@ -137,8 +137,7 @@ export default function Topbar({
 
             {profileOpen && (
               <div
-                className="absolute end-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-[300]"
-                style={{ animation: 'slideDown 0.15s ease' }}
+                className="absolute end-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-[300] animate-slide-down"
               >
                 {/* User Info */}
                 <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
@@ -177,8 +176,7 @@ export default function Topbar({
           onClick={closeSearch}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden"
-            style={{ animation: 'slideDown 0.18s ease' }}
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-slide-down"
             onClick={e => e.stopPropagation()}
           >
             {/* Search Input */}
@@ -269,12 +267,6 @@ export default function Topbar({
         </div>
       )}
 
-      <style>{`
-        @keyframes slideDown {
-          from { opacity: 0; transform: translateY(-16px) scale(0.97); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-      `}</style>
     </>
   );
 }

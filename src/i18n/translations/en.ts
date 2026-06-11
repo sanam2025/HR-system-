@@ -314,6 +314,7 @@ const en = {
       reasonPlaceholder: 'Why is this position needed?',
       requirements: 'Key Requirements',
       requirementsPlaceholder: 'Required skills, experience...',
+      requirementsHint: 'Search for a skill and click to add it',
       deadline: 'Target Hiring Date',
       submitBtn: 'Submit Request to HR',
       successTitle: 'Request Sent!',

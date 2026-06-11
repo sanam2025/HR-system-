@@ -4,20 +4,9 @@ import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, R
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
 import type { LucideIcon } from 'lucide-react';
+import { TASK_STATUS_COLORS, TASK_STATUS_EN, CHART_MONTHS_EN } from '../../constants';
 
-const taskStatusColors: Record<string, string> = {
-  'جديدة': 'bg-blue-50 text-blue-700',
-  'قيد التنفيذ': 'bg-yellow-50 text-yellow-700',
-  'مكتملة': 'bg-green-50 text-green-700',
-  'متأخرة': 'bg-red-50 text-red-600',
-};
-
-const taskStatusEn: Record<string, string> = {
-  'جديدة': 'New',
-  'قيد التنفيذ': 'In Progress',
-  'مكتملة': 'Completed',
-  'متأخرة': 'Late',
-};
+// ── Sub-components ──
 
 interface StatCardProps {
   icon: LucideIcon;
@@ -43,42 +32,50 @@ function StatCard({ icon: Icon, label, value, sub, iconBg, iconColor }: StatCard
   );
 }
 
+// ── Page ──
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const { t, isRTL, lang } = useLanguage();
   const d = t.dashboard;
   const stats = mockDashboardStats;
-  const pendingLeaves = mockLeaveRequests.filter(r => r.status === 'معلقة');
-  const pendingTasks = mockTasks.filter(tk => tk.status !== 'مكتملة').slice(0, 4);
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
 
-  const chartMonths: Record<string, string> = {
-    'يناير': 'Jan', 'فبراير': 'Feb', 'مارس': 'Mar', 'أبريل': 'Apr', 'مايو': 'May',
-  };
+  const pendingLeaves = mockLeaveRequests.filter(r => r.status === 'معلقة');
+  const pendingTasks  = mockTasks.filter(tk => tk.status !== 'مكتملة').slice(0, 4);
+
   const chartData = mockPerformanceChart.map(row => ({
     ...row,
-    month: lang === 'en' ? (chartMonths[row.month] || row.month) : row.month,
+    month: lang === 'en' ? (CHART_MONTHS_EN[row.month] ?? row.month) : row.month,
   }));
+
+  const quickStats = [
+    { label: d.pendingLeaves,    value: stats.pendingLeaves,             icon: '🗓️', color: 'text-yellow-600 bg-yellow-50', path: '/manager/leaves'     },
+    { label: d.pendingOvertime,  value: stats.pendingOvertime,           icon: '⏰', color: 'text-blue-600 bg-blue-50',   path: '/manager/overtime'   },
+    { label: d.completedTasks,   value: stats.completedTasksThisMonth,   icon: '✅', color: 'text-green-700 bg-green-50', path: '/manager/tasks'      },
+    { label: d.presentEmployees, value: `${stats.presentToday}/${stats.totalEmployees}`, icon: '👥', color: 'text-purple-600 bg-purple-50', path: '/manager/attendance' },
+  ];
 
   return (
     <div className="space-y-6">
       {/* ── Stat Cards ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={CheckSquare} label={d.pendingTasks} value={stats.pendingTasks} sub={`${stats.completedTasksThisMonth} ${d.completedThisMonth}`} iconBg="bg-red-50" iconColor="text-red-500" />
-        <StatCard icon={Calendar} label={d.attendanceRate} value={`${stats.attendanceRate}%`} sub={d.thisMonth} iconBg="bg-brown/10" iconColor="text-brown" />
-        <StatCard icon={TrendingUp} label={d.avgPerformance} value={`★${stats.avgPerformance}`} sub={d.outOf} iconBg="bg-gold/10" iconColor="text-gold" />
-        <StatCard icon={Users} label={d.totalEmployees} value={stats.totalEmployees} sub={`${stats.presentToday} ${d.presentToday}`} iconBg="bg-green/10" iconColor="text-green" />
+        <StatCard icon={CheckSquare} label={d.pendingTasks}   value={stats.pendingTasks}      sub={`${stats.completedTasksThisMonth} ${d.completedThisMonth}`} iconBg="bg-red-50"      iconColor="text-red-500"  />
+        <StatCard icon={Calendar}   label={d.attendanceRate}  value={`${stats.attendanceRate}%`} sub={d.thisMonth}                                               iconBg="bg-brown/10"    iconColor="text-brown"    />
+        <StatCard icon={TrendingUp} label={d.avgPerformance}  value={`★${stats.avgPerformance}`} sub={d.outOf}                                                   iconBg="bg-gold/10"     iconColor="text-gold"     />
+        <StatCard icon={Users}      label={d.totalEmployees}  value={stats.totalEmployees}    sub={`${stats.presentToday} ${d.presentToday}`}                   iconBg="bg-green/10"    iconColor="text-green"    />
       </div>
 
       {/* ── Charts ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Performance */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-card">
           <h2 className="font-bold text-dark text-base mb-5">{d.performanceChart}</h2>
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={chartData}>
               <defs>
                 <linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#4A7C59" stopOpacity={0.15} />
+                  <stop offset="5%"  stopColor="#4A7C59" stopOpacity={0.15} />
                   <stop offset="95%" stopColor="#4A7C59" stopOpacity={0} />
                 </linearGradient>
               </defs>
@@ -90,6 +87,8 @@ export default function Dashboard() {
             </AreaChart>
           </ResponsiveContainer>
         </div>
+
+        {/* Attendance */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-card">
           <h2 className="font-bold text-dark text-base mb-5">{d.attendanceChart}</h2>
           <ResponsiveContainer width="100%" height={220}>
@@ -121,8 +120,8 @@ export default function Dashboard() {
                   <p className="text-sm font-semibold text-dark">{task.title}</p>
                   <p className="text-xs text-brown mt-0.5">{task.assigneeName} · {task.dueDate}</p>
                 </div>
-                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${taskStatusColors[task.status]}`}>
-                  {lang === 'en' ? (taskStatusEn[task.status] || task.status) : task.status}
+                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${TASK_STATUS_COLORS[task.status]}`}>
+                  {lang === 'en' ? (TASK_STATUS_EN[task.status] ?? task.status) : task.status}
                 </span>
               </div>
             ))}
@@ -159,14 +158,12 @@ export default function Dashboard() {
 
       {/* ── Quick Stats ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: d.pendingLeaves, value: stats.pendingLeaves, icon: '🗓️', color: 'text-yellow-600 bg-yellow-50', path: '/manager/leaves' },
-          { label: d.pendingOvertime, value: stats.pendingOvertime, icon: '⏰', color: 'text-blue-600 bg-blue-50', path: '/manager/overtime' },
-          { label: d.completedTasks, value: stats.completedTasksThisMonth, icon: '✅', color: 'text-green-700 bg-green-50', path: '/manager/tasks' },
-          { label: d.presentEmployees, value: `${stats.presentToday}/${stats.totalEmployees}`, icon: '👥', color: 'text-purple-600 bg-purple-50', path: '/manager/attendance' },
-        ].map(item => (
-          <button key={item.label} onClick={() => navigate(item.path)}
-            className={`rounded-2xl p-4 text-${isRTL ? 'right' : 'left'} w-full transition-all hover:shadow-md hover:-translate-y-0.5 ${item.color}`}>
+        {quickStats.map(item => (
+          <button
+            key={item.label}
+            onClick={() => navigate(item.path)}
+            className={`rounded-2xl p-4 text-${isRTL ? 'right' : 'left'} w-full transition-all hover:shadow-md hover:-translate-y-0.5 ${item.color}`}
+          >
             <span className="text-2xl">{item.icon}</span>
             <p className="text-2xl font-extrabold mt-2">{item.value}</p>
             <p className="text-xs font-semibold mt-1 opacity-80">{item.label}</p>
