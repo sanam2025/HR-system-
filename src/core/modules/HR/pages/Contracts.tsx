@@ -9,26 +9,65 @@ import type { EmployeeContract } from "../types/contract.types";
 // ============= DATA =============
 const INITIAL_CONTRACTS: EmployeeContract[] = [
   {
-    id: "1", employeeId: "EMP001", employeeName: "Ahmed Mansour", employeeEmail: "ahmed.mansour@example.com",
-    department: "Information Technology", position: "Web Developer", contractNumber: "CT-2024-001",
-    startDate: "2024-01-01", endDate: "2024-12-31", salary: 18000000, workingHours: "40 hours/week",
-    benefits: "Health insurance, 21 paid leave days", status: "active", signedDate: "2024-01-01",
+    id: "1",
+    employeeId: "EMP001",
+    employeeName: "Ahmed Mansour",
+    employeeEmail: "ahmed.mansour@example.com",
+    department: "Information Technology",
+    position: "Web Developer",
+    contractNumber: "CT-2024-001",
+    startDate: "2024-01-01",
+    endDate: "2024-12-31",
+    salary: 18000000,
+    workingHours: "40 hours/week",
+    benefits: "Health insurance, 21 paid leave days",
+    status: "active",
+    signedDate: "2024-01-01",
   },
   {
-    id: "2", employeeId: "EMP002", employeeName: "Sara Khalil", employeeEmail: "sara.khalil@example.com",
-    department: "Basic Sciences", position: "Professor", contractNumber: "CT-2024-002",
-    startDate: "2024-02-01", endDate: "2025-01-31", salary: 25000000, workingHours: "35 hours/week",
-    benefits: "Health insurance, Research allowance", status: "active", signedDate: "2024-02-01",
+    id: "2",
+    employeeId: "EMP002",
+    employeeName: "Sara Khalil",
+    employeeEmail: "sara.khalil@example.com",
+    department: "Basic Sciences",
+    position: "Professor",
+    contractNumber: "CT-2024-002",
+    startDate: "2024-02-01",
+    endDate: "2025-01-31",
+    salary: 25000000,
+    workingHours: "35 hours/week",
+    benefits: "Health insurance, Research allowance",
+    status: "active",
+    signedDate: "2024-02-01",
   },
   {
-    id: "3", employeeId: "EMP003", employeeName: "Omar Hassan", employeeEmail: "omar.hassan@example.com",
-    department: "Electrical Engineering", position: "Department Head", contractNumber: "CT-2023-001",
-    startDate: "2023-06-01", endDate: "2024-05-31", salary: 35000000, workingHours: "40 hours/week",
-    benefits: "Full benefits, Car allowance", status: "expired", signedDate: "2023-06-01",
+    id: "3",
+    employeeId: "EMP003",
+    employeeName: "Omar Hassan",
+    employeeEmail: "omar.hassan@example.com",
+    department: "Electrical Engineering",
+    position: "Department Head",
+    contractNumber: "CT-2023-001",
+    startDate: "2023-06-01",
+    endDate: "2024-05-31",
+    salary: 35000000,
+    workingHours: "40 hours/week",
+    benefits: "Full benefits, Car allowance",
+    status: "expired",
+    signedDate: "2023-06-01",
   },
 ];
 
-const COLUMNS: string[] = ["Contract #", "Employee", "Department", "Position", "Period", "Salary", "Status", "Actions"];
+const COLUMNS: string[] = [
+  "Contract #",
+  "Employee",
+  "Department",
+  "Position",
+  "Period",
+  "Salary",
+  "Status",
+  "Actions",
+];
 
 // ============= Types =============
 interface CreateContractData {
@@ -57,13 +96,17 @@ interface RenewalData {
 
 // ============= MAIN =============
 export default function Contracts() {
-  const [contracts, setContracts] = useState<EmployeeContract[]>(INITIAL_CONTRACTS);
-  const [selectedContract, setSelectedContract] = useState<EmployeeContract | null>(null);
+  const [contracts, setContracts] =
+    useState<EmployeeContract[]>(INITIAL_CONTRACTS);
+  const [selectedContract, setSelectedContract] =
+    useState<EmployeeContract | null>(null);
   const [isContractModalOpen, setIsContractModalOpen] = useState(false);
   const [isRenewalModalOpen, setIsRenewalModalOpen] = useState(false);
 
   const handleView = (contract: EmployeeContract) => {
-    alert(`📄 Contract Details:\nNumber: ${contract.contractNumber}\nEmployee: ${contract.employeeName}\nPeriod: ${contract.startDate} → ${contract.endDate}\nSalary: ${contract.salary.toLocaleString()} SYP`);
+    alert(
+      `📄 Contract Details:\nNumber: ${contract.contractNumber}\nEmployee: ${contract.employeeName}\nPeriod: ${contract.startDate} → ${contract.endDate}\nSalary: ${contract.salary.toLocaleString()} SYP`,
+    );
   };
 
   const handleCreate = (data: CreateContractData) => {
@@ -81,9 +124,9 @@ export default function Contracts() {
       workingHours: data.workingHours,
       benefits: data.benefits,
       status: "active",
-      signedDate: new Date().toISOString().split('T')[0],
+      signedDate: new Date().toISOString().split("T")[0],
     };
-    setContracts(prev => [newContract, ...prev]);
+    setContracts((prev) => [newContract, ...prev]);
     alert(`✅ Contract created for ${data.employeeName}`);
     setIsContractModalOpen(false);
   };
@@ -95,11 +138,18 @@ export default function Contracts() {
 
   const handleSendRenewal = (data: RenewalData) => {
     if (selectedContract) {
-      setContracts(prev => prev.map(c => 
-        c.id === selectedContract.id 
-          ? { ...c, status: "renewed" as const, endDate: data.newEndDate, salary: data.newSalary || c.salary }
-          : c
-      ));
+      setContracts((prev) =>
+        prev.map((c) =>
+          c.id === selectedContract.id
+            ? {
+                ...c,
+                status: "renewed" as const,
+                endDate: data.newEndDate,
+                salary: data.newSalary || c.salary,
+              }
+            : c,
+        ),
+      );
     }
     alert(`📧 Renewal sent to ${data.employeeName}`);
     setIsRenewalModalOpen(false);
@@ -113,7 +163,11 @@ export default function Contracts() {
     <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
       <ContractFormModal
         isOpen={isContractModalOpen}
-        employeeName="" employeeId="" employeeEmail="" department="" position=""
+        employeeName=""
+        employeeId=""
+        employeeEmail=""
+        department=""
+        position=""
         onClose={() => setIsContractModalOpen(false)}
         onSubmit={handleCreate}
       />
@@ -127,9 +181,14 @@ export default function Contracts() {
       <div className="mb-8 flex justify-between items-start">
         <div>
           <h1 className="text-2xl font-bold">Employment Contracts</h1>
-          <p className="text-gray-500 text-sm mt-1">Manage employee contracts and renewals.</p>
+          <p className="text-gray-500 text-sm mt-1">
+            Manage employee contracts and renewals.
+          </p>
         </div>
-        <button onClick={handleNewContract} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700">
+        <button
+          onClick={handleNewContract}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
+        >
           <Plus className="w-4 h-4" /> New Contract
         </button>
       </div>
@@ -141,7 +200,10 @@ export default function Contracts() {
             <thead className="bg-gray-50">
               <tr>
                 {COLUMNS.map((c) => (
-                  <th key={c} className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  <th
+                    key={c}
+                    className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider"
+                  >
                     {c}
                   </th>
                 ))}
