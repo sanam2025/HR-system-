@@ -8,12 +8,9 @@ import type ar from '../../../i18n/translations/ar';
 type RecruitmentTranslation = typeof ar['recruitment'];
 
 const SKILL_OPTIONS = [
-  'React', 'TypeScript', 'JavaScript', 'Node.js', 'Python', 'Java', 'C#', 'C++',
-  'Vue.js', 'Angular', 'Next.js', 'Laravel', 'Django', 'Spring Boot',
-  'SQL', 'PostgreSQL', 'MongoDB', 'Redis', 'GraphQL', 'REST API',
-  'Docker', 'Kubernetes', 'AWS', 'Azure', 'Git', 'Linux',
-  'Figma', 'UI/UX Design', 'Tailwind CSS', 'CSS', 'HTML',
-  'Machine Learning', 'Data Analysis', 'Agile', 'Scrum',
+  'PHP', 'Laravel', 'JavaScript', 'Vue.js', 'MySQL',
+  'Project Management', 'Problem Solving', 'Communication Skills',
+  'Teamwork', 'Time Management'
 ];
 
 // ── Job Vacancy Request ───────
@@ -22,8 +19,8 @@ function JobVacancyRequest({ r }: { r: RecruitmentTranslation }) {
 
   const [form, setForm] = useState({ title: '', description: '', experience: 0, skills: [] as string[] });
   const [sent, setSent] = useState(false);
-  const [skillSearch, setSkillSearch] = useState('');
-  const [skillDropOpen, setSkillDropOpen] = useState(false);
+  const [selectedSkill, setSelectedSkill] = useState('');
+  const [customSkill, setCustomSkill] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,9 +38,7 @@ function JobVacancyRequest({ r }: { r: RecruitmentTranslation }) {
     }));
   };
 
-  const filteredSkills = SKILL_OPTIONS.filter(s =>
-    s.toLowerCase().includes(skillSearch.toLowerCase()) && !form.skills.includes(s)
-  );
+  const availableSkills = SKILL_OPTIONS.filter(s => !form.skills.includes(s));
 
   if (sent) return (
     <div className="bg-white rounded-2xl border border-green/20 shadow-card p-10 text-center">
@@ -117,30 +112,56 @@ function JobVacancyRequest({ r }: { r: RecruitmentTranslation }) {
           </div>
         )}
 
-        <div className="relative">
-          <input
-            type="text"
-            className="form-input"
-            placeholder={v.requirementsPlaceholder}
-            value={skillSearch}
-            onChange={e => setSkillSearch(e.target.value)}
-            onFocus={() => setSkillDropOpen(true)}
-            onBlur={() => setTimeout(() => setSkillDropOpen(false), 150)}
-          />
-          {skillDropOpen && filteredSkills.length > 0 && (
-            <div className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
-              {filteredSkills.map(skill => (
-                <button
-                  key={skill}
-                  type="button"
-                  onMouseDown={() => toggleSkill(skill)}
-                  className="w-full text-start px-4 py-2.5 text-sm text-dark hover:bg-green/5 hover:text-green transition-colors"
-                >
-                  {skill}
-                </button>
-              ))}
-            </div>
-          )}
+        <div className="flex flex-col gap-3">
+          {/* Select Existing Skill */}
+          <select
+            className="form-input w-full cursor-pointer hover:border-green transition-colors"
+            value={selectedSkill}
+            onChange={e => {
+              const val = e.target.value;
+              if (val && !form.skills.includes(val)) {
+                toggleSkill(val);
+              }
+              setSelectedSkill('');
+            }}
+          >
+            <option value="">{v.selectSkill || '-- اختر مهارة --'}</option>
+            {availableSkills.map(skill => (
+              <option key={skill} value={skill}>{skill}</option>
+            ))}
+          </select>
+
+          {/* Add Custom Skill */}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              className="form-input flex-1"
+              placeholder={v.customSkillPlaceholder || 'أو اكتب مهارة غير موجودة في القائمة...'}
+              value={customSkill}
+              onChange={e => setCustomSkill(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  if (customSkill.trim() && !form.skills.includes(customSkill.trim())) {
+                    toggleSkill(customSkill.trim());
+                    setCustomSkill('');
+                  }
+                }
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                if (customSkill.trim() && !form.skills.includes(customSkill.trim())) {
+                  toggleSkill(customSkill.trim());
+                  setCustomSkill('');
+                }
+              }}
+              className="btn bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200 px-6"
+            >
+              {v.addCustomSkillBtn || 'إضافة مهارة'}
+            </button>
+          </div>
         </div>
 
         {form.skills.length === 0 && (
