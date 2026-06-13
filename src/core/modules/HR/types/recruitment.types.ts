@@ -5,6 +5,37 @@ export type RecruitmentStatus = "approved" | "pending" | "rejected";
 export type ApplicationStatus = "pending" | "reviewed" | "interview" | "accepted" | "rejected";
 export type SkillLevel = "beginner" | "intermediate" | "advanced" | "expert";
 
+// JobRequisition من الـ API
+export interface JobRequisition {
+  id: number;
+  job_title: string;
+  experience: number;
+  status: 'pending' | 'approved' | 'rejected' | null;
+  created_at: string;
+  department: {
+    id: number;
+    name: string;
+  };
+  requested_by: {
+    id: number;
+    full_name: string;
+  };
+  skills_count: number;
+  is_posted: boolean;
+}
+
+// ✅ JobPostingData (للفورم - مطلوب)
+export interface JobPostingData {
+  jobTitle: string;
+  department: string;
+  requiredCount: number;
+  requester: string;
+  priority: RecruitmentPriority;
+  description: string;
+  requirements: string;
+  deadline: string;
+}
+
 export interface Skill {
   name: string;
   level: SkillLevel;
@@ -38,18 +69,7 @@ export interface RecruitmentRequest {
   recommendedCount?: number;
 }
 
-export interface JobPostingData {
-  jobTitle: string;
-  department: string;
-  requiredCount: number;
-  requester: string;
-  priority: RecruitmentPriority;
-  description: string;
-  requirements: string;
-  deadline: string;
-}
-
-// Configurations for UI
+// Configurations
 export const priorityConfig: Record<RecruitmentPriority, { label: string; className: string }> = {
   high: { label: "High", className: "bg-red-100 text-red-700" },
   medium: { label: "Medium", className: "bg-yellow-100 text-yellow-700" },

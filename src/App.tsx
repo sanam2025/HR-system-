@@ -1,6 +1,7 @@
 // TasksBoard removed because routes are handled by HRRoute. Keep import removed to avoid unused variable error.
 import HRRoute from "./shared/routes/HRRoute";
 
+
 // Placeholder components were removed as routes are handled by HRRoute
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
 
     <HRRoute />
   );
+  
 }
 
 export default App;

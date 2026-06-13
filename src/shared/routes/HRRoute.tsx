@@ -12,7 +12,11 @@ import AcceptedCandidates from "../../core/modules/HR/pages/AcceptedCandidates";
 import Terminations from "../../core/modules/HR/pages/Terminations";
 import Resignations from "../../core/modules/HR/pages/Resignations";
 import Contracts from "../../core/modules/HR/pages/Contracts";
-
+import JobRequisitionForm from "../../core/modules/HR/pages/JobRequisitionForm";
+import JobRequisitionDetail from "../../core/modules/HR/pages/JobRequisitionDetail";
+import JobPostings from "../../core/modules/HR/pages/JobPostings";
+import JobPostingDetail from "../../core/modules/HR/pages/JobPostingDetail";
+import JobPostingForm from "../../core/modules/HR/pages/JobPostingForm";
 
 const route = createBrowserRouter([
   {
@@ -22,16 +26,23 @@ const route = createBrowserRouter([
       { index: true, element: <Dashboard /> },
       { path: "employees", element: <Employees /> },
       { path: "attendance", element: <Attendance /> },
-    
       { path: "leaves", element: <Leaves /> },
       { path: "recruitment", element: <Recruitment /> },
       { path: "payroll", element: <Payroll /> },
       { path: "all-applicants", element: <AllApplicants /> },
       { path: "recruitment/applicant/:id", element: <ApplicantDetail /> },
       { path: "accepted-candidates", element: <AcceptedCandidates /> },
-     { path: "terminations", element: <Terminations /> },
-     { path: "resignations", element: <Resignations /> },
-     { path: "contracts", element: <Contracts /> },
+      { path: "terminations", element: <Terminations /> },
+      { path: "resignations", element: <Resignations /> },
+      { path: "contracts", element: <Contracts /> },
+      { path: "recruitment/:id", element: <JobRequisitionDetail /> },
+      { path: "recruitment/create", element: <JobRequisitionForm /> },
+      { path: "recruitment/edit/:id", element: <JobRequisitionForm /> },
+      { path: "job-postings", element: <JobPostings /> },
+      { path: "job-postings/:id", element: <JobPostingDetail /> },
+      { path: "job-postings/edit/:id", element: <JobPostingForm /> },
+      // ✅ مسار المتقدمين (يستقبل jobId)
+      { path: "recruitment/applicants/:jobId", element: <AllApplicants /> },
     ],
   },
 ]);
@@ -41,5 +52,3 @@ function HRRoute() {
 }
 
 export default HRRoute;
-
-
