@@ -1,6 +1,6 @@
-import { NavLink } from 'react-router-dom';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { NavLink } from "react-router-dom";
+import { ChevronRight, ChevronLeft } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 export interface NavItem {
@@ -24,31 +24,37 @@ export default function Sidebar({
   open,
   onToggle,
   navItems,
-  brand = { logo: '🏢', title: 'HR System', subtitle: 'Damascus University' },
-  user  = { avatar: 'U', name: 'User', role: '' },
-  navSectionLabel = 'Main Menu',
+  brand = { logo: "👩‍💻", title: "HR System", subtitle: "" },
+  user = { avatar: "HR", name: "soulaf", role: "" },
+  navSectionLabel = "Main Menu",
 }: SidebarProps) {
   return (
     <>
       {open && (
-        <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={onToggle} />
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          onClick={onToggle}
+        />
       )}
 
-      <aside className={`
+      <aside
+        className={`
         fixed top-0 left-0 h-screen z-50 flex flex-col
         bg-dark-sidebar shadow-[0_4px_20px_rgba(0,0,0,0.15)]
         transition-all duration-300
-        ${open ? 'w-64' : 'w-0 overflow-hidden md:w-16'}
-      `}>
-
+        ${open ? "w-64" : "w-0 overflow-hidden md:w-16"}
+      `}
+      >
         {/* Logo */}
         <div className="flex items-center gap-3 px-5 py-6 border-b border-white/10 animate-fade-in">
           <div className="w-9 h-9 bg-green rounded-xl flex items-center justify-center text-lg flex-shrink-0">
-            {brand.logo ?? '🏢'}
+            {brand.logo ?? "🏢"}
           </div>
           {open && (
             <div>
-              <p className="text-white font-bold text-sm leading-tight">{brand.title}</p>
+              <p className="text-white font-bold text-sm leading-tight">
+                {brand.title}
+              </p>
               <p className="text-white/40 text-[10px]">{brand.subtitle}</p>
             </div>
           )}
@@ -61,7 +67,9 @@ export default function Sidebar({
           </div>
           {open && (
             <div className="overflow-hidden">
-              <p className="text-white text-xs font-semibold truncate">{user.name}</p>
+              <p className="text-white text-xs font-semibold truncate">
+                {user.name}
+              </p>
               <p className="text-gold text-[10px]">{user.role}</p>
             </div>
           )}
@@ -83,10 +91,11 @@ export default function Sidebar({
                 end={item.exact ?? false}
                 style={{ animationDelay: `${i * 0.06}s` }}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-5 py-2.5 text-sm cursor-pointer transition-all duration-200 animate-slide-in-left
-                  ${isActive
-                    ? 'bg-green/25 text-white border-l-[3px] border-green'
-                    : 'text-white/65 hover:bg-white/5 hover:text-white hover:translate-x-0.5'
+                  `flex items-center gap-3 px-5 py-2.5 text-sm cursor-pointer transition-all duration-200
+                  ${
+                    isActive
+                      ? "bg-green/25 text-white border-l-[3px] border-green"
+                      : "text-white/65 hover:bg-white/5 hover:text-white"
                   }`
                 }
               >

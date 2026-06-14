@@ -1,24 +1,23 @@
-/* Google Fonts - must be FIRST */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap');
+/* ========================================
+   GOOGLE FONTS
+   ======================================== */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap");
 
 @import "tailwindcss";
 
 @theme {
-  /* ── Custom Colors ─── */
-  --color-green:        #4A7C59;
-  --color-green-dark:   #3a6347;
-  --color-green-light:  #e8f0e4;
-  --color-green-muted:  #6b8f71;
-  --color-gold:         #C4A66A;
-  --color-dark:         #4A4E4A;
+  --color-green: #4a7c59;
+  --color-green-dark: #3a6347;
+  --color-gold: #c4a66a;
+  --color-dark: #4a4e4a;
   --color-dark-sidebar: #2e312e;
-  --color-surface:      #f4f4f2;
-  --color-beige:        #f7f5f0;
-  --color-beige-dark:   #e8e3d8;
-  --color-brown:        #6B6358;
-  --color-brown-light:  #d4cfc4;
+  --color-surface: #f4f4f2;
+  --color-brown: #6b6358;
 }
 
+/* ========================================
+   BASE STYLES
+   ======================================== */
 @layer base {
   * {
     box-sizing: border-box;
@@ -27,47 +26,183 @@
   }
 
   body {
-    font-family: 'Tajawal', 'Inter', sans-serif;
+    font-family: "Tajawal", "Inter", sans-serif;
     background-color: #f1f5f9;
     color: #1e293b;
   }
 
-  .scrollbar-hide::-webkit-scrollbar { display: none; }
-  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
+/* ========================================
+   ANIMATIONS
+   ======================================== */
 @layer utilities {
   @keyframes slide-up {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   @keyframes fade-in {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
-  @keyframes scale-in {
-    from { opacity: 0; transform: scale(0.95); }
-    to   { opacity: 1; transform: scale(1); }
+  .animate-slide-up {
+    animation: slide-up 0.2s ease-out;
   }
-  @keyframes slide-up-stagger {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
+  .animate-fade-in {
+    animation: fade-in 0.15s ease-out;
   }
-  @keyframes slide-in-left {
-    from { opacity: 0; transform: translateX(-16px); }
-    to   { opacity: 1; transform: translateX(0); }
+  .shadow-modal {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   }
-  @keyframes pulse-soft {
-    0%, 100% { opacity: 1; }
-    50%      { opacity: 0.6; }
+}
+
+/* ========================================
+   RESPONSIVE STATS CARDS GRID
+   ======================================== */
+@media (max-width: 640px) {
+  .stats-grid,
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4,
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-5 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .stats-grid,
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4,
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-5 {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 1rem !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .stats-grid,
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4,
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-5 {
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 1.25rem !important;
+  }
+}
+
+/* ========================================
+   RESPONSIVE FILTERS
+   ======================================== */
+@media (max-width: 768px) {
+  .filters-container,
+  .flex.gap-4,
+  .flex.flex-wrap.gap-4 {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
   }
 
-  .animate-slide-up         { animation: slide-up 0.35s ease-out; }
-  .animate-fade-in          { animation: fade-in 0.3s ease-out; }
-  .animate-scale-in         { animation: scale-in 0.45s ease-out; }
-  .animate-slide-up-stagger { animation: slide-up-stagger 0.5s ease-out forwards; }
-  .animate-slide-in-left    { animation: slide-in-left 0.4s ease-out forwards; }
-  .animate-pulse-soft       { animation: pulse-soft 3s ease-in-out infinite; }
-  .shadow-modal             { box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+  .filter-input,
+  input[type="text"],
+  select {
+    width: 100% !important;
+  }
+}
+
+/* ========================================
+   RESPONSIVE TABLES
+   ======================================== */
+@media (max-width: 768px) {
+  .overflow-x-auto {
+    overflow-x: auto !important;
+  }
+
+  table,
+  .w-full {
+    min-width: 600px !important;
+  }
+}
+
+/* ========================================
+   RESPONSIVE PADDING & MARGIN
+   ======================================== */
+@media (max-width: 640px) {
+  .p-6 {
+    padding: 1rem !important;
+  }
+
+  .gap-5 {
+    gap: 0.75rem !important;
+  }
+
+  .mb-8 {
+    margin-bottom: 1rem !important;
+  }
+}
+
+/* ========================================
+   UTILITIES
+   ======================================== */
+.container,
+main {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+img,
+svg {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+*:focus {
+  outline: none !important;
+}
+
+button {
+  cursor: pointer !important;
+}
+
+/* ========================================
+   MODAL STYLES (DO NOT CHANGE)
+   ======================================== */
+.fixed.inset-0 {
+  z-index: 99999 !important;
+}
+/* ========================================
+   SIDEBAR FIX - ONLY THIS
+   ======================================== */
+
+/* فقط للشاشات الصغيرة - تعديل عرض السايد بار والمحتوى */
+@media (max-width: 768px) {
+  .fixed.left-0 {
+    width: 70px !important;
+  }
+
+  main {
+    margin-left: 70px !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .fixed.left-0 {
+    width: 80px !important;
+  }
+
+  main {
+    margin-left: 80px !important;
+  }
 }

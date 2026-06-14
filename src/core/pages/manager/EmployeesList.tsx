@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { mockEmployees } from '../../../data/mockData';
+import {mockEmployees} from '../../../data/mockData'
 import EmployeeCard from '../manager/EmployeeCard';
 import { Search } from 'lucide-react';
 

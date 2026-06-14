@@ -1,7 +1,7 @@
 import { ProfileHeader, PersonalDetailsCard, DocumentsCard, EmploymentStatusCard } from "../components/speciel-components/ProfileComponents";
 import { mockProfileData } from "../data/mockEmployeeData";
 
-export default function EmployeeProfile() {
+export default function EmployeeProfile_E() {
   const data = mockProfileData;
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in">
