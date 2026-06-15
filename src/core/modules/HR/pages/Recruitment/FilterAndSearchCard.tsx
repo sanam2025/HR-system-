@@ -1,6 +1,4 @@
 import { RefreshCw, Search, Users } from 'lucide-react'
-import React, { useState } from 'react'
-import type { JobRequisition, RecruitmentStatus } from '../../../../../api/service/HrService/Types/HRService.types'
 import { useNavigate } from 'react-router-dom'
 import type { FilterStatus } from './Recruitment'
 

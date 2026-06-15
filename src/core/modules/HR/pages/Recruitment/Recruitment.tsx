@@ -1,21 +1,22 @@
-
 import { useEffect, useState } from "react";
 import { Megaphone } from "lucide-react";
 import { useJobRequisitions } from "../../hooks/useJobRequisitions";
 import JobPostingForm from "../../Components/Special_Components/JobPostingForm";
-import type { JobPostingData, RecruitmentStatus } from "../../types/recruitment.types";
-
 import RecruitmentCard from "./RecruitmentCard";
 import Loading from "../../../../../shared/components/Loading";
 import StateCard from "./StateCard";
 import FilterAndSearchCard from "./FilterAndSearchCard";
-import ApproveForm from "./ApproveForm";
 import { useJobRequisitionsApprove } from "../../hooks/useJobRequisitionsApprove";
 import { useJobRequisitionsReject } from "../../hooks/useJobRequisitionsReject";
 import toast from "react-hot-toast";
+import type { RecruitmentStatus } from "../../../../../api/service/HrService/Types/HRService.types";
 
 export type FilterStatus = RecruitmentStatus | 'all'
 
+interface JobFormData {
+  jobTitle: string;
+  [key: string]: unknown;
+}
 
 export default function Recruitment() {
   
@@ -26,10 +27,10 @@ export default function Recruitment() {
   const isLoadingApprove = approveRequisition.isPending;
   const isLoadingReject = rejectRequisition.isPending;
 
-  const [searchTerm, setSearchTerm] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<FilterStatus>("all");
 
-  const handlePostJob = (formData: JobPostingData) => {
+  const handlePostJob = (formData: JobFormData) => {
     setIsFormOpen(false);
     alert(`✅ Job "${formData.jobTitle}" has been posted!`);
   };
@@ -60,14 +61,10 @@ export default function Recruitment() {
     console.log(data)
   } , [data])
 
-
-  const [statusFilter, setStatusFilter] = useState<FilterStatus>("all");
-
   const filteredRequests = data?.filter((req) => {
     const matchesStatus = statusFilter === "all" || req.status === statusFilter;
     return matchesStatus;
   });
-
 
   if (isLoading) {
     return (
@@ -85,7 +82,7 @@ export default function Recruitment() {
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
           <p className="text-red-600 mb-4">Error: {error.message}</p>
-          <button onClick={() => refetch} className="px-4 py-2 bg-red-600 text-white rounded-lg">
+          <button onClick={() => refetch()} className="px-4 py-2 bg-red-600 text-white rounded-lg">
             Retry
           </button>
         </div>
@@ -145,16 +142,8 @@ export default function Recruitment() {
             </tbody>
           </table>
         </div>
-        {/* {filteredRequests.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-400">No requests found</p>
-            <button onClick={fetchAll} className="mt-2 text-blue-500">Refresh</button>
-          </div>
-        )} */}
       </div>
     </div>
-
-    
     </>
   );
 }

@@ -34,6 +34,7 @@ function RecruitmentCard({
 
 
     const handleDeleteRequest = (id: number) =>{
+        
 
     }
 

@@ -1,4 +1,3 @@
-
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HRLayout from "./shared/layouts/HRLayout";
 import Dashboard from "./core/modules/HR/pages/Dashboard";
@@ -7,13 +6,10 @@ import Attendance from "./core/modules/HR/pages/Attendance";
 import Leaves from "./core/modules/HR/pages/Leaves";
 import Recruitment from "./core/modules/HR/pages/Recruitment/Recruitment";
 import Payroll from "./core/modules/HR/pages/Payroll";
-import ApplicantDetail from "./core/modules/HR/pages/ApplicantDetail";
 import AcceptedCandidates from "./core/modules/HR/pages/AcceptedCandidates";
 import Terminations from "./core/modules/HR/pages/Terminations";
 import Resignations from "./core/modules/HR/pages/Resignations";
 import Contracts from "./core/modules/HR/pages/Contracts";
-import JobRequisitionDetail from "./core/modules/HR/pages/JobRequisitionDetail";
-import JobRequisitionForm from "./core/modules/HR/pages/JobRequisitionForm";
 import ManagerLayout from "./shared/layouts/ManagerLayout";
 import EmployeesList from "./core/pages/manager/EmployeesList";
 import EmployeeProfile from "./core/pages/manager/EmployeeProfile";
@@ -23,6 +19,9 @@ import EmployeeDashboard from "./core/modules/employee/pages/EmployeeDashboard";
 import EmployeeProfile_E from "./core/modules/employee/pages/EmployeeProfile";
 import EmployeeTasksFinance from "./core/modules/employee/pages/EmployeeTasksFinance";
 import EmployeeAttendance from "./core/modules/employee/pages/EmployeeAttendance";
+import JobPostingForm from "./core/modules/HR/pages/JobPostings/JobPostingForm";
+import JobPostingDetail from "./core/modules/HR/pages/JobPostings/JobPostingDetail";
+import JobPostings from "./core/modules/HR/pages/JobPostings/JobPostings";
 
 function Page({ title }: { title: string }) {
   return (
@@ -43,14 +42,13 @@ const appRouter = createBrowserRouter([
       { path: "leaves", element: <Leaves /> },
       { path: "Recruitment", element: <Recruitment /> },
       { path: "payroll", element: <Payroll /> },
-      { path: "recruitment/applicant/:id", element: <ApplicantDetail /> },
       { path: "accepted-candidates", element: <AcceptedCandidates /> },
       { path: "terminations", element: <Terminations /> },
       { path: "resignations", element: <Resignations /> },
       { path: "contracts", element: <Contracts /> },
-      { path: "recruitment/:id", element: <JobRequisitionDetail /> },
-      { path: "recruitment/create", element: <JobRequisitionForm /> },
-      { path: "recruitment/edit/:id", element: <JobRequisitionForm /> },
+      { path: "job-postings", element: <JobPostings /> },
+{ path: "job-postings/:id", element: <JobPostingDetail /> },
+{ path: "job-postings/edit/:id", element: <JobPostingForm /> },
     ],
   },
   {
@@ -69,16 +67,16 @@ const appRouter = createBrowserRouter([
     ],
   },
   {
-      path: "/employee",
-      element: <EmployeeLayout />,
-      children: [
-        { index: true, element: <EmployeeDashboard /> },
-        { path: "profile", element: <EmployeeProfile_E /> },
-        { path: "tasks", element: <EmployeeTasksFinance /> },
-        { path: "finance", element: <EmployeeTasksFinance /> },
-        { path: "attendance", element: <EmployeeAttendance /> },
-      ],
-    },
+    path: "/employee",
+    element: <EmployeeLayout />,
+    children: [
+      { index: true, element: <EmployeeDashboard /> },
+      { path: "profile", element: <EmployeeProfile_E /> },
+      { path: "tasks", element: <EmployeeTasksFinance /> },
+      { path: "finance", element: <EmployeeTasksFinance /> },
+      { path: "attendance", element: <EmployeeAttendance /> },
+    ],
+  },
 ]);
 
 export default function AppRouter() {
