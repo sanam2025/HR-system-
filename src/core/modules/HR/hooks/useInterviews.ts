@@ -2,9 +2,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { InterviewsService } from '../../../../api/service/HrService/InterviewsService';
-import type { InterviewResultData, SubmitRankingData } from '../../../../api/service/HrService/Types/InterviewsService.types';
 
-// تعريف نوع بيانات الجدولة
+// ✅ تعريف الأنواع لتتوافق مع الـ API
 interface ScheduleData {
   candidate_id: number;
   interviewed_by: number;
@@ -13,90 +12,101 @@ interface ScheduleData {
   location_details: string;
 }
 
-// تعريف نوع الخطأ
-interface ApiError {
-  message: string;
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
+interface ResultData {
+  rate: number;
+  notes: string; // ✅ جعلها إجبارية بدلاً من optional
 }
 
-const getErrorMessage = (err: unknown): string => {
-  const apiError = err as ApiError;
-  if (apiError.response?.data?.message) {
-    return apiError.response.data.message;
-  }
-  if (apiError.message) {
-    return apiError.message;
-  }
-  return 'An error occurred';
-};
+interface RankingData {
+  ranking: { interview_id: number; rank: number }[];
+}
 
 export const useInterviews = (jobId?: number) => {
   const queryClient = useQueryClient();
 
+  // ✅ جلب المقابلات
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['interviews', jobId],
-    queryFn: () => InterviewsService.getByJobId(jobId!),
+    queryFn: async () => {
+      if (!jobId) return [];
+      const res = await InterviewsService.getByJobId(jobId);
+      return res.data?.data || [];
+    },
     enabled: !!jobId,
   });
 
+  // ✅ جدولة مقابلة
   const schedule = useMutation({
-    mutationFn: ({ jobId, data: scheduleData }: { jobId: number; data: ScheduleData }) => 
-      InterviewsService.schedule(jobId, scheduleData),
+    mutationFn: (data: ScheduleData) => {
+      if (!jobId) throw new Error('Job ID required');
+      return InterviewsService.schedule(jobId, data);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviews', jobId] });
       toast.success('Interview scheduled');
     },
-    onError: (err) => toast.error(getErrorMessage(err)),
+    onError: (err: Error) => toast.error(err.message || 'Schedule failed'),
   });
 
-  const updateResult = useMutation({
-    mutationFn: ({ id, data: resultData }: { id: number; data: InterviewResultData }) => 
-      InterviewsService.updateResult(id, resultData),
+  // ✅ تحديث النتيجة
+  const result = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: ResultData }) =>
+      InterviewsService.updateResult(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviews', jobId] });
       toast.success('Result updated');
     },
-    onError: (err) => toast.error(getErrorMessage(err)),
+    onError: (err: Error) => toast.error(err.message || 'Update failed'),
   });
 
+  // ✅ إلغاء المقابلة
   const cancel = useMutation({
     mutationFn: (id: number) => InterviewsService.cancel(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviews', jobId] });
       toast.success('Interview cancelled');
     },
-    onError: (err) => toast.error(getErrorMessage(err)),
+    onError: (err: Error) => toast.error(err.message || 'Cancel failed'),
   });
 
-  const { data: rankingResponse } = useQuery({
-    queryKey: ['ranking', jobId],
-    queryFn: () => InterviewsService.getRanking(jobId!),
+  // ✅ ترتيب المقابلات
+  const ranking = useQuery({
+    queryKey: ['interviews-ranking', jobId],
+    queryFn: async () => {
+      if (!jobId) return [];
+      const res = await InterviewsService.getRanking(jobId);
+      return res.data?.data || [];
+    },
     enabled: !!jobId,
   });
 
+  // ✅ حفظ الترتيب
   const submitRanking = useMutation({
-    mutationFn: ({ jobId, data: rankingPayload }: { jobId: number; data: SubmitRankingData }) => 
-      InterviewsService.submitRanking(jobId, rankingPayload),
-    onSuccess: () => toast.success('Ranking submitted'),
-    onError: (err) => toast.error(getErrorMessage(err)),
+    mutationFn: (data: RankingData) => {
+      if (!jobId) throw new Error('Job ID required');
+      return InterviewsService.submitRanking(jobId, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['interviews-ranking', jobId] });
+      toast.success('Ranking saved');
+    },
+    onError: (err: Error) => toast.error(err.message || 'Failed to save ranking'),
   });
 
   return {
-    interviews: data?.data?.data || [],
+    interviews: data || [],
     isLoading,
     error: error?.message || null,
     refetch,
-    schedule: schedule.mutate,
+    scheduleInterview: schedule.mutate,
     isScheduling: schedule.isPending,
-    updateResult: updateResult.mutate,
-    isUpdating: updateResult.isPending,
-    cancel: cancel.mutate,
+    updateResult: result.mutate,
+    isUpdating: result.isPending,
+    cancelInterview: cancel.mutate,
     isCancelling: cancel.isPending,
-    ranking: rankingResponse?.data?.data || [],
+    ranking: ranking.data || [],
+    isLoadingRanking: ranking.isLoading,
     submitRanking: submitRanking.mutate,
+    isSubmittingRanking: submitRanking.isPending,
   };
 };

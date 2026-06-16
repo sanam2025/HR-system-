@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { JobPostingsService } from '../../../../api/service/HrService/JobPostingsService';
 
-// تعريف نوع الخطأ
 interface ApiError {
   message: string;
   response?: {
@@ -13,7 +12,6 @@ interface ApiError {
   };
 }
 
-// تعريف نوع بيانات التحديث
 interface UpdateJobPostingData {
   job_title?: string;
   description?: string;
@@ -23,15 +21,12 @@ interface UpdateJobPostingData {
 
 const getErrorMessage = (err: unknown): string => {
   const apiError = err as ApiError;
-  if (apiError.response?.data?.message) {
-    return apiError.response.data.message;
-  }
-  if (apiError.message) {
-    return apiError.message;
-  }
+  if (apiError.response?.data?.message) return apiError.response.data.message;
+  if (apiError.message) return apiError.message;
   return 'An error occurred';
 };
 
+// ✅ جلب جميع الوظائف
 export const useJobPostings = () => {
   const queryClient = useQueryClient();
 
@@ -61,7 +56,7 @@ export const useJobPostings = () => {
   });
 
   const update = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateJobPostingData }) => 
+    mutationFn: ({ id, data }: { id: number; data: UpdateJobPostingData }) =>
       JobPostingsService.update(id, data),
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['job-postings'] });
@@ -81,5 +76,25 @@ export const useJobPostings = () => {
     isDeleting: deletePosting.isPending,
     update: update.mutate,
     isUpdating: update.isPending,
+  };
+};
+
+// ✅ جلب وظيفة واحدة
+export const useJobPosting = (jobId?: number) => {
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['jobPosting', jobId],
+    queryFn: async () => {
+      if (!jobId) return null;
+      const res = await JobPostingsService.getById(jobId);
+      return res.data?.data || null;
+    },
+    enabled: !!jobId,
+  });
+
+  return {
+    job: data,
+    isLoading,
+    error: error?.message || null,
+    refetch,
   };
 };

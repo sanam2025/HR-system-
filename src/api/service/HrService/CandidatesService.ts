@@ -5,8 +5,13 @@ import type { APIResponseWithData } from "./Types/types.types";
 
 export const CandidatesService = {
   // جلب كل المتقدمين على وظيفة معينة
-  getByJobId: (jobId: number) => 
-    apiClient.get<CandidatesResponse>(`job-postings/${jobId}/candidates`),
+  getByJobId: (jobId: number) => {
+    // ✅ تحقق من صحة jobId
+    if (!jobId || isNaN(jobId)) {
+      throw new Error('Invalid job ID');
+    }
+    return apiClient.get<CandidatesResponse>(`job-postings/${jobId}/candidates`);
+  },
   
   // جلب متقدم واحد
   getById: (id: number) => 

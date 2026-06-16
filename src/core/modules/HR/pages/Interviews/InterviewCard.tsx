@@ -1,0 +1,192 @@
+// src/core/modules/HR/pages/Interviews/InterviewCard.tsx
+import React from "react";
+import {
+  Calendar,
+  User,
+  MapPin,
+  X,
+  CheckCircle,
+  Clock,
+  Eye,
+} from "lucide-react";
+import type { Interview } from "../../../../../api/service/HrService/Types/InterviewsService.types";
+
+interface InterviewCardProps {
+  interview: Interview;
+  onUpdateResult: (id: number, rate: number, notes: string) => void;
+  onCancel: (id: number) => void;
+  isUpdating: boolean;
+  onViewDetails: () => void;
+}
+
+const InterviewCard: React.FC<InterviewCardProps> = ({
+  interview,
+  onUpdateResult,
+  onCancel,
+  isUpdating,
+  onViewDetails,
+}) => {
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "scheduled":
+        return "bg-blue-100 text-blue-800";
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getLocationIcon = (type: string) => {
+    switch (type) {
+      case "on_site":
+        return <MapPin className="w-4 h-4" />;
+      case "online":
+        return <User className="w-4 h-4" />;
+      case "phone":
+        return <Clock className="w-4 h-4" />;
+      default:
+        return <MapPin className="w-4 h-4" />;
+    }
+  };
+
+  // ✅ استخراج اسم المرشح - حسب نوع Interview من الـ API
+  const getCandidateName = (interview: Interview): string => {
+    // @ts-expect-error - الـ API قد يرجع كائن candidate كامل
+    if (interview.candidate?.full_name) {
+      // @ts-expect-error - الـ API قد يرجع كائن candidate كامل
+      return interview.candidate.full_name;
+    }
+    if (interview.candidate_id) {
+      return `Candidate #${interview.candidate_id}`;
+    }
+    return "N/A";
+  };
+
+  // ✅ استخراج اسم المحاور - حسب نوع Interview من الـ API
+  const getInterviewerName = (interview: Interview): string => {
+    // @ts-expect-error - الـ API قد يرجع كائن interviewer كامل
+    if (interview.interviewer?.name) {
+      // @ts-expect-error - الـ API قد يرجع كائن interviewer كامل
+      return interview.interviewer.name;
+    }
+    if (interview.interviewed_by) {
+      return `Interviewer #${interview.interviewed_by}`;
+    }
+    return "N/A";
+  };
+
+  // ✅ استخراج بريد المرشح
+  const getCandidateEmail = (interview: Interview): string => {
+    // @ts-expect-error - الـ API قد يرجع كائن candidate كامل
+    if (interview.candidate?.email) {
+      // @ts-expect-error - الـ API قد يرجع كائن candidate كامل
+      return interview.candidate.email;
+    }
+    return `ID: ${interview.candidate_id || "N/A"}`;
+  };
+
+  const candidateName = getCandidateName(interview);
+  const interviewerName = getInterviewerName(interview);
+  const candidateEmail = getCandidateEmail(interview);
+
+  return (
+    <tr className="hover:bg-gray-50">
+      <td className="px-6 py-4">
+        <div className="flex items-center">
+          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-medium">
+            {candidateName.charAt(0) || "?"}
+          </div>
+          <div className="ml-3">
+            <p className="text-sm font-medium text-gray-900">{candidateName}</p>
+            <p className="text-xs text-gray-500">{candidateEmail}</p>
+          </div>
+        </div>
+      </td>
+      <td className="px-6 py-4">
+        <div className="flex items-center gap-2">
+          <Calendar className="w-4 h-4 text-gray-400" />
+          <div>
+            <div className="text-sm text-gray-900">
+              {new Date(interview.scheduled_at).toLocaleDateString()}
+            </div>
+            <div className="text-xs text-gray-500">
+              {new Date(interview.scheduled_at).toLocaleTimeString()}
+            </div>
+          </div>
+        </div>
+      </td>
+      <td className="px-6 py-4">
+        <div className="flex items-center gap-1">
+          {getLocationIcon(interview.location_type)}
+          <span className="text-sm text-gray-900 capitalize">
+            {interview.location_type?.replace("_", " ") || "N/A"}
+          </span>
+        </div>
+        {interview.location_details && (
+          <div className="text-xs text-gray-500 mt-1">
+            {interview.location_details}
+          </div>
+        )}
+      </td>
+      <td className="px-6 py-4">
+        <div className="text-sm text-gray-900">{interviewerName}</div>
+      </td>
+      <td className="px-6 py-4">
+        <span
+          className={`px-2 py-1 text-xs rounded-full ${getStatusColor(interview.status)}`}
+        >
+          {interview.status || "N/A"}
+        </span>
+        {interview.rate && (
+          <div className="text-xs text-gray-500 mt-1">
+            Rate: {interview.rate}/10
+          </div>
+        )}
+      </td>
+      <td className="px-6 py-4">
+        <div className="flex items-center gap-2">
+          {interview.status === "scheduled" && (
+            <>
+              <button
+                onClick={() => onCancel(interview.id)}
+                disabled={isUpdating}
+                className="p-1 text-red-500 hover:text-red-700 disabled:opacity-50"
+                title="Cancel Interview"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => {
+                  const rate = prompt("Enter rate (1-10):");
+                  const notes = prompt("Enter notes:");
+                  if (rate && !isNaN(Number(rate))) {
+                    onUpdateResult(interview.id, Number(rate), notes || "");
+                  }
+                }}
+                disabled={isUpdating}
+                className="p-1 text-green-500 hover:text-green-700 disabled:opacity-50"
+                title="Update Result"
+              >
+                <CheckCircle className="w-4 h-4" />
+              </button>
+            </>
+          )}
+          <button
+            onClick={onViewDetails}
+            className="p-1 text-blue-500 hover:text-blue-700"
+            title="View Details"
+          >
+            <Eye className="w-4 h-4" />
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+};
+
+export default InterviewCard;
