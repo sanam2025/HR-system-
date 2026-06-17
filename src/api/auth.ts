@@ -1,6 +1,6 @@
 import apiClient from './axios';
 
-// ── Types ────────────────────────────────────────────────────
+// ── Types ───
 export interface LoginResponse {
   token: string;
   user: {
@@ -11,7 +11,7 @@ export interface LoginResponse {
   };
 }
 
-// ── Login ─────────────────────────────────────────────────────
+// ── Login ───
 // POST login?email=&password=
 export async function login(email: string, password: string): Promise<LoginResponse> {
   const response = await apiClient.post<LoginResponse>(
@@ -23,7 +23,7 @@ export async function login(email: string, password: string): Promise<LoginRespo
   return response.data;
 }
 
-// ── Logout ────────────────────────────────────────────────────
+// ── Logout ──
 // POST logout
 export async function logout(): Promise<void> {
   try {
@@ -35,7 +35,7 @@ export async function logout(): Promise<void> {
   }
 }
 
-// ── Helpers ───────────────────────────────────────────────────
+// ── Helpers ─
 export function getStoredToken(): string | null {
   return localStorage.getItem('auth_token');
 }

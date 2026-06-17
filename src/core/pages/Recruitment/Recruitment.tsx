@@ -393,6 +393,8 @@ function CandidateEvaluation({ r }: { r: RecruitmentTranslation }) {
   );
 }
 
+
+
 // ── Main Page ──
 export default function Recruitment() {
   const { t } = useLanguage();

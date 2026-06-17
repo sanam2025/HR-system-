@@ -10,11 +10,16 @@ import LeaveRequests from './core/pages/Leaves/LeaveRequests';
 import OvertimeRequests from './core/pages/Leaves/OvertimeRequests';
 import PeriodicEvaluation from './core/pages/Evaluation/PeriodicEvaluation';
 import Recruitment from './core/pages/Recruitment/Recruitment';
+import PublicJobsPage from './core/pages/PublicJobs/PublicJobsPage';
 
 const router = createBrowserRouter([
     {
         path: '/',
         element: <Navigate to="/manager" replace />,
+    },
+    {
+        path: '/careers',
+        element: <PublicJobsPage />,
     },
     {
         path: '/manager',

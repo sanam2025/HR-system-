@@ -1,4 +1,4 @@
-import { Menu, Search, X, Users, LayoutDashboard, CheckSquare, CalendarOff, Clock, BarChart2, TrendingUp, Briefcase, Settings, LogOut, User } from 'lucide-react';
+import { Menu, Search, X, Users, LayoutDashboard, CheckSquare, CalendarOff, Clock, BarChart2, TrendingUp, Briefcase, User } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../../i18n/translations/LanguageContext';
 import { useNavigate } from 'react-router-dom';
@@ -114,6 +114,18 @@ export default function Topbar({
           >
             <Search size={18} />
           </button>
+
+          {/* Public Jobs Link */}
+          <a
+            href="/careers"
+            target="_blank"
+            rel="noopener noreferrer"
+            title={lang === 'ar' ? 'بوابة الوظائف العامة' : 'Public Careers Portal'}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#4A7C59]/10 text-[#4A7C59] text-xs font-bold hover:bg-[#4A7C59]/20 transition-all cursor-pointer"
+          >
+            <Briefcase size={14} />
+            <span className="hidden sm:inline">{lang === 'ar' ? 'الوظائف' : 'Careers'}</span>
+          </a>
 
           {/* Language Switcher Pill */}
           <button
