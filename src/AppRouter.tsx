@@ -3,7 +3,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HRLayout from "./shared/layouts/HRLayout";
 import Dashboard from "./core/modules/HR/pages/Dashboard";
 import Employees from "./core/modules/HR/pages/Employees";
-import Leaves from "./core/modules/HR/pages/Leaves";
 import Recruitment from "./core/modules/HR/pages/Recruitment/Recruitment";
 import Payroll from "./core/modules/HR/pages/Payroll";
 import AcceptedCandidates from "./core/modules/HR/pages/AcceptedCandidates";
@@ -28,6 +27,10 @@ import { AllApplicants } from "./core/modules/HR/pages/AllApplicants/AllApplican
 import ScheduleInterview from "./core/modules/HR/pages/Interviews/ScheduleInterview";
 import Interviews from "./core/modules/HR/pages/Interviews/Interviews";
 import Attendance from "./core/modules/HR/pages/Attendance/Attendance";
+import Leaves from "./core/modules/HR/pages/Leaves/Leaves";
+import { LeaveDetail } from "./core/modules/HR/pages/Leaves/LeaveDetail";
+import { HourlyLeaveDetail } from "./core/modules/HR/pages/HourlyLeaves/HourlyLeaveDetail";
+import { HourlyLeaves } from "./core/modules/HR/pages/HourlyLeaves/HourlyLeaves";
 
 function Page({ title }: { title: string }) {
   return (
@@ -44,7 +47,6 @@ const appRouter = createBrowserRouter([
     children: [
       { index: true, element: <Dashboard /> },
       { path: "employees", element: <Employees /> },
-      { path: "leaves", element: <Leaves /> },
       { path: "Recruitment", element: <Recruitment /> },
       { path: "payroll", element: <Payroll /> },
       { path: "accepted-candidates", element: <AcceptedCandidates /> },
@@ -60,6 +62,15 @@ const appRouter = createBrowserRouter([
         path: "attendance",
         element: <Attendance />,
       },
+      {
+        path: "Leaves",
+        element: <Leaves />,
+      },
+      {
+        path: "Leaves/:id",
+        element: <LeaveDetail />,
+      },
+
       // ✅ أضف هذا الـ Route
       { path: "recruitment/applicant/:id", element: <ApplicantDetail /> },
       {
@@ -73,6 +84,14 @@ const appRouter = createBrowserRouter([
       {
         path: "interviews/:id",
         element: <div>Interview Details - Coming Soon</div>,
+      },
+      {
+        path: "hourly-leaves",
+        element: <HourlyLeaves />,
+      },
+      {
+        path: "hourly-leaves/:id",
+        element: <HourlyLeaveDetail />,
       },
     ],
   },

@@ -31,6 +31,12 @@ export default function HRLayout() {
     },
     { path: "attendance", label: "Attendance", icon: Clock, exact: false }, // ✅ جديد
     { path: "Leaves", label: "Leaves", icon: CalendarDays, exact: false },
+    {
+      path: "hourly-leaves",
+      label: "Hourly Leaves",
+      icon: Clock,
+      exact: false,
+    },
     { path: "Payroll", label: "Payroll", icon: DollarSign, exact: false },
     {
       path: "accepted-candidates",
