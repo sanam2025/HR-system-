@@ -12,7 +12,7 @@ import {
   FileText,
   Briefcase,
   Clock,
-  Bell,
+  
 } from "lucide-react";
 import { useState } from "react";
 
@@ -53,7 +53,7 @@ export default function HRLayout() {
       icon: Briefcase,
       exact: false,
     },
-    { path: "notifications", label: "Notifications", icon: Bell, exact: false }, // ✅ جديد
+   
   ];
 
   return (

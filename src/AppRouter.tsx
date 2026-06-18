@@ -31,6 +31,8 @@ import Leaves from "./core/modules/HR/pages/Leaves/Leaves";
 import { LeaveDetail } from "./core/modules/HR/pages/Leaves/LeaveDetail";
 import { HourlyLeaveDetail } from "./core/modules/HR/pages/HourlyLeaves/HourlyLeaveDetail";
 import { HourlyLeaves } from "./core/modules/HR/pages/HourlyLeaves/HourlyLeaves";
+import { SendOffer } from "./core/modules/HR/pages/Offers/SendOffer";
+import { Offers } from "./core/modules/HR/pages/Offers/Offers";
 
 function Page({ title }: { title: string }) {
   return (
@@ -92,6 +94,14 @@ const appRouter = createBrowserRouter([
       {
         path: "hourly-leaves/:id",
         element: <HourlyLeaveDetail />,
+      },
+      {
+        path: "job-postings/:jobId/offers",
+        element: <Offers />,
+      },
+      {
+        path: "job-postings/:jobId/offers/send",
+        element: <SendOffer />,
       },
     ],
   },
