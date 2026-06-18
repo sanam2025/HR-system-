@@ -1,4 +1,4 @@
-// layouts/HRLayout.tsx
+// src/shared/layouts/HRLayout.tsx
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/SideBar";
 import {
@@ -7,16 +7,18 @@ import {
   CalendarDays,
   DollarSign,
   UserPlus,
-  Clock,
   UsersRound,
   LogOut,
   FileText,
-  Briefcase, // للاستقالات
+  Briefcase,
+  Clock,
+  Bell,
 } from "lucide-react";
 import { useState } from "react";
 
 export default function HRLayout() {
   const [open, setOpen] = useState(true);
+
   const hrSideBar = [
     { path: "/Hr", label: "Dashboard", icon: LayoutDashboard, exact: true },
     { path: "employees", label: "Employee", icon: Users, exact: false },
@@ -27,7 +29,7 @@ export default function HRLayout() {
       icon: UsersRound,
       exact: false,
     },
-    { path: "Attendance", label: "Attendance", icon: Clock, exact: false },
+    { path: "attendance", label: "Attendance", icon: Clock, exact: false }, // ✅ جديد
     { path: "Leaves", label: "Leaves", icon: CalendarDays, exact: false },
     { path: "Payroll", label: "Payroll", icon: DollarSign, exact: false },
     {
@@ -38,13 +40,14 @@ export default function HRLayout() {
     },
     { path: "terminations", label: "Terminations", icon: Users, exact: false },
     { path: "resignations", label: "Resignations", icon: LogOut, exact: false },
-    { path: "contracts", label: "Contracts", icon: FileText, exact: false }, // أضف في hrSideBar
+    { path: "contracts", label: "Contracts", icon: FileText, exact: false },
     {
       path: "job-postings",
       label: "Job Postings",
       icon: Briefcase,
       exact: false,
-    }, //
+    },
+    { path: "notifications", label: "Notifications", icon: Bell, exact: false }, // ✅ جديد
   ];
 
   return (

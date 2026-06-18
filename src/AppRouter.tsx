@@ -3,7 +3,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HRLayout from "./shared/layouts/HRLayout";
 import Dashboard from "./core/modules/HR/pages/Dashboard";
 import Employees from "./core/modules/HR/pages/Employees";
-import Attendance from "./core/modules/HR/pages/Attendance";
 import Leaves from "./core/modules/HR/pages/Leaves";
 import Recruitment from "./core/modules/HR/pages/Recruitment/Recruitment";
 import Payroll from "./core/modules/HR/pages/Payroll";
@@ -28,6 +27,7 @@ import ApplicantDetail from "./core/modules/HR/pages/ApplicantDetail";
 import { AllApplicants } from "./core/modules/HR/pages/AllApplicants/AllApplicants";
 import ScheduleInterview from "./core/modules/HR/pages/Interviews/ScheduleInterview";
 import Interviews from "./core/modules/HR/pages/Interviews/Interviews";
+import Attendance from "./core/modules/HR/pages/Attendance/Attendance";
 
 function Page({ title }: { title: string }) {
   return (
@@ -44,7 +44,6 @@ const appRouter = createBrowserRouter([
     children: [
       { index: true, element: <Dashboard /> },
       { path: "employees", element: <Employees /> },
-      { path: "attendance", element: <Attendance /> },
       { path: "leaves", element: <Leaves /> },
       { path: "Recruitment", element: <Recruitment /> },
       { path: "payroll", element: <Payroll /> },
@@ -57,6 +56,10 @@ const appRouter = createBrowserRouter([
       { path: "job-postings/edit/:id", element: <JobPostingForm /> },
       { path: "all-applicants", element: <AllApplicants /> },
       { path: "recruitment/applicants/:jobId", element: <AllApplicants /> },
+      {
+        path: "attendance",
+        element: <Attendance />,
+      },
       // ✅ أضف هذا الـ Route
       { path: "recruitment/applicant/:id", element: <ApplicantDetail /> },
       {
