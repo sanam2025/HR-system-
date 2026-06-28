@@ -1,20 +1,47 @@
 import axios from 'axios';
 
-// ── Base URL ──────────────────────────────────────────────────
+// ── Base URL ─
 const BASE_URL = 'http://masarhr.alwaysdata.net/api/';
 
-// ── Axios Instance ────────────────────────────────────────────
 const apiClient = axios.create({
   baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
   },
+  transformResponse: [
+    (data) => {
+      if (typeof data === 'string') {
+        try {
+          // Clean up any prepended HTML warnings (like PHP deprecation notices)
+          const firstBrace = data.indexOf('{');
+          const firstBracket = data.indexOf('[');
+          let startIdx = -1;
+
+          if (firstBrace !== -1 && firstBracket !== -1) {
+            startIdx = Math.min(firstBrace, firstBracket);
+          } else if (firstBrace !== -1) {
+            startIdx = firstBrace;
+          } else if (firstBracket !== -1) {
+            startIdx = firstBracket;
+          }
+
+          if (startIdx > 0) {
+            console.warn('[API] Cleaned prepended non-JSON data from response.');
+            return JSON.parse(data.substring(startIdx));
+          }
+          return JSON.parse(data);
+        } catch (e) {
+          return data;
+        }
+      }
+      return data;
+    }
+  ]
 });
 
-// ── Request Interceptor: أضف Bearer Token تلقائياً ───────────
-// TODO: استبدل هذا بصفحة Login عند الانتهاء من التطوير
-const DEV_TOKEN = '6|kd5AHpNWWFqykkNeKGovVMtB3Qe660vNxaani3sG364f143a';
+// ── Request Interceptor: أضف Bearer Token تلقائياً ───
+const DEV_TOKEN = '3|nb9p6zaSjV70gNZK3xhW4Mz0US9YFnJd7gDhCpgOa60f9f02';
 
 apiClient.interceptors.request.use(
   (config) => {
@@ -25,7 +52,7 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// ── Response Interceptor: تعامل مع 401 ───────────────────────
+// ── Response Interceptor: تعامل مع 401 ──
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {

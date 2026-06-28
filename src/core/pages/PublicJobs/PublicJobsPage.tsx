@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Briefcase, Search, Clock, Users,
   CheckCircle2, XCircle, CalendarDays,
   ExternalLink, Send, X, User, Mail, Phone, FileText,
-  Loader2, Globe,
+  Loader2, Upload
 } from 'lucide-react';
+import { getAvailableJobs, submitJobApplication } from '../../../api/publicJobs';
 
 // ── i18n (self-contained, no LanguageProvider dependency) ──
 type Lang = 'ar' | 'en';
@@ -38,7 +39,7 @@ const TEXTS = {
     deadline: 'آخر موعد:',
     applicants: 'متقدم',
     emptyTitle: 'لا توجد نتائج',
-    emptyDesc: 'جرّب البحث بكلمات مختلفة',
+    emptyDesc: 'جرّب البحث بكلمات مختلفة أو انتظر حتى يتم نشر وظائف جديدة.',
     footerEmployee: 'هل أنت موظف؟',
     footerLogin: 'سجّل دخولك هنا',
     footerNote: 'يمكنك مشاركة رابط هذه الصفحة مع المتقدمين دون الحاجة لتسجيل دخول.',
@@ -51,11 +52,16 @@ const TEXTS = {
     phonePlaceholder: '+963 9XX XXX XXX',
     coverLabel: 'رسالة التقدم (اختياري)',
     coverPlaceholder: 'أخبرنا عن نفسك ولماذا تناسب هذه الوظيفة...',
+    cvLabel: 'السيرة الذاتية (CV)',
+    cvUploadBtn: 'اختر ملف...',
+    skillLabel: 'المهارة الأساسية',
+    selectSkill: '-- اختر مهارة --',
     required: '*',
     sendBtn: 'إرسال الطلب',
     sending: 'جاري الإرسال...',
     successTitle: 'تم إرسال طلبك!',
     successNote: (name: string) => `شكراً ${name}، تلقّينا طلبك للوظيفة. سيتواصل معك فريق الموارد البشرية قريباً.`,
+    errorTitle: 'فشل في الإرسال',
     backBtn: 'العودة للوظائف',
     typeFullTime: 'دوام كامل',
     typePartTime: 'دوام جزئي',
@@ -90,7 +96,7 @@ const TEXTS = {
     deadline: 'Deadline:',
     applicants: 'applicants',
     emptyTitle: 'No results found',
-    emptyDesc: 'Try different search terms',
+    emptyDesc: 'Try different search terms or wait for new postings.',
     footerEmployee: 'Are you an employee?',
     footerLogin: 'Login here',
     footerNote: 'Share this page link with applicants — no login required.',
@@ -103,11 +109,16 @@ const TEXTS = {
     phonePlaceholder: '+1 XXX XXX XXXX',
     coverLabel: 'Cover Letter (optional)',
     coverPlaceholder: 'Tell us about yourself and why you are a great fit...',
+    cvLabel: 'Resume / CV',
+    cvUploadBtn: 'Choose file...',
+    skillLabel: 'Primary Skill',
+    selectSkill: '-- Select a skill --',
     required: '*',
     sendBtn: 'Submit Application',
     sending: 'Submitting...',
     successTitle: 'Application Submitted!',
     successNote: (name: string) => `Thank you ${name}, we received your application. Our HR team will reach out to you soon.`,
+    errorTitle: 'Failed to submit',
     backBtn: 'Back to Jobs',
     typeFullTime: 'Full Time',
     typePartTime: 'Part Time',
@@ -129,107 +140,17 @@ interface Job {
   applicants: number;
 }
 
-// ── Mock Data ────────────────────────────────────────────
-const JOBS: Job[] = [
-  {
-    id: 1,
-    title: { ar: 'مطور واجهات أمامية', en: 'Frontend Developer' },
-    department: { ar: 'تقنية المعلومات', en: 'Information Technology' },
-    type: 'fullTime',
-    description: {
-      ar: 'نبحث عن مطور واجهات أمامية متمرس للانضمام إلى فريقنا التقني. ستعمل على بناء وتطوير واجهات مستخدم تفاعلية وعالية الجودة.',
-      en: 'We are looking for an experienced Frontend Developer to join our tech team. You will build and develop high-quality, interactive user interfaces.',
-    },
-    requirements: ['React.js', 'TypeScript', 'CSS/Tailwind', '+2 yrs exp'],
-    available: true,
-    postedDate: '2026-06-01',
-    deadline: '2026-07-01',
-    applicants: 12,
-  },
-  {
-    id: 2,
-    title: { ar: 'محلل بيانات', en: 'Data Analyst' },
-    department: { ar: 'الذكاء الاصطناعي', en: 'Artificial Intelligence' },
-    type: 'fullTime',
-    description: {
-      ar: 'نحتاج إلى محلل بيانات خبير لتحليل البيانات الضخمة واستخراج الرؤى التجارية القيّمة التي تدعم قرارات الإدارة العليا.',
-      en: 'We need an expert Data Analyst to process large datasets and extract valuable business insights that support executive decisions.',
-    },
-    requirements: ['Python', 'SQL', 'Power BI', '+3 yrs exp'],
-    available: true,
-    postedDate: '2026-06-05',
-    deadline: '2026-07-10',
-    applicants: 8,
-  },
-  {
-    id: 3,
-    title: { ar: 'مدير تسويق رقمي', en: 'Digital Marketing Manager' },
-    department: { ar: 'التسويق', en: 'Marketing' },
-    type: 'fullTime',
-    description: {
-      ar: 'نبحث عن مدير تسويق رقمي ذو خبرة واسعة في إدارة الحملات التسويقية عبر مختلف المنصات الرقمية وتحقيق أهداف النمو.',
-      en: 'Seeking a Digital Marketing Manager with extensive experience managing campaigns across digital platforms to drive growth goals.',
-    },
-    requirements: ['SEO / SEM', 'Social Media', 'Google Ads', '+4 yrs exp'],
-    available: true,
-    postedDate: '2026-06-08',
-    deadline: '2026-06-30',
-    applicants: 20,
-  },
-  {
-    id: 4,
-    title: { ar: 'محاسب أول', en: 'Senior Accountant' },
-    department: { ar: 'المالية', en: 'Finance' },
-    type: 'fullTime',
-    description: {
-      ar: 'فرصة للانضمام إلى فريق مالي محترف، ستكون مسؤولاً عن إعداد التقارير المالية والتأكد من دقة السجلات المحاسبية.',
-      en: 'An opportunity to join a professional finance team, responsible for preparing financial reports and ensuring accuracy of accounting records.',
-    },
-    requirements: ['Financial Accounting', 'Advanced Excel', 'IFRS', '+3 yrs exp'],
-    available: false,
-    postedDate: '2026-05-20',
-    deadline: '2026-06-15',
-    applicants: 35,
-  },
-  {
-    id: 5,
-    title: { ar: 'أخصائي موارد بشرية', en: 'HR Specialist' },
-    department: { ar: 'الموارد البشرية', en: 'Human Resources' },
-    type: 'partTime',
-    description: {
-      ar: 'نوفر فرصة عمل بدوام جزئي لأخصائي موارد بشرية لدعم فريقنا في عمليات التوظيف وإدارة الموظفين.',
-      en: 'A part-time opportunity for an HR Specialist to support our team in recruitment and employee management processes.',
-    },
-    requirements: ['Recruitment', 'Performance Management', '+2 yrs exp'],
-    available: true,
-    postedDate: '2026-06-10',
-    deadline: '2026-07-15',
-    applicants: 6,
-  },
-  {
-    id: 6,
-    title: { ar: 'مصمم جرافيك', en: 'Graphic Designer' },
-    department: { ar: 'التصميم', en: 'Design' },
-    type: 'remote',
-    description: {
-      ar: 'انضم إلى فريق التصميم الإبداعي لدينا وساهم في إنتاج محتوى بصري مبهر للحملات التسويقية والمنتجات الرقمية.',
-      en: 'Join our creative design team and contribute to producing stunning visual content for marketing campaigns and digital products.',
-    },
-    requirements: ['Adobe Creative Suite', 'Figma', 'UI/UX', '+1 yr exp'],
-    available: true,
-    postedDate: '2026-06-12',
-    deadline: '2026-07-20',
-    applicants: 15,
-  },
-];
-
-
-
 const TYPE_COLORS: Record<Job['type'], string> = {
   fullTime: 'bg-blue-50 text-blue-700 border-blue-100',
   partTime: 'bg-purple-50 text-purple-700 border-purple-100',
   remote: 'bg-emerald-50 text-emerald-700 border-emerald-100',
 };
+
+const SKILL_OPTIONS = [
+  'PHP', 'Laravel', 'JavaScript', 'Vue.js', 'MySQL',
+  'Project Management', 'Problem Solving', 'Communication Skills',
+  'Teamwork', 'Time Management'
+];
 
 // ── Apply Modal ──────────────────────────────────────────
 function ApplyModal({
@@ -240,16 +161,45 @@ function ApplyModal({
   onClose: () => void;
 }) {
   const tx = TEXTS[lang];
-  const [form, setForm] = useState({ name: '', email: '', phone: '', coverLetter: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', coverLetter: '', skill: '' });
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  
   const dir = tx.dir;
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.phone) return;
+    if (!form.name || !form.email || !form.phone || !cvFile || !form.skill) {
+      setErrorMsg('الرجاء تعبئة جميع الحقول وإرفاق السيرة الذاتية واختيار المهارة');
+      return;
+    }
+    
     setLoading(true);
-    setTimeout(() => { setLoading(false); setSubmitted(true); }, 1500);
+    setErrorMsg('');
+    
+    try {
+      const formData = new FormData();
+      formData.append('full_name', form.name);
+      formData.append('email', form.email);
+      formData.append('phone', form.phone);
+      if (form.coverLetter) formData.append('cover_letter', form.coverLetter);
+      formData.append('cv', cvFile); // الباك إند يتوقع cv بحرف صغير وليس CV
+      
+      const skillId = SKILL_OPTIONS.indexOf(form.skill) + 1;
+      formData.append('skill_ids[]', String(skillId > 0 ? skillId : 1)); // الباك إند يتوقع skill_ids[] وليس skills[]
+
+      await submitJobApplication(job.id, formData);
+      setSubmitted(true);
+    } catch (err: any) {
+      console.error(err);
+      setErrorMsg(err.response?.data?.message || 'حدث خطأ أثناء الإرسال');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -293,6 +243,12 @@ function ApplyModal({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto flex-1">
+            {errorMsg && (
+              <div className="bg-red-50 text-red-600 text-xs p-3 rounded-lg border border-red-100">
+                ⚠️ {errorMsg}
+              </div>
+            )}
+            
             {/* Name */}
             <div>
               <label className="form-label flex items-center gap-1.5">
@@ -336,6 +292,52 @@ function ApplyModal({
                 required
               />
             </div>
+            
+            {/* CV Upload */}
+            <div>
+              <label className="form-label flex items-center gap-1.5">
+                <Upload size={11} /> {tx.cvLabel} <span className="text-red-500">{tx.required}</span>
+              </label>
+              <input 
+                type="file" 
+                className="hidden" 
+                ref={fileInputRef} 
+                accept=".pdf,.doc,.docx"
+                onChange={e => {
+                  if (e.target.files && e.target.files[0]) {
+                    setCvFile(e.target.files[0]);
+                  }
+                }}
+              />
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="form-input flex items-center justify-between cursor-pointer hover:border-green hover:bg-green/5 transition-all border-dashed"
+              >
+                <span className={cvFile ? "text-dark text-sm" : "text-gray-400 text-sm"}>
+                  {cvFile ? cvFile.name : tx.cvUploadBtn}
+                </span>
+                <Upload size={16} className="text-gray-400" />
+              </div>
+            </div>
+
+            {/* Skill Select */}
+            <div>
+              <label className="form-label flex items-center gap-1.5">
+                <Briefcase size={11} /> {tx.skillLabel} <span className="text-red-500">{tx.required}</span>
+              </label>
+              <select
+                className="form-input w-full"
+                value={form.skill}
+                onChange={e => setForm({ ...form, skill: e.target.value })}
+                required
+              >
+                <option value="">{tx.selectSkill}</option>
+                {SKILL_OPTIONS.map(skill => (
+                  <option key={skill} value={skill}>{skill}</option>
+                ))}
+              </select>
+            </div>
+
             {/* Cover Letter */}
             <div>
               <label className="form-label flex items-center gap-1.5">
@@ -348,6 +350,7 @@ function ApplyModal({
                 onChange={e => setForm({ ...form, coverLetter: e.target.value })}
               />
             </div>
+            
             <button
               type="submit"
               disabled={loading}
@@ -374,7 +377,7 @@ function JobCard({
   onApply: (job: Job) => void;
 }) {
   const tx = TEXTS[lang];
-  const typeLabel = tx[`type${job.type.charAt(0).toUpperCase() + job.type.slice(1)}` as 'typeFullTime' | 'typePartTime' | 'typeRemote'];
+  const typeLabel = tx[`type${job.type.charAt(0).toUpperCase() + job.type.slice(1)}` as 'typeFullTime' | 'typePartTime' | 'typeRemote'] || job.type;
 
   return (
     <div
@@ -395,7 +398,7 @@ function JobCard({
               <Briefcase size={18} className={job.available ? 'text-[#4A7C59]' : 'text-gray-400'} />
             </div>
             <div className="min-w-0">
-              <h3 className="font-extrabold text-[#4A4E4A] text-sm sm:text-base leading-tight truncate">
+              <h3 className="font-extrabold text-[#4A4E4A] text-sm sm:text-base leading-tight truncate" title={job.title[lang]}>
                 {job.title[lang]}
               </h3>
               <p className="text-xs text-[#6B6358] mt-0.5 truncate">{job.department[lang]}</p>
@@ -414,36 +417,42 @@ function JobCard({
         </div>
 
         {/* Description */}
-        <p className="text-xs sm:text-sm text-[#6B6358] leading-relaxed mb-3">
+        <p className="text-xs sm:text-sm text-[#6B6358] leading-relaxed mb-3 line-clamp-3">
           {job.description[lang]}
         </p>
 
         {/* Requirements */}
-        <div className="flex flex-wrap gap-1.5 mb-3 sm:mb-4">
-          {job.requirements.map(req => (
-            <span
-              key={req}
-              className="text-[10px] sm:text-[11px] font-semibold bg-[#4A7C59]/8 text-[#4A7C59] border border-[#4A7C59]/15 px-2 sm:px-2.5 py-1 rounded-full"
-            >
-              {req}
-            </span>
-          ))}
-        </div>
+        {job.requirements && job.requirements.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-3 sm:mb-4">
+            {job.requirements.map((req, idx) => (
+              <span
+                key={idx}
+                className="text-[10px] sm:text-[11px] font-semibold bg-[#4A7C59]/8 text-[#4A7C59] border border-[#4A7C59]/15 px-2 sm:px-2.5 py-1 rounded-full"
+              >
+                {req}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Meta row */}
         <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-[#6B6358]">
 
-          <span className={`flex items-center gap-1 border rounded-full px-2 py-0.5 text-[10px] sm:text-xs ${TYPE_COLORS[job.type]}`}>
+          <span className={`flex items-center gap-1 border rounded-full px-2 py-0.5 text-[10px] sm:text-xs ${TYPE_COLORS[job.type] || 'bg-gray-50 border-gray-200'}`}>
             <Clock size={10} /> {typeLabel}
           </span>
-          <span className="flex items-center gap-1">
-            <CalendarDays size={11} className="text-[#C4A66A] flex-shrink-0" />
-            {tx.deadline} {job.deadline}
-          </span>
-          <span className="flex items-center gap-1">
-            <Users size={11} className="flex-shrink-0" />
-            {job.applicants} {tx.applicants}
-          </span>
+          {job.deadline && (
+            <span className="flex items-center gap-1">
+              <CalendarDays size={11} className="text-[#C4A66A] flex-shrink-0" />
+              {tx.deadline} {job.deadline}
+            </span>
+          )}
+          {job.applicants !== undefined && (
+             <span className="flex items-center gap-1">
+               <Users size={11} className="flex-shrink-0" />
+               {job.applicants} {tx.applicants}
+             </span>
+          )}
         </div>
 
       </div>
@@ -476,9 +485,44 @@ export default function PublicJobsPage() {
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'available' | 'closed'>('all');
   const [applyJob, setApplyJob] = useState<Job | null>(null);
+  
+  const [jobsData, setJobsData] = useState<Job[]>([]);
+  const [isLoadingJobs, setIsLoadingJobs] = useState(true);
 
   const tx = TEXTS[lang];
   const dir = tx.dir;
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      setIsLoadingJobs(true);
+      try {
+        const response = await getAvailableJobs();
+        const data = response?.data || response || [];
+        
+        // Map backend format to our Job interface
+        const mappedJobs = Array.isArray(data) ? data.map((j: any) => ({
+          id: j.id,
+          title: { ar: j.job_title || 'وظيفة', en: j.job_title || 'Job' },
+          department: { ar: 'القسم العام', en: 'General Dept' }, // Fallback since API lacks this
+          type: 'fullTime' as const,
+          description: { ar: j.description || '', en: j.description || '' },
+          requirements: ['General Skills'],
+          available: j.status === 'open',
+          postedDate: j.posted_at || '',
+          deadline: '', 
+          applicants: 0
+        })) : [];
+        
+        setJobsData(mappedJobs);
+      } catch (err) {
+        console.error('Failed to load jobs', err);
+      } finally {
+        setIsLoadingJobs(false);
+      }
+    };
+    
+    fetchJobs();
+  }, []);
 
   const toggleLang = () => {
     const next: Lang = lang === 'ar' ? 'en' : 'ar';
@@ -486,7 +530,7 @@ export default function PublicJobsPage() {
     localStorage.setItem('public_lang', next);
   };
 
-  const filtered = JOBS.filter(job => {
+  const filtered = jobsData.filter(job => {
     const q = search.toLowerCase();
     const matchSearch =
       job.title[lang].toLowerCase().includes(q) ||
@@ -620,7 +664,12 @@ export default function PublicJobsPage() {
         </div>
 
         {/* Grid */}
-        {filtered.length === 0 ? (
+        {isLoadingJobs ? (
+          <div className="text-center py-20 flex flex-col items-center">
+             <Loader2 size={36} className="animate-spin text-green mb-4" />
+             <p className="text-brown">جاري تحميل الوظائف المتاحة...</p>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="text-center py-16 sm:py-20">
             <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
               <Search size={24} className="text-gray-300" />

@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { mockCandidates } from '../../../data/mockData';
-import { Send, ClipboardList, Trophy } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Send, ClipboardList, Trophy, Loader2 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
+import { createJobRequisition, getInterviewCandidates, submitInterviewResult, submitCandidatesRanking } from '../../../api/recruitment';
 
 import type ar from '../../../i18n/translations/ar';
 type RecruitmentTranslation = typeof ar['recruitment'];
@@ -19,14 +19,33 @@ function JobVacancyRequest({ r }: { r: RecruitmentTranslation }) {
 
   const [form, setForm] = useState({ title: '', description: '', experience: 0, skills: [] as string[] });
   const [sent, setSent] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState('');
   const [customSkill, setCustomSkill] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title) { toast.error(v.toasts.fillAll); return; }
-    setSent(true);
-    toast.success(v.toasts.success);
+    
+    setIsSubmitting(true);
+    try {
+      await createJobRequisition({
+        job_title: form.title,
+        description: form.description,
+        experience: form.experience,
+        skills: [1] // الباك إند يجبرنا على إرسال رقم مهارة واحد على الأقل! سنرسل [1] مؤقتاً ليعمل معك
+      });
+      setSent(true);
+      toast.success(v.toasts.success);
+    } catch (err: any) {
+      const serverMsg = 
+        err.response?.data?.message || 
+        err.response?.data?.error || 
+        (typeof err.response?.data === 'string' ? 'خطأ في السيرفر: تأكد من الصلاحيات أو التوكن' : 'حدث خطأ أثناء الإرسال');
+      toast.error(serverMsg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const toggleSkill = (skill: string) => {
@@ -169,8 +188,9 @@ function JobVacancyRequest({ r }: { r: RecruitmentTranslation }) {
         )}
       </div>
 
-      <button type="submit" className="btn-primary btn w-full flex items-center justify-center gap-2">
-        <Send size={16} /> {v.submitBtn}
+      <button type="submit" disabled={isSubmitting} className="btn-primary btn w-full flex items-center justify-center gap-2">
+        {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />} 
+        {isSubmitting ? 'جاري الإرسال...' : v.submitBtn}
       </button>
     </form>
   );
@@ -204,24 +224,41 @@ function StarRating({ value, onChange, max = 5 }: { value: number; onChange?: (v
 function CandidateEvaluation({ r }: { r: RecruitmentTranslation }) {
   const cd = r.candidates;
 
-  // interview rating per candidate (0 = not rated)
-  const [ratings, setRatings] = useState<Record<number, number>>(
-    Object.fromEntries(mockCandidates.map(c => [c.id, 0]))
-  );
-  // manual order IDs (used to break ties)
-  const [order, setOrder] = useState<number[]>(mockCandidates.map(c => c.id));
+  const [candidates, setCandidates] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [ratings, setRatings] = useState<Record<number, number>>({});
+  const [order, setOrder] = useState<number[]>([]);
   const [sent, setSent] = useState(false);
 
-  const allRated = mockCandidates.every(c => ratings[c.id] > 0);
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      try {
+        // نستخدم الوظيفة رقم 4 مؤقتاً لعدم توفر شاشة تحديد الوظيفة، وهي الوظيفة الوحيدة التي تعمل حالياً في الباك إند
+        const data = await getInterviewCandidates(4); 
+        const items = Array.isArray(data) ? data : (data?.data || []);
+        setCandidates(items);
+        setRatings(Object.fromEntries(items.map((c: any) => [c.id, 0])));
+        setOrder(items.map((c: any) => c.id));
+      } catch (err: any) {
+        const serverMsg = err.response?.data?.message || err.response?.data?.error || 'فشل في جلب قائمة المرشحين. (تأكد من وجود بيانات في الباك إند)';
+        toast.error(typeof serverMsg === 'string' ? serverMsg : 'فشل في جلب قائمة المرشحين');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCandidates();
+  }, []);
+
+  const allRated = candidates.length > 0 && candidates.every(c => ratings[c.id] > 0);
 
   // Sort: primary = rating descending, secondary = manual order position
-  const ranked = [...mockCandidates].sort((a, b) => {
+  const ranked = [...candidates].sort((a, b) => {
     const diff = ratings[b.id] - ratings[a.id];
     if (diff !== 0) return diff;
     return order.indexOf(a.id) - order.indexOf(b.id);
   });
 
-  // Move within same-score group only
   const moveInOrder = (id: number, dir: -1 | 1) => {
     const currentScore = ratings[id];
     const sameScore = ranked.filter(c => ratings[c.id] === currentScore).map(c => c.id);
@@ -236,10 +273,30 @@ function CandidateEvaluation({ r }: { r: RecruitmentTranslation }) {
     setOrder(newOrder);
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!allRated) { toast.error(cd.rateAllFirst); return; }
-    setSent(true);
-    toast.success(cd.toasts.success);
+    
+    setIsSubmitting(true);
+    try {
+      // 1. Submit rating for each candidate
+      await Promise.all(ranked.map(c => 
+        submitInterviewResult(c.id, { rate: ratings[c.id], notes: 'تم التقييم من النظام الجديد' })
+      ));
+
+      // 2. Submit the ranking array
+      const rankingPayload = ranked.map((c, i) => ({
+        interview_id: c.id,
+        rank: i + 1
+      }));
+      await submitCandidatesRanking(1, { ranking: rankingPayload });
+
+      setSent(true);
+      toast.success(cd.toasts.success);
+    } catch (err) {
+      toast.error('حدث خطأ أثناء إرسال التقييمات للباك إند');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const medalColors = [
@@ -248,6 +305,25 @@ function CandidateEvaluation({ r }: { r: RecruitmentTranslation }) {
     'bg-gradient-to-br from-amber-600 to-amber-700 text-white shadow-lg shadow-amber-300',
   ];
   const medalEmojis = ['🥇', '🥈', '🥉'];
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-green">
+        <Loader2 className="animate-spin mb-4" size={40} />
+        <p className="font-bold">جاري تحميل المرشحين...</p>
+      </div>
+    );
+  }
+
+  if (candidates.length === 0) {
+    return (
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-10 text-center">
+        <div className="text-4xl mb-4">📭</div>
+        <h3 className="text-lg font-bold text-dark mb-2">لا يوجد مرشحون حالياً</h3>
+        <p className="text-brown text-sm">تأكد من وجود مرشحين للوظيفة في قاعدة البيانات (بانتظار موافقة الـ HR)</p>
+      </div>
+    );
+  }
 
   if (sent) return (
     <div className="bg-white rounded-2xl border border-gold/20 shadow-card p-10 text-center">
@@ -259,8 +335,8 @@ function CandidateEvaluation({ r }: { r: RecruitmentTranslation }) {
           <div key={c.id} className="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
             <span className="text-xl">{medalEmojis[i] || String(i + 1)}</span>
             <div className="flex-1 text-start">
-              <p className="font-bold text-dark text-sm">{c.name}</p>
-              <p className="text-xs text-brown">{c.position}</p>
+              <p className="font-bold text-dark text-sm">{c.name || 'بدون اسم'}</p>
+              <p className="text-xs text-brown">{c.position || 'مرشح'}</p>
             </div>
             <StarRating value={ratings[c.id]} max={5} />
           </div>
@@ -278,10 +354,11 @@ function CandidateEvaluation({ r }: { r: RecruitmentTranslation }) {
         </h3>
         <button
           onClick={handleSend}
-          disabled={!allRated}
-          className={`btn flex items-center gap-2 transition-all ${allRated ? 'btn-gold' : 'bg-gray-100 text-gray-400 cursor-not-allowed px-4 py-2 rounded-xl text-sm font-semibold'}`}
+          disabled={!allRated || isSubmitting}
+          className={`btn flex items-center gap-2 transition-all ${allRated && !isSubmitting ? 'btn-gold' : 'bg-gray-100 text-gray-400 cursor-not-allowed px-4 py-2 rounded-xl text-sm font-semibold'}`}
         >
-          <Send size={15} /> {cd.sendRanking}
+          {isSubmitting ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />} 
+          {isSubmitting ? 'جاري الإرسال...' : cd.sendRanking}
         </button>
       </div>
 
@@ -294,34 +371,35 @@ function CandidateEvaluation({ r }: { r: RecruitmentTranslation }) {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
         {/* Left: Rating Cards */}
         <div className="lg:col-span-3 space-y-3">
-          {mockCandidates.map(c => {
+          {candidates.map(c => {
             const score = ratings[c.id];
+            const candidateName = c.name || 'بدون اسم';
             return (
               <div key={c.id} className="bg-white rounded-2xl border border-gray-100 shadow-card p-4 flex items-center gap-4">
                 {/* Avatar */}
                 <div className="w-10 h-10 rounded-full bg-green/15 flex items-center justify-center text-green font-bold text-sm flex-shrink-0">
-                  {c.name.charAt(0)}
+                  {candidateName.charAt(0)}
                 </div>
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-dark text-sm">{c.name}</p>
-                  <p className="text-xs text-brown mb-1.5">{c.experience} {cd.experience} · {c.position}</p>
+                  <p className="font-bold text-dark text-sm">{candidateName}</p>
+                  <p className="text-xs text-brown mb-1.5">{c.experience ? `${c.experience} ${cd.experience}` : ''} · {c.position || 'مرشح'}</p>
                   <div className="flex gap-1 flex-wrap">
-                    {c.skills.map(s => (
+                    {(c.skills || []).map((s: string) => (
                       <span key={s} className="bg-green/10 text-green text-[10px] font-semibold px-2 py-0.5 rounded-full">{s}</span>
                     ))}
                   </div>
                 </div>
                 {/* Star Rating */}
                 <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                  <span className="text-xs font-semibold text-brown">{cd.interviewScore}</span>
+                  <span className="text-xs font-semibold text-brown">{cd.interviewScore || 'التقييم'}</span>
                   <StarRating
                     value={score}
                     onChange={v => setRatings(prev => ({ ...prev, [c.id]: v }))}
                     max={5}
                   />
                   {score === 0 && (
-                    <span className="text-[10px] text-gray-400">{cd.notRatedYet}</span>
+                    <span className="text-[10px] text-gray-400">{cd.notRatedYet || 'لم يُقيّم'}</span>
                   )}
                 </div>
               </div>
@@ -356,7 +434,7 @@ function CandidateEvaluation({ r }: { r: RecruitmentTranslation }) {
                     </div>
                     {/* Name + Stars */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-dark truncate">{c.name}</p>
+                      <p className="text-sm font-bold text-dark truncate">{c.name || 'بدون اسم'}</p>
                       <StarRating value={score} max={5} />
                     </div>
                     {/* Score or Tie Controls */}
@@ -392,8 +470,6 @@ function CandidateEvaluation({ r }: { r: RecruitmentTranslation }) {
     </div>
   );
 }
-
-
 
 // ── Main Page ──
 export default function Recruitment() {
