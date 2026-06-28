@@ -33,6 +33,7 @@ import { HourlyLeaveDetail } from "./core/modules/HR/pages/HourlyLeaves/HourlyLe
 import { HourlyLeaves } from "./core/modules/HR/pages/HourlyLeaves/HourlyLeaves";
 import { SendOffer } from "./core/modules/HR/pages/Offers/SendOffer";
 import { Offers } from "./core/modules/HR/pages/Offers/Offers";
+import JobRequisitionDetail from "./core/modules/HR/pages/Recruitment/JobRequisitionDetail";
 
 function Page({ title }: { title: string }) {
   return (
@@ -50,6 +51,10 @@ const appRouter = createBrowserRouter([
       { index: true, element: <Dashboard /> },
       { path: "employees", element: <Employees /> },
       { path: "Recruitment", element: <Recruitment /> },
+      {
+        path: "recruitment/:id",
+        element: <JobRequisitionDetail />,
+      },
       { path: "payroll", element: <Payroll /> },
       { path: "accepted-candidates", element: <AcceptedCandidates /> },
       { path: "terminations", element: <Terminations /> },

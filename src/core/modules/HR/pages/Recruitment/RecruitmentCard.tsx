@@ -22,64 +22,75 @@ export default function RecruitmentCard({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "approved":
-        return "bg-green-100 text-green-800";
-      case "rejected":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+      case "pending": return "bg-yellow-100 text-yellow-800";
+      case "approved": return "bg-green-100 text-green-800";
+      case "rejected": return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
     }
   };
 
-  const getDepartmentName = (
-    dept: string | { id: number; name: string } | null | undefined,
-  ): string => {
-    if (!dept) return "N/A";
-    if (typeof dept === "string") return dept;
-    if (typeof dept === "object" && "name" in dept) return dept.name;
-    return "N/A";
+  const getDepartmentName = (dept: string | { id: number; name: string } | null | undefined): string => {
+    if (!dept) return 'N/A';
+    if (typeof dept === 'string') return dept;
+    if (typeof dept === 'object' && 'name' in dept) return dept.name;
+    return 'N/A';
   };
 
-  const getRequesterName = (
-    requester: string | { id: number; full_name: string } | null | undefined,
-  ): string => {
-    if (!requester) return "N/A";
-    if (typeof requester === "string") return requester;
-    if (typeof requester === "object" && "full_name" in requester)
-      return requester.full_name;
-    return "N/A";
+  const getRequesterName = (requester: string | { id: number; full_name: string } | null | undefined): string => {
+    if (!requester) return 'N/A';
+    if (typeof requester === 'string') return requester;
+    if (typeof requester === 'object' && 'full_name' in requester) return requester.full_name;
+    return 'N/A';
   };
 
   const departmentName = getDepartmentName(req.department);
   const requesterName = getRequesterName(req.requested_by);
 
+  // ✅ دالة للتنقل للتفاصيل مع التحقق
+  const goToDetails = () => {
+    if (req?.id) {
+      navigate(`/Hr/recruitment/${req.id}`);
+    } else {
+      console.warn('❌ No ID found for this requisition:', req);
+    }
+  };
+
+  // ✅ دالة للتنقل للمتقدمين مع التحقق
+  const goToApplicants = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (req?.id) {
+      navigate(`/Hr/all-applicants?jobId=${req.id}`);
+    } else {
+      console.warn('❌ No ID found for this requisition:', req);
+    }
+  };
+
   return (
-    <tr className="hover:bg-gray-50 transition-colors">
+    <tr 
+      className="hover:bg-gray-50 transition-colors cursor-pointer"
+      onClick={goToDetails}
+    >
       <td className="px-4 py-3">
-        <span className="font-medium text-gray-900">
-          {req.job_title || "N/A"}
-        </span>
+        <span className="font-medium text-gray-900">{req.job_title || 'N/A'}</span>
       </td>
       <td className="px-4 py-3 text-gray-600">{departmentName}</td>
       <td className="px-4 py-3 text-gray-600">{req.experience || 0}+ years</td>
       <td className="px-4 py-3 text-gray-600">{requesterName}</td>
       <td className="px-4 py-3 text-gray-600">{req.skills_count || 0}</td>
       <td className="px-4 py-3">
-        <span
-          className={`px-2 py-1 text-xs rounded-full ${getStatusColor(req.status || "")}`}
-        >
-          {req.status || "N/A"}
+        <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(req.status || '')}`}>
+          {req.status || 'N/A'}
         </span>
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
-          {/* ✅ أزرار Approve/Reject تظهر فقط لـ pending */}
           {req.status === "pending" && (
             <>
               <button
-                onClick={() => onApprove(req.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onApprove(req.id);
+                }}
                 disabled={isLoadingApprove}
                 className="p-1 text-green-500 hover:text-green-700 disabled:opacity-50"
                 title="Approve"
@@ -87,7 +98,10 @@ export default function RecruitmentCard({
                 <CheckCircle className="w-4 h-4" />
               </button>
               <button
-                onClick={() => onReject(req.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReject(req.id);
+                }}
                 disabled={isLoadingReject}
                 className="p-1 text-red-500 hover:text-red-700 disabled:opacity-50"
                 title="Reject"
@@ -96,18 +110,22 @@ export default function RecruitmentCard({
               </button>
             </>
           )}
-
-          {/* ✅ زر عرض المتقدمين (لجميع الحالات) */}
+          
+          {/* ✅ زر المتقدمين 👥 */}
           <button
-            onClick={() => navigate(`/Hr/all-applicants?jobId=${req.id}`)}
+            onClick={goToApplicants}
             className="p-1 text-purple-500 hover:text-purple-700"
             title="View Applicants"
           >
             <Users className="w-4 h-4" />
           </button>
-
-          {/* ✅ زر التفاصيل */}
+          
+          {/* ✅ زر التفاصيل 👁️ */}
           <button
+            onClick={(e) => {
+              e.stopPropagation();
+              goToDetails();
+            }}
             className="p-1 text-blue-500 hover:text-blue-700"
             title="View Details"
           >
