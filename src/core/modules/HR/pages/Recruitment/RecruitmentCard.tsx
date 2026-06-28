@@ -1,129 +1,120 @@
 // src/core/modules/HR/pages/Recruitment/RecruitmentCard.tsx
-import type { JobRequisition } from "../../../../../api/service/HrService/Types/HRService.types";
-import { Trash2, Users } from "lucide-react";
+import { CheckCircle, XCircle, Eye, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import ApproveForm from "./ApproveForm";
-import { useState } from "react";
-import RejectForm from "./RejectForm";
-import toast from "react-hot-toast";
+import type { JobRequisition } from "../../../../../api/service/HrService/Types/HRService.types";
 
-type RecruitmentCardProps = {
+interface RecruitmentCardProps {
   req: JobRequisition;
-  isLoadingApprove: boolean;
-  isLoadingReject: boolean;
-
   onApprove: (id: number) => void;
   onReject: (id: number) => void;
-};
+  isLoadingApprove: boolean;
+  isLoadingReject: boolean;
+}
 
-function RecruitmentCard({
+export default function RecruitmentCard({
   req,
-  isLoadingApprove,
-  isLoadingReject,
-
   onApprove,
   onReject,
+  isLoadingApprove,
+  isLoadingReject,
 }: RecruitmentCardProps) {
   const navigate = useNavigate();
-  const [isApproveForm, setIsApproveForm] = useState(false);
-  const [isRejectFrom, setIsRejectForm] = useState(false);
 
-  const handleDeleteRequest = () => {
-    console.log("Delete request:", req.id);
-  };
-
-  // ✅ التحقق من وجود id قبل التنقل
-  const handleViewApplicants = () => {
-    if (req.id) {
-      navigate(`/Hr/recruitment/applicants/${req.id}`);
-    } else {
-      toast.error("Invalid job ID");
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "approved":
+        return "bg-green-100 text-green-800";
+      case "rejected":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
-  return (
-    <>
-      <tr className="hover:bg-gray-50 transition-colors">
-        <td className="px-4 py-3">
-          <span className="text-sm font-medium text-gray-800 break-words max-w-xs">
-            {req.job_title}
-          </span>
-        </td>
-        <td className="px-4 py-3 text-sm text-gray-600">
-          {req.department?.name || "-"}
-        </td>
-        <td className="px-4 py-3 text-sm text-gray-600">{req.experience}+y</td>
-        <td className="px-4 py-3 text-sm text-gray-600">
-          {req.requested_by?.full_name || "-"}
-        </td>
-        <td className="px-4 py-3 text-sm text-gray-600">
-          {req.skills_count} skills
-        </td>
-        <td className="px-4 py-3">
-          <span
-            className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${
-              req.status === "approved"
-                ? "bg-emerald-100 text-emerald-700"
-                : req.status === "rejected"
-                  ? "bg-red-100 text-red-700"
-                  : "bg-amber-100 text-amber-700"
-            }`}
-          >
-            {req.status === null ? "pending" : req.status}
-          </span>
-        </td>
-        <td className="px-4 py-3">
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setIsApproveForm(true)}
-              disabled={req.status === "approved" || req.status === "rejected"}
-              className="px-3 py-2 text-xs font-medium bg-emerald-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-emerald-700"
-            >
-              App
-            </button>
-            <button
-              onClick={() => setIsRejectForm(true)}
-              disabled={req.status === "approved" || req.status === "rejected"}
-              className="px-3 py-2 text-xs font-medium bg-red-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-700"
-            >
-              Rej
-            </button>
-            {/* ✅ زر المتقدمين مع تحقق */}
-            <button
-              onClick={handleViewApplicants}
-              className="p-1 text-blue-500 hover:bg-blue-50 rounded"
-              title="Applicants"
-            >
-              <Users className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={handleDeleteRequest}
-              disabled={isLoadingReject || isLoadingApprove}
-              className="p-1 text-red-500 hover:bg-red-50 rounded"
-              title="Delete"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </td>
-      </tr>
+  const getDepartmentName = (
+    dept: string | { id: number; name: string } | null | undefined,
+  ): string => {
+    if (!dept) return "N/A";
+    if (typeof dept === "string") return dept;
+    if (typeof dept === "object" && "name" in dept) return dept.name;
+    return "N/A";
+  };
 
-      {isApproveForm && (
-        <ApproveForm
-          isLoading={isLoadingApprove}
-          onClose={() => setIsApproveForm(false)}
-          onConfirm={() => onApprove(req.id)}
-        />
-      )}
-      {isRejectFrom && (
-        <RejectForm
-          isLoading={isLoadingReject}
-          onClose={() => setIsRejectForm(false)}
-          onConfirm={() => onReject(req.id)}
-        />
-      )}
-    </>
+  const getRequesterName = (
+    requester: string | { id: number; full_name: string } | null | undefined,
+  ): string => {
+    if (!requester) return "N/A";
+    if (typeof requester === "string") return requester;
+    if (typeof requester === "object" && "full_name" in requester)
+      return requester.full_name;
+    return "N/A";
+  };
+
+  const departmentName = getDepartmentName(req.department);
+  const requesterName = getRequesterName(req.requested_by);
+
+  return (
+    <tr className="hover:bg-gray-50 transition-colors">
+      <td className="px-4 py-3">
+        <span className="font-medium text-gray-900">
+          {req.job_title || "N/A"}
+        </span>
+      </td>
+      <td className="px-4 py-3 text-gray-600">{departmentName}</td>
+      <td className="px-4 py-3 text-gray-600">{req.experience || 0}+ years</td>
+      <td className="px-4 py-3 text-gray-600">{requesterName}</td>
+      <td className="px-4 py-3 text-gray-600">{req.skills_count || 0}</td>
+      <td className="px-4 py-3">
+        <span
+          className={`px-2 py-1 text-xs rounded-full ${getStatusColor(req.status || "")}`}
+        >
+          {req.status || "N/A"}
+        </span>
+      </td>
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-2">
+          {/* ✅ أزرار Approve/Reject تظهر فقط لـ pending */}
+          {req.status === "pending" && (
+            <>
+              <button
+                onClick={() => onApprove(req.id)}
+                disabled={isLoadingApprove}
+                className="p-1 text-green-500 hover:text-green-700 disabled:opacity-50"
+                title="Approve"
+              >
+                <CheckCircle className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => onReject(req.id)}
+                disabled={isLoadingReject}
+                className="p-1 text-red-500 hover:text-red-700 disabled:opacity-50"
+                title="Reject"
+              >
+                <XCircle className="w-4 h-4" />
+              </button>
+            </>
+          )}
+
+          {/* ✅ زر عرض المتقدمين (لجميع الحالات) */}
+          <button
+            onClick={() => navigate(`/Hr/all-applicants?jobId=${req.id}`)}
+            className="p-1 text-purple-500 hover:text-purple-700"
+            title="View Applicants"
+          >
+            <Users className="w-4 h-4" />
+          </button>
+
+          {/* ✅ زر التفاصيل */}
+          <button
+            className="p-1 text-blue-500 hover:text-blue-700"
+            title="View Details"
+          >
+            <Eye className="w-4 h-4" />
+          </button>
+        </div>
+      </td>
+    </tr>
   );
 }
-
-export default RecruitmentCard;
