@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { CheckSquare, Calendar } from 'lucide-react';
+import { useLanguage } from '../../../../i18n/translations/LanguageContext';
 
 const statusColor: Record<string, string> = {
   'Present': 'bg-green-50 text-green-700',
@@ -27,6 +28,9 @@ interface Employee {
 
 export default function EmployeeCard({ employee }: { employee: Employee }) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  
+  const statusLabel = t.employees.status[employee.todayStatus.toLowerCase() as keyof typeof t.employees.status] || employee.todayStatus;
 
   return (
     <div
@@ -39,7 +43,7 @@ export default function EmployeeCard({ employee }: { employee: Employee }) {
           {employee.avatar}
         </div>
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusColor[employee.todayStatus] || 'bg-gray-50 text-gray-600'}`}>
-          {employee.todayStatus}
+          {statusLabel}
         </span>
       </div>
 
@@ -55,11 +59,11 @@ export default function EmployeeCard({ employee }: { employee: Employee }) {
       <div className="flex gap-4 mt-4 pt-4 border-t border-gray-100">
         <div className="flex items-center gap-1.5 text-xs text-brown">
           <CheckSquare size={13} className="text-green" />
-          <span>{employee.tasksCount} Tasks</span>
+          <span>{employee.tasksCount} {t.employees.tasks}</span>
         </div>
         <div className="flex items-center gap-1.5 text-xs text-brown">
           <Calendar size={13} className="text-gold" />
-          <span>{employee.leaveBalance} Leaves</span>
+          <span>{employee.leaveBalance} {t.employees.leaves}</span>
         </div>
       </div>
     </div>

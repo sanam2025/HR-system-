@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { mockLeaveRequests, mockOvertimeRequests } from '../data/mockData';
 
 interface ManagerState {
   currentUser: {
@@ -15,6 +16,11 @@ interface ManagerState {
   sidebarOpen: boolean;
   toggleSidebar: () => void;
   updateNotifications: (notifs: ManagerState['notifications']) => void;
+  
+  leaveRequests: typeof mockLeaveRequests;
+  overtimeRequests: typeof mockOvertimeRequests;
+  updateLeaveRequestStatus: (id: number, status: string) => void;
+  updateOvertimeRequestStatus: (id: number, status: string) => void;
 }
 
 const useManagerStore = create<ManagerState>((set) => ({
@@ -34,6 +40,17 @@ const useManagerStore = create<ManagerState>((set) => ({
 
   // Actions
   updateNotifications: (notifs) => set({ notifications: notifs }),
+
+  leaveRequests: mockLeaveRequests,
+  overtimeRequests: mockOvertimeRequests,
+
+  updateLeaveRequestStatus: (id, status) => set((state) => ({
+    leaveRequests: state.leaveRequests.map(req => req.id === id ? { ...req, status } : req)
+  })),
+
+  updateOvertimeRequestStatus: (id, status) => set((state) => ({
+    overtimeRequests: state.overtimeRequests.map(req => req.id === id ? { ...req, status } : req)
+  })),
 }));
 
 export default useManagerStore;
