@@ -1,4 +1,4 @@
-// AppRouter.tsx
+// src/AppRouter.tsx
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HRLayout from "./shared/layouts/HRLayout";
 import Dashboard from "./core/modules/HR/pages/Dashboard";
@@ -21,7 +21,6 @@ import EmployeeAttendance from "./core/modules/employee/pages/EmployeeAttendance
 import JobPostingForm from "./core/modules/HR/pages/JobPostings/JobPostingForm";
 import JobPostingDetail from "./core/modules/HR/pages/JobPostings/JobPostingDetail";
 import JobPostings from "./core/modules/HR/pages/JobPostings/JobPostings";
-// ✅ أضف هذا الـ import
 import ApplicantDetail from "./core/modules/HR/pages/ApplicantDetail";
 import { AllApplicants } from "./core/modules/HR/pages/AllApplicants/AllApplicants";
 import ScheduleInterview from "./core/modules/HR/pages/Interviews/ScheduleInterview";
@@ -77,9 +76,8 @@ const appRouter = createBrowserRouter([
         path: "Leaves/:id",
         element: <LeaveDetail />,
       },
-
-      // ✅ أضف هذا الـ Route
       { path: "recruitment/applicant/:id", element: <ApplicantDetail /> },
+      // ✅ الرابط القديم للمقابلات (مع jobId)
       {
         path: "job-postings/:jobId/interviews",
         element: <Interviews />,
@@ -88,6 +86,7 @@ const appRouter = createBrowserRouter([
         path: "job-postings/:jobId/interviews/schedule",
         element: <ScheduleInterview />,
       },
+      // ❌ تم إزالة الروابط الجديدة (interviews, interviews/schedule)
       {
         path: "interviews/:id",
         element: <div>Interview Details - Coming Soon</div>,

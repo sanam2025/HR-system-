@@ -7,7 +7,6 @@ import ApplicantFilters from "./ApplicantFilters";
 import ApplicantCard from "./ApplicantCard";
 import { useState, useMemo } from "react";
 import type { Candidate } from "../../../../../api/service/HrService/Types/CandidatesService.types";
-import toast from "react-hot-toast";
 
 export const AllApplicants = () => {
   const navigate = useNavigate();
@@ -19,8 +18,7 @@ export const AllApplicants = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const { candidates, isLoading, error, updateStatus, isUpdating } =
-    useCandidates(jobId);
+  const { candidates, isLoading, error } = useCandidates(jobId);
 
   const getFullName = useMemo(
     () =>
@@ -40,18 +38,11 @@ export const AllApplicants = () => {
     [],
   );
 
-  // ✅ معالج جدولة مقابلة
-  const handleScheduleInterview = (candidateId: number) => {
-    if (!jobId) {
-      toast.error("No job associated with this candidate");
-      return;
-    }
-    navigate(
-      `/Hr/job-postings/${jobId}/interviews/schedule?candidateId=${candidateId}`,
-    );
-  };
-
-  if (candidates.length === 0 && !isLoading && !error) {
+  // ✅ حالة عدم وجود متقدمين
+  if (
+    (candidates.length === 0 && !isLoading && !error) ||
+    error?.includes("404")
+  ) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="mb-8">
@@ -82,7 +73,8 @@ export const AllApplicants = () => {
     );
   }
 
-  if (error) {
+  // ✅ حالة الخطأ
+  if (error && !error?.includes("404")) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="mb-8">
@@ -108,6 +100,7 @@ export const AllApplicants = () => {
     );
   }
 
+  // ✅ حالة التحميل
   if (isLoading) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
@@ -130,6 +123,7 @@ export const AllApplicants = () => {
     );
   }
 
+  // ✅ حساب الإحصائيات
   const stats = {
     total: candidates.length,
     pending: candidates.filter((c: Candidate) => c.status === "pending").length,
@@ -137,10 +131,15 @@ export const AllApplicants = () => {
       .length,
     rejected: candidates.filter((c: Candidate) => c.status === "rejected")
       .length,
-    accepted: candidates.filter((c: Candidate) => c.status === "accepted")
-      .length,
+    interviewed: candidates.filter(
+      (c: Candidate) => (c.status as string) === "interviewed",
+    ).length,
+    applied: candidates.filter(
+      (c: Candidate) => (c.status as string) === "applied",
+    ).length,
   };
 
+  // ✅ فلترة المرشحين
   const filteredCandidates = candidates.filter((candidate: Candidate) => {
     const fullName = getFullName(candidate).toLowerCase();
     const email = getEmail(candidate).toLowerCase();
@@ -198,31 +197,17 @@ export const AllApplicants = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Applied Date
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
+                {/* ❌ تم حذف عمود Actions */}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filteredCandidates.map((candidate: Candidate) => (
-                <ApplicantCard
-                  key={candidate.id}
-                  candidate={candidate}
-                  jobId={jobId}
-                  onUpdateStatus={(status: string) =>
-                    updateStatus({ id: candidate.id, status })
-                  }
-                  isUpdating={isUpdating}
-                  onViewDetails={() =>
-                    navigate(`/Hr/recruitment/applicant/${candidate.id}`)
-                  }
-                  onScheduleInterview={handleScheduleInterview}
-                />
+                <ApplicantCard key={candidate.id} candidate={candidate} />
               ))}
               {filteredCandidates.length === 0 && (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={6}
                     className="px-6 py-12 text-center text-gray-400"
                   >
                     No applicants match your filters

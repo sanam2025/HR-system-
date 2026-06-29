@@ -5,7 +5,6 @@ import {
   User,
   MapPin,
   X,
-  CheckCircle,
   Clock,
   Eye,
 } from "lucide-react";
@@ -13,7 +12,6 @@ import type { Interview } from "../../../../../api/service/HrService/Types/Inter
 
 interface InterviewCardProps {
   interview: Interview;
-  onUpdateResult: (id: number, rate: number, notes: string) => void;
   onCancel: (id: number) => void;
   isUpdating: boolean;
   onViewDetails: () => void;
@@ -21,7 +19,6 @@ interface InterviewCardProps {
 
 const InterviewCard: React.FC<InterviewCardProps> = ({
   interview,
-  onUpdateResult,
   onCancel,
   isUpdating,
   onViewDetails,
@@ -54,7 +51,6 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
     }
   };
 
-  // ✅ استخراج اسم المرشح - حسب نوع Interview من الـ API
   const getCandidateName = (interview: Interview): string => {
     // @ts-expect-error - الـ API قد يرجع كائن candidate كامل
     if (interview.candidate?.full_name) {
@@ -67,7 +63,6 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
     return "N/A";
   };
 
-  // ✅ استخراج اسم المحاور - حسب نوع Interview من الـ API
   const getInterviewerName = (interview: Interview): string => {
     // @ts-expect-error - الـ API قد يرجع كائن interviewer كامل
     if (interview.interviewer?.name) {
@@ -80,7 +75,6 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
     return "N/A";
   };
 
-  // ✅ استخراج بريد المرشح
   const getCandidateEmail = (interview: Interview): string => {
     // @ts-expect-error - الـ API قد يرجع كائن candidate كامل
     if (interview.candidate?.email) {
@@ -151,30 +145,14 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
       <td className="px-6 py-4">
         <div className="flex items-center gap-2">
           {interview.status === "scheduled" && (
-            <>
-              <button
-                onClick={() => onCancel(interview.id)}
-                disabled={isUpdating}
-                className="p-1 text-red-500 hover:text-red-700 disabled:opacity-50"
-                title="Cancel Interview"
-              >
-                <X className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => {
-                  const rate = prompt("Enter rate (1-10):");
-                  const notes = prompt("Enter notes:");
-                  if (rate && !isNaN(Number(rate))) {
-                    onUpdateResult(interview.id, Number(rate), notes || "");
-                  }
-                }}
-                disabled={isUpdating}
-                className="p-1 text-green-500 hover:text-green-700 disabled:opacity-50"
-                title="Update Result"
-              >
-                <CheckCircle className="w-4 h-4" />
-              </button>
-            </>
+            <button
+              onClick={() => onCancel(interview.id)}
+              disabled={isUpdating}
+              className="p-1 text-red-500 hover:text-red-700 disabled:opacity-50"
+              title="Cancel Interview"
+            >
+              <X className="w-4 h-4" />
+            </button>
           )}
           <button
             onClick={onViewDetails}

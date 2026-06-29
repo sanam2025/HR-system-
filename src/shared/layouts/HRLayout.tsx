@@ -12,7 +12,6 @@ import {
   FileText,
   Briefcase,
   Clock,
-  
 } from "lucide-react";
 import { useState } from "react";
 
@@ -29,14 +28,9 @@ export default function HRLayout() {
       icon: UsersRound,
       exact: false,
     },
-    { path: "attendance", label: "Attendance", icon: Clock, exact: false }, // ✅ جديد
+    { path: "attendance", label: "Attendance", icon: Clock, exact: false },
     { path: "Leaves", label: "Leaves", icon: CalendarDays, exact: false },
-    {
-      path: "hourly-leaves",
-      label: "Hourly Leaves",
-      icon: Clock,
-      exact: false,
-    },
+    { path: "hourly-leaves", label: "Hourly Leaves", icon: Clock, exact: false },
     { path: "Payroll", label: "Payroll", icon: DollarSign, exact: false },
     {
       path: "accepted-candidates",
@@ -53,7 +47,7 @@ export default function HRLayout() {
       icon: Briefcase,
       exact: false,
     },
-   
+    // ❌ تم إزالة Interviews من الـ Sidebar
   ];
 
   return (

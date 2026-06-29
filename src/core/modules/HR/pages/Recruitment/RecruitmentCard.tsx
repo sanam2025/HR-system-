@@ -46,27 +46,23 @@ export default function RecruitmentCard({
   const departmentName = getDepartmentName(req.department);
   const requesterName = getRequesterName(req.requested_by);
 
-  // ✅ دالة للتنقل للتفاصيل مع التحقق
   const goToDetails = () => {
     if (req?.id) {
       navigate(`/Hr/recruitment/${req.id}`);
-    } else {
-      console.warn('❌ No ID found for this requisition:', req);
     }
   };
 
-  // ✅ دالة للتنقل للمتقدمين مع التحقق
   const goToApplicants = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (req?.id) {
+      // ✅ استخدم req.id دائماً لأن is_posted: false
+      console.log(`🔍 Going to applicants for requisition ID: ${req.id}`);
       navigate(`/Hr/all-applicants?jobId=${req.id}`);
-    } else {
-      console.warn('❌ No ID found for this requisition:', req);
     }
   };
 
   return (
-    <tr 
+    <tr
       className="hover:bg-gray-50 transition-colors cursor-pointer"
       onClick={goToDetails}
     >
@@ -110,8 +106,7 @@ export default function RecruitmentCard({
               </button>
             </>
           )}
-          
-          {/* ✅ زر المتقدمين 👥 */}
+
           <button
             onClick={goToApplicants}
             className="p-1 text-purple-500 hover:text-purple-700"
@@ -119,8 +114,7 @@ export default function RecruitmentCard({
           >
             <Users className="w-4 h-4" />
           </button>
-          
-          {/* ✅ زر التفاصيل 👁️ */}
+
           <button
             onClick={(e) => {
               e.stopPropagation();

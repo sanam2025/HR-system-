@@ -1,6 +1,6 @@
 // src/core/modules/HR/pages/Interviews/Interviews.tsx
-import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Plus, XCircle } from 'lucide-react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { ArrowLeft, XCircle } from 'lucide-react';
 import { useInterviews } from '../../hooks/useInterviews';
 import InterviewCard from './InterviewCard';
 import InterviewStats from './InterviewStats';
@@ -10,7 +10,11 @@ import type { Interview } from '../../../../../api/service/HrService/Types/Inter
 
 export const Interviews = () => {
   const navigate = useNavigate();
-  const { jobId } = useParams<{ jobId: string }>();
+  const { jobId: jobIdFromParams } = useParams<{ jobId: string }>();
+  const [searchParams] = useSearchParams();
+  const jobIdFromQuery = searchParams.get('jobId');
+  
+  const jobId = jobIdFromParams || jobIdFromQuery;
   const jobIdNumber = jobId ? Number(jobId) : undefined;
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,7 +24,6 @@ export const Interviews = () => {
     interviews,
     isLoading,
     error,
-    updateResult,
     cancelInterview,
     isUpdating,
   } = useInterviews(jobIdNumber);
@@ -32,7 +35,6 @@ export const Interviews = () => {
     cancelled: interviews.filter((i: Interview) => i.status === 'cancelled').length,
   };
 
-  // ✅ استخراج اسم المرشح من candidate_id أو candidate object
   const getCandidateName = (interview: Interview): string => {
     // @ts-expect-error - API قد يرجع كائن candidate كامل
     if (interview.candidate?.full_name) {
@@ -96,13 +98,6 @@ export const Interviews = () => {
               Manage interviews for this job posting
             </p>
           </div>
-          <button
-            onClick={() => navigate(`/Hr/job-postings/${jobId}/interviews/schedule`)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Schedule Interview
-          </button>
         </div>
       </div>
 
@@ -132,9 +127,6 @@ export const Interviews = () => {
                 <InterviewCard
                   key={interview.id}
                   interview={interview}
-                  onUpdateResult={(id, rate, notes) =>
-                    updateResult({ id, data: { rate, notes } })
-                  }
                   onCancel={(id) => cancelInterview(id)}
                   isUpdating={isUpdating}
                   onViewDetails={() =>

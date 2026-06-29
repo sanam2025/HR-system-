@@ -8,7 +8,7 @@ interface StateCardProps {
 
 export default function StateCard({ data }: StateCardProps) {
   const requests = Array.isArray(data) ? data : [];
-  
+
   const stats = {
     total: requests.length,
     pending: requests.filter((r) => r.status === "pending").length,

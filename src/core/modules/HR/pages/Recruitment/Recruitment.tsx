@@ -1,8 +1,6 @@
 // src/core/modules/HR/pages/Recruitment/Recruitment.tsx
 import { useEffect, useState } from "react";
-import { Megaphone } from "lucide-react";
 import { useJobRequisitions } from "../../hooks/useJobRequisitions";
-import JobPostingForm from "../../Components/Special_Components/JobPostingForm";
 import RecruitmentCard from "./RecruitmentCard";
 import Loading from "../../../../../shared/components/Loading";
 import StateCard from "./StateCard";
@@ -11,13 +9,9 @@ import { useJobRequisitionsApprove } from "../../hooks/useJobRequisitionsApprove
 import { useJobRequisitionsReject } from "../../hooks/useJobRequisitionsReject";
 import toast from "react-hot-toast";
 import type { RecruitmentStatus } from "../../../../../api/service/HrService/Types/HRService.types";
+import ConfirmModal from "../../Components/Special_Components/ConfirmModal";
 
 export type FilterStatus = RecruitmentStatus | "all";
-
-interface JobFormData {
-  jobTitle: string;
-  [key: string]: unknown;
-}
 
 export default function Recruitment() {
   const { data, isLoading, error, refetch } = useJobRequisitions();
@@ -27,59 +21,68 @@ export default function Recruitment() {
   const isLoadingApprove = approveRequisition.isPending;
   const isLoadingReject = rejectRequisition.isPending;
 
-  const [isFormOpen, setIsFormOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("all");
 
-  // ✅ تأكد من أن data مصفوفة
+  const [modal, setModal] = useState<{
+    isOpen: boolean;
+    type: "approve" | "reject";
+    id: number | null;
+  }>({
+    isOpen: false,
+    type: "approve",
+    id: null,
+  });
+
   const requests = Array.isArray(data) ? data : [];
 
-  // ✅ Console للتأكد
-  useEffect(() => {
-    console.log("📊 Raw data:", data);
-    console.log("📊 Requests array:", requests);
-    console.log("📊 Requests length:", requests.length);
-  }, [data, requests]);
-
-  const handlePostJob = (formData: JobFormData) => {
-    setIsFormOpen(false);
-    alert(`✅ Job "${formData.jobTitle}" has been posted!`);
+  const openConfirmModal = (id: number, type: "approve" | "reject") => {
+    setModal({ isOpen: true, type, id });
   };
 
-  const handleApprove = (id: number) => {
-    approveRequisition.mutate(id, {
-      onSuccess: () => {
-        toast.success("Job approved successfully");
-        refetch();
-      },
-      onError: (e) => {
-        toast.error("Failed to approve: " + e);
-      },
-    });
+  const closeConfirmModal = () => {
+    setModal({ isOpen: false, type: "approve", id: null });
   };
 
-  const handleReject = (id: number) => {
-    rejectRequisition.mutate(id, {
-      onSuccess: () => {
-        toast.success("Job rejected successfully");
-        refetch();
-      },
-      onError: (e) => {
-        toast.error("Failed to reject: " + e);
-      },
-    });
+  const handleConfirm = () => {
+    if (!modal.id) return;
+
+    if (modal.type === "approve") {
+      approveRequisition.mutate(modal.id, {
+        onSuccess: () => {
+          toast.success("✅ Job approved successfully");
+          refetch();
+          closeConfirmModal();
+        },
+        onError: (e) => {
+          toast.error("❌ Failed to approve: " + e);
+          closeConfirmModal();
+        },
+      });
+    } else {
+      rejectRequisition.mutate(modal.id, {
+        onSuccess: () => {
+          toast.success("✅ Job rejected successfully");
+          refetch();
+          closeConfirmModal();
+        },
+        onError: (e) => {
+          toast.error("❌ Failed to reject: " + e);
+          closeConfirmModal();
+        },
+      });
+    }
   };
 
-  // ✅ فلترة الطلبات
   const filteredRequests = requests.filter((req) => {
     const matchesStatus = statusFilter === "all" || req.status === statusFilter;
     return matchesStatus;
   });
 
-  // ✅ Console للفلترة
   useEffect(() => {
-    console.log("🔍 Filtered requests:", filteredRequests);
-    console.log("🔍 Filtered length:", filteredRequests.length);
-  }, [filteredRequests]);
+    console.log("📊 Raw data:", data);
+    console.log("📊 Requests array:", requests);
+    console.log("📊 Requests length:", requests.length);
+  }, [data, requests]);
 
   if (isLoading) {
     return (
@@ -111,10 +114,20 @@ export default function Recruitment() {
   return (
     <>
       <div className="p-6 bg-gray-50" dir="ltr">
-        <JobPostingForm
-          isOpen={isFormOpen}
-          onClose={() => setIsFormOpen(false)}
-          onSubmit={handlePostJob}
+        <ConfirmModal
+          isOpen={modal.isOpen}
+          onClose={closeConfirmModal}
+          onConfirm={handleConfirm}
+          title={
+            modal.type === "approve" ? "Approve Request" : "Reject Request"
+          }
+          message={
+            modal.type === "approve"
+              ? "Are you sure you want to approve this recruitment request?"
+              : "Are you sure you want to reject this recruitment request?"
+          }
+          type={modal.type}
+          isLoading={isLoadingApprove || isLoadingReject}
         />
 
         <div className="mb-8">
@@ -127,17 +140,10 @@ export default function Recruitment() {
                 Review and manage recruitment requests.
               </p>
             </div>
-            <button
-              onClick={() => setIsFormOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
-            >
-              <Megaphone className="w-4 h-4" /> Post Job Opening
-            </button>
           </div>
         </div>
 
         <StateCard data={requests} />
-
         <FilterAndSearchCard
           statusFilter={statusFilter}
           setStatusFilter={setStatusFilter}
@@ -172,15 +178,14 @@ export default function Recruitment() {
                   </th>
                 </tr>
               </thead>
-
               <tbody className="divide-y divide-gray-100">
                 {filteredRequests.length > 0 ? (
                   filteredRequests.map((req) => (
                     <RecruitmentCard
                       key={req.id}
                       req={req}
-                      onApprove={handleApprove}
-                      onReject={handleReject}
+                      onApprove={() => openConfirmModal(req.id, "approve")}
+                      onReject={() => openConfirmModal(req.id, "reject")}
                       isLoadingApprove={isLoadingApprove}
                       isLoadingReject={isLoadingReject}
                     />

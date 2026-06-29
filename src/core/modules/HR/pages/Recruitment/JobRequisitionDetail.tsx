@@ -12,7 +12,6 @@ export default function JobRequisitionDetail() {
 
   const { data, isLoading, error } = useJobRequisitions();
 
-  // ✅ تأكد من أن data مصفوفة وابحث عن الـ requisition المطلوب
   const requisitions = Array.isArray(data) ? data : [];
   const req = requisitions.find((item: JobRequisition) => item.id === reqId);
 
@@ -41,7 +40,6 @@ export default function JobRequisitionDetail() {
   }
 
   const getStatusColor = (status: string | null | undefined) => {
-    if (!status) return "bg-gray-100 text-gray-800";
     switch (status) {
       case "pending":
         return "bg-yellow-100 text-yellow-800";
@@ -94,7 +92,6 @@ export default function JobRequisitionDetail() {
         >
           <ArrowLeft className="w-4 h-4" /> Back to Recruitment
         </button>
-
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">

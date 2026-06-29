@@ -5,7 +5,6 @@ import { CandidatesService } from '../../../../api/service/HrService/CandidatesS
 import type { Candidate } from '../../../../api/service/HrService/Types/CandidatesService.types';
 import { AxiosError } from 'axios';
 
-// ✅ تعريف نوع خطأ الـ API
 interface ApiErrorResponse {
   message?: string;
   errors?: Record<string, string[]>;
@@ -17,30 +16,27 @@ export const useCandidates = (jobId?: number) => {
   const { data, isLoading, error, refetch } = useQuery<Candidate[], Error>({
     queryKey: ['candidates', jobId],
     queryFn: async () => {
-      if (!jobId || isNaN(jobId)) {
+      if (!jobId || isNaN(jobId) || jobId <= 0) {
         return [] as Candidate[];
       }
-      
+
       try {
         const response = await CandidatesService.getByJobId(jobId);
         return response.data?.data || [];
       } catch (err) {
-        // ✅ التحقق من خطأ 404
         if (err instanceof AxiosError && err.response?.status === 404) {
-          console.warn(`No candidates found for job ${jobId}`);
+          console.warn(`ℹ️ No candidates found for job ${jobId}`);
           return [] as Candidate[];
         }
-        // ✅ إعادة رمي الخطأ
         throw err instanceof Error ? err : new Error('Unknown error occurred');
       }
     },
-    enabled: !!jobId && !isNaN(jobId),
+    enabled: !!jobId && !isNaN(jobId) && jobId > 0,
     retry: false,
   });
 
   const candidates = data || [];
 
-  // ✅ معالجة الخطأ بشكل آمن
   let errorMessage: string | null = null;
   if (error) {
     if (error instanceof AxiosError && error.response?.status === 404) {
@@ -51,11 +47,22 @@ export const useCandidates = (jobId?: number) => {
   }
 
   const updateStatus = useMutation({
-    mutationFn: ({ id, status }: { id: number; status: string }) => 
+    mutationFn: ({ id, status }: { id: number; status: string }) =>
       CandidatesService.updateStatus(id, status),
-    onSuccess: () => {
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['candidates', jobId] });
-      toast.success('Status updated successfully');
+      
+      // ✅ رسالة حسب الحالة
+      const status = res.config?.url?.split('status=')[1];
+      if (status === 'rejected') {
+        toast.error('❌ Candidate rejected successfully');
+      } else if (status === 'pending') {
+        toast.success('✅ Candidate moved to pending');
+      } else if (status === 'reviewed') {
+        toast.success('✅ Candidate reviewed successfully');
+      } else {
+        toast.success(`✅ Status updated to ${status}`);
+      }
     },
     onError: (err: unknown) => {
       let message = 'Failed to update status';
@@ -65,7 +72,7 @@ export const useCandidates = (jobId?: number) => {
       } else if (err instanceof Error) {
         message = err.message;
       }
-      toast.error(message);
+      toast.error('❌ ' + message);
     },
   });
 
@@ -83,7 +90,7 @@ export const useCandidates = (jobId?: number) => {
       } else if (err instanceof Error) {
         message = err.message;
       }
-      toast.error(message);
+      toast.error('❌ ' + message);
     },
   });
 

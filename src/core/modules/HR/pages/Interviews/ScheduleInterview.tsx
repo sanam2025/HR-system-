@@ -1,5 +1,5 @@
 // src/core/modules/HR/pages/Interviews/ScheduleInterview.tsx
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Calendar, User, MapPin } from 'lucide-react';
 import { useInterviews } from '../../hooks/useInterviews';
@@ -7,27 +7,24 @@ import toast from 'react-hot-toast';
 
 export const ScheduleInterview = () => {
   const navigate = useNavigate();
-  const { jobId } = useParams<{ jobId: string }>();
+  const { jobId: jobIdFromParams } = useParams<{ jobId: string }>();
   const [searchParams] = useSearchParams();
   const candidateIdFromUrl = searchParams.get('candidateId');
+  const jobIdFromQuery = searchParams.get('jobId');
   
-  const { scheduleInterview, isScheduling } = useInterviews(Number(jobId));
+  // ✅ خذ jobId من الـ params أو من الـ query
+  const jobId = jobIdFromParams || jobIdFromQuery;
+  const jobIdNumber = jobId ? Number(jobId) : undefined;
+  
+  const { scheduleInterview, isScheduling } = useInterviews(jobIdNumber);
 
   const [form, setForm] = useState({
-    candidate_id: '',
+    candidate_id: candidateIdFromUrl || '',
     interviewed_by: '',
     scheduled_at: '',
     location_type: 'on_site',
     location_details: '',
   });
-
-  // ✅ تعبئة candidate_id تلقائياً من الـ URL
-  useEffect(() => {
-    if (candidateIdFromUrl) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setForm(prev => ({ ...prev, candidate_id: candidateIdFromUrl }));
-    }
-  }, [candidateIdFromUrl]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +32,7 @@ export const ScheduleInterview = () => {
       toast.error('Please fill in all required fields');
       return;
     }
+    
     scheduleInterview({
       candidate_id: Number(form.candidate_id),
       interviewed_by: Number(form.interviewed_by),
@@ -42,7 +40,15 @@ export const ScheduleInterview = () => {
       location_type: form.location_type,
       location_details: form.location_details || '',
     });
-    navigate(`/Hr/job-postings/${jobId}/interviews`);
+    
+    toast.success('✅ Interview added to schedule successfully!');
+    
+    // ✅ بعد الجدولة، تروح للرابط القديم عشان تظهر المقابلات
+    if (jobId) {
+      navigate(`/Hr/job-postings/${jobId}/interviews`);
+    } else {
+      navigate('/Hr/interviews');
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -54,7 +60,13 @@ export const ScheduleInterview = () => {
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
           <button
-            onClick={() => navigate(`/Hr/job-postings/${jobId}/interviews`)}
+            onClick={() => {
+              if (jobId) {
+                navigate(`/Hr/job-postings/${jobId}/interviews`);
+              } else {
+                navigate('/Hr/interviews');
+              }
+            }}
             className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Interviews
@@ -154,13 +166,19 @@ export const ScheduleInterview = () => {
               <button
                 type="submit"
                 disabled={isScheduling}
-                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50"
               >
                 {isScheduling ? 'Scheduling...' : 'Schedule Interview'}
               </button>
               <button
                 type="button"
-                onClick={() => navigate(`/Hr/job-postings/${jobId}/interviews`)}
+                onClick={() => {
+                  if (jobId) {
+                    navigate(`/Hr/job-postings/${jobId}/interviews`);
+                  } else {
+                    navigate('/Hr/interviews');
+                  }
+                }}
                 className="px-4 py-2 border text-gray-700 rounded-lg hover:bg-gray-50"
               >
                 Cancel

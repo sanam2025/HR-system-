@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { InterviewsService } from '../../../../api/service/HrService/InterviewsService';
 
-// ✅ تعريف الأنواع لتتوافق مع الـ API
 interface ScheduleData {
   candidate_id: number;
   interviewed_by: number;
@@ -14,7 +13,7 @@ interface ScheduleData {
 
 interface ResultData {
   rate: number;
-  notes: string; // ✅ جعلها إجبارية بدلاً من optional
+  notes: string;
 }
 
 interface RankingData {
@@ -24,18 +23,23 @@ interface RankingData {
 export const useInterviews = (jobId?: number) => {
   const queryClient = useQueryClient();
 
-  // ✅ جلب المقابلات
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['interviews', jobId],
     queryFn: async () => {
       if (!jobId) return [];
-      const res = await InterviewsService.getByJobId(jobId);
-      return res.data?.data || [];
+      
+      try {
+        const res = await InterviewsService.getByJobId(jobId);
+        return res.data?.data || [];
+      } catch {
+        return [];
+      }
     },
     enabled: !!jobId,
   });
 
-  // ✅ جدولة مقابلة
+  const interviews = data || [];
+
   const schedule = useMutation({
     mutationFn: (data: ScheduleData) => {
       if (!jobId) throw new Error('Job ID required');
@@ -48,7 +52,6 @@ export const useInterviews = (jobId?: number) => {
     onError: (err: Error) => toast.error(err.message || 'Schedule failed'),
   });
 
-  // ✅ تحديث النتيجة
   const result = useMutation({
     mutationFn: ({ id, data }: { id: number; data: ResultData }) =>
       InterviewsService.updateResult(id, data),
@@ -59,7 +62,6 @@ export const useInterviews = (jobId?: number) => {
     onError: (err: Error) => toast.error(err.message || 'Update failed'),
   });
 
-  // ✅ إلغاء المقابلة
   const cancel = useMutation({
     mutationFn: (id: number) => InterviewsService.cancel(id),
     onSuccess: () => {
@@ -69,7 +71,6 @@ export const useInterviews = (jobId?: number) => {
     onError: (err: Error) => toast.error(err.message || 'Cancel failed'),
   });
 
-  // ✅ ترتيب المقابلات
   const ranking = useQuery({
     queryKey: ['interviews-ranking', jobId],
     queryFn: async () => {
@@ -80,7 +81,6 @@ export const useInterviews = (jobId?: number) => {
     enabled: !!jobId,
   });
 
-  // ✅ حفظ الترتيب
   const submitRanking = useMutation({
     mutationFn: (data: RankingData) => {
       if (!jobId) throw new Error('Job ID required');
@@ -94,7 +94,7 @@ export const useInterviews = (jobId?: number) => {
   });
 
   return {
-    interviews: data || [],
+    interviews,
     isLoading,
     error: error?.message || null,
     refetch,
