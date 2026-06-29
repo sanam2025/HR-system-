@@ -3,8 +3,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HRLayout from "./shared/layouts/HRLayout";
 import Dashboard from "./core/modules/HR/pages/Dashboard";
 import Employees from "./core/modules/HR/pages/Employees";
-import Attendance from "./core/modules/HR/pages/Attendance";
-import Leaves from "./core/modules/HR/pages/Leaves";
 import Recruitment from "./core/modules/HR/pages/Recruitment/Recruitment";
 import Payroll from "./core/modules/HR/pages/Payroll";
 import AcceptedCandidates from "./core/modules/HR/pages/AcceptedCandidates";
@@ -30,11 +28,26 @@ import ApplicantDetail from "./core/modules/HR/pages/ApplicantDetail";
 import { AllApplicants } from "./core/modules/HR/pages/AllApplicants/AllApplicants";
 import ScheduleInterview from "./core/modules/HR/pages/Interviews/ScheduleInterview";
 import Interviews from "./core/modules/HR/pages/Interviews/Interviews";
+import Attendance from "./core/modules/HR/pages/Attendance/Attendance";
+import Leaves from "./core/modules/HR/pages/Leaves/Leaves";
+import { LeaveDetail } from "./core/modules/HR/pages/Leaves/LeaveDetail";
+import { HourlyLeaveDetail } from "./core/modules/HR/pages/HourlyLeaves/HourlyLeaveDetail";
+import { HourlyLeaves } from "./core/modules/HR/pages/HourlyLeaves/HourlyLeaves";
+import { SendOffer } from "./core/modules/HR/pages/Offers/SendOffer";
+import { Offers } from "./core/modules/HR/pages/Offers/Offers";
+import JobRequisitionDetail from "./core/modules/HR/pages/Recruitment/JobRequisitionDetail";
 import PublicJobsPage from "./core/pages/PublicJobs/PublicJobsPage";
 import LeaveRequests from "./core/pages/Leaves/LeaveRequests";
 import OvertimeRequests from "./core/pages/Leaves/OvertimeRequests";
 import AttendanceView from "./core/pages/Attendance/AttendanceView";
 import PeriodicEvaluation from "./core/pages/Evaluation/PeriodicEvaluation";
+import AdminLayout from "./shared/layouts/AdminLayout";
+import SystemSettings from "./core/modules/admin/pages/SystemSettings";
+import Announcements from "./core/modules/admin/pages/Announcements";
+import OrganizationlStructure from "./core/modules/admin/pages/OrganizationlStructure";
+import Reports from "./core/modules/admin/pages/Reports";
+import EmployeeSearch from "./core/modules/admin/pages/EmployeeSearch";
+import DashboardAdmin from "./core/modules/admin/pages/Dashboard";
 
 function Page({ title }: { title: string }) {
   return (
@@ -51,9 +64,11 @@ const appRouter = createBrowserRouter([
     children: [
       { index: true, element: <Dashboard /> },
       { path: "employees", element: <Employees /> },
-      { path: "attendance", element: <Attendance /> },
-      { path: "leaves", element: <Leaves /> },
       { path: "Recruitment", element: <Recruitment /> },
+      {
+        path: "recruitment/:id",
+        element: <JobRequisitionDetail />,
+      },
       { path: "payroll", element: <Payroll /> },
       { path: "accepted-candidates", element: <AcceptedCandidates /> },
       { path: "terminations", element: <Terminations /> },
@@ -64,6 +79,19 @@ const appRouter = createBrowserRouter([
       { path: "job-postings/edit/:id", element: <JobPostingForm /> },
       { path: "all-applicants", element: <AllApplicants /> },
       { path: "recruitment/applicants/:jobId", element: <AllApplicants /> },
+      {
+        path: "attendance",
+        element: <Attendance />,
+      },
+      {
+        path: "Leaves",
+        element: <Leaves />,
+      },
+      {
+        path: "Leaves/:id",
+        element: <LeaveDetail />,
+      },
+
       // ✅ أضف هذا الـ Route
       { path: "recruitment/applicant/:id", element: <ApplicantDetail /> },
       {
@@ -77,6 +105,22 @@ const appRouter = createBrowserRouter([
       {
         path: "interviews/:id",
         element: <div>Interview Details - Coming Soon</div>,
+      },
+      {
+        path: "hourly-leaves",
+        element: <HourlyLeaves />,
+      },
+      {
+        path: "hourly-leaves/:id",
+        element: <HourlyLeaveDetail />,
+      },
+      {
+        path: "job-postings/:jobId/offers",
+        element: <Offers />,
+      },
+      {
+        path: "job-postings/:jobId/offers/send",
+        element: <SendOffer />,
       },
     ],
   },
@@ -110,6 +154,18 @@ const appRouter = createBrowserRouter([
       { path: "attendance", element: <EmployeeAttendance /> },
     ],
   },
+  {
+        path:'/admin',
+        element:<AdminLayout/>,
+        children:[
+            {index:true , element:<DashboardAdmin/>},
+            {path:'setting' , element:<SystemSettings/>},
+            {path:'announcement' , element:<Announcements/>},
+            {path:'organization' , element:<OrganizationlStructure/>},
+            {path:'report' , element:<Reports/>},
+            {path:'search' , element:<EmployeeSearch/>}
+        ]
+    }
 ]);
 
 export default function AppRouter() {

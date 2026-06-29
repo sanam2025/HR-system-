@@ -1,3 +1,4 @@
+// src/core/modules/HR/pages/Recruitment/Recruitment.tsx
 import { useEffect, useState } from "react";
 import { Megaphone } from "lucide-react";
 import { useJobRequisitions } from "../../hooks/useJobRequisitions";
@@ -29,6 +30,16 @@ export default function Recruitment() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("all");
 
+  // ✅ تأكد من أن data مصفوفة
+  const requests = Array.isArray(data) ? data : [];
+
+  // ✅ Console للتأكد
+  useEffect(() => {
+    console.log("📊 Raw data:", data);
+    console.log("📊 Requests array:", requests);
+    console.log("📊 Requests length:", requests.length);
+  }, [data, requests]);
+
   const handlePostJob = (formData: JobFormData) => {
     setIsFormOpen(false);
     alert(`✅ Job "${formData.jobTitle}" has been posted!`);
@@ -37,10 +48,11 @@ export default function Recruitment() {
   const handleApprove = (id: number) => {
     approveRequisition.mutate(id, {
       onSuccess: () => {
-        toast.success("Job approve successfully");
+        toast.success("Job approved successfully");
+        refetch();
       },
       onError: (e) => {
-        toast.error("faild to approve: " + e);
+        toast.error("Failed to approve: " + e);
       },
     });
   };
@@ -48,27 +60,31 @@ export default function Recruitment() {
   const handleReject = (id: number) => {
     rejectRequisition.mutate(id, {
       onSuccess: () => {
-        toast.success("job Rejected successfully");
+        toast.success("Job rejected successfully");
+        refetch();
       },
       onError: (e) => {
-        toast.error("faild to delete: " + e);
+        toast.error("Failed to reject: " + e);
       },
     });
   };
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
-
-  const filteredRequests = data?.filter((req) => {
+  // ✅ فلترة الطلبات
+  const filteredRequests = requests.filter((req) => {
     const matchesStatus = statusFilter === "all" || req.status === statusFilter;
     return matchesStatus;
   });
 
+  // ✅ Console للفلترة
+  useEffect(() => {
+    console.log("🔍 Filtered requests:", filteredRequests);
+    console.log("🔍 Filtered length:", filteredRequests.length);
+  }, [filteredRequests]);
+
   if (isLoading) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen flex items-center justify-center">
-        <div className=" flex flex-col items-center justify-center gap-3 text-center">
+        <div className="flex flex-col items-center justify-center gap-3 text-center">
           <Loading />
           <p className="text-gray-500">Loading requests...</p>
         </div>
@@ -120,7 +136,7 @@ export default function Recruitment() {
           </div>
         </div>
 
-        <StateCard data={data} />
+        <StateCard data={requests} />
 
         <FilterAndSearchCard
           statusFilter={statusFilter}
@@ -158,16 +174,27 @@ export default function Recruitment() {
               </thead>
 
               <tbody className="divide-y divide-gray-100">
-                {filteredRequests?.map((req) => (
-                  <RecruitmentCard
-                    key={req.id}
-                    req={req}
-                    onApprove={handleApprove}
-                    onReject={handleReject}
-                    isLoadingApprove={isLoadingApprove}
-                    isLoadingReject={isLoadingReject}
-                  />
-                ))}
+                {filteredRequests.length > 0 ? (
+                  filteredRequests.map((req) => (
+                    <RecruitmentCard
+                      key={req.id}
+                      req={req}
+                      onApprove={handleApprove}
+                      onReject={handleReject}
+                      isLoadingApprove={isLoadingApprove}
+                      isLoadingReject={isLoadingReject}
+                    />
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      className="px-4 py-8 text-center text-gray-400"
+                    >
+                      No recruitment requests found
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
