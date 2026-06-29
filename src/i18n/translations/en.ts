@@ -9,6 +9,7 @@ const en = {
     attendance: 'Attendance',
     evaluation: 'Periodic Review',
     recruitment: 'Recruitment',
+    interviews: 'Interviews',
     mainMenu: 'Main Menu',
   },
 
@@ -145,9 +146,37 @@ const en = {
 
   // ── Leaves ──
   leaves: {
-    title: 'Leave Requests',
+    title: 'Leaves',
     pendingReview: 'pending requests awaiting your review',
     pendingAttention: 'pending requests need attention',
+    mainTabs: {
+      teamLeaves: 'Team Leaves',
+      myLeaves: 'My Leaves'
+    },
+    myLeaves: {
+      newRequest: 'New Leave Request',
+      form: {
+        title: 'Submit Leave Request',
+        type: 'Leave Type',
+        startDate: 'Start Date',
+        date: 'Date',
+        daysCount: 'Number of Days',
+        startTime: 'Start Time',
+        endTime: 'End Time',
+        reason: 'Reason',
+        submit: 'Submit Request',
+        submitting: 'Submitting...',
+        cancel: 'Cancel'
+      },
+      status: {
+        pending: 'Pending Review',
+        approved: 'Approved',
+        rejected: 'Rejected'
+      },
+      toast: {
+        success: 'Leave request submitted successfully'
+      }
+    },
     tabs: {
       all: 'All',
       pending: 'Pending',
@@ -160,7 +189,9 @@ const en = {
       emergency: 'Emergency',
       unpaid: 'Unpaid'
     },
-    noRequests: 'No leave requests found',
+    dailyToggle: 'Daily Leave',
+    hourlyToggle: 'Hourly Leave',
+    noRequests: 'No requests found',
     requestedOn: 'Requested on:',
     days: 'days',
     reason: 'Reason:',
@@ -347,6 +378,35 @@ const en = {
       toasts: {
         success: 'Candidate ranking submitted successfully'
       }
+    }
+  },
+  interviews: {
+    title: 'Interviews Management',
+    subtitle: 'Candidates awaiting evaluation · Rate and submit final ranking',
+    searchPlaceholder: 'Search for a candidate...',
+    candidatesCount: 'candidate(s)',
+    ratedCount: 'rated',
+    rateAllWarning: 'Rate all candidates with stars to be able to send the final ranking',
+    sendRanking: 'Submit Final Ranking',
+    sendingRanking: 'Submitting...',
+    rankingSent: 'Submitted ✅',
+    rankingPanel: 'Live Ranking',
+    rankingSubtitle: 'Updates automatically · Use arrows to break ties manually',
+    readyToSend: '🎉 All candidates rated! You can submit the final ranking now.',
+    rankingDone: '✅ Final ranking submitted successfully',
+    interviewRating: 'Interview Rating',
+    notRatedYet: 'Not rated yet',
+    notes: 'Notes',
+    yearsExp: 'yrs exp.',
+    cvScore: 'CV Score',
+    noResults: 'No results matching your search',
+    statusPending: 'Awaiting Interview',
+    statusDone: 'Evaluated',
+    statusRejected: 'Rejected',
+    toasts: {
+      success: 'Ratings and ranking submitted successfully ✅',
+      error: 'An error occurred, please check your connection',
+      rateFirst: 'Please rate all candidates first'
     }
   },
 };

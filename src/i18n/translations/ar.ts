@@ -9,6 +9,7 @@ const ar = {
     attendance: 'الحضور',
     evaluation: 'التقييم الدوري',
     recruitment: 'التوظيف',
+    interviews: 'المقابلات',
     mainMenu: 'القائمة الرئيسية',
   },
 
@@ -146,9 +147,37 @@ const ar = {
 
   // ── Leaves ──
   leaves: {
-    title: 'طلبات الإجازة',
+    title: 'الإجازات',
     pendingReview: 'طلبات معلقة بانتظار مراجعتك',
     pendingAttention: 'طلبات معلقة تحتاج لاهتمامك',
+    mainTabs: {
+      teamLeaves: 'إجازات الفريق',
+      myLeaves: 'إجازاتي'
+    },
+    myLeaves: {
+      newRequest: 'طلب إجازة جديد',
+      form: {
+        title: 'تقديم طلب إجازة',
+        type: 'نوع الإجازة',
+        startDate: 'تاريخ البدء',
+        date: 'التاريخ',
+        daysCount: 'عدد الأيام',
+        startTime: 'وقت البدء',
+        endTime: 'وقت الانتهاء',
+        reason: 'السبب',
+        submit: 'تقديم الطلب',
+        submitting: 'جاري التقديم...',
+        cancel: 'إلغاء'
+      },
+      status: {
+        pending: 'قيد المراجعة',
+        approved: 'تمت الموافقة',
+        rejected: 'مرفوض'
+      },
+      toast: {
+        success: 'تم تقديم طلب الإجازة بنجاح'
+      }
+    },
     tabs: {
       all: 'الكل',
       pending: 'معلقة',
@@ -161,7 +190,9 @@ const ar = {
       emergency: 'اضطرارية',
       unpaid: 'غير مدفوعة'
     },
-    noRequests: 'لا توجد طلبات إجازة',
+    dailyToggle: 'إجازة يومية',
+    hourlyToggle: 'مغادرة (ساعيّة)',
+    noRequests: 'لا توجد طلبات',
     requestedOn: 'تاريخ الطلب:',
     days: 'أيام',
     reason: 'السبب:',
@@ -344,6 +375,35 @@ const ar = {
       toasts: {
         success: 'تم إرسال تقييم المرشحين بنجاح'
       }
+    }
+  },
+  interviews: {
+    title: 'إدارة المقابلات',
+    subtitle: 'مرشحون بانتظار التقييم · أدر النجوم وأرسل الترتيب النهائي',
+    searchPlaceholder: 'ابحث عن مرشح...',
+    candidatesCount: 'مرشح',
+    ratedCount: 'تم تقييمه',
+    rateAllWarning: 'قيّم جميع المرشحين بالنجوم لتتمكن من إرسال الترتيب النهائي',
+    sendRanking: 'إرسال الترتيب النهائي',
+    sendingRanking: 'جاري الإرسال...',
+    rankingSent: 'تم الإرسال ✅',
+    rankingPanel: 'الترتيب الحالي',
+    rankingSubtitle: 'يتحدّث تلقائياً عند تغيير التقييم · في حالة التساوي يمكنك ترتيبهم يدوياً',
+    readyToSend: '🎉 جميع المرشحين تم تقييمهم! يمكنك إرسال الترتيب النهائي الآن.',
+    rankingDone: '✅ تم إرسال الترتيب النهائي بنجاح',
+    interviewRating: 'تقييم المقابلة',
+    notRatedYet: 'لم يُقيَّم بعد',
+    notes: 'ملاحظات',
+    yearsExp: 'سنوات خبرة',
+    cvScore: 'CV Score',
+    noResults: 'لا توجد نتائج مطابقة للبحث',
+    statusPending: 'بانتظار المقابلة',
+    statusDone: 'تم التقييم',
+    statusRejected: 'مرفوض',
+    toasts: {
+      success: 'تم إرسال التقييمات والترتيب بنجاح ✅',
+      error: 'حدث خطأ أثناء الإرسال، تأكد من اتصالك بالخادم',
+      rateFirst: 'قيّم جميع المرشحين أولاً'
     }
   },
 };

@@ -41,7 +41,7 @@ const apiClient = axios.create({
 });
 
 // ── Request Interceptor: أضف Bearer Token تلقائياً ───
-const DEV_TOKEN = '10|UOH1eLZEFAYFcl5psZ6vmWy706tYqyXtAUu8ZPOdf3a53759';
+const DEV_TOKEN = '13|E96Dk8sFZzbUOMZ9vcF3scsaz3NUB7boYP6xT8AG43e7688a';
 
 apiClient.interceptors.request.use(
   (config) => {

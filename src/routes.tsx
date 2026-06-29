@@ -10,6 +10,7 @@ import LeaveRequests from './core/pages/Leaves/LeaveRequests';
 import OvertimeRequests from './core/pages/Leaves/OvertimeRequests';
 import PeriodicEvaluation from './core/pages/Evaluation/PeriodicEvaluation';
 import Recruitment from './core/pages/Recruitment/Recruitment';
+import InterviewsPage from './core/pages/Recruitment/InterviewsPage';
 import PublicJobsPage from './core/pages/PublicJobs/PublicJobsPage';
 
 const router = createBrowserRouter([
@@ -34,6 +35,7 @@ const router = createBrowserRouter([
             { path: 'attendance', element: <AttendanceView /> },
             { path: 'evaluation', element: <PeriodicEvaluation /> },
             { path: 'recruitment', element: <Recruitment /> },
+            { path: 'interviews', element: <InterviewsPage /> },
         ],
     },
     {

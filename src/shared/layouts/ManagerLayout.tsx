@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Users, CheckSquare,
-  CalendarOff, Clock, BarChart2, Briefcase, TrendingUp,
+  CalendarOff, Clock, BarChart2, Briefcase, TrendingUp, MessageSquare,
 } from 'lucide-react';
 import type { NavItem } from '../components/SideBar';
 import AppLayout from './AppLayout';
@@ -18,6 +18,7 @@ export default function ManagerLayout() {
     { label: t.nav.attendance,  icon: BarChart2,       path: '/manager/attendance',  exact: false },
     { label: t.nav.evaluation,  icon: TrendingUp,      path: '/manager/evaluation',  exact: false },
     { label: t.nav.recruitment, icon: Briefcase,       path: '/manager/recruitment', exact: false },
+    { label: t.nav.interviews,   icon: MessageSquare,   path: '/manager/interviews',  exact: false },
   ];
 
   const pageTitles: Record<string, string> = {
@@ -29,6 +30,7 @@ export default function ManagerLayout() {
     '/manager/attendance':  t.nav.attendance,
     '/manager/evaluation':  t.nav.evaluation,
     '/manager/recruitment': t.nav.recruitment,
+    '/manager/interviews':  t.nav.interviews,
   };
 
   return (
