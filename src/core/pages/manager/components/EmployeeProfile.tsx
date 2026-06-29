@@ -1,6 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { mockEmployees, mockTasks, mockAttendance, mockPerformanceChart } from '../../../../data/mockData';
-import { ArrowRight, ArrowLeft, Phone, Mail, Calendar, Star, CheckSquare, Clock } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { getEmployeeProfile } from '../../../../api/manager';
+import { mockTasks, mockAttendance, mockPerformanceChart } from '../../../../data/mockData';
+import { ArrowRight, ArrowLeft, Phone, Mail, Calendar, Star, CheckSquare, Clock, Loader2 } from 'lucide-react';
 import { useLanguage } from '../../../../i18n/translations/LanguageContext';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TASK_STATUS_COLORS, TASK_STATUS_EN, CHART_MONTHS_EN, ATTENDANCE_STATUS_INFO } from '../../../constants';
@@ -29,23 +31,63 @@ export default function EmployeeProfile() {
   const es = t.employees.status;
   const BackIcon = isRTL ? ArrowRight : ArrowLeft;
 
-  const employee  = mockEmployees.find(e => e.id === Number(id));
+  const [employee, setEmployee] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        const data = await getEmployeeProfile(Number(id));
+        const profile = data?.data || data;
+        
+        setEmployee({
+          id: profile.id || Number(id),
+          name: profile.name || profile.user?.name || 'بدون اسم',
+          title: profile.title || 'موظف',
+          department: profile.department || 'القسم',
+          email: profile.email || profile.user?.email || 'غير متوفر',
+          phone: profile.phone_number || 'غير متوفر',
+          joinDate: profile.join_date || 'غير متوفر',
+          avatar: profile.name ? profile.name.charAt(0).toUpperCase() : (profile.user?.name ? profile.user.name.charAt(0).toUpperCase() : '👤'),
+          todayStatus: 'حاضر',
+          avgRating: '0.0',
+          leaveBalance: profile.leave_balance || 0,
+        });
+      } catch (err) {
+        setError('تعذر جلب ملف الموظف (قد لا يوجد ملف شخصي لهذا الموظف بعد في قاعدة البيانات).');
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (id) fetchProfile();
+  }, [id]);
+
   const empTasks  = mockTasks.filter(tk => tk.assigneeId === Number(id));
   const ratedTasks = empTasks.filter(tk => tk.rating);
   const avgRating = ratedTasks.length
     ? (ratedTasks.reduce((sum, tk) => sum + (tk.rating ?? 0), 0) / ratedTasks.length).toFixed(1)
-    : employee?.avgRating;
+    : employee?.avgRating || '0.0';
 
   const getAttendanceLabel = (status: string) =>
     lang === 'ar'
       ? status
       : ({ 'حاضر': es.present, 'غائب': es.absent, 'تأخير': es.late } as Record<string, string>)[status] ?? status;
 
-  if (!employee) {
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-20 text-green">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !employee) {
     return (
       <div className="text-center py-20 text-gray-400">
         <div className="text-5xl mb-4">🔍</div>
-        <p className="text-lg font-semibold">{ep.notFound}</p>
+        <p className="text-lg font-semibold">{error || ep.notFound}</p>
         <button onClick={() => navigate('/manager/employees')} className="btn-primary btn mt-4">
           {ep.backToList}
         </button>

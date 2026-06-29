@@ -1,13 +1,46 @@
-import { useState } from 'react';
-import { mockEmployees } from '../../../../data/mockData';
+import { useState, useEffect } from 'react';
+import { getManagerEmployees } from '../../../../api/manager';
 import EmployeeCard from './EmployeeCard';
-import { Search } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 import { useLanguage } from '../../../../i18n/translations/LanguageContext';
 
 export default function EmployeesList() {
   const { t } = useLanguage();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
+  
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        setLoading(true);
+        const res = await getManagerEmployees();
+        const data = Array.isArray(res) ? res : (res?.data || []);
+        
+        // Map API data to the format expected by the UI
+        const mappedData = data.map((emp: any) => ({
+          id: emp.id,
+          name: emp.name,
+          title: emp.title || 'موظف', // Fallback if API doesn't provide title
+          department: emp.department || 'القسم',
+          email: emp.email,
+          avatar: emp.name ? emp.name.charAt(0).toUpperCase() : '👤',
+          // Backend doesn't provide todayStatus or avgRating in this API yet, so we use placeholders
+          todayStatus: 'حاضر', 
+          avgRating: '0.0'
+        }));
+        setEmployees(mappedData);
+      } catch (err) {
+        setError('فشل في جلب قائمة الموظفين من الخادم');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEmployees();
+  }, []);
 
   const filterOptions = [
     { key: 'all', label: t.employees.filterAll },
@@ -18,14 +51,14 @@ export default function EmployeesList() {
 
   const arToEnEmpStatus: Record<string, string> = { 'حاضر': 'Present', 'غائب': 'Absent', 'تأخير': 'Late' };
   
-  const normalizedEmployees = mockEmployees.map(e => ({
+  const normalizedEmployees = employees.map(e => ({
     ...e,
     todayStatus: arToEnEmpStatus[e.todayStatus] || e.todayStatus
   }));
 
   const filtered = normalizedEmployees.filter(e => {
-    const matchSearch = e.name.toLowerCase().includes(query.toLowerCase())
-     || e.title.toLowerCase().includes(query.toLowerCase());
+    const matchSearch = e.name?.toLowerCase().includes(query.toLowerCase())
+     || e.title?.toLowerCase().includes(query.toLowerCase());
     const matchFilter = filter === 'all' || e.todayStatus === filter;
     return matchSearch && matchFilter;
   });
@@ -36,7 +69,7 @@ export default function EmployeesList() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-extrabold text-dark">{t.employees.listTitle}</h2>
-          <p className="text-sm text-brown mt-1">{mockEmployees.length} {t.employees.employeesCount}</p>
+          <p className="text-sm text-brown mt-1">{employees.length} {t.employees.employeesCount}</p>
         </div>
       </div>
 
@@ -70,7 +103,15 @@ export default function EmployeesList() {
       </div>
 
       {/* Grid */}
-      {filtered.length === 0 ? (
+      {loading ? (
+        <div className="flex justify-center items-center py-20 text-green">
+          <Loader2 className="w-8 h-8 animate-spin" />
+        </div>
+      ) : error ? (
+        <div className="text-center py-20 text-red-500">
+          <p className="font-semibold">{error}</p>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
           <div className="text-5xl mb-4 opacity-40">👤</div>
           <p className="font-semibold text-gray-500 text-lg">{t.employees.noEmployees}</p>

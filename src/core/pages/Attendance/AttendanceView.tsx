@@ -1,11 +1,10 @@
-import { useState } from 'react';
-import { mockEmployees } from '../../../data/mockData';
-import { Search, CheckCircle2, XCircle, AlertTriangle, ClipboardList } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, CheckCircle2, XCircle, AlertTriangle, ClipboardList, Loader2 } from 'lucide-react';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
 import { ATTENDANCE_STATUS_INFO } from '../../constants';
+import { getManagerEmployees, getAttendanceFilter, getAttendanceTodayAnalysis } from '../../../api/manager';
 
 // ── Types ──
-
 type AttendanceRecord = {
   date: string;
   checkIn: string | null;
@@ -13,58 +12,17 @@ type AttendanceRecord = {
   status: string;
   delay: number;
   earlyLeave: number;
+  empId?: number;
+  empName?: string;
+  empNameEn?: string;
+  empAvatar?: string;
+  empTitle?: string;
+  empTitleEn?: string;
 };
 
-// ── Helpers ──
-
-/** Generates dynamic attendance records per employee to make UI interactive and realistic */
-const getEmployeeAttendance = (empId: number): AttendanceRecord[] => {
-  const base: AttendanceRecord[] = [
-    { date: '2026-05-11', checkIn: '08:05', checkOut: '17:00', status: 'حاضر',  delay: 5,  earlyLeave: 0  },
-    { date: '2026-05-10', checkIn: '08:30', checkOut: '17:00', status: 'تأخير', delay: 30, earlyLeave: 0  },
-    { date: '2026-05-09', checkIn: '08:00', checkOut: '17:00', status: 'حاضر',  delay: 0,  earlyLeave: 0  },
-    { date: '2026-05-08', checkIn: null,    checkOut: null,    status: 'غائب',  delay: 0,  earlyLeave: 0  },
-    { date: '2026-05-07', checkIn: '08:10', checkOut: '16:30', status: 'حاضر',  delay: 10, earlyLeave: 30 },
-    { date: '2026-05-06', checkIn: '08:00', checkOut: '17:00', status: 'حاضر',  delay: 0,  earlyLeave: 0  },
-    { date: '2026-05-05', checkIn: '09:00', checkOut: '17:00', status: 'تأخير', delay: 60, earlyLeave: 0  },
-  ];
-
-  const present = { status: 'حاضر', checkIn: '08:00', checkOut: '17:00', delay: 0, earlyLeave: 0 };
-  const absent  = { status: 'غائب', checkIn: null,    checkOut: null,    delay: 0, earlyLeave: 0 };
-
-  let result: AttendanceRecord[];
-
-  switch (empId) {
-    case 2: // Sara: always present, no delays
-      result = base.map(r => (r.status === 'غائب' || r.status === 'تأخير') ? { ...r, ...present } : r);
-      break;
-    case 3: // Mohamed: high absence rate
-      result = base.map((r, idx) => idx % 2 === 0 ? { ...r, ...absent } : r);
-      break;
-    case 4: // Layla: present with some early leaves
-      result = base.map((r, idx) => r.status === 'غائب' ? { ...r, ...present } : idx === 3 ? { ...r, earlyLeave: 45 } : r);
-      break;
-    case 5: // Khalid: high lateness rate
-      result = base.map((r, idx) => idx % 2 === 1 ? { ...r, status: 'تأخير', checkIn: '08:45', checkOut: '17:00', delay: 45 } : r);
-      break;
-    case 6: // Nour: app developer, mostly present
-      result = base.map((r, idx) => idx === 0 ? { ...r, ...present } : r);
-      break;
-    default:
-      result = base;
-  }
-
-  // Post-process: ensure delay > 0 → status is 'تأخير'
-  return result.map(r =>
-    r.delay > 0 && (r.status === 'حاضر' || r.status === 'Present')
-      ? { ...r, status: 'تأخير' }
-      : r
-  );
-};
-
-// ── Status filter helpers ──
 type StatusFilter = 'all' | 'present' | 'absent' | 'late';
 
+// ── Helpers ──
 const matchesStatusFilter = (status: string, filter: StatusFilter): boolean => {
   if (filter === 'all') return true;
   if (filter === 'present') return status === 'حاضر' || status === 'Present';
@@ -73,52 +31,104 @@ const matchesStatusFilter = (status: string, filter: StatusFilter): boolean => {
   return true;
 };
 
-const countByStatus = (records: { status: string }[], filter: StatusFilter) =>
-  records.filter(r => matchesStatusFilter(r.status, filter)).length;
-
-// ── Component ──
-
 export default function AttendanceView() {
   const { t, lang } = useLanguage();
 
   const [activeTab, setActiveTab]       = useState<'byEmployee' | 'generalReport'>('byEmployee');
-  const [selectedEmp, setSelectedEmp]   = useState(mockEmployees[0].id);
+  
+  // Data states
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [records, setRecords] = useState<AttendanceRecord[]>([]);
+  const [todayStats, setTodayStats] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Filter states
+  const [selectedEmp, setSelectedEmp]   = useState<number | null>(null);
   const [query, setQuery]               = useState('');
-  const [startDate, setStartDate]       = useState('2026-05-05');
-  const [endDate, setEndDate]           = useState('2026-05-11');
+  const [startDate, setStartDate]       = useState(new Date().toISOString().split('T')[0]);
+  const [endDate, setEndDate]           = useState(new Date().toISOString().split('T')[0]);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
-  const filteredEmployees = mockEmployees.filter(e =>
-    e.name.includes(query) || (e.nameEn ?? '').toLowerCase().includes(query.toLowerCase())
+  // 1. Fetch Employees & Today's Analysis on mount
+  useEffect(() => {
+    const initFetch = async () => {
+      try {
+        const [empRes, statsRes] = await Promise.all([
+          getManagerEmployees(),
+          getAttendanceTodayAnalysis()
+        ]);
+        const emps = Array.isArray(empRes) ? empRes : (empRes?.data || []);
+        
+        const mappedEmps = emps.map((e: any) => ({
+          ...e,
+          avatar: e.name ? e.name.charAt(0).toUpperCase() : '👤'
+        }));
+        
+        setEmployees(mappedEmps);
+        if (mappedEmps.length > 0) {
+          setSelectedEmp(mappedEmps[0].id);
+        }
+        setTodayStats(statsRes);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    initFetch();
+  }, []);
+
+  // 2. Fetch records when tab, date, or status changes
+  useEffect(() => {
+    const fetchRecords = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        
+        const filterParams = {
+           from: startDate,
+           to: endDate,
+           status: activeTab === 'generalReport' ? statusFilter : 'all'
+        };
+        
+        const res = await getAttendanceFilter(filterParams);
+        const data = Array.isArray(res) ? res : (res?.data || []);
+        
+        const mappedRecords: AttendanceRecord[] = data.map((r: any) => ({
+          date: r.date || r.created_at?.split('T')[0] || startDate,
+          checkIn: r.check_in || null,
+          checkOut: r.check_out || null,
+          status: r.status || 'حاضر',
+          delay: r.delay_minutes || 0,
+          earlyLeave: r.early_leave_minutes || 0,
+          empId: r.user?.id,
+          empName: r.user?.name || 'بدون اسم',
+          empTitle: r.user?.title || 'موظف',
+          empAvatar: r.user?.name ? r.user.name.charAt(0).toUpperCase() : '👤'
+        }));
+        setRecords(mappedRecords);
+      } catch (err) {
+        setError('تعذر جلب سجلات الحضور');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRecords();
+  }, [startDate, endDate, statusFilter, activeTab]);
+
+  const filteredEmployees = employees.filter(e =>
+    e.name?.includes(query) || (e.nameEn ?? '').toLowerCase().includes(query.toLowerCase())
   );
-  const employee         = mockEmployees.find(e => e.id === selectedEmp);
-  const attendanceRecords = getEmployeeAttendance(selectedEmp);
+  
+  const employee = employees.find(e => e.id === selectedEmp);
+  
+  const employeeRecords = records.filter(r => r.empId === selectedEmp);
+  
+  const filteredRecords = records.filter(r => matchesStatusFilter(r.status, statusFilter));
 
-  const allRecords = mockEmployees.flatMap(emp =>
-    getEmployeeAttendance(emp.id).map(r => ({
-      ...r,
-      empId: emp.id,
-      empName:    emp.name,
-      empNameEn:  emp.nameEn,
-      empAvatar:  emp.avatar,
-      empTitle:   emp.title,
-      empTitleEn: emp.titleEn,
-    }))
-  );
-
-  const filteredRecords = allRecords.filter(r => {
-    const inDateRange = r.date >= startDate && r.date <= endDate;
-    return inDateRange && matchesStatusFilter(r.status, statusFilter);
-  });
-
-  const statsSource = activeTab === 'byEmployee'
-    ? attendanceRecords
-    : allRecords.filter(r => r.date >= startDate && r.date <= endDate);
-
-  const present = countByStatus(statsSource, 'present');
-  const absent  = countByStatus(statsSource, 'absent');
-  const late    = countByStatus(statsSource, 'late');
-  const total   = statsSource.length;
+  const present = todayStats?.present ?? 0;
+  const absent  = todayStats?.absent ?? 0;
+  const late    = todayStats?.late ?? 0;
+  const total   = todayStats?.total ?? 0;
 
   const summaryCards = [
     { label: t.attendance.stats.present, value: present, icon: CheckCircle2,   bg: 'bg-green-50/60 border border-green-100 text-green-800',   iconBg: 'bg-green-500/10',  iconColor: 'text-green-600'  },
@@ -167,7 +177,7 @@ export default function AttendanceView() {
         ))}
       </div>
 
-      {/* Summary Stats */}
+      {/* Summary Stats (Today) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {summaryCards.map(s => (
           <div key={s.label} className={`rounded-2xl p-5 ${s.bg} flex items-center justify-between shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200`}>
@@ -183,26 +193,27 @@ export default function AttendanceView() {
       </div>
 
       {/* General Report Filters */}
-      {activeTab === 'generalReport' && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5 flex flex-wrap gap-6 items-end">
-          <div className="flex-1 min-w-[200px] text-start">
-            <label className="block text-xs font-bold text-brown uppercase mb-2">{t.attendance.filter.fromDate}</label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={e => setStartDate(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-dark focus:border-green outline-none"
-            />
-          </div>
-          <div className="flex-1 min-w-[200px] text-start">
-            <label className="block text-xs font-bold text-brown uppercase mb-2">{t.attendance.filter.toDate}</label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={e => setEndDate(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-dark focus:border-green outline-none"
-            />
-          </div>
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5 flex flex-wrap gap-6 items-end">
+        <div className="flex-1 min-w-[200px] text-start">
+          <label className="block text-xs font-bold text-brown uppercase mb-2">{t.attendance.filter.fromDate}</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={e => setStartDate(e.target.value)}
+            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-dark focus:border-green outline-none"
+          />
+        </div>
+        <div className="flex-1 min-w-[200px] text-start">
+          <label className="block text-xs font-bold text-brown uppercase mb-2">{t.attendance.filter.toDate}</label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={e => setEndDate(e.target.value)}
+            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-dark focus:border-green outline-none"
+          />
+        </div>
+        
+        {activeTab === 'generalReport' && (
           <div className="flex-2 min-w-[280px] text-start">
             <label className="block text-xs font-bold text-brown uppercase mb-2">{t.attendance.filter.status}</label>
             <div className="flex flex-wrap gap-1.5">
@@ -221,11 +232,17 @@ export default function AttendanceView() {
               ))}
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Tab Contents */}
-      {activeTab === 'byEmployee' ? (
+      {loading ? (
+        <div className="flex justify-center items-center py-20 text-green">
+          <Loader2 className="w-8 h-8 animate-spin" />
+        </div>
+      ) : error ? (
+        <div className="text-center py-20 text-red-500 font-semibold">{error}</div>
+      ) : activeTab === 'byEmployee' ? (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Employee Selector */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-4 h-fit">
@@ -285,12 +302,12 @@ export default function AttendanceView() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {attendanceRecords.length === 0 ? (
+                  {employeeRecords.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="text-center py-12 text-gray-400">{t.attendance.noRecords}</td>
                     </tr>
                   ) : (
-                    attendanceRecords.map((rec, i) => (
+                    employeeRecords.map((rec, i) => (
                       <tr key={i} className="hover:bg-gray-50/50 transition-colors">
                         <td className="px-5 py-3.5 text-sm text-brown text-start">{rec.date}</td>
                         <td className="px-5 py-3.5 text-start">
