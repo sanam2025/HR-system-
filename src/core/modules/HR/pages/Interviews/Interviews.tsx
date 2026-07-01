@@ -5,7 +5,7 @@ import { useInterviews } from '../../hooks/useInterviews';
 import InterviewCard from './InterviewCard';
 import InterviewStats from './InterviewStats';
 import InterviewFilters from './InterviewFilters';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Interview } from '../../../../../api/service/HrService/Types/InterviewsService.types';
 
 export const Interviews = () => {
@@ -16,6 +16,11 @@ export const Interviews = () => {
   
   const jobId = jobIdFromParams || jobIdFromQuery;
   const jobIdNumber = jobId ? Number(jobId) : undefined;
+
+  console.log('📊 JobId from params:', jobIdFromParams);
+  console.log('📊 JobId from query:', jobIdFromQuery);
+  console.log('📊 Final jobId:', jobId);
+  console.log('📊 Final jobIdNumber:', jobIdNumber);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -28,13 +33,27 @@ export const Interviews = () => {
     isUpdating,
   } = useInterviews(jobIdNumber);
 
+  console.log('📊 Interviews from hook:', interviews);
+  console.log('📊 Interviews from hook - is array?', Array.isArray(interviews));
+  console.log('📊 Interviews from hook - length:', interviews?.length);
+
+  useEffect(() => {
+    console.log('📊 Interviews updated in component:', interviews);
+  }, [interviews]);
+
+  // ✅ تأكد من أن interviews مصفوفة
+  const interviewsArray = Array.isArray(interviews) ? interviews : [];
+
   const stats = {
-    total: interviews.length,
-    scheduled: interviews.filter((i: Interview) => i.status === 'scheduled').length,
-    completed: interviews.filter((i: Interview) => i.status === 'completed').length,
-    cancelled: interviews.filter((i: Interview) => i.status === 'cancelled').length,
+    total: interviewsArray.length,
+    scheduled: interviewsArray.filter((i: Interview) => i.status === 'scheduled').length,
+    completed: interviewsArray.filter((i: Interview) => i.status === 'completed').length,
+    cancelled: interviewsArray.filter((i: Interview) => i.status === 'cancelled').length,
   };
 
+  console.log('📊 Stats:', stats);
+
+  // ✅ استخراج اسم المرشح باستخدام @ts-expect-error
   const getCandidateName = (interview: Interview): string => {
     // @ts-expect-error - API قد يرجع كائن candidate كامل
     if (interview.candidate?.full_name) {
@@ -47,13 +66,17 @@ export const Interviews = () => {
     return '';
   };
 
-  const filteredInterviews = interviews.filter((interview: Interview) => {
+  // ✅ فلترة المقابلات
+  const filteredInterviews = interviewsArray.filter((interview: Interview) => {
     const candidateName = getCandidateName(interview).toLowerCase();
     const search = searchTerm.toLowerCase();
     const matchesSearch = candidateName.includes(search);
     const matchesStatus = statusFilter === 'all' || interview.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  console.log('📊 Filtered interviews:', filteredInterviews);
+  console.log('📊 Filtered length:', filteredInterviews.length);
 
   if (isLoading) {
     return (

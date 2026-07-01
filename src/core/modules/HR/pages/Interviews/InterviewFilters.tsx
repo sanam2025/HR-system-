@@ -40,6 +40,7 @@ const InterviewFilters: React.FC<InterviewFiltersProps> = ({
       </select>
     </div>
   );
+  
 };
 
 export default InterviewFilters;

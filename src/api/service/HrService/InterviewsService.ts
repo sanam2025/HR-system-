@@ -4,10 +4,10 @@ import { apiClient } from '../../client';
 // ✅ تعريف أنواع البيانات
 export interface ScheduleInterviewData {
   candidate_id: number;
-  interviewed_by: number;
   scheduled_at: string;
   location_type: string;
   location_details?: string;
+  // ❌ interviewed_by محذوف (يتم تعيينه تلقائياً)
 }
 
 export interface UpdateResultData {
@@ -26,7 +26,7 @@ export const InterviewsService = {
   // ✅ جلب مقابلات وظيفة معينة
   getByJobId: (jobId: number) => apiClient.get(`/job-postings/${jobId}/interviews`),
   
-  // ✅ جدولة مقابلة جديدة
+  // ✅ جدولة مقابلة جديدة (بدون interviewed_by)
   schedule: (jobId: number, data: ScheduleInterviewData) => 
     apiClient.post(`/job-postings/${jobId}/interviews`, data),
   

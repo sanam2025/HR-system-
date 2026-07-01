@@ -17,6 +17,19 @@ interface InterviewCardProps {
   onViewDetails: () => void;
 }
 
+// ✅ تعريف نوع ممتد من Interview مع خصائص candidate و interviewer
+interface ExtendedInterview extends Interview {
+  candidate?: {
+    id: number;
+    full_name: string;
+    email: string;
+  };
+  interviewer?: {
+    id: number;
+    full_name: string;
+  };
+}
+
 const InterviewCard: React.FC<InterviewCardProps> = ({
   interview,
   onCancel,
@@ -51,42 +64,15 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
     }
   };
 
-  const getCandidateName = (interview: Interview): string => {
-    // @ts-expect-error - الـ API قد يرجع كائن candidate كامل
-    if (interview.candidate?.full_name) {
-      // @ts-expect-error - الـ API قد يرجع كائن candidate كامل
-      return interview.candidate.full_name;
-    }
-    if (interview.candidate_id) {
-      return `Candidate #${interview.candidate_id}`;
-    }
-    return "N/A";
-  };
-
-  const getInterviewerName = (interview: Interview): string => {
-    // @ts-expect-error - الـ API قد يرجع كائن interviewer كامل
-    if (interview.interviewer?.name) {
-      // @ts-expect-error - الـ API قد يرجع كائن interviewer كامل
-      return interview.interviewer.name;
-    }
-    if (interview.interviewed_by) {
-      return `Interviewer #${interview.interviewed_by}`;
-    }
-    return "N/A";
-  };
-
-  const getCandidateEmail = (interview: Interview): string => {
-    // @ts-expect-error - الـ API قد يرجع كائن candidate كامل
-    if (interview.candidate?.email) {
-      // @ts-expect-error - الـ API قد يرجع كائن candidate كامل
-      return interview.candidate.email;
-    }
-    return `ID: ${interview.candidate_id || "N/A"}`;
-  };
-
-  const candidateName = getCandidateName(interview);
-  const interviewerName = getInterviewerName(interview);
-  const candidateEmail = getCandidateEmail(interview);
+  // ✅ استخدم النوع الممتد ExtendedInterview بدلاً من any
+  const extendedInterview = interview as ExtendedInterview;
+  
+  const candidateName = extendedInterview.candidate?.full_name || 
+                        (interview.candidate_id ? `Candidate #${interview.candidate_id}` : "N/A");
+  const interviewerName = extendedInterview.interviewer?.full_name || 
+                          (interview.interviewed_by ? `Interviewer #${interview.interviewed_by}` : "N/A");
+  const candidateEmail = extendedInterview.candidate?.email || 
+                         `ID: ${interview.candidate_id || "N/A"}`;
 
   return (
     <tr className="hover:bg-gray-50">

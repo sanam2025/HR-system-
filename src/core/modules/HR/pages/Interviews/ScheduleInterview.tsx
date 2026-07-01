@@ -12,7 +12,6 @@ export const ScheduleInterview = () => {
   const candidateIdFromUrl = searchParams.get('candidateId');
   const jobIdFromQuery = searchParams.get('jobId');
   
-  // ✅ خذ jobId من الـ params أو من الـ query
   const jobId = jobIdFromParams || jobIdFromQuery;
   const jobIdNumber = jobId ? Number(jobId) : undefined;
   
@@ -20,22 +19,32 @@ export const ScheduleInterview = () => {
 
   const [form, setForm] = useState({
     candidate_id: candidateIdFromUrl || '',
-    interviewed_by: '',
     scheduled_at: '',
     location_type: 'on_site',
     location_details: '',
   });
 
+  // ✅ التحقق من يوم العطلة
+  const isWeekend = (date: string) => {
+    const day = new Date(date).getDay();
+    return day === 5 || day === 6;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.candidate_id || !form.interviewed_by || !form.scheduled_at) {
+    
+    if (!form.candidate_id || !form.scheduled_at) {
       toast.error('Please fill in all required fields');
+      return;
+    }
+    
+    if (isWeekend(form.scheduled_at)) {
+      toast.error('Interviews cannot be scheduled on weekends (Friday, Saturday)');
       return;
     }
     
     scheduleInterview({
       candidate_id: Number(form.candidate_id),
-      interviewed_by: Number(form.interviewed_by),
       scheduled_at: form.scheduled_at,
       location_type: form.location_type,
       location_details: form.location_details || '',
@@ -43,7 +52,6 @@ export const ScheduleInterview = () => {
     
     toast.success('✅ Interview added to schedule successfully!');
     
-    // ✅ بعد الجدولة، تروح للرابط القديم عشان تظهر المقابلات
     if (jobId) {
       navigate(`/Hr/job-postings/${jobId}/interviews`);
     } else {
@@ -100,22 +108,6 @@ export const ScheduleInterview = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Interviewer ID *</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="number"
-                  name="interviewed_by"
-                  value={form.interviewed_by}
-                  onChange={handleChange}
-                  placeholder="Enter interviewer ID"
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Scheduled Date & Time *</label>
               <div className="relative">
                 <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -128,6 +120,7 @@ export const ScheduleInterview = () => {
                   required
                 />
               </div>
+              <p className="text-xs text-gray-400 mt-1">Choose a weekday (Sunday - Thursday)</p>
             </div>
 
             <div>
