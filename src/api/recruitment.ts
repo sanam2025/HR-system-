@@ -21,6 +21,17 @@ export interface CandidateRankingPayload {
 
 // ── طلبات التوظيف (Job Requisitions) ──
 
+export async function getJobRequisitions() {
+  // يرجع طلبات التوظيف الخاصة بالمدير (كلها أو المعتمدة)
+  const response = await apiClient.get('job-requisitions');
+  return response.data;
+}
+
+export async function getJobPostings() {
+  const response = await apiClient.get('job-postings');
+  return response.data;
+}
+
 export async function createJobRequisition(data: JobRequisitionPayload) {
   const response = await apiClient.post('job-requisitions', data);
   return response.data;
@@ -29,10 +40,23 @@ export async function createJobRequisition(data: JobRequisitionPayload) {
 // ── المقابلات والمرشحين (Interviews & Candidates) ──
 
 export async function getInterviewCandidates(jobPostingId: number) {
-  // يرجع قائمة المرشحين المؤهلين لمقابلة لوظيفة معينة
-  const response = await apiClient.get(`job-postings/${jobPostingId}/candidates/interview`);
-  return response.data;
+  // المدير يجلب مقابلاته الخاصة ثم يفلتر حسب الوظيفة
+  const response = await apiClient.get('my-interviews');
+  const allInterviews = Array.isArray(response.data)
+    ? response.data
+    : (response.data?.data || []);
+
+  // فلتر حسب job_posting_id إذا كان متوفراً في الـ response
+  const filtered = allInterviews.filter((iv: any) =>
+    iv.job_posting_id === jobPostingId ||
+    iv.job_posting?.id === jobPostingId ||
+    iv.jobPostingId === jobPostingId
+  );
+
+  // إذا ما في فلتر ناجح، ارجع الكل (fallback للمرشحين العامين)
+  return filtered.length > 0 ? filtered : allInterviews;
 }
+
 
 export async function submitInterviewResult(interviewId: number, data: CandidateResultPayload) {
   // تحديث نتيجة المقابلة (تقييم المرشح)

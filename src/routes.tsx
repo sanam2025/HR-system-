@@ -35,6 +35,7 @@ const router = createBrowserRouter([
             { path: 'attendance', element: <AttendanceView /> },
             { path: 'evaluation', element: <PeriodicEvaluation /> },
             { path: 'recruitment', element: <Recruitment /> },
+            { path: 'job-postings/:jobPostingId/interviews', element: <InterviewsPage /> },
             { path: 'interviews', element: <InterviewsPage /> },
         ],
     },
