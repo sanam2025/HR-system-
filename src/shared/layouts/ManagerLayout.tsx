@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Users, CheckSquare,
-  CalendarOff, Clock, BarChart2, Briefcase, TrendingUp, MessageSquare,
+  CalendarOff, Clock, BarChart2, Briefcase, TrendingUp, MessageSquare, Megaphone
 } from 'lucide-react';
 import type { NavItem } from '../components/SideBar';
 import AppLayout from './AppLayout';
@@ -10,27 +10,29 @@ export default function ManagerLayout() {
   const { t } = useLanguage();
 
   const navItems: NavItem[] = [
-    { label: t.nav.dashboard,   icon: LayoutDashboard, path: '/manager',             exact: true  },
-    { label: t.nav.employees,   icon: Users,           path: '/manager/employees',   exact: false },
-    { label: t.nav.tasks,       icon: CheckSquare,     path: '/manager/tasks',       exact: false },
-    { label: t.nav.leaves,      icon: CalendarOff,     path: '/manager/leaves',      exact: false },
-    { label: t.nav.overtime,    icon: Clock,           path: '/manager/overtime',    exact: false },
-    { label: t.nav.attendance,  icon: BarChart2,       path: '/manager/attendance',  exact: false },
-    { label: t.nav.evaluation,  icon: TrendingUp,      path: '/manager/evaluation',  exact: false },
-    { label: t.nav.recruitment, icon: Briefcase,       path: '/manager/recruitment', exact: false },
-    { label: t.nav.interviews,   icon: MessageSquare,   path: '/manager/interviews',  exact: false },
+    { label: t.nav.dashboard, icon: LayoutDashboard, path: '/manager', exact: true },
+    { label: t.nav.employees, icon: Users, path: '/manager/employees', exact: false },
+    { label: t.nav.tasks, icon: CheckSquare, path: '/manager/tasks', exact: false },
+    { label: t.nav.leaves, icon: CalendarOff, path: '/manager/leaves', exact: false },
+    { label: t.nav.overtime, icon: Clock, path: '/manager/overtime', exact: false },
+    { label: t.nav.attendance, icon: BarChart2, path: '/manager/attendance', exact: false },
+    { label: t.nav.evaluation, icon: TrendingUp, path: '/manager/evaluation', exact: false },
+    { label: t.nav.recruitment, icon: Briefcase, path: '/manager/recruitment', exact: false },
+    { label: t.nav.interviews, icon: MessageSquare, path: '/manager/interviews', exact: false },
+    { label: t.nav.announcements, icon: Megaphone, path: '/manager/announcements', exact: false },
   ];
 
   const pageTitles: Record<string, string> = {
-    '/manager':             t.nav.dashboard,
-    '/manager/employees':   t.nav.employees,
-    '/manager/tasks':       t.nav.tasks,
-    '/manager/leaves':      t.nav.leaves,
-    '/manager/overtime':    t.nav.overtime,
-    '/manager/attendance':  t.nav.attendance,
-    '/manager/evaluation':  t.nav.evaluation,
+    '/manager': t.nav.dashboard,
+    '/manager/employees': t.nav.employees,
+    '/manager/tasks': t.nav.tasks,
+    '/manager/leaves': t.nav.leaves,
+    '/manager/overtime': t.nav.overtime,
+    '/manager/attendance': t.nav.attendance,
+    '/manager/evaluation': t.nav.evaluation,
     '/manager/recruitment': t.nav.recruitment,
-    '/manager/interviews':  t.nav.interviews,
+    '/manager/interviews': t.nav.interviews,
+    '/manager/announcements': t.nav.announcements,
   };
 
   return (

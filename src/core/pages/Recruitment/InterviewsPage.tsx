@@ -306,16 +306,14 @@ export default function InterviewsPage() {
                 key={job.id ?? `req-${idx}`}
                 disabled={!canClick}
                 onClick={() => canClick && setSelectedJobId(job.id)}
-                className={`rounded-2xl border p-5 text-start transition-all group ${
-                  canClick
-                    ? 'bg-white border-gray-100 shadow-card hover:border-green hover:shadow-md cursor-pointer'
-                    : 'bg-gray-50 border-gray-100 opacity-60 cursor-not-allowed'
-                }`}
+                className={`rounded-2xl border p-5 text-start transition-all group ${canClick
+                  ? 'bg-white border-gray-100 shadow-card hover:border-green hover:shadow-md cursor-pointer'
+                  : 'bg-gray-50 border-gray-100 opacity-60 cursor-not-allowed'
+                  }`}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
-                    canClick ? 'bg-green/10 group-hover:bg-green/20' : 'bg-gray-200'
-                  }`}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${canClick ? 'bg-green/10 group-hover:bg-green/20' : 'bg-gray-200'
+                    }`}>
                     <Briefcase size={18} className={canClick ? 'text-green' : 'text-gray-400'} />
                   </div>
                   {canClick
@@ -326,23 +324,18 @@ export default function InterviewsPage() {
                 <h3 className="font-bold text-dark mt-3 text-sm">{job.job_title}</h3>
                 <p className="text-xs text-brown mt-1">{job.description ? job.description.slice(0, 60) + '...' : ''}</p>
                 <div className="mt-3 flex items-center flex-wrap gap-2">
-                  {canClick ? (
-                    <span className="bg-green/10 text-green text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
-                      {lang === 'ar' ? `وظيفة #${job.id}` : `Job #${job.id}`}
-                    </span>
-                  ) : (
+                  {!canClick && (
                     <span className="bg-amber-50 text-amber-600 text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
                       {lang === 'ar' ? 'بانتظار النشر' : 'Not published yet'}
                     </span>
                   )}
                   {job.status && (
-                    <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${
-                      job.status === 'approved' ? 'bg-emerald-50 text-emerald-600' :
-                      job.status === 'pending'  ? 'bg-yellow-50 text-yellow-600' :
-                      'bg-gray-100 text-gray-500'
-                    }`}>
-                      {job.status === 'approved' ? (lang === 'ar' ? 'معتمد' : 'Approved') :
-                       job.status === 'pending'  ? (lang === 'ar' ? 'قيد المراجعة' : 'Pending') : job.status}
+                    <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${job.status === 'approved' || job.status === 'open' ? 'bg-emerald-50 text-emerald-600' :
+                      job.status === 'pending' ? 'bg-yellow-50 text-yellow-600' :
+                        'bg-gray-100 text-gray-500'
+                      }`}>
+                      {job.status === 'approved' || job.status === 'open' ? (lang === 'ar' ? 'متاحة' : 'Open') :
+                        job.status === 'pending' ? (lang === 'ar' ? 'قيد المراجعة' : 'Pending') : job.status}
                     </span>
                   )}
                 </div>

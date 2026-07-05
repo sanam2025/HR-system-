@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
 import type { LucideIcon } from 'lucide-react';
 import { TASK_STATUS_COLORS, TASK_STATUS_EN, CHART_MONTHS_EN } from '../../constants';
+import ActiveAnnouncements from '../Announcements/components/ActiveAnnouncements';
 
 // ── Sub-components ──
 
@@ -42,7 +43,7 @@ export default function Dashboard() {
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
 
   const pendingLeaves = mockLeaveRequests.filter(r => r.status === 'معلقة');
-  const pendingTasks  = mockTasks.filter(tk => tk.status !== 'مكتملة').slice(0, 4);
+  const pendingTasks = mockTasks.filter(tk => tk.status !== 'مكتملة').slice(0, 4);
 
   const chartData = mockPerformanceChart.map(row => ({
     ...row,
@@ -50,20 +51,23 @@ export default function Dashboard() {
   }));
 
   const quickStats = [
-    { label: d.pendingLeaves,    value: stats.pendingLeaves,             icon: '🗓️', color: 'text-yellow-600 bg-yellow-50', path: '/manager/leaves'     },
-    { label: d.pendingOvertime,  value: stats.pendingOvertime,           icon: '⏰', color: 'text-blue-600 bg-blue-50',   path: '/manager/overtime'   },
-    { label: d.completedTasks,   value: stats.completedTasksThisMonth,   icon: '✅', color: 'text-green-700 bg-green-50', path: '/manager/tasks'      },
+    { label: d.pendingLeaves, value: stats.pendingLeaves, icon: '🗓️', color: 'text-yellow-600 bg-yellow-50', path: '/manager/leaves' },
+    { label: d.pendingOvertime, value: stats.pendingOvertime, icon: '⏰', color: 'text-blue-600 bg-blue-50', path: '/manager/overtime' },
+    { label: d.completedTasks, value: stats.completedTasksThisMonth, icon: '✅', color: 'text-green-700 bg-green-50', path: '/manager/tasks' },
     { label: d.presentEmployees, value: `${stats.presentToday}/${stats.totalEmployees}`, icon: '👥', color: 'text-purple-600 bg-purple-50', path: '/manager/attendance' },
   ];
 
   return (
     <div className="space-y-6">
+      {/* ── التعميمات النشطة — تختفي إذا لم يوجد تعميمات ── */}
+      <ActiveAnnouncements />
+
       {/* ── Stat Cards ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={CheckSquare} label={d.pendingTasks}   value={stats.pendingTasks}      sub={`${stats.completedTasksThisMonth} ${d.completedThisMonth}`} iconBg="bg-red-50"      iconColor="text-red-500"  />
-        <StatCard icon={Calendar}   label={d.attendanceRate}  value={`${stats.attendanceRate}%`} sub={d.thisMonth}                                               iconBg="bg-brown/10"    iconColor="text-brown"    />
-        <StatCard icon={TrendingUp} label={d.avgPerformance}  value={`★${stats.avgPerformance}`} sub={d.outOf}                                                   iconBg="bg-gold/10"     iconColor="text-gold"     />
-        <StatCard icon={Users}      label={d.totalEmployees}  value={stats.totalEmployees}    sub={`${stats.presentToday} ${d.presentToday}`}                   iconBg="bg-green/10"    iconColor="text-green"    />
+        <StatCard icon={CheckSquare} label={d.pendingTasks} value={stats.pendingTasks} sub={`${stats.completedTasksThisMonth} ${d.completedThisMonth}`} iconBg="bg-red-50" iconColor="text-red-500" />
+        <StatCard icon={Calendar} label={d.attendanceRate} value={`${stats.attendanceRate}%`} sub={d.thisMonth} iconBg="bg-brown/10" iconColor="text-brown" />
+        <StatCard icon={TrendingUp} label={d.avgPerformance} value={`★${stats.avgPerformance}`} sub={d.outOf} iconBg="bg-gold/10" iconColor="text-gold" />
+        <StatCard icon={Users} label={d.totalEmployees} value={stats.totalEmployees} sub={`${stats.presentToday} ${d.presentToday}`} iconBg="bg-green/10" iconColor="text-green" />
       </div>
 
       {/* ── Charts ── */}
@@ -75,7 +79,7 @@ export default function Dashboard() {
             <AreaChart data={chartData}>
               <defs>
                 <linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#4A7C59" stopOpacity={0.15} />
+                  <stop offset="5%" stopColor="#4A7C59" stopOpacity={0.15} />
                   <stop offset="95%" stopColor="#4A7C59" stopOpacity={0} />
                 </linearGradient>
               </defs>

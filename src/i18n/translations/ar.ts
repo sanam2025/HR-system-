@@ -1,5 +1,5 @@
 const ar = {
-// ── Navigation ─
+  // ── Navigation ─
   nav: {
     dashboard: 'لوحة التحكم',
     employees: 'الموظفون',
@@ -10,6 +10,7 @@ const ar = {
     evaluation: 'التقييم الدوري',
     recruitment: 'التوظيف',
     interviews: 'المقابلات',
+    announcements: 'التعميمات',
     mainMenu: 'القائمة الرئيسية',
   },
 
@@ -44,7 +45,72 @@ const ar = {
     presentEmployees: 'موظفون حاضرون'
   },
 
-  
+  // ── Announcements ──
+  announcements: {
+    title: 'إدارة التعميمات',
+    subtitle: 'إنشاء ومتابعة التعميمات الخاصة بقسمك',
+    createNew: 'إنشاء تعميم',
+    activeTitle: 'الإعلانات',
+    form: {
+      createTitle: 'إنشاء تعميم جديد',
+      editTitle: 'تعديل التعميم',
+      titleLabel: 'عنوان التعميم',
+      bodyLabel: 'نص التعميم',
+      priorityLabel: 'الأولوية',
+      startsAtLabel: 'تاريخ النشر',
+      endsAtLabel: 'تاريخ الانتهاء (اختياري)',
+      audienceNote: '📢 سيتم توجيه هذا التعميم تلقائياً لجميع موظفي قسمك.',
+      saveBtn: 'حفظ التعميم',
+      savingBtn: 'جاري الحفظ...',
+      cancelBtn: 'إلغاء',
+      fillRequired: 'يرجى ملء جميع الحقول المطلوبة',
+      createdSuccess: 'تم إنشاء التعميم بنجاح ✅',
+      updatedSuccess: 'تم تعديل التعميم بنجاح ✅',
+    },
+    list: {
+      title: 'قائمة التعميمات',
+      loading: 'جاري التحميل...',
+      emptyMsg: 'لا توجد تعميمات حتى الآن',
+      createFirst: '+ إنشاء أول تعميم',
+      columns: {
+        title: 'العنوان',
+        audience: 'الجمهور',
+        priority: 'الأولوية',
+        status: 'الحالة',
+        date: 'تاريخ النشر',
+        actions: 'الإجراءات',
+      },
+      publishNow: 'نشر الآن',
+      edit: 'تعديل',
+      delete: 'حذف',
+      publishedSuccess: 'تم النشر فوراً ✅',
+    },
+    deleteConfirm: {
+      title: 'تأكيد الحذف',
+      desc: 'هل أنت متأكد من حذف التعميم "{title}"؟ لا يمكن التراجع عن هذا الإجراء.',
+      yesBtn: 'نعم، احذف',
+      cancelBtn: 'إلغاء',
+      success: 'تم الحذف بنجاح',
+    },
+    priorities: {
+      urgent: '🔴 عاجل',
+      normal: '🟡 عادي',
+      info: '🟢 إشعار عام',
+    },
+    audiences: {
+      all: 'الكل',
+      department: 'القسم',
+      managers: 'المدراء',
+    },
+    statuses: {
+      draft: 'مسودة',
+      scheduled: 'مجدول',
+      active: 'نشط',
+      expired: 'منتهي',
+    }
+  },
+
+
   // ── Sidebar / Topbar ──
   layout: {
     systemName: 'HR System',
@@ -326,8 +392,8 @@ const ar = {
 
   // ── Recruitment ──
   recruitment: {
-    title: 'التوظيف والمرشحين',
-    subtitle: 'إدارة الشواغر الوظيفية وتقييم المرشحين',
+    title: 'التوظيف',
+    subtitle: 'إدارة الشواغر الوظيفية',
     tabVacancy: 'طلب شاغر وظيفي',
     tabCandidates: 'تقييم المرشحين',
     vacancy: {

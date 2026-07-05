@@ -437,21 +437,11 @@ function JobCard({
 
         {/* Meta row */}
         <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-[#6B6358]">
-
-          <span className={`flex items-center gap-1 border rounded-full px-2 py-0.5 text-[10px] sm:text-xs ${TYPE_COLORS[job.type] || 'bg-gray-50 border-gray-200'}`}>
-            <Clock size={10} /> {typeLabel}
-          </span>
           {job.deadline && (
             <span className="flex items-center gap-1">
               <CalendarDays size={11} className="text-[#C4A66A] flex-shrink-0" />
               {tx.deadline} {job.deadline}
             </span>
-          )}
-          {job.applicants !== undefined && (
-             <span className="flex items-center gap-1">
-               <Users size={11} className="flex-shrink-0" />
-               {job.applicants} {tx.applicants}
-             </span>
           )}
         </div>
 

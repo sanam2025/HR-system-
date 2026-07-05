@@ -10,6 +10,7 @@ const en = {
     evaluation: 'Periodic Review',
     recruitment: 'Recruitment',
     interviews: 'Interviews',
+    announcements: 'Announcements',
     mainMenu: 'Main Menu',
   },
 
@@ -42,6 +43,71 @@ const en = {
     pendingOvertime: 'Pending Overtime',
     completedTasks: 'Completed Tasks',
     presentEmployees: 'Present Employees'
+  },
+
+  // ── Announcements ──
+  announcements: {
+    title: 'Announcements Management',
+    subtitle: 'Create and track announcements for your department',
+    createNew: 'Create Announcement',
+    activeTitle: 'Announcements',
+    form: {
+      createTitle: 'Create New Announcement',
+      editTitle: 'Edit Announcement',
+      titleLabel: 'Announcement Title',
+      bodyLabel: 'Announcement Body',
+      priorityLabel: 'Priority',
+      startsAtLabel: 'Publish Date',
+      endsAtLabel: 'End Date (Optional)',
+      audienceNote: '📢 This announcement will be directed automatically to all employees in your department.',
+      saveBtn: 'Save Announcement',
+      savingBtn: 'Saving...',
+      cancelBtn: 'Cancel',
+      fillRequired: 'Please fill all required fields',
+      createdSuccess: 'Announcement created successfully ✅',
+      updatedSuccess: 'Announcement updated successfully ✅',
+    },
+    list: {
+      title: 'Announcements List',
+      loading: 'Loading...',
+      emptyMsg: 'No announcements yet',
+      createFirst: '+ Create First Announcement',
+      columns: {
+        title: 'Title',
+        audience: 'Audience',
+        priority: 'Priority',
+        status: 'Status',
+        date: 'Publish Date',
+        actions: 'Actions',
+      },
+      publishNow: 'Publish Now',
+      edit: 'Edit',
+      delete: 'Delete',
+      publishedSuccess: 'Published immediately ✅',
+    },
+    deleteConfirm: {
+      title: 'Confirm Delete',
+      desc: 'Are you sure you want to delete the announcement "{title}"? This action cannot be undone.',
+      yesBtn: 'Yes, delete',
+      cancelBtn: 'Cancel',
+      success: 'Deleted successfully',
+    },
+    priorities: {
+      urgent: '🔴 Urgent',
+      normal: '🟡 Normal',
+      info: '🟢 Info',
+    },
+    audiences: {
+      all: 'All',
+      department: 'Department',
+      managers: 'Managers',
+    },
+    statuses: {
+      draft: 'Draft',
+      scheduled: 'Scheduled',
+      active: 'Active',
+      expired: 'Expired',
+    }
   },
 
   // ── Sidebar / Topbar ─
