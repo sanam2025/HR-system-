@@ -21,61 +21,29 @@ interface UpdateJobPostingData {
 
 const getErrorMessage = (err: unknown): string => {
   const apiError = err as ApiError;
-  if (apiError.response?.data?.message) return apiError.response.data.message;
-  if (apiError.message) return apiError.message;
+  if (apiError.response?.data?.message) {
+    return apiError.response.data.message;
+  }
+  if (apiError.message) {
+    return apiError.message;
+  }
   return 'An error occurred';
 };
 
 // ✅ جلب جميع الوظائف
 export const useJobPostings = () => {
-  const queryClient = useQueryClient();
-
-  const { data: response, isLoading, error, refetch } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['job-postings'],
     queryFn: () => JobPostingsService.getAll(),
   });
 
-  const postings = response?.data?.data || [];
-
-  const close = useMutation({
-    mutationFn: (id: number) => JobPostingsService.close(id),
-    onSuccess: (res) => {
-      queryClient.invalidateQueries({ queryKey: ['job-postings'] });
-      toast.success(res.data?.message || 'Job posting closed');
-    },
-    onError: (err) => toast.error(getErrorMessage(err)),
-  });
-
-  const deletePosting = useMutation({
-    mutationFn: (id: number) => JobPostingsService.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['job-postings'] });
-      toast.success('Job posting deleted');
-    },
-    onError: (err) => toast.error(getErrorMessage(err)),
-  });
-
-  const update = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdateJobPostingData }) =>
-      JobPostingsService.update(id, data),
-    onSuccess: (res) => {
-      queryClient.invalidateQueries({ queryKey: ['job-postings'] });
-      toast.success(res.data?.message || 'Job posting updated');
-    },
-    onError: (err) => toast.error(getErrorMessage(err)),
-  });
+  const postings = data?.data?.data || [];
 
   return {
     postings,
     isLoading,
     error: error?.message || null,
     refetch,
-    close: close.mutate,
-    isClosing: close.isPending,
-    delete: deletePosting.mutate,
-    isDeleting: deletePosting.isPending,
-    update: update.mutate,
-    isUpdating: update.isPending,
   };
 };
 
@@ -97,4 +65,50 @@ export const useJobPosting = (jobId?: number) => {
     error: error?.message || null,
     refetch,
   };
+};
+
+// ✅ تحديث وظيفة
+export const useUpdateJobPosting = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: UpdateJobPostingData }) =>
+      JobPostingsService.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['job-postings'] });
+      queryClient.invalidateQueries({ queryKey: ['jobPosting'] });
+      toast.success('Job posting updated');
+    },
+    onError: (err) => toast.error(getErrorMessage(err)),
+  });
+};
+
+// ✅ إغلاق وظيفة
+export const useCloseJobPosting = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => JobPostingsService.close(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['job-postings'] });
+      queryClient.invalidateQueries({ queryKey: ['jobPosting'] });
+      toast.success('Job posting closed');
+    },
+    onError: (err) => toast.error(getErrorMessage(err)),
+  });
+};
+
+// ✅ حذف وظيفة
+export const useDeleteJobPosting = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => JobPostingsService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['job-postings'] });
+      queryClient.invalidateQueries({ queryKey: ['jobPosting'] });
+      toast.success('Job posting deleted');
+    },
+    onError: (err) => toast.error(getErrorMessage(err)),
+  });
 };

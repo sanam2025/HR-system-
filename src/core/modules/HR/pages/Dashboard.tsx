@@ -1,11 +1,13 @@
-// core/modules/HR/pages/Dashboard.tsx
+// src/core/modules/HR/pages/Dashboard.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, Calendar, TrendingUp, DollarSign } from "lucide-react";
+import { Users, Calendar, TrendingUp, DollarSign, Megaphone } from "lucide-react";
 import StatCard from "../Components/common_Components/StatCard";
 import LeaveRequestItem from "../Components/Special_Components/LeaveRequestItem";
+import { useActiveAnnouncements } from "../hooks/useAnnouncements";
+import AnnouncementCard from "../Components/Special_Components/AnnouncementCard";
 
-// ============= Constants (رفع البيانات خارج المكون) =============
+// ============= Constants =============
 const STATS_DATA = {
   totalEmployees: 6,
   pendingLeaves: 2,
@@ -18,7 +20,6 @@ const LEAVE_REQUESTS = [
   { name: "Mohammed Al-Hassan", title: "Teaching Assistant", department: "Information Technology Engineering" },
 ] as const;
 
-// ============= Configuration (تكوين البطاقات) =============
 const STATS_CONFIG = [
   { key: "totalEmployees" as const, title: "Total Employees", icon: Users, color: "blue" as const, path: "/Hr/employees" },
   { key: "pendingLeaves" as const, title: "Pending Leave Requests", icon: Calendar, color: "orange" as const, path: "/Hr/leaves" },
@@ -26,23 +27,42 @@ const STATS_CONFIG = [
   { key: "attendanceRate" as const, title: "Attendance Rate", icon: TrendingUp, color: "teal" as const, path: "/Hr/attendance" },
 ] as const;
 
-// ============= Helper Functions =============
 const getStatValue = (key: keyof typeof STATS_DATA) => STATS_DATA[key];
 
-// ============= Main Component =============
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { announcements, isLoading } = useActiveAnnouncements();
 
-  // Single navigation handler
   const handleNavigate = (path: string) => () => navigate(path);
+
+  // ✅ إذا كان في تعميمات، اعرضها في الـ Dashboard
+  const hasAnnouncements = !isLoading && announcements.length > 0;
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
-      {/* Header - يمكن نقله إلى Component منفصل مستقبلاً */}
+      {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Welcome to HR Dashboard</h1>
         <p className="text-gray-500 mt-1 text-sm">Overview of employee performance and statistics.</p>
       </div>
+
+      {/* ✅ Announcements Section - تظهر فقط إذا كان في تعميمات */}
+      {hasAnnouncements && (
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Megaphone className="w-5 h-5 text-blue-500" />
+            <h2 className="text-lg font-semibold text-gray-800">📢 Announcements</h2>
+            <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
+              {announcements.length}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {announcements.slice(0, 3).map((announcement) => (
+              <AnnouncementCard key={announcement.id} announcement={announcement} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">

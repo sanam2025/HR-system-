@@ -35,6 +35,7 @@ export default function HRLayout() {
     { path: "resignations", label: t('resignations'), icon: LogOut, exact: false },
     { path: "contracts", label: t('contracts'), icon: FileText, exact: false },
     { path: "job-postings", label: t('jobPostings'), icon: Briefcase, exact: false },
+    // ❌ تم حذف announcements من الـ Sidebar
   ];
 
   return (

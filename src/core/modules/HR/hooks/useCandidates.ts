@@ -5,11 +5,6 @@ import { CandidatesService } from '../../../../api/service/HrService/CandidatesS
 import type { Candidate } from '../../../../api/service/HrService/Types/CandidatesService.types';
 import { AxiosError } from 'axios';
 
-interface ApiErrorResponse {
-  message?: string;
-  errors?: Record<string, string[]>;
-}
-
 export const useCandidates = (jobId?: number) => {
   const queryClient = useQueryClient();
 
@@ -17,7 +12,7 @@ export const useCandidates = (jobId?: number) => {
     queryKey: ['candidates', jobId],
     queryFn: async () => {
       if (!jobId || isNaN(jobId) || jobId <= 0) {
-        return [] as Candidate[];
+        return [];
       }
 
       try {
@@ -25,55 +20,23 @@ export const useCandidates = (jobId?: number) => {
         return response.data?.data || [];
       } catch (err) {
         if (err instanceof AxiosError && err.response?.status === 404) {
-          console.warn(`ℹ️ No candidates found for job ${jobId}`);
-          return [] as Candidate[];
+          return [];
         }
-        throw err instanceof Error ? err : new Error('Unknown error occurred');
+        throw err instanceof Error ? err : new Error('Unknown error');
       }
     },
     enabled: !!jobId && !isNaN(jobId) && jobId > 0,
     retry: false,
   });
 
-  const candidates = data || [];
-
-  let errorMessage: string | null = null;
-  if (error) {
-    if (error instanceof AxiosError && error.response?.status === 404) {
-      errorMessage = null;
-    } else {
-      errorMessage = error.message || 'An error occurred while loading candidates';
-    }
-  }
-
   const updateStatus = useMutation({
     mutationFn: ({ id, status }: { id: number; status: string }) =>
       CandidatesService.updateStatus(id, status),
-    onSuccess: (res) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['candidates', jobId] });
-      
-      // ✅ رسالة حسب الحالة
-      const status = res.config?.url?.split('status=')[1];
-      if (status === 'rejected') {
-        toast.error('❌ Candidate rejected successfully');
-      } else if (status === 'pending') {
-        toast.success('✅ Candidate moved to pending');
-      } else if (status === 'reviewed') {
-        toast.success('✅ Candidate reviewed successfully');
-      } else {
-        toast.success(`✅ Status updated to ${status}`);
-      }
+      toast.success('Status updated');
     },
-    onError: (err: unknown) => {
-      let message = 'Failed to update status';
-      if (err instanceof AxiosError) {
-        const data = err.response?.data as ApiErrorResponse;
-        message = data?.message || message;
-      } else if (err instanceof Error) {
-        message = err.message;
-      }
-      toast.error('❌ ' + message);
-    },
+    onError: () => toast.error('Failed to update status'),
   });
 
   const getCV = useMutation({
@@ -82,22 +45,13 @@ export const useCandidates = (jobId?: number) => {
       const url = res.data?.data?.url;
       if (url) window.open(url, '_blank');
     },
-    onError: (err: unknown) => {
-      let message = 'Failed to load CV';
-      if (err instanceof AxiosError) {
-        const data = err.response?.data as ApiErrorResponse;
-        message = data?.message || message;
-      } else if (err instanceof Error) {
-        message = err.message;
-      }
-      toast.error('❌ ' + message);
-    },
+    onError: () => toast.error('Failed to load CV'),
   });
 
   return {
-    candidates,
+    candidates: data || [],
     isLoading,
-    error: errorMessage,
+    error: error?.message || null,
     refetch,
     updateStatus: updateStatus.mutate,
     isUpdating: updateStatus.isPending,
