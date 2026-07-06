@@ -1,8 +1,11 @@
-import { Menu, Search, X, Users, LayoutDashboard, CheckSquare, CalendarOff, Clock, BarChart2, TrendingUp, Briefcase, User } from 'lucide-react';
+import { Menu, Search, X, Users, LayoutDashboard, CheckSquare, CalendarOff, Clock, BarChart2, TrendingUp, Briefcase, User, LogIn, LogOut, Bell } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../../i18n/translations/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import { mockEmployees } from '../../data/mockData';
+import toast from 'react-hot-toast';
+import { submitCheckIn, submitCheckOut, getMyNotifications, markNotificationAsRead } from '../../api/manager';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface TopbarProps {
   title: string;
@@ -31,23 +34,81 @@ export default function Topbar({
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [profileOpen, setProfileOpen] = useState(false);
+  
+  // Notifications state
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  const { data: notifications = [] } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: getMyNotifications,
+    refetchInterval: 30000,
+  });
+
+  const unreadCount = notifications.filter((n: any) => !n.is_read && !n.read_at).length;
+
+  const markAsReadMutation = useMutation({
+    mutationFn: markNotificationAsRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    }
+  });
+
+  const handleNotificationClick = (n: any) => {
+    if (!n.is_read && !n.read_at) {
+      markAsReadMutation.mutate(n.id);
+    }
+  };
+
+  // Check-in state
+  const [isCheckedIn, setIsCheckedIn] = useState(() => localStorage.getItem('isCheckedIn') === 'true');
+  const [isLoadingCheck, setIsLoadingCheck] = useState(false);
+
+  const handleCheckInOut = async () => {
+    setIsLoadingCheck(true);
+    try {
+      if (isCheckedIn) {
+        await submitCheckOut();
+        setIsCheckedIn(false);
+        localStorage.setItem('isCheckedIn', 'false');
+        toast.success(lang === 'ar' ? 'تم تسجيل الانصراف بنجاح' : 'Checked out successfully');
+      } else {
+        await submitCheckIn();
+        setIsCheckedIn(true);
+        localStorage.setItem('isCheckedIn', 'true');
+        toast.success(lang === 'ar' ? 'تم تسجيل الحضور بنجاح' : 'Checked in successfully');
+      }
+    } catch (error: any) {
+      const backendMessage = error.response?.data?.message || error.response?.data?.error;
+      const defaultMessage = lang === 'ar' ? 'حدث خطأ في التسجيل' : 'Error recording attendance';
+      toast.error(backendMessage ? `${defaultMessage}: ${backendMessage}` : defaultMessage);
+      console.error("Check-in/out error:", error.response || error);
+    } finally {
+      setIsLoadingCheck(false);
+    }
+  };
+
   const inputRef = useRef<HTMLInputElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
 
   // Close on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { closeSearch(); setProfileOpen(false); }
+      if (e.key === 'Escape') { closeSearch(); setProfileOpen(false); setNotificationsOpen(false); }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  // Close profile dropdown on outside click
+  // Close profile and notif dropdowns on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
         setProfileOpen(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotificationsOpen(false);
       }
     };
     document.addEventListener('mousedown', handler);
@@ -127,6 +188,53 @@ export default function Topbar({
             <span className="hidden sm:inline">{lang === 'ar' ? 'الوظائف' : 'Careers'}</span>
           </a>
 
+          {/* Check-in / Check-out Buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={async () => {
+                setIsLoadingCheck(true);
+                try {
+                  await submitCheckIn();
+                  toast.success(lang === 'ar' ? 'تم تسجيل الحضور بنجاح' : 'Checked in successfully');
+                } catch (error: any) {
+                  const msg = error.response?.data?.message || error.response?.data?.error;
+                  toast.error(msg ? `خطأ حضور: ${msg}` : (lang === 'ar' ? 'خطأ في تسجيل الحضور' : 'Check-in error'));
+                  console.error(error);
+                } finally {
+                  setIsLoadingCheck(false);
+                }
+              }}
+              disabled={isLoadingCheck}
+              title={lang === 'ar' ? 'تسجيل حضور' : 'Check In'}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer shadow-sm border bg-green/10 text-[#4A7C59] border-green/20 hover:bg-green/20 disabled:opacity-50"
+            >
+              <LogIn size={14} />
+              <span className="hidden sm:inline">{lang === 'ar' ? 'حضور' : 'Check In'}</span>
+            </button>
+
+            <button
+              onClick={async () => {
+                setIsLoadingCheck(true);
+                try {
+                  await submitCheckOut();
+                  toast.success(lang === 'ar' ? 'تم تسجيل الانصراف بنجاح' : 'Checked out successfully');
+                } catch (error: any) {
+                  const msg = error.response?.data?.message || error.response?.data?.error;
+                  toast.error(msg ? `خطأ انصراف: ${msg}` : (lang === 'ar' ? 'خطأ في تسجيل الانصراف' : 'Check-out error'));
+                  console.error(error);
+                } finally {
+                  setIsLoadingCheck(false);
+                }
+              }}
+              disabled={isLoadingCheck}
+              title={lang === 'ar' ? 'تسجيل انصراف' : 'Check Out'}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer shadow-sm border bg-red-50 text-red-600 border-red-200 hover:bg-red-100 disabled:opacity-50"
+            >
+              <LogOut size={14} />
+              <span className="hidden sm:inline">{lang === 'ar' ? 'انصراف' : 'Check Out'}</span>
+            </button>
+          </div>
+
           {/* Language Switcher Pill */}
           <button
             onClick={toggleLang}
@@ -137,6 +245,98 @@ export default function Topbar({
             <span className="text-gray-300 font-normal">|</span>
             <span className={`font-tajawal text-[13px] leading-none ${lang === 'ar' ? 'text-green font-bold' : 'text-gray-400'}`}>ع</span>
           </button>
+
+          {/* Notifications Dropdown */}
+          <div className="relative" ref={notifRef}>
+            <button
+              onClick={() => setNotificationsOpen(p => !p)}
+              className="relative p-2 rounded-full text-gray-500 hover:bg-gray-100 transition-colors focus:outline-none cursor-pointer"
+            >
+              <Bell size={20} />
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
+              )}
+            </button>
+
+            {notificationsOpen && (
+              <div className="absolute end-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-[300] animate-slide-down flex flex-col max-h-[80vh]">
+                <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center sticky top-0">
+                  <h3 className="font-bold text-dark">{lang === 'ar' ? 'الإشعارات' : 'Notifications'}</h3>
+                  {unreadCount > 0 && (
+                    <span className="bg-green/10 text-green text-xs font-bold px-2 py-0.5 rounded-full">
+                      {unreadCount} {lang === 'ar' ? 'جديد' : 'New'}
+                    </span>
+                  )}
+                </div>
+                <div className="overflow-y-auto flex-1">
+                  {notifications.length === 0 ? (
+                    <div className="p-6 text-center text-gray-400">
+                      <Bell size={24} className="mx-auto mb-2 opacity-20" />
+                      <p className="text-sm">{lang === 'ar' ? 'لا توجد إشعارات' : 'No notifications'}</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col">
+                      {notifications.map((n: any) => {
+                        const isUnread = !n.read_at;
+                        
+                        // استخراج النص حسب نوع الإشعار
+                        let title = lang === 'ar' ? 'إشعار نظام' : 'System Notification';
+                        let subtitle = '';
+                        let extraInfo = '';
+                        let icon = '🔔';
+                        let targetPath = '';
+
+                        if (n.data?.type === 'interview_assigned') {
+                          icon = '🗓️';
+                          title = lang === 'ar' ? 'تم تعيين مقابلة جديدة لك' : 'New Interview Assigned';
+                          subtitle = lang === 'ar' 
+                            ? `المرشح: ${n.data.candidate || 'غير محدد'}` 
+                            : `Candidate: ${n.data.candidate || 'Unknown'}`;
+                          if (n.data.scheduled_at) {
+                            const d = new Date(n.data.scheduled_at);
+                            extraInfo = lang === 'ar'
+                              ? `الموعد: ${d.toLocaleDateString('ar-SY')} - ${d.toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' })}`
+                              : `Scheduled: ${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                          }
+                          targetPath = '/manager/interviews';
+                        } else if (n.data?.message) {
+                          title = n.data.message;
+                        } else if (n.data?.title) {
+                          title = n.data.title;
+                        }
+
+                        return (
+                          <div
+                            key={n.id}
+                            onClick={() => {
+                              if (isUnread) markAsReadMutation.mutate(n.id);
+                              setNotificationsOpen(false);
+                              if (targetPath) navigate(targetPath);
+                            }}
+                            className={`p-4 border-b border-gray-50 cursor-pointer transition-colors hover:bg-gray-50 flex gap-3 ${isUnread ? 'bg-blue-50/30' : ''}`}
+                          >
+                            {/* أيقونة نوع الإشعار */}
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-base">
+                              {icon}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-sm leading-snug ${isUnread ? 'font-bold text-dark' : 'text-gray-600'}`}>{title}</p>
+                              {subtitle && <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>}
+                              {extraInfo && <p className="text-xs text-green font-semibold mt-0.5">{extraInfo}</p>}
+                              <span className="text-xs text-gray-400 mt-1 block">
+                                {n.created_at ? new Date(n.created_at).toLocaleString() : ''}
+                              </span>
+                            </div>
+                            {isUnread && <div className="mt-1.5 flex-shrink-0 w-2 h-2 rounded-full bg-blue-500"></div>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* User Avatar + Dropdown */}
           <div className="relative" ref={profileRef}>

@@ -8,9 +8,11 @@
 // ==============================================================
 
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Send, Loader2, Megaphone, ClipboardList } from 'lucide-react';
+import { Plus, Edit2, Trash2, Send, Loader2, Megaphone, ClipboardList, CalendarDays } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
+import { useQuery } from '@tanstack/react-query';
+import { getHolidays } from '../../../api/manager';
 import {
   getAnnouncements,
   createAnnouncement,
@@ -266,6 +268,13 @@ export default function ManagerAnnouncements() {
     });
   };
 
+  // ── Holidays Query ──
+  const { data: holidays = [], isLoading: holidaysLoading } = useQuery({
+    queryKey: ['holidays'],
+    queryFn: getHolidays,
+    retry: false,
+  });
+
   // ── render ──
   return (
     <div className="space-y-6">
@@ -285,6 +294,77 @@ export default function ManagerAnnouncements() {
             <Plus size={18} />
             {t.announcements.createNew}
           </button>
+        )}
+      </div>
+
+      {/* ── قسم العطل الرسمية ── */}
+      <div className="bg-white rounded-2xl border border-amber-100 shadow-card overflow-hidden">
+        <div className="flex items-center gap-2 px-6 py-4 border-b border-amber-100 bg-amber-50/40">
+          <CalendarDays size={18} className="text-amber-600" />
+          <span className="font-bold text-dark">{lang === 'ar' ? 'العطل الرسمية' : 'Official Holidays'}</span>
+          {!holidaysLoading && (
+            <span className="text-xs bg-amber-100 text-amber-700 rounded-full px-2 py-0.5 font-semibold ms-1">
+              {holidays.length}
+            </span>
+          )}
+        </div>
+
+        {holidaysLoading ? (
+          <div className="flex items-center justify-center py-8 text-gray-400 gap-3">
+            <Loader2 size={20} className="animate-spin" />
+          </div>
+        ) : holidays.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-8 text-gray-400 gap-2">
+            <CalendarDays size={32} className="opacity-20" />
+            <p className="text-sm">{lang === 'ar' ? 'لا توجد عطل مسجلة' : 'No holidays found'}</p>
+          </div>
+        ) : (
+          <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {holidays.map((h: any) => {
+              const start = new Date(h.start_date || h.date || h.starts_at || h.from);
+              const end   = h.end_date || h.ends_at || h.to ? new Date(h.end_date || h.ends_at || h.to) : null;
+              const isUpcoming = start > new Date();
+              const isToday = start.toDateString() === new Date().toDateString();
+              return (
+                <div
+                  key={h.id}
+                  className={`flex items-start gap-3 p-4 rounded-xl border transition-all ${
+                    isToday
+                      ? 'bg-green/5 border-green/20'
+                      : isUpcoming
+                        ? 'bg-amber-50/50 border-amber-100'
+                        : 'bg-gray-50 border-gray-100 opacity-70'
+                  }`}
+                >
+                  <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex flex-col items-center justify-center text-center ${
+                    isToday ? 'bg-green text-white' : isUpcoming ? 'bg-amber-100 text-amber-700' : 'bg-gray-200 text-gray-500'
+                  }`}>
+                    <span className="text-[10px] font-bold uppercase leading-none">
+                      {start.toLocaleString(lang === 'ar' ? 'ar-SY' : 'en', { month: 'short' })}
+                    </span>
+                    <span className="text-lg font-extrabold leading-none">{start.getDate()}</span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-dark text-sm leading-snug">{h.name || h.title || (lang === 'ar' ? 'عطلة رسمية' : 'Holiday')}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {start.toLocaleDateString(lang === 'ar' ? 'ar-SY' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                      {end && ` → ${end.toLocaleDateString(lang === 'ar' ? 'ar-SY' : 'en-US', { month: 'short', day: 'numeric' })}`}
+                    </p>
+                    {isToday && (
+                      <span className="inline-block mt-1 text-[10px] bg-green text-white px-2 py-0.5 rounded-full font-bold">
+                        {lang === 'ar' ? 'اليوم' : 'Today'}
+                      </span>
+                    )}
+                    {isUpcoming && !isToday && (
+                      <span className="inline-block mt-1 text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold">
+                        {lang === 'ar' ? 'قادم' : 'Upcoming'}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
 

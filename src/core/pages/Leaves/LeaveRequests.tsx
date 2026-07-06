@@ -21,26 +21,7 @@ const typeColors: Record<string, string> = {
   'Unpaid': 'bg-gray-100 text-gray-600',
 };
 
-// ── Mock Data for Fallback (500 errors) ──
-const MOCK_TEAM_LEAVES = [
-  { id: 1, employeeName: 'أحمد محمود', type: 'سنوية', from: '2026-07-01', to: '2026-07-05', days: 5, reason: 'سفر مع العائلة', status: 'معلقة', leaveBalance: 14, requestDate: '2026-06-28' },
-  { id: 2, employeeName: 'سارة يوسف', type: 'مرضية', from: '2026-06-30', to: '2026-06-30', days: 1, reason: 'موعد طبيب أسنان', status: 'موافقة', leaveBalance: 10, requestDate: '2026-06-29' },
-  { id: 3, employeeName: 'عمر كمال', type: 'اضطرارية', from: '2026-06-29', to: '2026-06-29', days: 1, reason: 'ظرف عائلي طارئ', status: 'مرفوضة', leaveBalance: 0, requestDate: '2026-06-29' },
-];
 
-const MOCK_MY_LEAVES = [
-  { id: 101, type: 'سنوية', from: '2026-08-10', to: '2026-08-15', days: 6, reason: 'إجازة صيفية', status: 'approved', requestDate: '2026-06-20' },
-  { id: 102, type: 'مرضية', from: '2026-05-12', to: '2026-05-13', days: 2, reason: 'زكام شديد', status: 'approved', requestDate: '2026-05-12' },
-];
-
-const MOCK_TEAM_HOURLY = [
-  { id: 201, employeeName: 'خالد محمد', date: '2026-06-29', startTime: '09:00', endTime: '11:00', reason: 'موعد حكومي', status: 'معلقة', requestDate: '2026-06-28' },
-  { id: 202, employeeName: 'ليلى زيد', date: '2026-06-30', startTime: '13:00', endTime: '15:00', reason: 'مغادرة مبكرة لظرف عائلي', status: 'موافقة', requestDate: '2026-06-29' },
-];
-
-const MOCK_MY_HOURLY = [
-  { id: 301, date: '2026-05-20', startTime: '10:00', endTime: '12:00', reason: 'تجديد أوراق رسمية', status: 'approved', requestDate: '2026-05-19' }
-];
 
 export default function LeaveRequests() {
   const { t, lang } = useLanguage();
@@ -114,11 +95,7 @@ function TeamLeavesView({ lv, lang, subType }: { lv: any, lang: string, subType:
   const [activeTabIdx, setActiveTabIdx] = useState(1);
   const [confirm, setConfirm] = useState<{ id: number; action: 'approve' | 'reject' } | null>(null);
 
-  // Fallback to mock data if API fails or is empty
-  const mockData = subType === 'daily' ? MOCK_TEAM_LEAVES : MOCK_TEAM_HOURLY;
-  const safeRequests = (isError || !rawRequests || (Array.isArray(rawRequests) && rawRequests.length === 0))
-    ? mockData
-    : (Array.isArray(rawRequests) ? rawRequests : []);
+  const safeRequests = Array.isArray(rawRequests) ? rawRequests : [];
 
   const requests = safeRequests.map((req: any) => ({
     id: req.id,
@@ -148,7 +125,7 @@ function TeamLeavesView({ lv, lang, subType }: { lv: any, lang: string, subType:
       setConfirm(null);
     },
     onError: () => {
-      toast.success(lv.toast.approved + ' (Mock)');
+      toast.error('حدث خطأ أثناء الموافقة على الطلب');
       setConfirm(null);
     }
   });
@@ -161,7 +138,7 @@ function TeamLeavesView({ lv, lang, subType }: { lv: any, lang: string, subType:
       setConfirm(null);
     },
     onError: () => {
-      toast.success(lv.toast.rejected + ' (Mock)');
+      toast.error('حدث خطأ أثناء رفض الطلب');
       setConfirm(null);
     }
   });
@@ -313,10 +290,7 @@ function MyLeavesView({ myLv, lv, lang, subType }: { myLv: any, lv: any, lang: s
     queryFn: () => subType === 'daily' ? getMyLeaveRequests() : getMyHourlyLeaveRequests()
   });
 
-  const mockData = subType === 'daily' ? MOCK_MY_LEAVES : MOCK_MY_HOURLY;
-  const safeRequests = (isError || !rawRequests || (Array.isArray(rawRequests) && rawRequests.length === 0))
-    ? mockData
-    : (Array.isArray(rawRequests) ? rawRequests : []);
+  const safeRequests = Array.isArray(rawRequests) ? rawRequests : [];
 
   const submitMutation = useMutation({
     mutationFn: (data: any) => subType === 'daily' ? submitLeaveRequest(data) : submitHourlyLeaveRequest(data),
@@ -328,7 +302,7 @@ function MyLeavesView({ myLv, lv, lang, subType }: { myLv: any, lv: any, lang: s
       else setHourlyForm({ date: '', start_time: '', end_time: '', reason: '' });
     },
     onError: () => {
-      toast.success(myLv.toast.success + ' (Mock)');
+      toast.error('حدث خطأ أثناء إرسال الطلب');
       setShowForm(false);
     }
   });

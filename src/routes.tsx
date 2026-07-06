@@ -13,6 +13,7 @@ import Recruitment from './core/pages/Recruitment/Recruitment';
 import InterviewsPage from './core/pages/Recruitment/InterviewsPage';
 import PublicJobsPage from './core/pages/PublicJobs/PublicJobsPage';
 import ManagerAnnouncements from './core/pages/Announcements/ManagerAnnouncements';
+import ManagerProfile from './core/pages/Profile/ManagerProfile';
 
 const router = createBrowserRouter([
     {
@@ -39,6 +40,7 @@ const router = createBrowserRouter([
             { path: 'job-postings/:jobPostingId/interviews',        element: <InterviewsPage />       },
             { path: 'interviews',                                   element: <InterviewsPage />       },
             { path: 'announcements',                                element: <ManagerAnnouncements /> },
+            { path: 'profile',                                      element: <ManagerProfile /> },
         ],
     },
     {
