@@ -47,7 +47,7 @@ export default function Announcements() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm('هل أنت متأكد من الحذف؟')) {
+    if (confirm('Are you sure you want to delete this announcement?')) {
       deleteAnnouncement.mutate(id, { onSuccess: () => refetch() });
     }
   };
@@ -88,21 +88,21 @@ export default function Announcements() {
   };
 
   if (isLoading) {
-    return <div className="p-6 text-center">جاري التحميل...</div>;
+    return <div className="p-6 text-center">Loading...</div>;
   }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">إدارة التعميمات</h1>
-          <p className="text-gray-500 text-sm">إدارة التعميمات والإعلانات</p>
+          <h1 className="text-2xl font-bold text-gray-900">📢 Manage Announcements</h1>
+          <p className="text-gray-500 text-sm">Create and manage announcements for employees</p>
         </div>
         <button
           onClick={() => { setShowForm(true); setEditingId(null); setFormData({ title: '', content: '', audience: 'all', status: 'draft', starts_at: '', ends_at: '' }); }}
           className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
         >
-          <Plus className="w-4 h-4" /> إضافة تعميم جديد
+          <Plus className="w-4 h-4" /> Add Announcement
         </button>
       </div>
 
@@ -111,46 +111,46 @@ export default function Announcements() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">{editingId ? 'تعديل تعميم' : 'إضافة تعميم جديد'}</h2>
+              <h2 className="text-xl font-bold">{editingId ? 'Edit Announcement' : 'Add Announcement'}</h2>
               <button onClick={() => setShowForm(false)} className="p-1 hover:bg-gray-100 rounded"><X className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleSave} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">العنوان *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
                 <input type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">المحتوى *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
                 <textarea value={formData.content} onChange={(e) => setFormData({ ...formData, content: e.target.value })} rows={3} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" required />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">الجمهور</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Audience</label>
                 <select value={formData.audience} onChange={handleAudienceChange} className="w-full px-3 py-2 border rounded-lg">
-                  <option value="all">الكل</option>
-                  <option value="employees">موظفين</option>
-                  <option value="managers">مدراء</option>
+                  <option value="all">All</option>
+                  <option value="employees">Employees</option>
+                  <option value="managers">Managers</option>
                   <option value="hr">HR</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">تاريخ البدء</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
                 <input type="datetime-local" value={formData.starts_at} onChange={(e) => setFormData({ ...formData, starts_at: e.target.value })} className="w-full px-3 py-2 border rounded-lg" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">تاريخ الانتهاء (اختياري)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">End Date (optional)</label>
                 <input type="datetime-local" value={formData.ends_at} onChange={(e) => setFormData({ ...formData, ends_at: e.target.value })} className="w-full px-3 py-2 border rounded-lg" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">الحالة</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <select value={formData.status} onChange={handleStatusChange} className="w-full px-3 py-2 border rounded-lg">
-                  <option value="draft">مسودة</option>
-                  <option value="scheduled">مجدول</option>
-                  <option value="active">نشط</option>
+                  <option value="draft">Draft</option>
+                  <option value="scheduled">Scheduled</option>
+                  <option value="active">Active</option>
                 </select>
               </div>
               <div className="flex gap-3 pt-4">
-                <button type="submit" className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">{editingId ? 'تحديث' : 'إضافة'}</button>
-                <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">إلغاء</button>
+                <button type="submit" className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">{editingId ? 'Update' : 'Create'}</button>
+                <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
               </div>
             </form>
           </div>
@@ -164,11 +164,11 @@ export default function Announcements() {
             <thead className="bg-gray-50 border-b">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">العنوان</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">الجمهور</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">الحالة</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">تاريخ البدء</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">الإجراءات</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Audience</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Start Date</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -181,18 +181,18 @@ export default function Announcements() {
                   <td className="px-4 py-3 text-sm text-gray-500">{new Date(ann.starts_at).toLocaleDateString()}</td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => handleEdit(ann)} className="p-1 text-blue-500 hover:text-blue-700" title="تعديل"><Edit className="w-4 h-4" /></button>
-                      <button onClick={() => handleDelete(ann.id)} className="p-1 text-red-500 hover:text-red-700" title="حذف"><Trash2 className="w-4 h-4" /></button>
+                      <button onClick={() => handleEdit(ann)} className="p-1 text-blue-500 hover:text-blue-700" title="Edit"><Edit className="w-4 h-4" /></button>
+                      <button onClick={() => handleDelete(ann.id)} className="p-1 text-red-500 hover:text-red-700" title="Delete"><Trash2 className="w-4 h-4" /></button>
                       {ann.status !== 'active' && (
-                        <button onClick={() => handlePublishNow(ann.id)} className="p-1 text-green-500 hover:text-green-700" title="نشر فوري"><Send className="w-4 h-4" /></button>
+                        <button onClick={() => handlePublishNow(ann.id)} className="p-1 text-green-500 hover:text-green-700" title="Publish Now"><Send className="w-4 h-4" /></button>
                       )}
-                      <button onClick={() => navigate(`/Hr/announcements/${ann.id}`)} className="p-1 text-gray-500 hover:text-gray-700" title="عرض"><Eye className="w-4 h-4" /></button>
+                      <button onClick={() => navigate(`/Hr/announcements/${ann.id}`)} className="p-1 text-gray-500 hover:text-gray-700" title="View"><Eye className="w-4 h-4" /></button>
                     </div>
                   </td>
                 </tr>
               ))}
               {announcements.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">لا توجد تعميمات</td></tr>
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">No announcements found</td></tr>
               )}
             </tbody>
           </table>

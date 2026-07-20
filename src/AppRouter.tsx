@@ -33,6 +33,15 @@ import { HourlyLeaves } from "./core/modules/HR/pages/HourlyLeaves/HourlyLeaves"
 import { SendOffer } from "./core/modules/HR/pages/Offers/SendOffer";
 import { Offers } from "./core/modules/HR/pages/Offers/Offers";
 import JobRequisitionDetail from "./core/modules/HR/pages/Recruitment/JobRequisitionDetail";
+// ✅ Announcements
+import Announcements from "./core/modules/HR/pages/Announcements/Announcements";
+// ✅ Complaints
+import Complaints from "./core/modules/HR/pages/Complaints/Complaints";
+import ComplaintDetail from "./core/modules/HR/pages/Complaints/ComplaintDetail";
+// ✅ Employee Profile (HR)
+import EmployeeProfileHR from "./core/modules/HR/pages/EmployeeProfile";
+// ✅ Department Detail
+import DepartmentDetail from "./core/modules/HR/pages/DepartmentDetail";
 
 function Page({ title }: { title: string }) {
   return (
@@ -77,7 +86,7 @@ const appRouter = createBrowserRouter([
         element: <LeaveDetail />,
       },
       { path: "recruitment/applicant/:id", element: <ApplicantDetail /> },
-      // ✅ الرابط القديم للمقابلات (مع jobId)
+      // ✅ Interviews
       {
         path: "job-postings/:jobId/interviews",
         element: <Interviews />,
@@ -86,7 +95,6 @@ const appRouter = createBrowserRouter([
         path: "job-postings/:jobId/interviews/schedule",
         element: <ScheduleInterview />,
       },
-      // ❌ تم إزالة الروابط الجديدة (interviews, interviews/schedule)
       {
         path: "interviews/:id",
         element: <div>Interview Details - Coming Soon</div>,
@@ -106,6 +114,30 @@ const appRouter = createBrowserRouter([
       {
         path: "job-postings/:jobId/offers/send",
         element: <SendOffer />,
+      },
+      // ✅ Announcements
+      {
+        path: "announcements",
+        element: <Announcements />,
+      },
+      // ✅ Complaints
+      {
+        path: "complaints",
+        element: <Complaints />,
+      },
+      {
+        path: "complaints/:id",
+        element: <ComplaintDetail />,
+      },
+      // ✅ Employee Profile (HR)
+      {
+        path: "employee/:id",
+        element: <EmployeeProfileHR />,
+      },
+      // ✅ Department Detail
+      {
+        path: "department/:id",
+        element: <DepartmentDetail />,
       },
     ],
   },

@@ -14,6 +14,8 @@ import {
   FileText,
   Briefcase,
   Clock,
+  Scale,
+  Megaphone,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -35,7 +37,20 @@ export default function HRLayout() {
     { path: "resignations", label: t('resignations'), icon: LogOut, exact: false },
     { path: "contracts", label: t('contracts'), icon: FileText, exact: false },
     { path: "job-postings", label: t('jobPostings'), icon: Briefcase, exact: false },
-    // ❌ تم حذف announcements من الـ Sidebar
+    // ✅ إضافة Announcements في الـ Sidebar
+    {
+      path: "announcements",
+      label: t('announcements') || "التعميمات",
+      icon: Megaphone,
+      exact: false,
+    },
+    // ✅ إضافة الشكاوي في الـ Sidebar
+    {
+      path: "complaints",
+      label: t('complaints') || "الشكاوي",
+      icon: Scale,
+      exact: false,
+    },
   ];
 
   return (
