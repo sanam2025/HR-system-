@@ -1,9 +1,10 @@
 // src/core/modules/HR/pages/Interviews/ScheduleInterview.tsx
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Calendar, User, MapPin } from 'lucide-react';
+import { ArrowLeft, Calendar, MapPin } from 'lucide-react';
 import { useInterviews } from '../../hooks/useInterviews';
 import toast from 'react-hot-toast';
+import { AxiosError } from 'axios';
 
 export const ScheduleInterview = () => {
   const navigate = useNavigate();
@@ -17,8 +18,8 @@ export const ScheduleInterview = () => {
   
   const { scheduleInterview, isScheduling } = useInterviews(jobIdNumber);
 
+  // ✅ candidate_id و interviewed_by تلقائي (مخفيين عن المستخدم)
   const [form, setForm] = useState({
-    candidate_id: candidateIdFromUrl || '',
     scheduled_at: '',
     location_type: 'on_site',
     location_details: '',
@@ -30,11 +31,22 @@ export const ScheduleInterview = () => {
     return day === 5 || day === 6;
   };
 
+  const getErrorMessage = (err: unknown): string => {
+    if (err instanceof AxiosError) {
+      const data = err.response?.data as { message?: string };
+      return data?.message || err.message || 'Failed to schedule interview';
+    }
+    if (err instanceof Error) {
+      return err.message;
+    }
+    return 'Failed to schedule interview';
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!form.candidate_id || !form.scheduled_at) {
-      toast.error('Please fill in all required fields');
+    if (!form.scheduled_at) {
+      toast.error('Please select a date and time');
       return;
     }
     
@@ -43,20 +55,31 @@ export const ScheduleInterview = () => {
       return;
     }
     
-    scheduleInterview({
-      candidate_id: Number(form.candidate_id),
+    // ✅ البيانات مع candidate_id من الـ URL و interviewed_by تلقائي (4)
+    const data = {
+      candidate_id: Number(candidateIdFromUrl || 1),
+      interviewed_by: 4, // ✅ تلقائي
       scheduled_at: form.scheduled_at,
       location_type: form.location_type,
       location_details: form.location_details || '',
+    };
+    
+    console.log('📅 Sending data:', data);
+    
+    scheduleInterview(data, {
+      onSuccess: () => {
+        toast.success('✅ Interview added to schedule successfully!');
+        if (jobId) {
+          navigate(`/Hr/job-postings/${jobId}/interviews`);
+        } else {
+          navigate('/Hr/interviews');
+        }
+      },
+      onError: (err) => {
+        console.error('❌ Schedule error:', err);
+        toast.error(getErrorMessage(err));
+      },
     });
-    
-    toast.success('✅ Interview added to schedule successfully!');
-    
-    if (jobId) {
-      navigate(`/Hr/job-postings/${jobId}/interviews`);
-    } else {
-      navigate('/Hr/interviews');
-    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -90,21 +113,26 @@ export const ScheduleInterview = () => {
 
         <div className="bg-white rounded-xl shadow-sm p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Candidate ID *</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            {/* ✅ Candidate ID - مخفي */}
+            {candidateIdFromUrl && (
+              <div className="hidden">
                 <input
                   type="number"
                   name="candidate_id"
-                  value={form.candidate_id}
-                  onChange={handleChange}
-                  placeholder="Enter candidate ID"
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  required
-                  readOnly={!!candidateIdFromUrl}
+                  value={candidateIdFromUrl}
+                  readOnly
                 />
               </div>
+            )}
+
+            {/* ✅ Interviewer ID - مخفي */}
+            <div className="hidden">
+              <input
+                type="number"
+                name="interviewed_by"
+                value="4"
+                readOnly
+              />
             </div>
 
             <div>
@@ -120,7 +148,7 @@ export const ScheduleInterview = () => {
                   required
                 />
               </div>
-              <p className="text-xs text-gray-400 mt-1">Choose a weekday (Sunday - Thursday)</p>
+              <p className="text-xs text-gray-400 mt-1">Choose a weekday (Sunday - Thursday, avoid Friday/Saturday)</p>
             </div>
 
             <div>

@@ -7,6 +7,9 @@ import {
   X,
   Clock,
   Eye,
+  Briefcase,
+  Trophy,
+  Medal,
 } from "lucide-react";
 import type { Interview } from "../../../../../api/service/HrService/Types/InterviewsService.types";
 
@@ -15,19 +18,8 @@ interface InterviewCardProps {
   onCancel: (id: number) => void;
   isUpdating: boolean;
   onViewDetails: () => void;
-}
-
-// ✅ تعريف نوع ممتد من Interview مع خصائص candidate و interviewer
-interface ExtendedInterview extends Interview {
-  candidate?: {
-    id: number;
-    full_name: string;
-    email: string;
-  };
-  interviewer?: {
-    id: number;
-    full_name: string;
-  };
+  onSendOffer?: () => void;
+  showOfferButton?: boolean;
 }
 
 const InterviewCard: React.FC<InterviewCardProps> = ({
@@ -35,6 +27,8 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
   onCancel,
   isUpdating,
   onViewDetails,
+  onSendOffer,
+  
 }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -46,6 +40,8 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
         return "bg-red-100 text-red-800";
       case "pending":
         return "bg-yellow-100 text-yellow-800";
+      case "done":
+        return "bg-green-100 text-green-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -64,18 +60,32 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
     }
   };
 
-  // ✅ استخدم النوع الممتد ExtendedInterview بدلاً من any
-  const extendedInterview = interview as ExtendedInterview;
-  
-  const candidateName = extendedInterview.candidate?.full_name || 
-                        (interview.candidate_id ? `Candidate #${interview.candidate_id}` : "N/A");
-  const interviewerName = extendedInterview.interviewer?.full_name || 
-                          (interview.interviewed_by ? `Interviewer #${interview.interviewed_by}` : "N/A");
-  const candidateEmail = extendedInterview.candidate?.email || 
-                         `ID: ${interview.candidate_id || "N/A"}`;
+  // ✅ دالة لعرض أيقونة الترتيب
+  const getRankIcon = (rank?: number) => {
+    if (!rank) return null;
+    switch (rank) {
+      case 1:
+        return <Trophy className="w-4 h-4 text-yellow-500" />;
+      case 2:
+        return <Medal className="w-4 h-4 text-gray-400" />;
+      case 3:
+        return <Medal className="w-4 h-4 text-amber-600" />;
+      default:
+        return <span className="text-xs text-gray-400">#{rank}</span>;
+    }
+  };
+
+  const candidateName = interview.candidate?.full_name ||
+    (interview.candidate_id ? `Candidate #${interview.candidate_id}` : "N/A");
+  const interviewerName = interview.interviewer?.full_name ||
+    (interview.interviewed_by ? `Interviewer #${interview.interviewed_by}` : "N/A");
+  const candidateEmail = interview.candidate?.email ||
+    `ID: ${interview.candidate_id || "N/A"}`;
+
+  const isDone = interview.status === 'done' || interview.status === 'completed';
 
   return (
-    <tr className="hover:bg-gray-50">
+    <tr className="hover:bg-gray-50 transition-colors">
       <td className="px-6 py-4">
         <div className="flex items-center">
           <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-medium">
@@ -84,6 +94,15 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
           <div className="ml-3">
             <p className="text-sm font-medium text-gray-900">{candidateName}</p>
             <p className="text-xs text-gray-500">{candidateEmail}</p>
+            {/* ✅ عرض الرتبة بجانب الاسم */}
+            {interview.rank && (
+              <div className="flex items-center gap-1 mt-0.5">
+                {getRankIcon(interview.rank)}
+                <span className="text-xs font-medium text-gray-600">
+                  Rank #{interview.rank}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </td>
@@ -117,16 +136,27 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
         <div className="text-sm text-gray-900">{interviewerName}</div>
       </td>
       <td className="px-6 py-4">
-        <span
-          className={`px-2 py-1 text-xs rounded-full ${getStatusColor(interview.status)}`}
-        >
-          {interview.status || "N/A"}
-        </span>
-        {interview.rate && (
-          <div className="text-xs text-gray-500 mt-1">
-            Rate: {interview.rate}/10
-          </div>
-        )}
+        <div className="flex flex-col gap-1">
+          <span
+            className={`px-2 py-1 text-xs rounded-full inline-flex items-center gap-1 w-fit ${getStatusColor(interview.status)}`}
+          >
+            {interview.status === 'done' && <span>✅</span>}
+            {interview.status || "N/A"}
+          </span>
+          {interview.rate && (
+            <div className="text-xs text-gray-500 flex items-center gap-1">
+              <span className="text-yellow-500">⭐</span>
+              Rate: {interview.rate}/10
+            </div>
+          )}
+          {/* ✅ عرض الرتبة هنا أيضاً */}
+          {interview.rank && (
+            <div className="text-xs text-gray-500 flex items-center gap-1">
+              {getRankIcon(interview.rank)}
+              <span>Rank: #{interview.rank}</span>
+            </div>
+          )}
+        </div>
       </td>
       <td className="px-6 py-4">
         <div className="flex items-center gap-2">
@@ -134,7 +164,7 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
             <button
               onClick={() => onCancel(interview.id)}
               disabled={isUpdating}
-              className="p-1 text-red-500 hover:text-red-700 disabled:opacity-50"
+              className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
               title="Cancel Interview"
             >
               <X className="w-4 h-4" />
@@ -142,11 +172,21 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
           )}
           <button
             onClick={onViewDetails}
-            className="p-1 text-blue-500 hover:text-blue-700"
+            className="p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
             title="View Details"
           >
             <Eye className="w-4 h-4" />
           </button>
+          {isDone && onSendOffer && (
+            <button
+              onClick={onSendOffer}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 text-white text-xs font-medium rounded-lg hover:bg-orange-600 hover:shadow-md transition-all"
+              title="Send Offer to Candidate"
+            >
+              <Briefcase className="w-3.5 h-3.5" />
+              Send Offer
+            </button>
+          )}
         </div>
       </td>
     </tr>

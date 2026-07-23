@@ -1,38 +1,45 @@
-// src/api/Types/InterviewsService.types.ts
-import type { APIResponseWithData, APIResponseWithDataArray } from "./types.types";
-
-export type LocationType = 'on_site' | 'online';
-export type InterviewStatus = 'scheduled' | 'completed' | 'cancelled';
-
+// src/api/service/HrService/Types/InterviewsService.types.ts
 export interface Interview {
   id: number;
   candidate_id: number;
-  candidate_name: string;
   interviewed_by: number;
-  interviewer_name: string;
   scheduled_at: string;
-  location_type: LocationType;
-  location_details: string;
-  status: InterviewStatus;
+  location_type: string;
+  location_details?: string;
+  status: 'scheduled' | 'completed' | 'cancelled' | 'pending' | 'done';
   rate?: number;
+  rate_label?: string;
   notes?: string;
+  rank?: number;
+  candidate?: {
+    id: number;
+    full_name: string;
+    email: string;
+  };
+  interviewer?: {
+    id: number;
+    full_name: string;
+  };
   created_at: string;
+  updated_at: string;
 }
 
-export interface InterviewRanking {
-  interview_id: number;
-  rank: number;
+export interface ScheduleInterviewData {
+  candidate_id: number;
+  interviewed_by: number;
+  scheduled_at: string;
+  location_type: string;
+  location_details?: string;
+}
+
+export interface UpdateInterviewResultData {
+  rate: number;
+  notes?: string;
 }
 
 export interface SubmitRankingData {
-  ranking: InterviewRanking[];
+  ranking: {
+    interview_id: number;
+    rank: number;
+  }[];
 }
-
-export interface InterviewResultData {
-  rate: number;
-  notes: string;
-}
-
-export type InterviewsResponse = APIResponseWithDataArray<Interview>;
-export type InterviewResponse = APIResponseWithData<Interview>;
-export type RankingResponse = APIResponseWithData<InterviewRanking[]>;

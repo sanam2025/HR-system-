@@ -1,6 +1,6 @@
 // src/core/modules/HR/pages/JobPostings/JobPostingDetail.tsx
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, Users, Briefcase, Clock, DollarSign, FileText } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, Briefcase, Clock, DollarSign } from 'lucide-react';
 import { useJobPosting } from '../../hooks/useJobPostings';
 import { useCandidates } from '../../hooks/useCandidates';
 import Loading from '../../../../../shared/components/Loading';
@@ -99,19 +99,6 @@ export const JobPostingDetail = () => {
               <Calendar className="w-4 h-4" />
               View Interviews
             </button>
-            <button
-              onClick={() => navigate(`/Hr/job-postings/${id}/offers`)}
-              className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-            >
-              <FileText className="w-4 h-4" />
-              View Offers
-            </button>
-            <button
-              onClick={() => navigate(`/Hr/job-postings/edit/${id}`)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              Edit
-            </button>
           </div>
         </div>
       </div>
@@ -188,6 +175,7 @@ export const JobPostingDetail = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Experience</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  {/* ❌ تم حذف عمود Action بالكامل */}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">

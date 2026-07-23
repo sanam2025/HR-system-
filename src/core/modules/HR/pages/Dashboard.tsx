@@ -1,15 +1,17 @@
 // src/core/modules/HR/pages/Dashboard.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Users, Calendar, TrendingUp, DollarSign, Megaphone, 
-  Building2, ChevronRight, 
+  Building2, ChevronRight, Plus, X
 } from 'lucide-react';
 import StatCard from '../Components/common_Components/StatCard';
-import { useActiveAnnouncements } from '../hooks/useAnnouncements';
+import { useActiveAnnouncements, useCreateAnnouncement } from '../hooks/useAnnouncements';
 import AnnouncementCard from '../Components/Special_Components/AnnouncementCard';
 import { useDepartmentsWithUsers } from '../hooks/useDepartments';
 import Loading from '../../../../shared/components/Loading';
+import toast from 'react-hot-toast';
+import type { CreateAnnouncementData } from '../../../../api/service/HrService/Types/AnnouncementsService.types';
 
 const STATS_DATA = {
   totalEmployees: 0,
@@ -29,17 +31,48 @@ const getStatValue = (key: keyof typeof STATS_DATA) => STATS_DATA[key];
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [showForm, setShowForm] = useState(false);
   
-  const { announcements, isLoading: announcementsLoading } = useActiveAnnouncements();
+  const { announcements, isLoading: announcementsLoading, refetch } = useActiveAnnouncements();
   const { departments, isLoading: departmentsLoading } = useDepartmentsWithUsers();
+  const createAnnouncement = useCreateAnnouncement();
+
+  const [formData, setFormData] = useState<CreateAnnouncementData>({
+    title: '',
+    content: '',
+    audience: 'all',
+    status: 'active',
+    starts_at: new Date().toISOString().slice(0, 16),
+    ends_at: '',
+  });
 
   const handleNavigate = (path: string) => () => navigate(path);
 
-  const hasAnnouncements = !announcementsLoading && announcements.length > 0;
   const hasDepartments = !departmentsLoading && departments.length > 0;
-
-  // ✅ حساب إجمالي الموظفين من الأقسام
   const totalEmployees = departments.reduce((acc, dept) => acc + (dept.employees?.length || 0), 0);
+
+  const handleCreateAnnouncement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.title || !formData.content) {
+      toast.error('Please fill in title and content');
+      return;
+    }
+    await createAnnouncement.mutateAsync(formData);
+    setShowForm(false);
+    setFormData({
+      title: '',
+      content: '',
+      audience: 'all',
+      status: 'active',
+      starts_at: new Date().toISOString().slice(0, 16),
+      ends_at: '',
+    });
+    refetch();
+  };
+
+  const handleAudienceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData({ ...formData, audience: e.target.value as CreateAnnouncementData['audience'] });
+  };
 
   if (departmentsLoading) {
     return (
@@ -57,23 +90,127 @@ export default function Dashboard() {
         <p className="text-gray-500 mt-1 text-sm">Overview of employee performance and statistics.</p>
       </div>
 
-      {/* ✅ Announcements Section */}
-      {hasAnnouncements && (
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
+      {/* ✅ Announcements Section مع زر الإضافة */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
             <Megaphone className="w-5 h-5 text-blue-500" />
             <h2 className="text-lg font-semibold text-gray-800">📢 Announcements</h2>
-            <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
-              {announcements.length}
-            </span>
+            {!announcementsLoading && (
+              <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
+                {announcements.length}
+              </span>
+            )}
           </div>
+          {/* ✅ زر إضافة تعميم جديد - يفتح الفورم في نفس الصفحة */}
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="flex items-center gap-2 px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Add Announcement
+          </button>
+        </div>
+
+        {/* ✅ Form Modal - يظهر في نفس الصفحة */}
+        {showForm && (
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">Create New Announcement</h3>
+              <button
+                onClick={() => setShowForm(false)}
+                className="p-1 hover:bg-gray-100 rounded"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <form onSubmit={handleCreateAnnouncement} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
+                <textarea
+                  value={formData.content}
+                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                  rows={3}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Audience</label>
+                <select
+                  value={formData.audience}
+                  onChange={handleAudienceChange}
+                  className="w-full px-3 py-2 border rounded-lg"
+                >
+                  <option value="all">All</option>
+                  <option value="employees">Employees</option>
+                  <option value="managers">Managers</option>
+                  <option value="hr">HR</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                <input
+                  type="datetime-local"
+                  value={formData.starts_at}
+                  onChange={(e) => setFormData({ ...formData, starts_at: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">End Date (optional)</label>
+                <input
+                  type="datetime-local"
+                  value={formData.ends_at}
+                  onChange={(e) => setFormData({ ...formData, ends_at: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={createAnnouncement.isPending}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+                >
+                  {createAnnouncement.isPending ? 'Creating...' : 'Create Announcement'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {!announcementsLoading && announcements.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {announcements.slice(0, 3).map((announcement) => (
               <AnnouncementCard key={announcement.id} announcement={announcement} />
             ))}
           </div>
-        </div>
-      )}
+        ) : (
+          !announcementsLoading && (
+            <div className="bg-gray-50 rounded-lg p-6 text-center text-gray-400 border border-dashed border-gray-300">
+              <Megaphone className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+              <p className="text-sm">No announcements at the moment</p>
+            </div>
+          )
+        )}
+      </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
@@ -89,7 +226,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* ✅ Departments Section - كاردات أقسام */}
+      {/* ✅ Departments Section */}
       {hasDepartments && (
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
