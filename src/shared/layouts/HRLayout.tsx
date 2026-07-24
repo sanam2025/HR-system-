@@ -60,17 +60,15 @@ export default function HRLayout() {
         onToggle={() => setOpen(!open)}
         open={open}
       />
-      <main
-        className={`flex-1 transition-all duration-300 ${open ? "ml-64" : "ml-20"}`}
-      >
+      <div className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${open ? 'md:ms-64' : 'md:ms-16'}`}>
         <div className="p-4 border-b bg-white flex justify-between items-center">
           <h1 className="text-xl font-bold text-gray-800"></h1>
           <LanguageSwitcher />
         </div>
-        <div className="p-6">
+        <main className="flex-1 p-6 pb-16 overflow-x-hidden overflow-y-auto">
           <Outlet />
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

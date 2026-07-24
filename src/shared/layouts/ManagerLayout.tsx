@@ -4,37 +4,41 @@ import {
 } from 'lucide-react';
 import type { NavItem } from '../components/SideBar';
 import AppLayout from './AppLayout';
-
-const navItems: NavItem[] = [
-  { label: 'Dashboard',   icon: LayoutDashboard, path: '/manager',             exact: true  },
-  { label: 'Employees',   icon: Users,           path: '/manager/employees',   exact: false },
-  { label: 'Tasks',       icon: CheckSquare,     path: '/manager/tasks',       exact: false },
-  { label: 'Leaves',      icon: CalendarOff,     path: '/manager/leaves',      exact: false },
-  { label: 'Overtime',    icon: Clock,           path: '/manager/overtime',    exact: false },
-  { label: 'Attendance',  icon: BarChart2,       path: '/manager/attendance',  exact: false },
-  { label: 'Evaluation',  icon: TrendingUp,      path: '/manager/evaluation',  exact: false },
-  { label: 'Recruitment', icon: Briefcase,       path: '/manager/recruitment', exact: false },
-];
-
-const pageTitles: Record<string, string> = {
-  '/manager':             'Dashboard',
-  '/manager/employees':   'Employees',
-  '/manager/tasks':       'Tasks',
-  '/manager/leaves':      'Leaves',
-  '/manager/overtime':    'Overtime',
-  '/manager/attendance':  'Attendance',
-  '/manager/evaluation':  'Evaluation',
-  '/manager/recruitment': 'Recruitment',
-};
+import { useLanguage } from '../../i18n/translations/LanguageContext';
 
 export default function ManagerLayout() {
+  const { t } = useLanguage();
+
+  const navItems: NavItem[] = [
+    { label: t.nav.dashboard,   icon: LayoutDashboard, path: '/manager',             exact: true  },
+    { label: t.nav.employees,   icon: Users,           path: '/manager/employees',   exact: false },
+    { label: t.nav.tasks,       icon: CheckSquare,     path: '/manager/tasks',       exact: false },
+    { label: t.nav.leaves,      icon: CalendarOff,     path: '/manager/leaves',      exact: false },
+    { label: t.nav.overtime,    icon: Clock,           path: '/manager/overtime',    exact: false },
+    { label: t.nav.attendance,  icon: BarChart2,       path: '/manager/attendance',  exact: false },
+    { label: t.nav.evaluation,  icon: TrendingUp,      path: '/manager/evaluation',  exact: false },
+    { label: t.nav.recruitment, icon: Briefcase,       path: '/manager/recruitment', exact: false },
+  ];
+
+  const pageTitles: Record<string, string> = {
+    '/manager':             t.nav.dashboard,
+    '/manager/employees':   t.nav.employees,
+    '/manager/tasks':       t.nav.tasks,
+    '/manager/leaves':      t.nav.leaves,
+    '/manager/overtime':    t.nav.overtime,
+    '/manager/attendance':  t.nav.attendance,
+    '/manager/evaluation':  t.nav.evaluation,
+    '/manager/recruitment': t.nav.recruitment,
+  };
+
   return (
     <AppLayout
       navItems={navItems}
       pageTitles={pageTitles}
-      brand={{ logo: '🏢', title: 'HR System', subtitle: 'Damascus University' }}
-      user={{ avatar: 'M', name: 'Mohamed Ahmed', role: 'Department Manager' }}
-      navSectionLabel="Main Menu"
+      brand={{ logo: '🏢', title: t.layout.systemName, subtitle: t.layout.university }}
+      user={{ avatar: t.layout.userAvatar, name: t.layout.userName, role: t.layout.managerRole }}
+      navSectionLabel={t.nav.mainMenu}
+      defaultTitle={t.nav.dashboard}
     />
   );
 }

@@ -10,8 +10,10 @@ import Terminations from "./core/modules/HR/pages/Terminations";
 import Resignations from "./core/modules/HR/pages/Resignations";
 import Contracts from "./core/modules/HR/pages/Contracts";
 import ManagerLayout from "./shared/layouts/ManagerLayout";
-import EmployeesList from "./core/pages/manager/EmployeesList";
-import EmployeeProfile from "./core/pages/manager/EmployeeProfile";
+// import EmployeesList from "./core/pages/manager/EmployeesList";
+// import EmployeeProfile from "./core/pages/manager/EmployeeProfile";
+import EmployeesList from "./core/pages/manager/components/EmployeesList";
+import EmployeeProfile from "./core/pages/manager/components/EmployeeProfile";
 import TasksBoard from "./core/pages/Tasks/TasksBoard";
 import EmployeeLayout from "./shared/layouts/EmployeeLayout";
 import EmployeeDashboard from "./core/modules/employee/pages/EmployeeDashboard";
@@ -33,7 +35,7 @@ import { HourlyLeaves } from "./core/modules/HR/pages/HourlyLeaves/HourlyLeaves"
 import { SendOffer } from "./core/modules/HR/pages/Offers/SendOffer";
 import { Offers } from "./core/modules/HR/pages/Offers/Offers";
 import JobRequisitionDetail from "./core/modules/HR/pages/Recruitment/JobRequisitionDetail";
-// ✅ Announcements
+// ✅ Announcements (HR)
 import Announcements from "./core/modules/HR/pages/Announcements/Announcements";
 // ✅ Complaints
 import Complaints from "./core/modules/HR/pages/Complaints/Complaints";
@@ -42,6 +44,18 @@ import ComplaintDetail from "./core/modules/HR/pages/Complaints/ComplaintDetail"
 import EmployeeProfileHR from "./core/modules/HR/pages/EmployeeProfile";
 // ✅ Department Detail
 import DepartmentDetail from "./core/modules/HR/pages/DepartmentDetail";
+import PublicJobsPage from "./core/pages/PublicJobs/PublicJobsPage";
+import LeaveRequests from "./core/pages/Leaves/LeaveRequests";
+import OvertimeRequests from "./core/pages/Leaves/OvertimeRequests";
+import AttendanceView from "./core/pages/Attendance/AttendanceView";
+import PeriodicEvaluation from "./core/pages/Evaluation/PeriodicEvaluation";
+import AdminLayout from "./shared/layouts/AdminLayout";
+import SystemSettings from "./core/modules/admin/pages/SystemSettings";
+import AdminAnnouncements from "./core/modules/admin/pages/Announcements";
+import OrganizationlStructure from "./core/modules/admin/pages/OrganizationlStructure";
+import Reports from "./core/modules/admin/pages/Reports";
+import EmployeeSearch from "./core/modules/admin/pages/EmployeeSearch";
+import DashboardAdmin from "./core/modules/admin/pages/Dashboard";
 
 function Page({ title }: { title: string }) {
   return (
@@ -142,18 +156,22 @@ const appRouter = createBrowserRouter([
     ],
   },
   {
-    path: "/manager",
+    path: '/careers',
+    element: <PublicJobsPage />,
+  },
+  {
+    path: '/manager',
     element: <ManagerLayout />,
     children: [
-      { index: true, element: <Page title="Dashboard" /> },
-      { path: "employees", element: <EmployeesList /> },
-      { path: "employees/:id", element: <EmployeeProfile /> },
-      { path: "tasks", element: <TasksBoard /> },
-      { path: "leaves", element: <Page title="Leaves" /> },
-      { path: "overtime", element: <Page title="Overtime" /> },
-      { path: "attendance", element: <Page title="Attendance" /> },
-      { path: "evaluation", element: <Page title="Evaluation" /> },
-      { path: "recruitment", element: <Page title="Recruitment" /> },
+      { index: true, element: <Dashboard /> },
+      { path: 'employees', element: <EmployeesList /> },
+      { path: 'employees/:id', element: <EmployeeProfile /> },
+      { path: 'tasks', element: <TasksBoard /> },
+      { path: 'leaves', element: <LeaveRequests /> },
+      { path: 'overtime', element: <OvertimeRequests /> },
+      { path: 'attendance', element: <AttendanceView /> },
+      { path: 'evaluation', element: <PeriodicEvaluation /> },
+      { path: 'recruitment', element: <Recruitment /> },
     ],
   },
   {
@@ -167,6 +185,18 @@ const appRouter = createBrowserRouter([
       { path: "attendance", element: <EmployeeAttendance /> },
     ],
   },
+  {
+        path:'/admin',
+        element:<AdminLayout/>,
+        children:[
+            {index:true , element:<DashboardAdmin/>},
+            {path:'setting' , element:<SystemSettings/>},
+            {path:'announcement' , element:<AdminAnnouncements/>},
+            {path:'organization' , element:<OrganizationlStructure/>},
+            {path:'report' , element:<Reports/>},
+            {path:'search' , element:<EmployeeSearch/>}
+        ]
+    }
 ]);
 
 export default function AppRouter() {
