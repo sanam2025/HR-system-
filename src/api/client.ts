@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = 'http://masarhr.alwaysdata.net/api/'
+const BASE_URL = 'https://masarhr.alwaysdata.net/api/'
 
 
 export const apiClient = axios.create({

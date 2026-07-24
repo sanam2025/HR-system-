@@ -1,5 +1,5 @@
 // src/AppRouter.tsx
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import HRLayout from "./shared/layouts/HRLayout";
 import Dashboard from "./core/modules/HR/pages/Dashboard";
 import Employees from "./core/modules/HR/pages/Employees";
@@ -66,6 +66,10 @@ function Page({ title }: { title: string }) {
 }
 
 const appRouter = createBrowserRouter([
+  {
+    path: "/",
+    element: <Navigate to="/Hr" replace />
+  },
   {
     path: "/Hr",
     element: <HRLayout />,

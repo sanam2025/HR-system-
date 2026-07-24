@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // ── Base URL ──────────────────────────────────────────────────
-const BASE_URL = 'http://masarhr.alwaysdata.net/api/';
+const BASE_URL = 'https://masarhr.alwaysdata.net/api/';
 
 // ── Axios Instance ────────────────────────────────────────────
 const apiClient = axios.create({

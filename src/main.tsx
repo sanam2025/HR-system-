@@ -7,7 +7,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import './i18n'; 
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1, // Only retry once instead of 3 times to fail faster
+      refetchOnWindowFocus: false, // Don't refetch every time the window is focused
+    },
+  },
+});
 
 // ── Error Boundary ──
 interface ErrorBoundaryState {
