@@ -35,10 +35,7 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
-<<<<<<< HEAD
-=======
 
->>>>>>> 271086e7cd8c96c23a144f90f4cb6ee09648fe98
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -49,33 +46,6 @@
    ANIMATIONS
    ======================================== */
 @layer utilities {
-<<<<<<< HEAD
-  @keyframes slide-up {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  .animate-slide-up {
-    animation: slide-up 0.2s ease-out;
-  }
-  .animate-fade-in {
-    animation: fade-in 0.15s ease-out;
-  }
-=======
   .shadow-card {
     box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
   }
@@ -89,7 +59,6 @@
       opacity: 0;
       transform: translateY(8px);
     }
-
     to {
       opacity: 1;
       transform: translateY(0);
@@ -100,7 +69,6 @@
     from {
       opacity: 0;
     }
-
     to {
       opacity: 1;
     }
@@ -122,14 +90,12 @@
   .animate-slide-down {
     animation: slide-down 0.18s ease;
   }
-
->>>>>>> 271086e7cd8c96c23a144f90f4cb6ee09648fe98
   .shadow-modal {
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   }
 }
 
-<<<<<<< HEAD
+
 /* ========================================
    RESPONSIVE STATS CARDS GRID
    ======================================== */
@@ -262,7 +228,7 @@ button {
     margin-left: 80px !important;
   }
 }
-=======
+
 @layer components {
   .btn {
     @apply px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 inline-flex items-center justify-center;
@@ -284,4 +250,4 @@ button {
     @apply w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-[#4A4E4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4A7C59]/30 focus:border-[#4A7C59] transition-all duration-150;
   }
 }
->>>>>>> 271086e7cd8c96c23a144f90f4cb6ee09648fe98
+

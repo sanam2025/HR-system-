@@ -9,7 +9,7 @@ import {
   AlertCircle,
   Send,
 } from "lucide-react";
-import type { JobPostingData } from "../../types/recruitment.types";
+import type { JobPosting as JobPostingData } from "../../../../../api/service/HrService/Types/JobPostingsService.types";
 
 interface JobPostingFormProps {
   isOpen: boolean;
