@@ -26,6 +26,13 @@ export default function AppLayout({
   const location = useLocation();
   const { i18n, t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
+  const { currentUser } = useAuthStore();
+  
+  const displayUser = user || {
+    name: currentUser?.name || t('userName'),
+    role: currentUser?.role || t('managerRole'),
+    avatar: currentUser?.name ? currentUser.name[0] : t('userAvatar')
+  };
 
   const toggleSidebar = useCallback(() => setSidebarOpen(open => !open), []);
 
