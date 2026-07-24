@@ -1,6 +1,7 @@
 // core/modules/Admin/pages/Announcements.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { 
   Megaphone, 
   Plus, 
@@ -15,6 +16,7 @@ import {
 } from "lucide-react";
 
 export default function Announcements() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   const announcements = [
@@ -48,18 +50,18 @@ export default function Announcements() {
   ];
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Announcements</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('announcements')}</h1>
           <p className="text-gray-500 mt-1 text-sm">
-            Create and manage company announcements
+            {t('manageAnnouncements')}
           </p>
         </div>
         <button className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2">
           <Plus className="w-4 h-4" />
-          New Announcement
+          {t('newAnnouncement')}
         </button>
       </div>
 
@@ -68,7 +70,7 @@ export default function Announcements() {
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Total</p>
+              <p className="text-sm text-gray-500">{t('total')}</p>
               <p className="text-2xl font-bold text-gray-900">12</p>
             </div>
             <div className="bg-blue-50 text-blue-600 p-3 rounded-xl">
@@ -80,7 +82,7 @@ export default function Announcements() {
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Active</p>
+              <p className="text-sm text-gray-500">{t('active')}</p>
               <p className="text-2xl font-bold text-emerald-600">8</p>
             </div>
             <div className="bg-emerald-50 text-emerald-600 p-3 rounded-xl">
@@ -92,7 +94,7 @@ export default function Announcements() {
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">High Priority</p>
+              <p className="text-sm text-gray-500">{t('highPriority')}</p>
               <p className="text-2xl font-bold text-red-600">4</p>
             </div>
             <div className="bg-red-50 text-red-600 p-3 rounded-xl">
@@ -104,7 +106,7 @@ export default function Announcements() {
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Expired</p>
+              <p className="text-sm text-gray-500">{t('expired')}</p>
               <p className="text-2xl font-bold text-gray-400">4</p>
             </div>
             <div className="bg-gray-50 text-gray-400 p-3 rounded-xl">
@@ -117,7 +119,7 @@ export default function Announcements() {
       {/* Announcements List */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800">All Announcements</h3>
+          <h3 className="text-lg font-semibold text-gray-800">{t('allAnnouncements')}</h3>
         </div>
         <div className="divide-y divide-gray-50">
           {announcements.map((announcement) => (
@@ -131,14 +133,14 @@ export default function Announcements() {
                         ? "bg-red-50 text-red-600" 
                         : "bg-yellow-50 text-yellow-600"
                     }`}>
-                      {announcement.priority}
+                      {t(announcement.priority.toLowerCase())}
                     </span>
                     <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                       announcement.status === "Active" 
                         ? "bg-emerald-50 text-emerald-600" 
                         : "bg-gray-50 text-gray-400"
                     }`}>
-                      {announcement.status}
+                      {t(announcement.status.toLowerCase())}
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 mb-2">{announcement.content}</p>

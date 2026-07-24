@@ -1,6 +1,6 @@
-// src/api/service/HrService/JobPostingsService.ts
+﻿// src/api/service/HrService/JobPostingsService.ts
 import type { APIResponseWithData } from "./Types/types.types";
-import { apiClient } from "../../client";
+import apiClient from '@/api/axios';
 import type { JobPosting, JobPostingSingleResponse } from "./Types/JobPostingsService.types";
 
 export const JobPostingsService = {

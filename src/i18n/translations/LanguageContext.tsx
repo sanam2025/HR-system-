@@ -18,11 +18,20 @@ type LanguageContextType = {
 
 const LanguageContext = createContext<LanguageContextType | null>(null);
 
+import i18next from '../index'; // import i18n instance
+
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const [lang, setLang] = useState<Lang>(() => {
         const stored = localStorage.getItem('lang');
         return (stored === 'en' ? 'en' : 'ar');
     });
+
+    useEffect(() => {
+        // Sync i18next initial language
+        if (i18next.language !== lang) {
+            i18next.changeLanguage(lang);
+        }
+    }, []);
 
     const t = translations[lang] || translations.ar;
     const isRTL = lang === 'ar';
@@ -32,6 +41,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         const next: Lang = lang === 'ar' ? 'en' : 'ar';
         setLang(next);
         localStorage.setItem('lang', next);
+        i18next.changeLanguage(next);
     };
 
     // Update document direction and font when language changes

@@ -1,6 +1,7 @@
 // core/modules/HR/pages/AcceptedCandidates.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Users } from "lucide-react";
 import AcceptedCandidateRow from "../Components/Special_Components/AcceptedCandidateRow";
 import JobOfferModal from "../Components/Special_Components/JobOfferModal";
@@ -53,18 +54,19 @@ const INITIAL_CANDIDATES: AcceptedCandidate[] = [
   },
 ];
 
-const COLUMNS = [
-  "Candidate",
-  "Position",
-  "Department",
-  "Interview Date",
-  "Offer Status",
-  "Actions",
+const COLUMNS_KEYS = [
+  { key: "candidate", label: "Candidate" },
+  { key: "position", label: "Position" },
+  { key: "department", label: "Department" },
+  { key: "interviewDate", label: "Interview Date" },
+  { key: "offerStatus", label: "Offer Status" },
+  { key: "actions", label: "Actions" },
 ];
 
 // ============= MAIN =============
 export default function AcceptedCandidates() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [candidates, setCandidates] =
     useState<AcceptedCandidate[]>(INITIAL_CANDIDATES);
   const [selectedCandidate, setSelectedCandidate] =
@@ -90,7 +92,7 @@ export default function AcceptedCandidates() {
           : c,
       ),
     );
-    alert(`✅ Job offer sent to ${offerData.candidateName}`);
+    alert(`Job offer sent to ${offerData.candidateName}`);
     setIsOfferModalOpen(false);
   };
 
@@ -100,27 +102,27 @@ export default function AcceptedCandidates() {
         c.id === candidate.id ? { ...c, employmentStatus: "converted" } : c,
       ),
     );
-    alert(`✅ ${candidate.name} has been converted to an employee`);
+    alert(`${candidate.name} has been converted to an employee`);
   };
 
   const handleViewDetails = (candidate: AcceptedCandidate) => {
     alert(
-      `📋 ${candidate.name}\nPosition: ${candidate.position}\nInterview Date: ${candidate.interviewDate}\nResult: ${candidate.interviewResult}`,
+      `${candidate.name}\nPosition: ${candidate.position}\nInterview Date: ${candidate.interviewDate}\nResult: ${candidate.interviewResult}`,
     );
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-8">
         <button
           onClick={() => navigate("/Hr/recruitment")}
           className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Recruitment
+          <ArrowLeft className="w-4 h-4" /> {t('backToRecruitmentLink') || 'Back to Recruitment'}
         </button>
-        <h1 className="text-2xl font-bold">Accepted Candidates</h1>
+        <h1 className="text-2xl font-bold">{t('acceptedCandidatesTitle') || 'Accepted Candidates'}</h1>
         <p className="text-gray-500 text-sm mt-1">
-          Manage candidates who passed the manager interview.
+          {t('manageAcceptedCandidates') || 'Manage candidates who passed the manager interview.'}
         </p>
       </div>
 
@@ -130,12 +132,12 @@ export default function AcceptedCandidates() {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                {COLUMNS.map((col) => (
+                {COLUMNS_KEYS.map((col) => (
                   <th
-                    key={col}
+                    key={col.key}
                     className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider"
                   >
-                    {col}
+                    {t(col.key) || col.label}
                   </th>
                 ))}
               </tr>
@@ -158,7 +160,7 @@ export default function AcceptedCandidates() {
           <div className="text-center py-12">
             <Users className="w-10 h-10 text-gray-300 mx-auto mb-2" />
             <p className="text-sm text-gray-400">
-              No accepted candidates found
+              {t('noAcceptedCandidates') || 'No accepted candidates found'}
             </p>
           </div>
         )}

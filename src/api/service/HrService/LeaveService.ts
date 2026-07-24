@@ -1,5 +1,5 @@
-// src/api/service/HrService/LeaveService.ts
-import { apiClient } from '../../client';
+﻿// src/api/service/HrService/LeaveService.ts
+import apiClient from '@/api/axios';
 
 export interface LeaveRequest {
   id: number;
@@ -22,29 +22,29 @@ export interface LeaveBalance {
 }
 
 export const LeaveService = {
-  // ✅ جلب كل الطلبات
+  // جلب كل الطلبات
   getAll: () => apiClient.get<{ data: LeaveRequest[] }>('/leaveRequests'),
 
-  // ✅ جلب تفاصيل طلب
+  // جلب تفاصيل طلب
   getById: (id: number) => apiClient.get<{ data: LeaveRequest }>(`/leaveRequests/${id}`),
 
-  // ✅ موافقة على طلب
+  // موافقة على طلب
   approve: (id: number) => apiClient.put(`/leave-requests/${id}/approve`),
 
-  // ✅ رفض طلب
+  // رفض طلب
   reject: (id: number) => apiClient.put(`/leave-requests/${id}/reject`),
 
-  // ✅ رصيد إجازات موظف
+  // رصيد إجازات موظف
   getBalance: (employeeId: number) =>
     apiClient.get<{ data: LeaveBalance }>(`/employee-leave/${employeeId}/balance`),
 
-  // ✅ طلبات قسم معين
+  // طلبات قسم معين
   getDepartmentRequests: (status?: string) =>
     apiClient.get<{ data: LeaveRequest[] }>(
       `/department-leave-request${status ? `?status=${status}` : ''}`
     ),
 
-  // ✅ كل طلبات الإجازات (مع فلترة)
+  // كل طلبات الإجازات (مع فلترة)
   getAllRequests: (from?: string, to?: string) => {
     let url = '/all-leave-request';
     const params = new URLSearchParams();

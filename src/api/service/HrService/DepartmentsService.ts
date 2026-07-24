@@ -1,24 +1,24 @@
-// src/api/service/HrService/DepartmentsService.ts
-import { apiClient } from '../../client';
+﻿// src/api/service/HrService/DepartmentsService.ts
+import apiClient from '@/api/axios';
 import type {  DepartmentWithEmployees, Employee, Profile } from './Types/DepartmentsService.types';
 
 export const DepartmentsService = {
-  // ✅ جلب كل الأقسام مع الموظفين والمدراء
+  // جلب كل الأقسام مع الموظفين والمدراء
   getAllWithUsers: () => apiClient.get<{ data: DepartmentWithEmployees[] }>('/department/users'),
 
-  // ✅ جلب موظفي قسم معين
+  // جلب موظفي قسم معين
   getDepartmentEmployees: (departmentId: number) => 
     apiClient.get<{ data: Employee[] }>(`/department/${departmentId}/employees`),
 
-  // ✅ جلب بروفايل موظف
+  // جلب بروفايل موظف
   getProfile: (userId: number) => 
     apiClient.get<{ data: Profile }>(`/profiles/${userId}`),
 
-  // ✅ جلب بروفايل المستخدم الحالي
+  // جلب بروفايل المستخدم الحالي
   getMyProfile: () => 
     apiClient.get<{ data: Profile }>('/profiles'),
 
-  // ✅ جلب موظفي المدير
+  // جلب موظفي المدير
   getManagerEmployees: () => 
     apiClient.get<{ data: Employee[] }>('/manager-employees'),
 };

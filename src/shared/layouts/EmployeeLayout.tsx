@@ -4,23 +4,26 @@ import {
 import type { NavItem } from "../components/SideBar";
 import AppLayout from "./AppLayout";
 
-const navItems: NavItem[] = [
-  { label: "Dashboard",          icon: LayoutDashboard, path: "/employee",             exact: true  },
-  { label: "Profile",            icon: User,           path: "/employee/profile",      exact: false },
-  { label: "Attendance & Leaves", icon: CalendarCheck,  path: "/employee/attendance",   exact: false },
-  { label: "Tasks",              icon: ListTodo,        path: "/employee/tasks",        exact: false },
-  { label: "Finance",            icon: Wallet,          path: "/employee/finance",      exact: false },
-];
-
-const pageTitles: Record<string, string> = {
-  "/employee":             "Dashboard",
-  "/employee/profile":     "Profile",
-  "/employee/attendance":  "Attendance & Leaves",
-  "/employee/tasks":       "Tasks",
-  "/employee/finance":     "Finance",
-};
+import { useTranslation } from 'react-i18next';
 
 export default function EmployeeLayout() {
+  const { t } = useTranslation();
+
+  const navItems: NavItem[] = [
+    { label: t('dashboard'), icon: LayoutDashboard, path: "/employee", exact: true },
+    { label: t('profile'), icon: User, path: "/employee/profile", exact: false },
+    { label: t('attendance'), icon: CalendarCheck, path: "/employee/attendance", exact: false },
+    { label: t('tasks'), icon: ListTodo, path: "/employee/tasks", exact: false },
+    { label: t('finance'), icon: Wallet, path: "/employee/finance", exact: false },
+  ];
+
+  const pageTitles: Record<string, string> = {
+    "/employee": t('dashboard'),
+    "/employee/profile": t('profile'),
+    "/employee/attendance": t('attendance'),
+    "/employee/tasks": t('tasks'),
+    "/employee/finance": t('finance'),
+  };
   return (
     <AppLayout
       navItems={navItems}

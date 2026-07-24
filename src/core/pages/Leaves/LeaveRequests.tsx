@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { CheckCircle, XCircle, Calendar, User, Clock, AlertTriangle } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
-import useManagerStore from '@/store/managerStore';
+import { useRequestsStore } from '@/store/requestsStore';
 
 const typeColors: Record<string, string> = {
   'سنوية': 'bg-blue-50 text-blue-700',
@@ -16,8 +16,8 @@ export default function LeaveRequests() {
   const tabs = [t.leaves.tabs.all, t.leaves.tabs.pending, t.leaves.tabs.approved, t.leaves.tabs.rejected];
   const tabKeys = ['all', 'معلقة', 'موافقة', 'مرفوضة'];
 
-  const requests = useManagerStore((s) => s.leaveRequests);
-  const updateLeaveRequestStatus = useManagerStore((s) => s.updateLeaveRequestStatus);
+  const requests = useRequestsStore((s) => s.leaveRequests);
+  const updateLeaveRequestStatus = useRequestsStore((s) => s.updateLeaveRequestStatus);
 
   const [activeTabIdx, setActiveTabIdx] = useState(1); // default: Pending
   const [confirm, setConfirm] = useState<{ id: number; action: 'approve' | 'reject' } | null>(null);
@@ -135,7 +135,7 @@ export default function LeaveRequests() {
       {confirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in p-4">
           <div className="bg-white rounded-2xl shadow-modal p-6 max-w-sm w-full animate-slide-up text-center">
-            <div className="text-4xl mb-3">{confirm.action === 'approve' ? '✅' : '❌'}</div>
+            <div className="text-4xl mb-3">{confirm.action === 'approve' ? '' : ''}</div>
             <h3 className="font-bold text-dark text-lg mb-2">
               {confirm.action === 'approve' ? t.leaves.confirmModal.approveTitle : t.leaves.confirmModal.rejectTitle}
             </h3>

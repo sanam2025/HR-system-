@@ -1,8 +1,9 @@
 import { Menu, Search, X, Users, LayoutDashboard, CheckSquare, CalendarOff, Clock, BarChart2, TrendingUp, Briefcase, User } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../../i18n/translations/LanguageContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { mockEmployees } from '../../data/mockData';
+import NotificationDropdown from './NotificationDropdown';
 
 interface TopbarProps {
   title: string;
@@ -10,7 +11,7 @@ interface TopbarProps {
   user?: { avatar: string; name: string; role: string };
 }
 
-const PAGES = [
+const MANAGER_PAGES = [
   { labelAr: 'لوحة التحكم', labelEn: 'Dashboard', path: '/manager', icon: LayoutDashboard },
   { labelAr: 'الموظفون', labelEn: 'Employees', path: '/manager/employees', icon: Users },
   { labelAr: 'المهام', labelEn: 'Tasks', path: '/manager/tasks', icon: CheckSquare },
@@ -21,6 +22,26 @@ const PAGES = [
   { labelAr: 'التوظيف', labelEn: 'Recruitment', path: '/manager/recruitment', icon: Briefcase },
 ];
 
+const HR_PAGES = [
+  { labelAr: 'لوحة التحكم', labelEn: 'Dashboard', path: '/Hr', icon: LayoutDashboard },
+  { labelAr: 'الموظفون', labelEn: 'Employees', path: '/Hr/employees', icon: Users },
+  { labelAr: 'التوظيف', labelEn: 'Recruitment', path: '/Hr/Recruitment', icon: Briefcase },
+  { labelAr: 'الحضور', labelEn: 'Attendance', path: '/Hr/attendance', icon: Clock },
+  { labelAr: 'الرواتب', labelEn: 'Payroll', path: '/Hr/Payroll', icon: CheckSquare },
+];
+
+const ADMIN_PAGES = [
+  { labelAr: 'لوحة التحكم', labelEn: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+  { labelAr: 'الإعدادات', labelEn: 'Settings', path: '/admin/setting', icon: CheckSquare },
+  { labelAr: 'التقارير', labelEn: 'Reports', path: '/admin/report', icon: BarChart2 },
+];
+
+const EMPLOYEE_PAGES = [
+  { labelAr: 'لوحة التحكم', labelEn: 'Dashboard', path: '/employee', icon: LayoutDashboard },
+  { labelAr: 'الحضور', labelEn: 'Attendance', path: '/employee/attendance', icon: Clock },
+  { labelAr: 'المهام', labelEn: 'Tasks', path: '/employee/tasks', icon: CheckSquare },
+];
+
 export default function Topbar({
   title,
   onToggleSidebar,
@@ -28,11 +49,22 @@ export default function Topbar({
 }: TopbarProps) {
   const { lang, toggleLang } = useLanguage();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [profileOpen, setProfileOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  // Determine active pages based on current route prefix
+  const getActivePages = () => {
+    if (location.pathname.startsWith('/admin')) return ADMIN_PAGES;
+    if (location.pathname.startsWith('/Hr')) return HR_PAGES;
+    if (location.pathname.startsWith('/employee')) return EMPLOYEE_PAGES;
+    return MANAGER_PAGES;
+  };
+
+  const activePages = getActivePages();
 
   // Close on Escape
   useEffect(() => {
@@ -65,11 +97,11 @@ export default function Topbar({
   const q = query.trim().toLowerCase();
 
   const matchedPages = q
-    ? PAGES.filter(p =>
+    ? activePages.filter(p =>
       p.labelAr.includes(query) ||
       p.labelEn.toLowerCase().includes(q)
     )
-    : PAGES;
+    : activePages;
 
   const matchedEmployees = q
     ? mockEmployees.filter(e =>
@@ -137,6 +169,9 @@ export default function Topbar({
             <span className="text-gray-300 font-normal">|</span>
             <span className={`font-tajawal text-[13px] leading-none ${lang === 'ar' ? 'text-green font-bold' : 'text-gray-400'}`}>ع</span>
           </button>
+
+          {/* Notification Dropdown */}
+          <NotificationDropdown />
 
           {/* User Avatar + Dropdown */}
           <div className="relative" ref={profileRef}>

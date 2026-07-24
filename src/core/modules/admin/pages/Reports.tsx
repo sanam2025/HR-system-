@@ -1,6 +1,7 @@
 // core/modules/Admin/pages/Reports.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   BarChart,
   TrendingUp,
@@ -34,78 +35,79 @@ import {
 } from "recharts";
 
 export default function Reports() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   const reports = [
-    { title: "Attendance Report", value: "92%", change: "+3%", color: "emerald", icon: TrendingUp },
-    { title: "Employee Turnover", value: "8%", change: "-2%", color: "blue", icon: Users },
-    { title: "Payroll Summary", value: "SAR 485K", change: "+5%", color: "purple", icon: DollarSign },
-    { title: "Leave Usage", value: "156 days", change: "+12%", color: "orange", icon: Calendar },
+    { title: t('attendanceReport'), value: "92%", change: "+3%", color: "emerald", icon: TrendingUp },
+    { title: t('employeeTurnover'), value: "8%", change: "-2%", color: "blue", icon: Users },
+    { title: t('payrollSummary'), value: t('sar485k'), change: "+5%", color: "purple", icon: DollarSign },
+    { title: t('leaveUsage'), value: t('days156'), change: "+12%", color: "orange", icon: Calendar },
   ];
 
   // Chart Data
   const attendanceTrendData = [
-    { week: "Week 1", rate: 88, target: 90 },
-    { week: "Week 2", rate: 92, target: 90 },
-    { week: "Week 3", rate: 85, target: 90 },
-    { week: "Week 4", rate: 95, target: 90 },
-    { week: "Week 5", rate: 89, target: 90 },
+    { week: t('week1'), rate: 88, target: 90 },
+    { week: t('week2'), rate: 92, target: 90 },
+    { week: t('week3'), rate: 85, target: 90 },
+    { week: t('week4'), rate: 95, target: 90 },
+    { week: t('week5'), rate: 89, target: 90 },
   ];
 
   const departmentDistributionData = [
-    { name: "IT", value: 35, color: "#3b82f6" },
-    { name: "Sales", value: 28, color: "#f59e0b" },
-    { name: "Finance", value: 22, color: "#8b5cf6" },
-    { name: "HR", value: 15, color: "#10b981" },
+    { name: t('itDept'), value: 35, color: "#3b82f6" },
+    { name: t('salesDept'), value: 28, color: "#f59e0b" },
+    { name: t('financeDept'), value: 22, color: "#8b5cf6" },
+    { name: t('hrDept'), value: 15, color: "#10b981" },
   ];
 
   const monthlyPayrollData = [
-    { month: "Jan", amount: 420000, bonus: 25000 },
-    { month: "Feb", amount: 435000, bonus: 28000 },
-    { month: "Mar", amount: 450000, bonus: 32000 },
-    { month: "Apr", amount: 460000, bonus: 30000 },
-    { month: "May", amount: 475000, bonus: 35000 },
-    { month: "Jun", amount: 485000, bonus: 38000 },
+    { month: t('jan'), amount: 420000, bonus: 25000 },
+    { month: t('feb'), amount: 435000, bonus: 28000 },
+    { month: t('mar'), amount: 450000, bonus: 32000 },
+    { month: t('apr'), amount: 460000, bonus: 30000 },
+    { month: t('may'), amount: 475000, bonus: 35000 },
+    { month: t('jun'), amount: 485000, bonus: 38000 },
   ];
 
   const leaveUsageData = [
-    { department: "IT", annual: 12, sick: 4, personal: 3 },
-    { department: "Sales", annual: 15, sick: 6, personal: 5 },
-    { department: "Finance", annual: 10, sick: 3, personal: 2 },
-    { department: "HR", annual: 14, sick: 5, personal: 4 },
-    { department: "Operations", annual: 11, sick: 4, personal: 3 },
+    { department: t('itDept'), annual: 12, sick: 4, personal: 3 },
+    { department: t('salesDept'), annual: 15, sick: 6, personal: 5 },
+    { department: t('financeDept'), annual: 10, sick: 3, personal: 2 },
+    { department: t('hrDept'), annual: 14, sick: 5, personal: 4 },
+    { department: t('operationsDept'), annual: 11, sick: 4, personal: 3 },
   ];
 
   const employeeSatisfactionData = [
-    { department: "IT", satisfaction: 4.2 },
-    { department: "Sales", satisfaction: 3.8 },
-    { department: "Finance", satisfaction: 4.5 },
-    { department: "HR", satisfaction: 4.7 },
-    { department: "Operations", satisfaction: 3.9 },
+    { department: t('itDept'), satisfaction: 4.2 },
+    { department: t('salesDept'), satisfaction: 3.8 },
+    { department: t('financeDept'), satisfaction: 4.5 },
+    { department: t('hrDept'), satisfaction: 4.7 },
+    { department: t('operationsDept'), satisfaction: 3.9 },
   ];
 
   const applicantPipelineData = [
-    { stage: "Applications", count: 156, color: "#3b82f6" },
-    { stage: "Interviews", count: 89, color: "#8b5cf6" },
-    { stage: "Job Offers", count: 34, color: "#f59e0b" },
-    { stage: "Hired", count: 12, color: "#10b981" },
+    { stage: t('applications'), count: 156, color: "#3b82f6" },
+    { stage: t('interviews'), count: 89, color: "#8b5cf6" },
+    { stage: t('jobOffers'), count: 34, color: "#f59e0b" },
+    { stage: t('hired'), count: 12, color: "#10b981" },
   ];
 
   const COLORS = ["#3b82f6", "#f59e0b", "#8b5cf6", "#10b981", "#ef4444"];
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reports & Analytics</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('reportsAnalytics')}</h1>
           <p className="text-gray-500 mt-1 text-sm">
-            View and export company analytics and reports
+            {t('viewExportAnalytics')}
           </p>
         </div>
         <button className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2">
           <Download className="w-4 h-4" />
-          Export All
+          {t('exportAll')}
         </button>
       </div>
 
@@ -141,7 +143,7 @@ export default function Reports() {
         {/* Attendance Trend - Line Chart with Target */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="font-semibold text-gray-800">Attendance Trend vs Target</h3>
+            <h3 className="font-semibold text-gray-800">{t('attendanceTrendTarget')}</h3>
             <LineChart className="w-5 h-5 text-gray-400" />
           </div>
           <ResponsiveContainer width="100%" height={300}>
@@ -154,6 +156,7 @@ export default function Reports() {
               <Line
                 type="monotone"
                 dataKey="rate"
+                name={t('rate')}
                 stroke="#10b981"
                 strokeWidth={3}
                 dot={{ fill: "#10b981", r: 6 }}
@@ -161,6 +164,7 @@ export default function Reports() {
               <Line
                 type="monotone"
                 dataKey="target"
+                name={t('target')}
                 stroke="#94a3b8"
                 strokeWidth={2}
                 strokeDasharray="5 5"
@@ -170,10 +174,10 @@ export default function Reports() {
           </ResponsiveContainer>
         </div>
 
-        {/* Department Distribution - Pie Chart */}
+        {/* {t('departmentDistribution')} - Pie Chart */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="font-semibold text-gray-800">Department Distribution</h3>
+            <h3 className="font-semibold text-gray-800">{t('departmentDistribution')}</h3>
             <PieChart className="w-5 h-5 text-gray-400" />
           </div>
           <ResponsiveContainer width="100%" height={300}>
@@ -203,7 +207,7 @@ export default function Reports() {
         {/* Payroll Summary - Composed Chart */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="font-semibold text-gray-800">Payroll & Bonus Trends</h3>
+            <h3 className="font-semibold text-gray-800">{t('payrollBonusTrends')}</h3>
             <DollarSign className="w-5 h-5 text-gray-400" />
           </div>
           <ResponsiveContainer width="100%" height={300}>
@@ -214,11 +218,12 @@ export default function Reports() {
               <YAxis yAxisId="right" orientation="right" />
               <Tooltip />
               <Legend />
-              <Bar yAxisId="left" dataKey="amount" fill="#3b82f6" radius={[8, 8, 0, 0]} />
+              <Bar yAxisId="left" dataKey="amount" fill="#3b82f6" name={t('amount')} radius={[8, 8, 0, 0]} />
               <Line
                 yAxisId="right"
                 type="monotone"
                 dataKey="bonus"
+                name={t('bonus')}
                 stroke="#f59e0b"
                 strokeWidth={3}
                 dot={{ fill: "#f59e0b", r: 6 }}
@@ -230,7 +235,7 @@ export default function Reports() {
         {/* Leave Usage - Stacked Bar Chart */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="font-semibold text-gray-800">Leave Usage by Department</h3>
+            <h3 className="font-semibold text-gray-800">{t('leaveUsageByDept')}</h3>
             <Calendar className="w-5 h-5 text-gray-400" />
           </div>
           <ResponsiveContainer width="100%" height={300}>
@@ -240,9 +245,9 @@ export default function Reports() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="annual" stackId="a" fill="#3b82f6" />
-              <Bar dataKey="sick" stackId="a" fill="#ef4444" />
-              <Bar dataKey="personal" stackId="a" fill="#f59e0b" />
+              <Bar dataKey="annual" stackId="a" fill="#3b82f6" name={t('annual')} />
+              <Bar dataKey="sick" stackId="a" fill="#ef4444" name={t('sick')} />
+              <Bar dataKey="personal" stackId="a" fill="#f59e0b" name={t('personal')} />
             </ReBarChart>
           </ResponsiveContainer>
         </div>
@@ -250,10 +255,10 @@ export default function Reports() {
 
       {/* Chart Section - Row 3 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* Employee Satisfaction - Area Chart */}
+        {/* {t('employeeSatisfaction')} - Area Chart */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="font-semibold text-gray-800">Employee Satisfaction</h3>
+            <h3 className="font-semibold text-gray-800">{t('employeeSatisfaction')}</h3>
             <TrendingUp className="w-5 h-5 text-gray-400" />
           </div>
           <ResponsiveContainer width="100%" height={300}>
@@ -265,6 +270,7 @@ export default function Reports() {
               <Area
                 type="monotone"
                 dataKey="satisfaction"
+                name={t('satisfaction')}
                 stroke="#8b5cf6"
                 fill="#8b5cf6"
                 fillOpacity={0.3}
@@ -273,10 +279,10 @@ export default function Reports() {
           </ResponsiveContainer>
         </div>
 
-        {/* Applicant Pipeline - Scatter Chart */}
+        {/* {t('applicantPipeline')} - Scatter Chart */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="font-semibold text-gray-800">Applicant Pipeline</h3>
+            <h3 className="font-semibold text-gray-800">{t('applicantPipeline')}</h3>
             <Users className="w-5 h-5 text-gray-400" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
@@ -299,8 +305,8 @@ export default function Reports() {
           <ResponsiveContainer width="100%" height={150}>
             <ScatterChart>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="category" dataKey="stage" name="Stage" />
-              <YAxis type="number" dataKey="count" name="Count" />
+              <XAxis type="category" dataKey="stage" name={t('stage')} />
+              <YAxis type="number" dataKey="count" name={t('count')} />
               <ZAxis type="number" range={[100]} />
               <Tooltip cursor={{ strokeDasharray: "3 3" }} />
               <Scatter data={applicantPipelineData} fill="#3b82f6" />
@@ -309,19 +315,19 @@ export default function Reports() {
         </div>
       </div>
 
-      {/* Full Width Chart - Department Performance Comparison */}
+      {/* Full Width Chart - {t('deptPerformanceComparison')} */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-gray-800">Department Performance Comparison</h3>
+          <h3 className="font-semibold text-gray-800">{t('deptPerformanceComparison')}</h3>
           <BarChart className="w-5 h-5 text-gray-400" />
         </div>
         <ResponsiveContainer width="100%" height={250}>
           <ReBarChart data={[
-            { department: "IT", performance: 92, satisfaction: 4.2 },
-            { department: "Sales", performance: 85, satisfaction: 3.8 },
-            { department: "Finance", performance: 88, satisfaction: 4.5 },
-            { department: "HR", performance: 90, satisfaction: 4.7 },
-            { department: "Operations", performance: 78, satisfaction: 3.9 },
+            { department: t('itDept'), performance: 92, satisfaction: 4.2 },
+            { department: t('salesDept'), performance: 85, satisfaction: 3.8 },
+            { department: t('financeDept'), performance: 88, satisfaction: 4.5 },
+            { department: t('hrDept'), performance: 90, satisfaction: 4.7 },
+            { department: t('operationsDept'), performance: 78, satisfaction: 3.9 },
           ]}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="department" />
@@ -329,8 +335,8 @@ export default function Reports() {
             <YAxis yAxisId="right" orientation="right" domain={[0, 5]} />
             <Tooltip />
             <Legend />
-            <Bar yAxisId="left" dataKey="performance" fill="#3b82f6" radius={[8, 8, 0, 0]} />
-            <Bar yAxisId="right" dataKey="satisfaction" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
+            <Bar yAxisId="left" dataKey="performance" fill="#3b82f6" name={t('performance')} radius={[8, 8, 0, 0]} />
+            <Bar yAxisId="right" dataKey="satisfaction" fill="#8b5cf6" name={t('satisfaction')} radius={[8, 8, 0, 0]} />
           </ReBarChart>
         </ResponsiveContainer>
       </div>

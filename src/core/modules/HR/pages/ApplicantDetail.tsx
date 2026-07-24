@@ -21,7 +21,7 @@ interface ApiError {
   };
 }
 
-// ✅ نوع ممتد من Candidate مع الحقول الإضافية (مع جعلها اختيارية)
+// نوع ممتد من Candidate مع الحقول الإضافية (مع جعلها اختيارية)
 interface ExtendedCandidate extends Candidate {
   job_posting_id?: number;
   job_id?: number;
@@ -53,7 +53,7 @@ export default function ApplicantDetail() {
 
   const candidate = response?.data?.data as ExtendedCandidate;
 
-  // ✅ استخراج jobId من المتقدم (باستخدام ExtendedCandidate)
+  // استخراج jobId من المتقدم (باستخدام ExtendedCandidate)
   const jobId = candidate?.job_posting_id || candidate?.job_id;
 
   const handleStatusChange = async (status: CandidateStatus) => {
@@ -148,7 +148,7 @@ export default function ApplicantDetail() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-6">
         <button
           onClick={() => navigate("/Hr/all-applicants")}

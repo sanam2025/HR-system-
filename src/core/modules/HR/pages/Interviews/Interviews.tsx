@@ -41,7 +41,7 @@ export const Interviews = () => {
     }
   }, [jobIdNumber, refetch]);
 
-  // ✅ ترتيب المقابلات حسب الرتبة (الأقل رقم أولاً)
+  // ترتيب المقابلات حسب الرتبة (الأقل رقم أولاً)
   const sortedInterviews = useMemo(() => {
     return [...interviews].sort((a, b) => {
       // إذا كان هناك رتبة، رتب حسبها

@@ -1,5 +1,6 @@
 // core/modules/HR/pages/Contracts.tsx
 import React, { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Plus } from "lucide-react";
 import ContractTableRow from "../Components/Special_Components/ContractTableRow";
 import ContractFormModal from "../Components/Special_Components/ContractFormModal";
@@ -58,15 +59,15 @@ const INITIAL_CONTRACTS: EmployeeContract[] = [
   },
 ];
 
-const COLUMNS: string[] = [
-  "Contract #",
-  "Employee",
-  "Department",
-  "Position",
-  "Period",
-  "Salary",
-  "Status",
-  "Actions",
+const COLUMNS_KEYS = [
+  { key: "contractNum", label: "Contract #" },
+  { key: "employee", label: "Employee" },
+  { key: "department", label: "Department" },
+  { key: "position", label: "Position" },
+  { key: "period", label: "Period" },
+  { key: "salary", label: "Salary" },
+  { key: "status", label: "Status" },
+  { key: "actions", label: "Actions" },
 ];
 
 // ============= Types =============
@@ -96,6 +97,7 @@ interface RenewalData {
 
 // ============= MAIN =============
 export default function Contracts() {
+  const { t } = useTranslation();
   const [contracts, setContracts] =
     useState<EmployeeContract[]>(INITIAL_CONTRACTS);
   const [selectedContract, setSelectedContract] =
@@ -105,7 +107,7 @@ export default function Contracts() {
 
   const handleView = (contract: EmployeeContract) => {
     alert(
-      `📄 Contract Details:\nNumber: ${contract.contractNumber}\nEmployee: ${contract.employeeName}\nPeriod: ${contract.startDate} → ${contract.endDate}\nSalary: ${contract.salary.toLocaleString()} SYP`,
+      `Contract Details:\nNumber: ${contract.contractNumber}\nEmployee: ${contract.employeeName}\nPeriod: ${contract.startDate} → ${contract.endDate}\nSalary: ${contract.salary.toLocaleString()} SYP`,
     );
   };
 
@@ -127,7 +129,7 @@ export default function Contracts() {
       signedDate: new Date().toISOString().split("T")[0],
     };
     setContracts((prev) => [newContract, ...prev]);
-    alert(`✅ Contract created for ${data.employeeName}`);
+    alert(`Contract created for ${data.employeeName}`);
     setIsContractModalOpen(false);
   };
 
@@ -151,7 +153,7 @@ export default function Contracts() {
         ),
       );
     }
-    alert(`📧 Renewal sent to ${data.employeeName}`);
+    alert(`Renewal sent to ${data.employeeName}`);
     setIsRenewalModalOpen(false);
   };
 
@@ -160,7 +162,7 @@ export default function Contracts() {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen">
       <ContractFormModal
         isOpen={isContractModalOpen}
         employeeName=""
@@ -180,16 +182,16 @@ export default function Contracts() {
 
       <div className="mb-8 flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-bold">Employment Contracts</h1>
+          <h1 className="text-2xl font-bold">{t('employmentContracts') || 'Employment Contracts'}</h1>
           <p className="text-gray-500 text-sm mt-1">
-            Manage employee contracts and renewals.
+            {t('manageContracts') || 'Manage employee contracts and renewals.'}
           </p>
         </div>
         <button
           onClick={handleNewContract}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
         >
-          <Plus className="w-4 h-4" /> New Contract
+          <Plus className="w-4 h-4" /> {t('newContract') || 'New Contract'}
         </button>
       </div>
 
@@ -199,12 +201,12 @@ export default function Contracts() {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                {COLUMNS.map((c) => (
+                {COLUMNS_KEYS.map((col) => (
                   <th
-                    key={c}
+                    key={col.key}
                     className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider"
                   >
-                    {c}
+                    {t(col.key) || col.label}
                   </th>
                 ))}
               </tr>

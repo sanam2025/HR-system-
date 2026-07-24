@@ -1,5 +1,6 @@
 // core/modules/HR/pages/Payroll.tsx
 import React, { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { DollarSign, Wallet, TrendingUp, TrendingDown, Users, FileText, CheckCircle } from "lucide-react";
 import StatCard from "../Components/common_Components/StatCard";
 import { PayrollTableRow } from "../Components/Special_Components/PayrollTableRow";
@@ -163,6 +164,7 @@ const EmptyState: React.FC = () => (
 
 // ============= Main Component =============
 export default function Payroll() {
+  const { t } = useTranslation();
   const [records, setRecords] = useState<PayrollRecord[]>(PAYROLL_DATA as PayrollRecord[]);
   const summary: PayrollSummary = calculatePayrollSummary(records);
 
@@ -185,14 +187,14 @@ export default function Payroll() {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="mb-8">
         <div className="flex justify-between items-start flex-wrap gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Payroll Management</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t('payrollManagement') || 'Payroll Management'}</h1>
             <p className="text-gray-500 mt-1 text-sm">
-              Manage employee salaries, deductions, and bonuses.
+              {t('managePayroll') || 'Manage employee salaries, deductions, and bonuses.'}
             </p>
           </div>
           <div className="flex items-center gap-2 bg-white rounded-xl shadow-sm border border-gray-100 px-4 py-2">

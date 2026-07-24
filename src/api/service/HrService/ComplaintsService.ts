@@ -1,5 +1,5 @@
-// src/api/service/HrService/ComplaintsService.ts
-import { apiClient } from '../../client';
+﻿// src/api/service/HrService/ComplaintsService.ts
+import apiClient from '@/api/axios';
 import type {
   Complaint,
   CreateComplaintData,
@@ -8,23 +8,23 @@ import type {
 } from './Types/ComplaintsService.types';
 
 export const ComplaintsService = {
-  // ✅ Get all complaints (HR only)
+  // Get all complaints (HR only)
   getAll: () => apiClient.get<{ data: Complaint[] }>('/complaints'),
 
-  // ✅ Get single complaint
+  // Get single complaint
   getById: (id: number) => apiClient.get<{ data: Complaint }>(`/complaints/${id}`),
 
-  // ✅ Create new complaint (Employee)
+  // Create new complaint (Employee)
   create: (data: CreateComplaintData) => apiClient.post<{ data: Complaint }>('/complaints', data),
 
-  // ✅ Start review (HR)
+  // Start review (HR)
   markUnderReview: (id: number) => apiClient.patch<{ data: Complaint }>(`/complaints/${id}/mark-under-review`),
 
-  // ✅ Respond to complaint (HR)
+  // Respond to complaint (HR)
   respond: (id: number, data: RespondComplaintData) => 
     apiClient.post<{ data: Complaint }>(`/complaints/${id}/respond`, data),
 
-  // ✅ Update complaint status
+  // Update complaint status
   updateStatus: (id: number, data: UpdateComplaintStatusData) =>
     apiClient.patch<{ data: Complaint }>(`/complaints/${id}/status`, data),
 };

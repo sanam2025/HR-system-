@@ -3,7 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import type { NavItem } from '../components/SideBar';
 import Sidebar from '../components/SideBar';
 import Topbar from '../components/Topbar';
-import { useLanguage } from '../../i18n/translations/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 interface AppLayoutProps {
   navItems: NavItem[];
@@ -23,7 +23,7 @@ export default function AppLayout({
   defaultTitle = 'لوحة التحكم',
 }: AppLayoutProps) {
   const location = useLocation();
-  const { dir } = useLanguage();
+  const { i18n, t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
 
   const toggleSidebar = useCallback(() => setSidebarOpen(open => !open), []);
@@ -32,10 +32,10 @@ export default function AppLayout({
   const title =
     pageTitles[location.pathname] ||
     pageTitles[basePath] ||
-    defaultTitle;
+    t('dashboard');
 
   return (
-    <div className="flex min-h-screen bg-surface" dir={dir}>
+    <div className="flex min-h-screen bg-surface" dir={i18n.dir()}>
       <Sidebar
         open={sidebarOpen}
         onToggle={toggleSidebar}

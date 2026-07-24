@@ -1,7 +1,7 @@
 import { CheckCircle, XCircle, Clock, AlertTriangle } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
-import useManagerStore from '@/store/managerStore';
+import { useRequestsStore } from '@/store/requestsStore';
 
 const statusEn: Record<string, string> = { 'معلقة': 'Pending', 'موافقة': 'Approved', 'مرفوضة': 'Rejected' };
 
@@ -10,8 +10,8 @@ export default function OvertimeRequests() {
   const ov = t.overtime;
   const c = t.common;
 
-  const requests = useManagerStore((s) => s.overtimeRequests);
-  const updateOvertimeRequestStatus = useManagerStore((s) => s.updateOvertimeRequestStatus);
+  const requests = useRequestsStore((s) => s.overtimeRequests);
+  const updateOvertimeRequestStatus = useRequestsStore((s) => s.updateOvertimeRequestStatus);
   const pending = requests.filter(r => r.status === 'معلقة').length;
 
   const handleAction = (id: number, action: 'approve' | 'reject') => {

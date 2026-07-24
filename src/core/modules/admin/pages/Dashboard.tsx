@@ -1,6 +1,7 @@
 // core/modules/HR/pages/Dashboard.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Users,
   Calendar,
@@ -86,6 +87,7 @@ const employeeStatusData = [
 // ============= Main Component =============
 
 export default function Dashboard() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   // Navigation functions
@@ -97,27 +99,27 @@ export default function Dashboard() {
   const goToReports = () => navigate("/Hr/reports");
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">
-          Welcome
+          {t('welcome')}
         </h1>
         <p className="text-gray-500 mt-1 text-sm">
-          Overview of employee performance and statistics.
+          {t('dashboardSubtitle')}
         </p>
       </div>
 
       {/* Stats Grid - Row 1 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
-        {/* Total Employees - Blue */}
+        {/* {t('totalEmployees')} - Blue */}
         <div
           onClick={goToEmployees}
           className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all cursor-pointer hover:scale-[1.02]"
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 mb-1">Total Employees</p>
+              <p className="text-sm text-gray-500 mb-1">{t('totalEmployees')}</p>
               <p className="text-2xl font-bold text-gray-900">{statsData.totalEmployees}</p>
             </div>
             <div className="bg-blue-50 text-blue-600 p-3 rounded-xl">
@@ -133,7 +135,7 @@ export default function Dashboard() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 mb-1">New Hires (This Month)</p>
+              <p className="text-sm text-gray-500 mb-1">{t('newHiresMonth')}</p>
               <p className="text-2xl font-bold text-gray-900">{statsData.newHires}</p>
             </div>
             <div className="bg-emerald-50 text-emerald-600 p-3 rounded-xl">
@@ -149,7 +151,7 @@ export default function Dashboard() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 mb-1">Monthly Payroll</p>
+              <p className="text-sm text-gray-500 mb-1">{t('monthlyPayroll')}</p>
               <p className="text-2xl font-bold text-gray-900">{statsData.payrollCost}</p>
             </div>
             <div className="bg-purple-50 text-purple-600 p-3 rounded-xl">
@@ -158,14 +160,14 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Attendance Rate - Teal */}
+        {/* {t('attendanceRate')} - Teal */}
         <div
           onClick={goToAttendance}
           className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all cursor-pointer hover:scale-[1.02]"
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 mb-1">Attendance Rate</p>
+              <p className="text-sm text-gray-500 mb-1">{t('attendanceRate')}</p>
               <p className="text-2xl font-bold text-gray-900">{statsData.attendanceRate}</p>
             </div>
             <div className="bg-teal-50 text-teal-600 p-3 rounded-xl">
@@ -177,14 +179,14 @@ export default function Dashboard() {
 
       {/* Stats Grid - Row 2 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-        {/* Pending Complaints - Red */}
+        {/* {t('pendingComplaints')} - Red */}
         <div
           onClick={goToComplaints}
           className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all cursor-pointer hover:scale-[1.02]"
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 mb-1">Pending Complaints</p>
+              <p className="text-sm text-gray-500 mb-1">{t('pendingComplaints')}</p>
               <p className="text-2xl font-bold text-gray-900">{statsData.pendingComplaints}</p>
             </div>
             <div className="bg-red-50 text-red-600 p-3 rounded-xl">
@@ -193,14 +195,14 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Departments - Indigo */}
+        {/* {t('departments')} - Indigo */}
         <div
           onClick={goToEmployees}
           className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all cursor-pointer hover:scale-[1.02]"
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 mb-1">Departments</p>
+              <p className="text-sm text-gray-500 mb-1">{t('departments')}</p>
               <p className="text-2xl font-bold text-gray-900">{statsData.departments}</p>
             </div>
             <div className="bg-indigo-50 text-indigo-600 p-3 rounded-xl">
@@ -216,7 +218,7 @@ export default function Dashboard() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 mb-1">Avg Employee Rating</p>
+              <p className="text-sm text-gray-500 mb-1">{t('avgEmployeeRating')}</p>
               <p className="text-2xl font-bold text-gray-900">{statsData.avgRating}</p>
             </div>
             <div className="bg-yellow-50 text-yellow-600 p-3 rounded-xl">
@@ -232,7 +234,7 @@ export default function Dashboard() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 mb-1">On-Time Arrival</p>
+              <p className="text-sm text-gray-500 mb-1">{t('onTimeArrival')}</p>
               <p className="text-2xl font-bold text-gray-900">88%</p>
             </div>
             <div className="bg-cyan-50 text-cyan-600 p-3 rounded-xl">
@@ -248,7 +250,7 @@ export default function Dashboard() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-800">
-              Monthly New Hires
+              {t('monthlyNewHires')}
             </h3>
             <BarChart className="w-5 h-5 text-gray-400" />
           </div>
@@ -267,7 +269,7 @@ export default function Dashboard() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-800">
-              Weekly Attendance Trend
+              {t('weeklyAttendanceTrend')}
             </h3>
             <TrendingUp className="w-5 h-5 text-gray-400" />
           </div>
@@ -297,12 +299,12 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Employee Status - Pie Chart (Circle) & Leave Requests */}
+      {/* Employee Status - Pie Chart (Circle) & {t('leaveRequests')} */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-800">
-              Employee Status Distribution
+              {t('employeeStatusDistribution')}
             </h3>
             <Users className="w-5 h-5 text-gray-400" />
           </div>
@@ -317,7 +319,7 @@ export default function Dashboard() {
                   outerRadius={90}
                   paddingAngle={5}
                   dataKey="value"
-                  label={({ name, value }) => `${name} (${value}%)`}
+                  label={({ name, value }) => `${t(name === 'On Leave' ? 'onLeave' : name.toLowerCase())} (${value}%)`}
                   labelLine={true}
                 >
                   {employeeStatusData.map((entry, index) => (
@@ -335,24 +337,24 @@ export default function Dashboard() {
                   className="w-3 h-3 rounded-full" 
                   style={{ backgroundColor: status.color }}
                 />
-                <span className="text-sm text-gray-600">{status.name}</span>
+                <span className="text-sm text-gray-600">{t(status.name === 'On Leave' ? 'onLeave' : status.name.toLowerCase())}</span>
                 <span className="text-sm font-semibold text-gray-900">{status.value}%</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Leave Requests Section */}
+        {/* {t('leaveRequests')} Section */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
             <h3 className="text-lg font-semibold text-gray-800">
-              Leave Requests
+              {t('leaveRequests')}
             </h3>
             <span
               onClick={goToLeaves}
               className="text-sm text-orange-600 bg-orange-50 px-3 py-1 rounded-full cursor-pointer hover:bg-orange-100 transition-colors"
             >
-              {statsData.pendingLeaves} Pending
+              {statsData.pendingLeaves} {t('pending')}
             </span>
           </div>
           <div className="divide-y divide-gray-50">
@@ -365,7 +367,7 @@ export default function Dashboard() {
                     <p className="text-xs text-gray-400 mt-1">{request.department}</p>
                   </div>
                   <div className="bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-xs font-medium">
-                    Pending
+                    {t('pending')}
                   </div>
                 </div>
               </div>
@@ -374,13 +376,13 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Recent Announcements */}
+      {/* {t('recentAnnouncements')} */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100">
           <div className="flex items-center gap-2">
             <Megaphone className="w-5 h-5 text-blue-500" />
             <h3 className="text-lg font-semibold text-gray-800">
-              Recent Announcements
+              {t('recentAnnouncements')}
             </h3>
           </div>
         </div>
@@ -399,7 +401,7 @@ export default function Dashboard() {
                       : "bg-yellow-50 text-yellow-600"
                   }`}
                 >
-                  {announcement.priority}
+                  {t(announcement.priority.toLowerCase())}
                 </span>
               </div>
             </div>

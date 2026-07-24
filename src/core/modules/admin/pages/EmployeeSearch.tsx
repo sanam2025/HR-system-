@@ -1,6 +1,7 @@
 // core/modules/Admin/pages/Search.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { 
   Search, 
   Filter, 
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 
 export default function EmployeeSearch() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   const employees = [
@@ -26,12 +28,12 @@ export default function EmployeeSearch() {
   const topRated = [...employees].sort((a, b) => b.rating - a.rating).slice(0, 3);
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Employee Search</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('employeeSearch')}</h1>
         <p className="text-gray-500 mt-1 text-sm">
-          Search and filter employees, view top-rated staff
+          {t('searchFilterStaff')}
         </p>
       </div>
 
@@ -42,13 +44,13 @@ export default function EmployeeSearch() {
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
             <input 
               type="text" 
-              placeholder="Search by name, department, or position..."
+              placeholder={t('searchPlaceholder')}
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500"
             />
           </div>
           <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center gap-2">
             <Filter className="w-4 h-4" />
-            Filter
+            {t('filter')}
           </button>
         </div>
       </div>
@@ -58,7 +60,7 @@ export default function EmployeeSearch() {
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Total Employees</p>
+              <p className="text-sm text-gray-500">{t('totalEmployees')}</p>
               <p className="text-2xl font-bold text-gray-900">248</p>
             </div>
             <div className="bg-blue-50 text-blue-600 p-3 rounded-xl">
@@ -70,7 +72,7 @@ export default function EmployeeSearch() {
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Departments</p>
+              <p className="text-sm text-gray-500">{t('departments')}</p>
               <p className="text-2xl font-bold text-emerald-600">8</p>
             </div>
             <div className="bg-emerald-50 text-emerald-600 p-3 rounded-xl">
@@ -82,7 +84,7 @@ export default function EmployeeSearch() {
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Avg Rating</p>
+              <p className="text-sm text-gray-500">{t('avgRating')}</p>
               <p className="text-2xl font-bold text-yellow-600">4.6</p>
             </div>
             <div className="bg-yellow-50 text-yellow-600 p-3 rounded-xl">
@@ -92,11 +94,11 @@ export default function EmployeeSearch() {
         </div>
       </div>
 
-      {/* Top Rated Employees */}
+      {/* {t('topRatedEmployees')} */}
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-4">
           <Award className="w-5 h-5 text-yellow-500" />
-          <h2 className="text-lg font-semibold text-gray-800">Top Rated Employees</h2>
+          <h2 className="text-lg font-semibold text-gray-800">{t('topRatedEmployees')}</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {topRated.map((employee, idx) => (
@@ -126,10 +128,10 @@ export default function EmployeeSearch() {
         </div>
       </div>
 
-      {/* All Employees List */}
+      {/* {t('allEmployees')} List */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800">All Employees</h3>
+          <h3 className="text-lg font-semibold text-gray-800">{t('allEmployees')}</h3>
         </div>
         <div className="divide-y divide-gray-50">
           {employees.map((employee) => (

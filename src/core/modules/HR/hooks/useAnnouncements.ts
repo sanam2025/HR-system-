@@ -7,7 +7,7 @@ import type {
   UpdateAnnouncementData,
 } from '../../../../api/service/HrService/Types/AnnouncementsService.types';
 
-// ✅ جلب جميع التعميمات
+// جلب جميع التعميمات
 export const useAnnouncements = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['announcements'],
@@ -25,7 +25,7 @@ export const useAnnouncements = () => {
   };
 };
 
-// ✅ جلب التعميمات النشطة
+// جلب التعميمات النشطة
 export const useActiveAnnouncements = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['announcements-active'],
@@ -44,7 +44,7 @@ export const useActiveAnnouncements = () => {
   };
 };
 
-// ✅ جلب تعميم واحد
+// جلب تعميم واحد
 export const useAnnouncement = (id?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['announcement', id],
@@ -64,7 +64,7 @@ export const useAnnouncement = (id?: number) => {
   };
 };
 
-// ✅ إنشاء تعميم
+// إنشاء تعميم
 export const useCreateAnnouncement = () => {
   const queryClient = useQueryClient();
 
@@ -73,7 +73,7 @@ export const useCreateAnnouncement = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['announcements'] });
       queryClient.invalidateQueries({ queryKey: ['announcements-active'] });
-      toast.success('✅ تم إنشاء التعميم بنجاح');
+      toast.success('تم إنشاء التعميم بنجاح');
     },
     onError: (err: Error) => {
       toast.error(err.message || 'فشل إنشاء التعميم');
@@ -81,7 +81,7 @@ export const useCreateAnnouncement = () => {
   });
 };
 
-// ✅ تحديث تعميم
+// تحديث تعميم
 export const useUpdateAnnouncement = () => {
   const queryClient = useQueryClient();
 
@@ -91,7 +91,7 @@ export const useUpdateAnnouncement = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['announcements'] });
       queryClient.invalidateQueries({ queryKey: ['announcements-active'] });
-      toast.success('✅ تم تحديث التعميم بنجاح');
+      toast.success('تم تحديث التعميم بنجاح');
     },
     onError: (err: Error) => {
       toast.error(err.message || 'فشل تحديث التعميم');
@@ -99,7 +99,7 @@ export const useUpdateAnnouncement = () => {
   });
 };
 
-// ✅ حذف تعميم
+// حذف تعميم
 export const useDeleteAnnouncement = () => {
   const queryClient = useQueryClient();
 
@@ -108,7 +108,7 @@ export const useDeleteAnnouncement = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['announcements'] });
       queryClient.invalidateQueries({ queryKey: ['announcements-active'] });
-      toast.success('✅ تم حذف التعميم بنجاح');
+      toast.success('تم حذف التعميم بنجاح');
     },
     onError: (err: Error) => {
       toast.error(err.message || 'فشل حذف التعميم');
@@ -116,7 +116,7 @@ export const useDeleteAnnouncement = () => {
   });
 };
 
-// ✅ نشر فوري
+// نشر فوري
 export const usePublishAnnouncement = () => {
   const queryClient = useQueryClient();
 
@@ -125,7 +125,7 @@ export const usePublishAnnouncement = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['announcements'] });
       queryClient.invalidateQueries({ queryKey: ['announcements-active'] });
-      toast.success('✅ تم النشر الفوري للتعميم');
+      toast.success('تم النشر الفوري للتعميم');
     },
     onError: (err: Error) => {
       toast.error(err.message || 'فشل النشر الفوري');

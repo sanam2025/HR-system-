@@ -1,33 +1,39 @@
-
-
-import SideBar from '../components/SideBar'
-import { Outlet } from 'react-router-dom'
-import { LayoutDashboard  , Settings , Megaphone , FolderTree , BarChart , Search} from 'lucide-react'
-import { useState } from 'react'
+import { useTranslation } from 'react-i18next';
+import AppLayout from "./AppLayout";
+import { LayoutDashboard, Settings, Megaphone, FolderTree, BarChart, Search } from 'lucide-react';
 
 function AdminLayout() {
+  const { t } = useTranslation()
 
   const adminSideBar = [
-    {path: '/admin' ,  label: 'Dashboard' , icon: LayoutDashboard , exact: true},
-    {path: '/admin/setting' , label: 'Settings' , icon: Settings , exact: false},
-    {path: '/admin/announcement' , label: 'Announcements' , icon: Megaphone , exact: false},
-    {path: '/admin/organization' , label: 'Organization Structure' , icon: FolderTree , exact: false},
-    {path: '/admin/report' , label: 'Reports & Analytics' , icon: BarChart , exact: false},
-    {path: '/admin/search' , label: 'Employee Search' , icon: Search , exact: false},
-  ]
+    { path: '/admin', label: t('dashboard'), icon: LayoutDashboard, exact: true },
+    { path: '/admin/setting', label: t('settings'), icon: Settings, exact: false },
+    { path: '/admin/announcement', label: t('announcements'), icon: Megaphone, exact: false },
+    { path: '/admin/organization', label: t('organizationStructure'), icon: FolderTree, exact: false },
+    { path: '/admin/report', label: t('reports'), icon: BarChart, exact: false },
+    { path: '/admin/search', label: t('employeeSearch'), icon: Search, exact: false },
+  ];
 
-  const [open , setopen] = useState(false);
+  const adminPageTitles: Record<string, string> = {
+    '/admin': t('dashboard'),
+    '/admin/setting': t('settings'),
+    '/admin/announcement': t('announcements'),
+    '/admin/organization': t('organizationStructure'),
+    '/admin/report': t('reports'),
+    '/admin/search': t('employeeSearch'),
+  };
 
   return (
-    <div className='flex h-screen'>
-      <SideBar navItems={adminSideBar} onToggle={() => setopen(!open)} open={open}/>
-      <div className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${open ? 'md:ms-64' : 'md:ms-16'}`}>
-        <main className="flex-1 p-6 pb-16 overflow-x-hidden overflow-y-auto">
-          <Outlet />
-        </main>
-      </div>
-    </div>
-  )
+    <AppLayout
+      navItems={adminSideBar}
+      pageTitles={adminPageTitles}
+      brand={{
+        title: t('adminPortal') || "Admin Portal",
+        subtitle: t('administration') || 'Administration'
+      }}
+      navSectionLabel={t('adminMenu') || 'Admin Menu'}
+    />
+  );
 }
 
-export default AdminLayout
+export default AdminLayout;

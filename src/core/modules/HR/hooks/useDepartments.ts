@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { DepartmentsService } from '../../../../api/service/HrService/DepartmentsService';
 
-// ✅ جلب كل الأقسام مع الموظفين
+// جلب كل الأقسام مع الموظفين
 export const useDepartmentsWithUsers = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['departments-with-users'],
@@ -20,7 +20,7 @@ export const useDepartmentsWithUsers = () => {
   };
 };
 
-// ✅ جلب موظفي قسم معين
+// جلب موظفي قسم معين
 export const useDepartmentEmployees = (departmentId?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['department-employees', departmentId],
@@ -40,7 +40,7 @@ export const useDepartmentEmployees = (departmentId?: number) => {
   };
 };
 
-// ✅ جلب بروفايل موظف
+// جلب بروفايل موظف
 export const useProfile = (userId?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['profile', userId],
@@ -60,7 +60,7 @@ export const useProfile = (userId?: number) => {
   };
 };
 
-// ✅ جلب موظفي المدير
+// جلب موظفي المدير
 export const useManagerEmployees = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['manager-employees'],

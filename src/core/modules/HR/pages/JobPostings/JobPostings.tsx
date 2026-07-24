@@ -37,7 +37,7 @@ export default function JobPostings() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Job Postings (HR)</h1>
         <p className="text-gray-500 text-sm mt-1">Manage all job postings.</p>

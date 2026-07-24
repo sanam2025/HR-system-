@@ -9,12 +9,12 @@ export const useJobRequisitions = () => {
     queryFn: async () => {
       const response = await RequestionService.allRequestion();
       
-      // ✅ إذا كانت response.data مصفوفة
+      // إذا كانت response.data مصفوفة
       if (Array.isArray(response.data)) {
         return response.data;
       }
       
-      // ✅ إذا كانت response.data فيها خاصية data مصفوفة
+      // إذا كانت response.data فيها خاصية data مصفوفة
       if (response.data && typeof response.data === 'object') {
         const nestedData = (response.data as { data: JobRequisition[] }).data;
         if (Array.isArray(nestedData)) {
@@ -22,7 +22,7 @@ export const useJobRequisitions = () => {
         }
       }
       
-      // ✅ في النهاية، أرجع مصفوفة فارغة
+      // في النهاية، أرجع مصفوفة فارغة
       return [];
     },
     staleTime: 30 * 60 * 1000,

@@ -75,7 +75,7 @@ export const TerminationFormModal: React.FC<TerminationFormModalProps> = ({ isOp
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" dir="ltr">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex justify-between items-center">
@@ -179,7 +179,7 @@ export const TerminationFormModal: React.FC<TerminationFormModalProps> = ({ isOp
             {uploads.length > 0 && (
               <div className="mt-2">
                 {uploads.map((file, idx) => (
-                  <div key={idx} className="text-xs text-gray-500">📄 {file.name}</div>
+                  <div key={idx} className="text-xs text-gray-500">{file.name}</div>
                 ))}
               </div>
             )}

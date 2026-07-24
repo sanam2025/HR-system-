@@ -14,7 +14,7 @@ const getErrorMessage = (err: unknown): string => {
   return 'Failed to send offer';
 };
 
-// ✅ استخدام `useSendOffer` لإرسال العرض
+// استخدام `useSendOffer` لإرسال العرض
 export const useSendOffer = (jobPostingId?: number) => {
   const queryClient = useQueryClient();
 
@@ -36,7 +36,7 @@ export const useSendOffer = (jobPostingId?: number) => {
   });
 };
 
-// ✅ إضافة `useOffers` لجلب كل العروض
+// إضافة `useOffers` لجلب كل العروض
 export const useOffers = (jobPostingId?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['offers', jobPostingId],

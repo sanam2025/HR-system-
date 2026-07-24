@@ -14,12 +14,14 @@ const apiClient = axios.create({
 
 // ── Request Interceptor: أضف Bearer Token تلقائياً ───────────
 // TODO: استبدل هذا بصفحة Login عند الانتهاء من التطوير
-const DEV_TOKEN = '6|kd5AHpNWWFqykkNeKGovVMtB3Qe660vNxaani3sG364f143a';
+const DEV_TOKEN = import.meta.env.VITE_DEV_TOKEN || '';
 
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('auth_token') || DEV_TOKEN;
-    config.headers['Authorization'] = `Bearer ${token}`;
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => Promise.reject(error),
@@ -30,11 +32,14 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token منتهي أو غير صالح — امسح التوكن وأعد للـ Login
+      // Token منتهي أو غير صالح — امسح التوكن
       localStorage.removeItem('auth_token');
       localStorage.removeItem('auth_user');
-      // يمكن إضافة redirect لاحقاً
-      console.warn('[API] Unauthorized — token cleared.');
+      
+      // إرسال حدث للواجهة لتوجيه المستخدم لصفحة تسجيل الدخول
+      window.dispatchEvent(new Event('auth-expired'));
+      
+      console.warn('[API] Unauthorized — token cleared and auth-expired event dispatched.');
     }
     return Promise.reject(error);
   },

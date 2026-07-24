@@ -71,7 +71,7 @@ export default function PeriodicEvaluation() {
   const employee = mockEmployees.find(e => e.id === Number(selectedEmp));
 
   const criteriaKeys: Array<{ key: RatingKey; label: string; icon: string }> = [
-    { key: 'performance', label: t.evaluation.criteria.performance, icon: '📊' },
+    { key: 'performance', label: t.evaluation.criteria.performance, icon: '' },
     { key: 'attendance',  label: t.evaluation.criteria.attendance,  icon: '🛡️' },
     { key: 'behavior',    label: t.evaluation.criteria.behavior,    icon: '💚' },
     { key: 'teamwork',    label: t.evaluation.criteria.teamwork,    icon: '🏠' },
@@ -109,7 +109,7 @@ export default function PeriodicEvaluation() {
       {submitted ? (
         /* Success Card */
         <div className="bg-white rounded-2xl border border-green/20 shadow-md p-10 text-center">
-          <div className="text-6xl mb-4">✅</div>
+          <div className="text-6xl mb-4"></div>
           <h3 className="text-xl font-bold text-green mb-2">{t.evaluation.successCard.title}</h3>
           <p className="text-brown text-sm mb-6">
             {t.evaluation.successCard.thankYou} <strong>{employee?.name}</strong>

@@ -35,7 +35,7 @@ export const SendOffer = () => {
     return "Failed to send offer";
   };
 
-  // ✅ التأكد من وجود candidate_id
+  // التأكد من وجود candidate_id
   useEffect(() => {
     if (!candidateIdFromUrl) {
       toast.error("No candidate selected");
@@ -69,15 +69,15 @@ export const SendOffer = () => {
       working_hour_per_day: Number(form.working_hour_per_day),
     };
 
-    console.log("📤 Sending offer:", data);
+    console.log("Sending offer:", data);
 
     sendOffer(data, {
       onSuccess: () => {
-        toast.success("✅ Offer sent successfully!");
+        toast.success("Offer sent successfully!");
         navigate(`/Hr/job-postings/${jobId}/offers`);
       },
       onError: (err: unknown) => {
-        console.error("❌ Send offer error:", err);
+        console.error("Send offer error:", err);
         toast.error(getErrorMessage(err));
       },
     });
@@ -114,7 +114,7 @@ export const SendOffer = () => {
             Send a job offer to the candidate
             {candidateIdFromUrl && (
               <span className="text-purple-600 block mt-1">
-                👤 Sending offer to Candidate #{candidateIdFromUrl}
+                Sending offer to Candidate #{candidateIdFromUrl}
               </span>
             )}
           </p>
@@ -122,7 +122,7 @@ export const SendOffer = () => {
 
         <div className="bg-white rounded-xl shadow-sm p-6">
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* ✅ Candidate ID مخفي (يؤخذ من الـ URL تلقائياً) */}
+            {/* Candidate ID مخفي (يؤخذ من الـ URL تلقائياً) */}
             <div className="hidden">
               <input
                 type="number"

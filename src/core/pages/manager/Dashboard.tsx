@@ -52,7 +52,7 @@ export default function Dashboard() {
   const quickStats = [
     { label: d.pendingLeaves,    value: stats.pendingLeaves,             icon: '🗓️', color: 'text-yellow-600 bg-yellow-50', path: '/manager/leaves'     },
     { label: d.pendingOvertime,  value: stats.pendingOvertime,           icon: '⏰', color: 'text-blue-600 bg-blue-50',   path: '/manager/overtime'   },
-    { label: d.completedTasks,   value: stats.completedTasksThisMonth,   icon: '✅', color: 'text-green-700 bg-green-50', path: '/manager/tasks'      },
+    { label: d.completedTasks,   value: stats.completedTasksThisMonth,   icon: '', color: 'text-green-700 bg-green-50', path: '/manager/tasks'      },
     { label: d.presentEmployees, value: `${stats.presentToday}/${stats.totalEmployees}`, icon: '👥', color: 'text-purple-600 bg-purple-50', path: '/manager/attendance' },
   ];
 

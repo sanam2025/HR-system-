@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
 import { CalendarClock, Star, Clock, XCircle, CheckCircle, Video, User, Loader2 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
-import useManagerStore from '../../../store/managerStore';
+import { useRequestsStore } from '../../../store/requestsStore';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
 import CandidateModal from './components/CandidateModal';
 
 export default function Interviews() {
   const { t } = useLanguage();
-  const { myInterviews, myInterviewsLoading, fetchMyInterviews, rateInterview, cancelMyInterview } = useManagerStore();
+  const myInterviews = useRequestsStore((state) => state.myInterviews);
+  const myInterviewsLoading = useRequestsStore((state) => state.myInterviewsLoading);
+  const fetchMyInterviews = useRequestsStore((state) => state.fetchMyInterviews);
+  const rateInterview = useRequestsStore((state) => state.rateInterview);
+  const cancelMyInterview = useRequestsStore((state) => state.cancelMyInterview);
 
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
   const [selectedInterview, setSelectedInterview] = useState<number | null>(null);

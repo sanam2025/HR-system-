@@ -1,5 +1,5 @@
-// src/api/service/HrService/AnnouncementsService.ts
-import { apiClient } from '../../client';
+﻿// src/api/service/HrService/AnnouncementsService.ts
+import apiClient from '@/api/axios';
 import type {
   Announcement,
   CreateAnnouncementData,
@@ -7,24 +7,24 @@ import type {
 } from './Types/AnnouncementsService.types';
 
 export const AnnouncementsService = {
-  // ✅ جلب جميع التعميمات
+  // جلب جميع التعميمات
   getAll: () => apiClient.get<{ data: Announcement[] }>('/announcements'),
 
-  // ✅ جلب التعميمات النشطة (للواجهة الرئيسية)
+  // جلب التعميمات النشطة (للواجهة الرئيسية)
   getActive: () => apiClient.get<{ data: Announcement[] }>('/announcements/active'),
 
-  // ✅ جلب تعميم واحد
+  // جلب تعميم واحد
   getById: (id: number) => apiClient.get<{ data: Announcement }>(`/announcements/${id}`),
 
-  // ✅ إنشاء تعميم جديد
+  // إنشاء تعميم جديد
   create: (data: CreateAnnouncementData) => apiClient.post<{ data: Announcement }>('/announcements', data),
 
-  // ✅ تحديث تعميم
+  // تحديث تعميم
   update: (id: number, data: UpdateAnnouncementData) => apiClient.put<{ data: Announcement }>(`/announcements/${id}`, data),
 
-  // ✅ حذف تعميم
+  // حذف تعميم
   delete: (id: number) => apiClient.delete(`/announcements/${id}`),
 
-  // ✅ نشر فوري
+  // نشر فوري
   publishNow: (id: number) => apiClient.post(`/announcements/${id}/publish`),
 };

@@ -50,7 +50,7 @@ export const JobPostingDetail = () => {
   const jobWithSalary = job as JobPostingWithSalary;
   const skills = (job.skills || []) as (string | Skill)[];
 
-  // ✅ تغيير الحالة من rejected إلى applied
+  // تغيير الحالة من rejected إلى applied
   const displayCandidates = candidates?.map((candidate: Candidate) => ({
     ...candidate,
     displayStatus: candidate.status === 'rejected' ? 'applied' : candidate.status
@@ -77,7 +77,7 @@ export const JobPostingDetail = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-6">
         <button
           onClick={() => navigate('/Hr/job-postings')}
@@ -175,7 +175,7 @@ export const JobPostingDetail = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Experience</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  {/* ❌ تم حذف عمود Action بالكامل */}
+                  {/* تم حذف عمود Action بالكامل */}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">

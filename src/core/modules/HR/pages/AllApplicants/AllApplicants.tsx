@@ -1,6 +1,6 @@
-// src/core/modules/HR/pages/AllApplicants/AllApplicants.tsx
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Users, XCircle } from 'lucide-react';
+import { ArrowLeft, Users, XCircle, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useCandidates } from '../../hooks/useCandidates';
 import ApplicantStats from './ApplicantStats';
 import ApplicantFilters from './ApplicantFilters';
@@ -10,6 +10,7 @@ import type { Candidate } from '../../../../../api/service/HrService/Types/Candi
 import toast from 'react-hot-toast';
 
 export const AllApplicants = () => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const jobId = searchParams.get('jobId') ? Number(searchParams.get('jobId')) : undefined;
@@ -34,16 +35,16 @@ export const AllApplicants = () => {
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="mb-8">
           <button onClick={() => navigate('/Hr/recruitment')} className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3">
-            <ArrowLeft className="w-4 h-4" /> Back to Recruitment
+            {i18n.dir() === 'rtl' ? <ChevronRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />} {t('backToRecruitment')}
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">All Applicants</h1>
-          <p className="text-gray-500 text-sm mt-1">No job selected</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('allApplicants')}</h1>
+          <p className="text-gray-500 text-sm mt-1">{t('noJobSelected')}</p>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-12 text-center">
           <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-400 text-lg">Please select a job posting to view applicants.</p>
+          <p className="text-gray-400 text-lg">{t('selectJobPostingToView')}</p>
           <button onClick={() => navigate('/Hr/job-postings')} className="mt-4 text-blue-500 hover:text-blue-700 font-medium">
-            Go to Job Postings
+            {t('goToJobPostings')}
           </button>
         </div>
       </div>
@@ -55,16 +56,16 @@ export const AllApplicants = () => {
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="mb-8">
           <button onClick={() => navigate('/Hr/recruitment')} className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3">
-            <ArrowLeft className="w-4 h-4" /> Back to Recruitment
+            {i18n.dir() === 'rtl' ? <ChevronRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />} {t('backToRecruitment')}
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">All Applicants</h1>
-          <p className="text-gray-500 text-sm mt-1">No applicants found for this job posting</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('allApplicants')}</h1>
+          <p className="text-gray-500 text-sm mt-1">{t('noApplicants')}</p>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-12 text-center">
           <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-400 text-lg">No applicants have applied for this position yet.</p>
+          <p className="text-gray-400 text-lg">{t('noApplicantsApplied')}</p>
           <button onClick={() => navigate('/Hr/recruitment')} className="mt-4 text-blue-500 hover:text-blue-700 font-medium">
-            Back to Recruitment
+            {t('backToRecruitment')}
           </button>
         </div>
       </div>
@@ -76,15 +77,15 @@ export const AllApplicants = () => {
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="mb-8">
           <button onClick={() => navigate('/Hr/recruitment')} className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3">
-            <ArrowLeft className="w-4 h-4" /> Back to Recruitment
+            {i18n.dir() === 'rtl' ? <ChevronRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />} {t('backToRecruitment')}
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">All Applicants</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('allApplicants')}</h1>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-12 text-center">
           <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <p className="text-red-500">Error loading applicants: {error}</p>
+          <p className="text-red-500">{t('error')}: {error}</p>
           <button onClick={() => window.location.reload()} className="mt-4 text-blue-500 hover:text-blue-700 font-medium">
-            Try Again
+            {t('tryAgain')}
           </button>
         </div>
       </div>
@@ -96,15 +97,15 @@ export const AllApplicants = () => {
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="mb-8">
           <button onClick={() => navigate('/Hr/recruitment')} className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3">
-            <ArrowLeft className="w-4 h-4" /> Back to Recruitment
+            {i18n.dir() === 'rtl' ? <ChevronRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />} {t('backToRecruitment')}
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">All Applicants</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('allApplicants')}</h1>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-12 text-center">
           <div className="flex justify-center items-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
           </div>
-          <p className="text-gray-400 mt-4">Loading applicants...</p>
+          <p className="text-gray-400 mt-4">{t('loading')}</p>
         </div>
       </div>
     );
@@ -132,10 +133,10 @@ export const AllApplicants = () => {
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-8">
         <button onClick={() => navigate('/Hr/recruitment')} className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3">
-          <ArrowLeft className="w-4 h-4" /> Back to Recruitment
+          {i18n.dir() === 'rtl' ? <ChevronRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />} {t('backToRecruitment')}
         </button>
-        <h1 className="text-2xl font-bold text-gray-900">All Applicants</h1>
-        <p className="text-gray-500 text-sm mt-1">{candidates.length} applicants for this position</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('allApplicants')}</h1>
+        <p className="text-gray-500 text-sm mt-1">{candidates.length} {t('applicantsForPosition')}</p>
       </div>
 
       <ApplicantStats stats={stats} />

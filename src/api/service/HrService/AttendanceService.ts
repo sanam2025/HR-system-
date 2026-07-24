@@ -1,5 +1,5 @@
-// src/api/service/HrService/AttendanceService.ts
-import { apiClient } from '../../client';
+﻿// src/api/service/HrService/AttendanceService.ts
+import apiClient from '@/api/axios';
 
 export interface AttendanceRecord {
   id: number;
@@ -19,13 +19,13 @@ export interface AttendanceStats {
 }
 
 export const AttendanceService = {
-  // ✅ جلب حضور اليوم
+  // جلب حضور اليوم
   getToday: () => apiClient.get<{ data: AttendanceRecord[] }>('/attendance-today'),
 
-  // ✅ جلب تحليل الحضور
+  // جلب تحليل الحضور
   getAnalysis: () => apiClient.get<{ data: AttendanceStats }>('/attendance-today-analysis'),
 
-  // ✅ جلب الحضور المفلتر
+  // جلب الحضور المفلتر
   getFiltered: (from: string, to: string) =>
     apiClient.get<{ data: AttendanceRecord[] }>(`/attendance-filter?from=${from}&to=${to}`),
 };

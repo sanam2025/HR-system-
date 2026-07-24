@@ -1,5 +1,6 @@
 // core/modules/HR/pages/Terminations.tsx
 import React, { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Plus } from "lucide-react";
 import TerminationRequestRow from "../Components/Special_Components/TerminationRequestRow";
 import TerminationFormModal from "../Components/Special_Components/TerminationFormModal";
@@ -36,12 +37,14 @@ const INITIAL_TERMINATIONS: TerminationRequest[] = [
 const STATS_CONFIG = [
   {
     key: "total",
+    labelKey: "totalRequests",
     label: "Total Requests",
     color: "text-gray-800",
     getValue: (arr: TerminationRequest[]) => arr.length,
   },
   {
     key: "pending",
+    labelKey: "pending",
     label: "Pending",
     color: "text-amber-600",
     getValue: (arr: TerminationRequest[]) =>
@@ -49,6 +52,7 @@ const STATS_CONFIG = [
   },
   {
     key: "processed",
+    labelKey: "processed",
     label: "Processed",
     color: "text-emerald-600",
     getValue: (arr: TerminationRequest[]) =>
@@ -56,6 +60,7 @@ const STATS_CONFIG = [
   },
   {
     key: "draft",
+    labelKey: "draft",
     label: "Draft",
     color: "text-gray-600",
     getValue: (arr: TerminationRequest[]) =>
@@ -63,22 +68,22 @@ const STATS_CONFIG = [
   },
 ];
 
-const COLUMNS = [
-  "Employee",
-  "Department",
-  "Type",
-  "Effective Date",
-  "Status",
-  "Actions",
+const COLUMNS_KEYS = [
+  { key: "employee", label: "Employee" },
+  { key: "department", label: "Department" },
+  { key: "type", label: "Type" },
+  { key: "effectiveDate", label: "Effective Date" },
+  { key: "status", label: "Status" },
+  { key: "actions", label: "Actions" },
 ];
 
 // ============= STATS GRID =============
-const StatsGrid = ({ requests }: { requests: TerminationRequest[] }) => (
+const StatsGrid = ({ requests, t }: { requests: TerminationRequest[], t: (key: string) => string }) => (
   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-    {STATS_CONFIG.map(({ label, color, getValue }) => (
+    {STATS_CONFIG.map(({ labelKey, label, color, getValue }) => (
       <div key={label} className="bg-white rounded-xl shadow-sm p-4">
         <p className="text-xs text-gray-400 uppercase tracking-wider">
-          {label}
+          {t(labelKey) || label}
         </p>
         <p className={`text-2xl font-bold ${color} mt-1`}>
           {getValue(requests)}
@@ -90,13 +95,14 @@ const StatsGrid = ({ requests }: { requests: TerminationRequest[] }) => (
 
 // ============= MAIN =============
 export default function Terminations() {
+  const { t } = useTranslation();
   const [requests, setRequests] =
     useState<TerminationRequest[]>(INITIAL_TERMINATIONS);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const handleView = (r: TerminationRequest) =>
     alert(
-      `📋 ${r.employeeName}\nType: ${r.terminationType}\nReason: ${r.reason}\nEffective Date: ${r.effectiveDate}`,
+      `${r.employeeName}\nType: ${r.terminationType}\nReason: ${r.reason}\nEffective Date: ${r.effectiveDate}`,
     );
 
   const handleProcess = (r: TerminationRequest) => {
@@ -106,7 +112,7 @@ export default function Terminations() {
       ),
     );
     alert(
-      `✅ ${r.employeeName}'s termination processed. Documents and compensation ready.`,
+      `${r.employeeName}'s termination processed. Documents and compensation ready.`,
     );
   };
 
@@ -124,40 +130,40 @@ export default function Terminations() {
       submittedDate: new Date().toISOString().split("T")[0],
     };
     setRequests((prev) => [newRequest, ...prev]);
-    alert(`✅ Termination request for ${newRequest.employeeName} submitted!`);
+    alert(`Termination request for ${newRequest.employeeName} submitted!`);
     setIsFormOpen(false);
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-8 flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-bold">Employee Termination</h1>
+          <h1 className="text-2xl font-bold">{t('employeeTermination') || 'Employee Termination'}</h1>
           <p className="text-gray-500 text-sm mt-1">
-            Manage employee termination, contract end, and compensation.
+            {t('manageTerminations') || 'Manage employee termination, contract end, and compensation.'}
           </p>
         </div>
         <button
           onClick={() => setIsFormOpen(true)}
           className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700"
         >
-          <Plus className="w-4 h-4" /> New Request
+          <Plus className="w-4 h-4" /> {t('newRequest') || 'New Request'}
         </button>
       </div>
 
-      <StatsGrid requests={requests} />
+      <StatsGrid requests={requests} t={t as (key: string) => string} />
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                {COLUMNS.map((c) => (
+                {COLUMNS_KEYS.map((col) => (
                   <th
-                    key={c}
+                    key={col.key}
                     className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider"
                   >
-                    {c}
+                    {t(col.key) || col.label}
                   </th>
                 ))}
               </tr>

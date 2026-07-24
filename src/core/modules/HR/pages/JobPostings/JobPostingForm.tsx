@@ -85,7 +85,7 @@ export default function JobPostingForm() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-6">
         <button
           onClick={() => navigate("/Hr/job-postings")}

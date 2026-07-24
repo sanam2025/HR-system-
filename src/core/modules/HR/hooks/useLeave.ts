@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { LeaveService } from '../../../../api/service/HrService/LeaveService';
 
-// ✅ جلب كل الطلبات
+// جلب كل الطلبات
 export const useLeaveRequests = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['leave-requests'],
@@ -21,7 +21,7 @@ export const useLeaveRequests = () => {
   };
 };
 
-// ✅ جلب تفاصيل طلب
+// جلب تفاصيل طلب
 export const useLeaveRequest = (id?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['leave-request', id],
@@ -41,7 +41,7 @@ export const useLeaveRequest = (id?: number) => {
   };
 };
 
-// ✅ موافقة على طلب
+// موافقة على طلب
 export const useApproveLeave = () => {
   const queryClient = useQueryClient();
 
@@ -57,7 +57,7 @@ export const useApproveLeave = () => {
   });
 };
 
-// ✅ رفض طلب
+// رفض طلب
 export const useRejectLeave = () => {
   const queryClient = useQueryClient();
 
@@ -73,7 +73,7 @@ export const useRejectLeave = () => {
   });
 };
 
-// ✅ رصيد إجازات موظف
+// رصيد إجازات موظف
 export const useLeaveBalance = (employeeId?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['leave-balance', employeeId],
@@ -93,7 +93,7 @@ export const useLeaveBalance = (employeeId?: number) => {
   };
 };
 
-// ✅ طلبات قسم معين
+// طلبات قسم معين
 export const useDepartmentLeaveRequests = (status?: string) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['department-leave-requests', status],
@@ -111,7 +111,7 @@ export const useDepartmentLeaveRequests = (status?: string) => {
   };
 };
 
-// ✅ كل طلبات الإجازات (مع فلترة)
+// كل طلبات الإجازات (مع فلترة)
 export const useAllLeaveRequests = (from?: string, to?: string) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['all-leave-requests', from, to],

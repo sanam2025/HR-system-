@@ -1,8 +1,5 @@
-// src/shared/layouts/HRLayout.tsx
-import { Outlet } from "react-router-dom";
-import Sidebar from "../components/SideBar";
-import LanguageSwitcher from "../components/LanguageSwitcher";
 import { useTranslation } from 'react-i18next';
+import AppLayout from "./AppLayout";
 import {
   LayoutDashboard,
   Users,
@@ -17,10 +14,8 @@ import {
   Scale,
   Megaphone,
 } from "lucide-react";
-import { useState } from "react";
 
 export default function HRLayout() {
-  const [open, setOpen] = useState(true);
   const { t } = useTranslation();
 
   const hrSideBar = [
@@ -37,38 +32,47 @@ export default function HRLayout() {
     { path: "resignations", label: t('resignations'), icon: LogOut, exact: false },
     { path: "contracts", label: t('contracts'), icon: FileText, exact: false },
     { path: "job-postings", label: t('jobPostings'), icon: Briefcase, exact: false },
-    // ✅ إضافة Announcements في الـ Sidebar
     {
       path: "announcements",
-      label: t('announcements') || "التعميمات",
+      label: t('announcements'),
       icon: Megaphone,
       exact: false,
     },
-    // ✅ إضافة الشكاوي في الـ Sidebar
     {
       path: "complaints",
-      label: t('complaints') || "الشكاوي",
+      label: t('complaints'),
       icon: Scale,
       exact: false,
     },
   ];
 
+  const hrPageTitles: Record<string, string> = {
+    '/Hr': t('dashboard'),
+    '/Hr/employees': t('employee'),
+    '/Hr/Recruitment': t('recruitment'),
+    '/Hr/all-applicants': t('applicants'),
+    '/Hr/attendance': t('attendance'),
+    '/Hr/Leaves': t('leaves'),
+    '/Hr/hourly-leaves': t('hourlyLeaves'),
+    '/Hr/Payroll': t('payroll'),
+    '/Hr/accepted-candidates': t('acceptedCandidates'),
+    '/Hr/terminations': t('terminations'),
+    '/Hr/resignations': t('resignations'),
+    '/Hr/contracts': t('contracts'),
+    '/Hr/job-postings': t('jobPostings'),
+    '/Hr/announcements': t('announcements'),
+    '/Hr/complaints': t('complaints'),
+  };
+
   return (
-    <div className="flex overflow-hidden bg-gray-100">
-      <Sidebar
-        navItems={hrSideBar}
-        onToggle={() => setOpen(!open)}
-        open={open}
-      />
-      <div className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${open ? 'md:ms-64' : 'md:ms-16'}`}>
-        <div className="p-4 border-b bg-white flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-800"></h1>
-          <LanguageSwitcher />
-        </div>
-        <main className="flex-1 p-6 pb-16 overflow-x-hidden overflow-y-auto">
-          <Outlet />
-        </main>
-      </div>
-    </div>
+    <AppLayout
+      navItems={hrSideBar}
+      pageTitles={hrPageTitles}
+      brand={{
+        title: "HR Portal",
+        subtitle: t('department')
+      }}
+      navSectionLabel={t('hrMenu') || 'HR Menu'}
+    />
   );
 }

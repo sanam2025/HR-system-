@@ -1,9 +1,9 @@
-// src/core/modules/HR/hooks/useEmployees.ts
+﻿// src/core/modules/HR/hooks/useEmployees.ts
 import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '../../../../api/client';
+import apiClient from '@/api/axios';
 import type { Employee } from '../../../../api/service/HrService/Types/DepartmentsService.types';
 
-// ✅ جلب موظف واحد
+// جلب موظف واحد
 export const useEmployee = (userId?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['employee', userId],

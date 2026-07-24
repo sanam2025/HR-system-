@@ -21,7 +21,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
   jobId,
   onScheduleInterview,
 }) => {
-  // ✅ تغيير الحالة من rejected إلى applied
+  // تغيير الحالة من rejected إلى applied
   const displayStatus = candidate.status === 'rejected' ? 'applied' : candidate.status;
 
   const getStatusColor = (status: string) => {
@@ -46,10 +46,10 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
   const experience = candidate.experience || 0;
   const status = displayStatus as string;
 
-  // ✅ إظهار أيقونة التقويم فقط لـ applied
+  // إظهار أيقونة التقويم فقط لـ applied
   const showScheduleButton = jobId && status === 'applied';
   
-  // ❌ تم حذف أيقونة Offer من هنا (نقلت لصفحة JobPostingDetail)
+  // تم حذف أيقونة Offer من هنا (نقلت لصفحة JobPostingDetail)
 
   return (
     <tr className="hover:bg-gray-50">
@@ -99,7 +99,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
       </td>
       <td className="px-6 py-4">
         <div className="flex items-center justify-end">
-          {/* ✅ أيقونة التقويم (لـ applied فقط) */}
+          {/* أيقونة التقويم (لـ applied فقط) */}
           {showScheduleButton && (
             <button
               onClick={() => onScheduleInterview(candidate.id)}
@@ -109,7 +109,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
               <Calendar className="w-5 h-5" />
             </button>
           )}
-          {/* ❌ تم حذف أيقونة Offer */}
+          {/* تم حذف أيقونة Offer */}
         </div>
       </td>
     </tr>

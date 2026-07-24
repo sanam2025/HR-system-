@@ -18,14 +18,14 @@ export const ScheduleInterview = () => {
   
   const { scheduleInterview, isScheduling } = useInterviews(jobIdNumber);
 
-  // ✅ candidate_id و interviewed_by تلقائي (مخفيين عن المستخدم)
+  // candidate_id و interviewed_by تلقائي (مخفيين عن المستخدم)
   const [form, setForm] = useState({
     scheduled_at: '',
     location_type: 'on_site',
     location_details: '',
   });
 
-  // ✅ التحقق من يوم العطلة
+  // التحقق من يوم العطلة
   const isWeekend = (date: string) => {
     const day = new Date(date).getDay();
     return day === 5 || day === 6;
@@ -55,20 +55,20 @@ export const ScheduleInterview = () => {
       return;
     }
     
-    // ✅ البيانات مع candidate_id من الـ URL و interviewed_by تلقائي (4)
+    // البيانات مع candidate_id من الـ URL و interviewed_by تلقائي (4)
     const data = {
       candidate_id: Number(candidateIdFromUrl || 1),
-      interviewed_by: 4, // ✅ تلقائي
+      interviewed_by: 4, // تلقائي
       scheduled_at: form.scheduled_at,
       location_type: form.location_type,
       location_details: form.location_details || '',
     };
     
-    console.log('📅 Sending data:', data);
+    console.log('Sending data:', data);
     
     scheduleInterview(data, {
       onSuccess: () => {
-        toast.success('✅ Interview added to schedule successfully!');
+        toast.success('Interview added to schedule successfully!');
         if (jobId) {
           navigate(`/Hr/job-postings/${jobId}/interviews`);
         } else {
@@ -76,7 +76,7 @@ export const ScheduleInterview = () => {
         }
       },
       onError: (err) => {
-        console.error('❌ Schedule error:', err);
+        console.error('Schedule error:', err);
         toast.error(getErrorMessage(err));
       },
     });
@@ -106,14 +106,14 @@ export const ScheduleInterview = () => {
           <p className="text-gray-500 text-sm mt-1">Schedule a new interview for this job posting</p>
           {candidateIdFromUrl && (
             <p className="text-sm text-purple-600 mt-2">
-              👤 Scheduling interview for Candidate #{candidateIdFromUrl}
+              Scheduling interview for Candidate #{candidateIdFromUrl}
             </p>
           )}
         </div>
 
         <div className="bg-white rounded-xl shadow-sm p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* ✅ Candidate ID - مخفي */}
+            {/* Candidate ID - مخفي */}
             {candidateIdFromUrl && (
               <div className="hidden">
                 <input
@@ -125,7 +125,7 @@ export const ScheduleInterview = () => {
               </div>
             )}
 
-            {/* ✅ Interviewer ID - مخفي */}
+            {/* Interviewer ID - مخفي */}
             <div className="hidden">
               <input
                 type="number"

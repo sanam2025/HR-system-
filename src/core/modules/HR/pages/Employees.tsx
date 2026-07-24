@@ -5,7 +5,10 @@ import { Users, Building2, ChevronRight, Mail } from 'lucide-react';
 import { useDepartmentsWithUsers } from '../hooks/useDepartments';
 import Loading from '../../../../shared/components/Loading';
 
+import { useTranslation } from 'react-i18next';
+
 export default function Employees() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { departments, isLoading } = useDepartmentsWithUsers();
 
@@ -18,10 +21,13 @@ export default function Employees() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">🏢 Departments</h1>
-        <p className="text-gray-500 text-sm">Browse employees by department</p>
+        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <Building2 className="w-6 h-6 text-purple-500" />
+          {t('departmentsPageTitle')}
+        </h1>
+        <p className="text-gray-500 text-sm mt-1">{t('browseEmployeesByDept')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -40,7 +46,7 @@ export default function Employees() {
                   {department.name}
                 </h3>
                 {department.manager_name && (
-                  <p className="text-xs text-gray-500">Manager: {department.manager_name}</p>
+                  <p className="text-xs text-gray-500">{t('managers')}: {department.manager_name}</p>
                 )}
               </div>
               <ChevronRight className="w-4 h-4 text-gray-400" />
@@ -75,10 +81,10 @@ export default function Employees() {
         ))}
       </div>
 
-      {departments.length === 0 && (
+      {!isLoading && departments.length === 0 && (
         <div className="text-center py-12">
-          <Users className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-          <p className="text-gray-400">No departments found</p>
+          <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500">{t('noDepartmentsFound')}</p>
         </div>
       )}
     </div>

@@ -1,11 +1,13 @@
 // src/core/modules/HR/pages/Complaints/Complaints.tsx
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Eye, RefreshCw } from 'lucide-react';
 import { useComplaints } from '../../hooks/useComplaints';
 import type { Complaint } from '../../../../../api/service/HrService/Types/ComplaintsService.types';
 
 export default function Complaints() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { complaints, isLoading, refetch } = useComplaints();
 
   const getStatusBadge = (status: string) => {
@@ -19,21 +21,21 @@ export default function Complaints() {
   };
 
   if (isLoading) {
-    return <div className="p-6 text-center">Loading...</div>;
+    return <div className="p-6 text-center">{t('loading') || 'Loading...'}</div>;
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">📋 Complaints Management</h1>
-          <p className="text-gray-500 text-sm">View and manage all complaints from employees and managers</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('complaintsManagement') || 'Complaints Management'}</h1>
+          <p className="text-gray-500 text-sm">{t('viewManageComplaints') || 'View and manage all complaints from employees and managers'}</p>
         </div>
         <button
           onClick={() => refetch()}
           className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
         >
-          <RefreshCw className="w-4 h-4" /> Refresh
+          <RefreshCw className="w-4 h-4" /> {t('refresh') || 'Refresh'}
         </button>
       </div>
 
@@ -43,12 +45,12 @@ export default function Complaints() {
             <thead className="bg-gray-50 border-b">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Complainant</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Against</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('titleStar') || 'Title'}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('complainant') || 'Complainant'}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('against') || 'Against'}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('status') || 'Status'}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('date') || 'Date'}</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('actions') || 'Actions'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -66,7 +68,7 @@ export default function Complaints() {
                     <button
                       onClick={() => navigate(`/Hr/complaints/${complaint.id}`)}
                       className="p-1 text-blue-500 hover:text-blue-700 transition-colors"
-                      title="View Details"
+                      title={t('viewDetails') || 'View Details'}
                     >
                       <Eye className="w-4 h-4" />
                     </button>
@@ -76,7 +78,7 @@ export default function Complaints() {
               {complaints.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
-                    No complaints found
+                    {t('noComplaints') || 'No complaints found'}
                   </td>
                 </tr>
               )}
@@ -86,4 +88,4 @@ export default function Complaints() {
       </div>
     </div>
   );
-}
+}

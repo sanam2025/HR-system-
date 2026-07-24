@@ -13,7 +13,9 @@ interface RecruitmentCardProps {
   isLoadingReject: boolean;
 }
 
-export default function RecruitmentCard({
+import React from "react";
+
+export function RecruitmentCard({
   req,
   onApprove,
   onReject,
@@ -22,10 +24,10 @@ export default function RecruitmentCard({
 }: RecruitmentCardProps) {
   const navigate = useNavigate();
   
-  // ✅ جلب جميع الوظائف المنشورة
+  // جلب جميع الوظائف المنشورة
   const { postings } = useJobPostings();
 
-  // ✅ البحث عن الوظيفة المنشورة التي تطابق job_title
+  // البحث عن الوظيفة المنشورة التي تطابق job_title
   const getJobPostingId = (): number | undefined => {
     if (!postings || postings.length === 0) return undefined;
     const match = postings.find((p: JobPosting) => p.job_title === req.job_title);
@@ -108,3 +110,5 @@ export default function RecruitmentCard({
     </tr>
   );
 }
+
+export default React.memo(RecruitmentCard);

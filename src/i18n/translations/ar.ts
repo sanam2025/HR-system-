@@ -32,7 +32,7 @@ const ar = {
     completedThisMonth: 'مكتملة هذا الشهر',
     performanceChart: '📈 أداء القسم الشهري',
     avgRating: 'متوسط التقييم',
-    attendanceChart: '📊 نسبة الحضور الشهرية',
+    attendanceChart: 'نسبة الحضور الشهرية',
     attendancePct: 'نسبة الحضور %',
     pendingTasksList: '⏳ المهام المعلقة',
     pendingLeavesList: '📋 طلبات الإجازة المعلقة',

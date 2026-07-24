@@ -1,7 +1,7 @@
-// src/core/modules/HR/pages/Leaves/Leaves.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, RefreshCw, FileText } from 'lucide-react';
+import { ArrowLeft, RefreshCw, FileText, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useLeaveRequests, useApproveLeave, useRejectLeave } from '../../hooks/useLeave';
 import LeaveStats from './LeaveStats';
 import LeaveCard from './LeaveCard';
@@ -9,6 +9,7 @@ import LeaveFilters from './LeaveFilters';
 import Loading from '../../../../../shared/components/Loading';
 
 export const Leaves = () => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -18,7 +19,7 @@ export const Leaves = () => {
   const approveMutation = useApproveLeave();
   const rejectMutation = useRejectLeave();
 
-  // ✅ حساب الإحصائيات
+  // حساب الإحصائيات
   const stats = {
     total: requests.length,
     pending: requests.filter((r) => r.status === 'pending').length,
@@ -26,7 +27,7 @@ export const Leaves = () => {
     rejected: requests.filter((r) => r.status === 'rejected').length,
   };
 
-  // ✅ فلترة الطلبات
+  // فلترة الطلبات
   const filtered = requests.filter((request) => {
     const matchesSearch = request.employee_name?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
@@ -51,17 +52,17 @@ export const Leaves = () => {
             onClick={() => navigate('/Hr')}
             className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-2"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+            {i18n.dir() === 'rtl' ? <ChevronRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />} {t('backToDashboard') || 'Back to Dashboard'}
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">Leave Requests</h1>
-          <p className="text-gray-500 text-sm mt-1">Manage employee leave requests</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('leaveRequests') || 'Leave Requests'}</h1>
+          <p className="text-gray-500 text-sm mt-1">{t('manageLeaveRequests') || 'Manage employee leave requests'}</p>
         </div>
         <button
           onClick={() => refetch()}
           className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
-          Refresh
+          {t('refresh') || 'Refresh'}
         </button>
       </div>
 
@@ -82,7 +83,7 @@ export const Leaves = () => {
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
           <h3 className="text-lg font-semibold text-gray-800">
-            Leave Requests ({filtered.length})
+            {t('leaveRequests') || 'Leave Requests'} ({filtered.length})
           </h3>
         </div>
 
@@ -92,25 +93,25 @@ export const Leaves = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Employee
+                    {t('employee') || 'Employee'}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Department
+                    {t('department') || 'Department'}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Start Date
+                    {t('startDate') || 'Start Date'}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Days
+                    {t('days') || 'Days'}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Type
+                    {t('type') || 'Type'}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                    {t('status') || 'Status'}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
+                    {t('actions') || 'Actions'}
                   </th>
                 </tr>
               </thead>
@@ -129,9 +130,9 @@ export const Leaves = () => {
             </table>
           </div>
         ) : (
-          <div className="p-12 text-center text-gray-400">
+          <div className="p-12 text-center">
             <FileText className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p>No leave requests found</p>
+            <p className="text-gray-500 text-lg">{t('noLeaveRequests') || 'No leave requests found'}</p>
           </div>
         )}
       </div>
