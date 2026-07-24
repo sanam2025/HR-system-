@@ -4,6 +4,7 @@ import type { NavItem } from '../components/SideBar';
 import Sidebar from '../components/SideBar';
 import Topbar from '../components/Topbar';
 import { useTranslation } from 'react-i18next';
+import { useAuthStore } from '../../store/authStore';
 
 interface AppLayoutProps {
   navItems: NavItem[];
@@ -41,7 +42,7 @@ export default function AppLayout({
         onToggle={toggleSidebar}
         navItems={navItems}
         brand={brand}
-        user={user}
+        user={displayUser}
         navSectionLabel={navSectionLabel}
       />
       <div className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${sidebarOpen ? 'md:ms-64' : 'md:ms-16'}`}>

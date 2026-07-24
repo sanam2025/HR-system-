@@ -35,6 +35,14 @@ const resources = {
       complaints: 'Complaints',
       
       // Dashboard
+            systemName: 'HR System',
+      university: 'University of Damascus',
+      managerRole: 'Department Manager',
+      userName: 'Mohamed Ahmed',
+      userAvatar: 'M',
+      adminRole: 'System Administrator',
+      hrRole: 'HR Manager',
+      employeeRole: 'Employee',
       dashboardTitle: 'Welcome to HR Dashboard',
       dashboardSubtitle: 'Overview of employee performance and statistics.',
       addAnnouncement: 'Add Announcement',
@@ -406,6 +414,14 @@ const resources = {
       complaints: 'الشكاوي',
 
       // Dashboard
+            systemName: 'نظام الموارد البشرية',
+      university: 'جامعة دمشق',
+      managerRole: 'مدير القسم',
+      userName: 'أحمد محمد الصالح',
+      userAvatar: 'أ',
+      adminRole: 'مدير النظام',
+      hrRole: 'مدير الموارد البشرية',
+      employeeRole: 'موظف',
       dashboardTitle: 'مرحباً بك في لوحة تحكم الموارد البشرية',
       dashboardSubtitle: 'نظرة عامة على أداء الموظفين والإحصائيات.',
       addAnnouncement: 'إضافة تعميم',

@@ -29,7 +29,6 @@ export default function EmployeeLayout() {
       navItems={navItems}
       pageTitles={pageTitles}
       brand={{ logo: "🌱", title: "Terra Portal", subtitle: "Employee Management" }}
-      user={{ avatar: "S", name: "Sarah", role: "Employee" }}
       navSectionLabel="Main Menu"
     />
   );

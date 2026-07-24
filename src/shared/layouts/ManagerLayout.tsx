@@ -36,7 +36,6 @@ export default function ManagerLayout() {
       navItems={navItems}
       pageTitles={pageTitles}
       brand={{ logo: '🏢', title: t('systemName') || 'HR System', subtitle: t('university') || 'University of Damascus' }}
-      user={{ avatar: t('userAvatar') || 'M', name: t('userName') || 'Mohamed Ahmed', role: t('managerRole') || 'Department Manager' }}
       navSectionLabel={t('mainMenu') || 'Main Menu'}
       defaultTitle={t('dashboard') || 'Dashboard'}
     />
