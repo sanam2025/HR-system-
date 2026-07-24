@@ -202,7 +202,7 @@ export default function Topbar({
                 {/* Menu Items */}
                 <div className="py-1.5">
                   <button
-                    onClick={() => { navigate('/manager/profile'); setProfileOpen(false); }}
+                    onClick={() => { navigate(`/${location.pathname.split('/')[1]}/profile`); setProfileOpen(false); }}
                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-dark hover:bg-green/5 hover:text-green transition-colors text-start"
                   >
                     <User size={16} className="text-gray-400" />

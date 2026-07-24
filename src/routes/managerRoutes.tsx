@@ -11,12 +11,14 @@ const OvertimeRequests = React.lazy(() => import('@/core/pages/Leaves/OvertimeRe
 const AttendanceView = React.lazy(() => import('@/core/pages/Attendance/AttendanceView'));
 const PeriodicEvaluation = React.lazy(() => import('@/core/pages/Evaluation/PeriodicEvaluation'));
 const Recruitment = React.lazy(() => import('@/core/modules/HR/pages/Recruitment/Recruitment'));
+const MyProfile = React.lazy(() => import('@/core/modules/employee/pages/EmployeeProfile'));
 
 export const managerRoutes = {
   path: '/manager',
   element: <ManagerLayout />,
   children: [
     { index: true, element: <SuspenseWrapper><Dashboard /></SuspenseWrapper> },
+    { path: 'profile', element: <SuspenseWrapper><MyProfile /></SuspenseWrapper> },
     { path: 'employees', element: <SuspenseWrapper><EmployeesList /></SuspenseWrapper> },
     { path: 'employees/:id', element: <SuspenseWrapper><EmployeeProfile /></SuspenseWrapper> },
     { path: 'tasks', element: <SuspenseWrapper><TasksBoard /></SuspenseWrapper> },

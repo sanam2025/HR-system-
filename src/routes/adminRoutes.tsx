@@ -8,12 +8,14 @@ const AdminAnnouncements = React.lazy(() => import('@/core/modules/admin/pages/A
 const OrganizationlStructure = React.lazy(() => import('@/core/modules/admin/pages/OrganizationlStructure'));
 const Reports = React.lazy(() => import('@/core/modules/admin/pages/Reports'));
 const EmployeeSearch = React.lazy(() => import('@/core/modules/admin/pages/EmployeeSearch'));
+const MyProfile = React.lazy(() => import('@/core/modules/employee/pages/EmployeeProfile'));
 
 export const adminRoutes = {
   path: '/admin',
   element: <AdminLayout />,
   children: [
     { index: true, element: <SuspenseWrapper><DashboardAdmin /></SuspenseWrapper> },
+    { path: 'profile', element: <SuspenseWrapper><MyProfile /></SuspenseWrapper> },
     { path: 'setting', element: <SuspenseWrapper><SystemSettings /></SuspenseWrapper> },
     { path: 'announcement', element: <SuspenseWrapper><AdminAnnouncements /></SuspenseWrapper> },
     { path: 'organization', element: <SuspenseWrapper><OrganizationlStructure /></SuspenseWrapper> },

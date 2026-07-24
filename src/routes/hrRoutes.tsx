@@ -30,12 +30,14 @@ const Complaints = React.lazy(() => import('@/core/modules/HR/pages/Complaints/C
 const ComplaintDetail = React.lazy(() => import('@/core/modules/HR/pages/Complaints/ComplaintDetail'));
 const EmployeeProfileHR = React.lazy(() => import('@/core/modules/HR/pages/EmployeeProfile'));
 const DepartmentDetail = React.lazy(() => import('@/core/modules/HR/pages/DepartmentDetail'));
+const MyProfile = React.lazy(() => import('@/core/modules/employee/pages/EmployeeProfile'));
 
 export const hrRoutes = {
   path: "/Hr",
   element: <HRLayout />,
   children: [
     { index: true, element: <SuspenseWrapper><Dashboard /></SuspenseWrapper> },
+    { path: "profile", element: <SuspenseWrapper><MyProfile /></SuspenseWrapper> },
     { path: "employees", element: <SuspenseWrapper><Employees /></SuspenseWrapper> },
     { path: "Recruitment", element: <SuspenseWrapper><Recruitment /></SuspenseWrapper> },
     { path: "recruitment/:id", element: <SuspenseWrapper><JobRequisitionDetail /></SuspenseWrapper> },
