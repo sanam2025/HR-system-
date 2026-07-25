@@ -18,7 +18,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function ProfileHeader({ profile }: { profile: EmployeeProfile }) {
+export function ProfileHeader({ profile, onEdit }: { profile: EmployeeProfile; onEdit?: () => void }) {
   const { t } = useTranslation();
   return (
     <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md animate-scale-in">
@@ -38,6 +38,7 @@ export function ProfileHeader({ profile }: { profile: EmployeeProfile }) {
       </div>
         <button
           type="button"
+          onClick={onEdit}
           className="w-full sm:w-auto px-5 py-2.5 bg-green text-white rounded-xl text-sm font-medium hover:bg-green-dark transition-colors flex-shrink-0 active:scale-[0.97] transition-transform duration-100"
           aria-label="Edit profile"
         >
@@ -78,7 +79,7 @@ function DocumentItem({ doc, index }: { doc: Document; index: number }) {
   );
 }
 
-export function DocumentsCard({ documents }: { documents: Document[] }) {
+export function DocumentsCard({ documents, onAddDoc }: { documents: Document[]; onAddDoc?: () => void }) {
   const { t } = useTranslation();
   return (
     <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
@@ -86,6 +87,7 @@ export function DocumentsCard({ documents }: { documents: Document[] }) {
         <h3 className="text-sm font-semibold text-dark">{t('documents')}</h3>
         <button
           type="button"
+          onClick={onAddDoc}
           className="w-7 h-7 rounded-lg bg-green-light flex items-center justify-center hover:bg-green/20 transition-colors"
           aria-label="Add new document"
         >
