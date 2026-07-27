@@ -7,6 +7,7 @@ import SystemSettings from "./core/modules/admin/pages/SystemSettings";
 import AdminLayout from "./shared/layouts/AdminLayout";
 import DashboardAdmin from "./core/modules/admin/pages/Dashboard";
 import Holidays from "./core/modules/admin/pages/Holidays/Holidays";
+import Login from "./core/modules/auth/Login";
 
 
 
@@ -19,6 +20,10 @@ function Page({ title }: { title: string }) {
 }
 
 const appRouter = createBrowserRouter([
+  {
+    path:'/',
+    element:<Login/>,
+  },
   {
     path:'/admin',
     element:<AdminLayout/>,

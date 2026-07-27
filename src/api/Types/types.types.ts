@@ -26,3 +26,12 @@ export interface APIResponseWithOnlyData<T>{
 export interface APIResponseWithOnlyDataArray<T>{
   data: T[];
 }
+
+export interface APIResponseWithToken<T>{
+  message: string;
+  data: {
+    user: T
+  };
+  Token: string;
+  status_code: number;
+}

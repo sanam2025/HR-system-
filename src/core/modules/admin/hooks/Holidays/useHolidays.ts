@@ -4,7 +4,6 @@ import { HolidaysService } from "../../../../../api/service/adminService/Holiday
 export const HOLIDAYS_KEY = {
     all: ['holidays'],
     detail: (id: number) => [...HOLIDAYS_KEY.all, 'detail', id],
-
 }
 
 export const useHolidays = () =>{
