@@ -4,11 +4,33 @@ import JobPostingsStats from './JobPostingsStats';
 import JobPostingsFilters from './JobPostingsFilters';
 import JobPostingsCard from './JobPostingsCard';
 import Loading from '../../../../../shared/components/Loading';
-import { useJobPostings } from '../../hooks/useJobPostings';
+import { 
+  useJobPostings, 
+  useCloseJobPosting, 
+  useDeleteJobPosting 
+} from '../../hooks/useJobPostings';
 
 export default function JobPostings() {
-  const { postings, isLoading, error, refetch, close, delete: deletePosting, isClosing, isDeleting } = useJobPostings();
   const [searchTerm, setSearchTerm] = useState('');
+
+  // 1. جلب الوظائف (هذا موجود عندك)
+  const { postings, isLoading, error, refetch } = useJobPostings();
+
+  // 2. هوك الإغلاق (موجود عندك في ملف منفصل)
+  const closeMutation = useCloseJobPosting();
+
+  // 3. هوك الحذف (موجود عندك في ملف منفصل)
+  const deleteMutation = useDeleteJobPosting();
+
+  // دالة الإغلاق
+  const handleClose = (id: number) => {
+    closeMutation.mutate(id);
+  };
+
+  // دالة الحذف
+  const handleDelete = (id: number) => {
+    deleteMutation.mutate(id);
+  };
 
   const filteredPostings = postings.filter(p =>
     p.job_title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -63,10 +85,11 @@ export default function JobPostings() {
                 <JobPostingsCard
                   key={posting.id}
                   posting={posting}
-                  onClose={close}
-                  onDelete={deletePosting}
-                  isClosing={isClosing}
-                  isDeleting={isDeleting}
+                  onClose={handleClose}
+                  onDelete={handleDelete}
+                  // ✅ تمرير حالات التحميل الخاصة بكل عملية
+                  isClosing={closeMutation.isPending}
+                  isDeleting={deleteMutation.isPending}
                 />
               ))}
             </tbody>

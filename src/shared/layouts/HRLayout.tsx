@@ -2,7 +2,7 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/SideBar";
 import LanguageSwitcher from "../components/LanguageSwitcher";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import {
   LayoutDashboard,
   Users,
@@ -24,30 +24,59 @@ export default function HRLayout() {
   const { t } = useTranslation();
 
   const hrSideBar = [
-    { path: "/Hr", label: t('dashboard'), icon: LayoutDashboard, exact: true },
-    { path: "employees", label: t('employee'), icon: Users, exact: false },
-    { path: "Recruitment", label: t('recruitment'), icon: UserPlus, exact: false },
-    { path: "all-applicants", label: t('applicants'), icon: UsersRound, exact: false },
-    { path: "attendance", label: t('attendance'), icon: Clock, exact: false },
-    { path: "Leaves", label: t('leaves'), icon: CalendarDays, exact: false },
-    { path: "hourly-leaves", label: t('hourlyLeaves'), icon: Clock, exact: false },
-    { path: "Payroll", label: t('payroll'), icon: DollarSign, exact: false },
-    { path: "accepted-candidates", label: t('acceptedCandidates'), icon: Users, exact: false },
-    { path: "terminations", label: t('terminations'), icon: Users, exact: false },
-    { path: "resignations", label: t('resignations'), icon: LogOut, exact: false },
-    { path: "contracts", label: t('contracts'), icon: FileText, exact: false },
-    { path: "job-postings", label: t('jobPostings'), icon: Briefcase, exact: false },
+    { path: "/Hr", label: t("dashboard"), icon: LayoutDashboard, exact: true },
+    { path: "employees", label: t("employee"), icon: Users, exact: false },
+    {
+      path: "Recruitment",
+      label: t("recruitment"),
+      icon: UserPlus,
+      exact: false,
+    },
+    {
+      path: "all-applicants",
+      label: t("applicants"),
+      icon: UsersRound,
+      exact: false,
+    },
+    { path: "attendance", label: t("attendance"), icon: Clock, exact: false },
+    { path: "Leaves", label: t("leaves"), icon: CalendarDays, exact: false },
+    {
+      path: "hourly-leaves",
+      label: t("hourlyLeaves"),
+      icon: Clock,
+      exact: false,
+    },
+    { path: "Payroll", label: t("payroll"), icon: DollarSign, exact: false },
+    {
+      path: "terminations",
+      label: t("terminations"),
+      icon: Users,
+      exact: false,
+    },
+    {
+      path: "resignations",
+      label: t("resignations"),
+      icon: LogOut,
+      exact: false,
+    },
+    { path: "contracts", label: t("contracts"), icon: FileText, exact: false },
+    {
+      path: "job-postings",
+      label: t("jobPostings"),
+      icon: Briefcase,
+      exact: false,
+    },
     // ✅ إضافة Announcements في الـ Sidebar
     {
       path: "announcements",
-      label: t('announcements') || "التعميمات",
+      label: t("announcements") || "التعميمات",
       icon: Megaphone,
       exact: false,
     },
     // ✅ إضافة الشكاوي في الـ Sidebar
     {
       path: "complaints",
-      label: t('complaints') || "الشكاوي",
+      label: t("complaints") || "الشكاوي",
       icon: Scale,
       exact: false,
     },

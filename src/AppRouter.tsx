@@ -5,7 +5,6 @@ import Dashboard from "./core/modules/HR/pages/Dashboard";
 import Employees from "./core/modules/HR/pages/Employees";
 import Recruitment from "./core/modules/HR/pages/Recruitment/Recruitment";
 import Payroll from "./core/modules/HR/pages/Payroll";
-import AcceptedCandidates from "./core/modules/HR/pages/AcceptedCandidates";
 import Terminations from "./core/modules/HR/pages/Terminations";
 import Resignations from "./core/modules/HR/pages/Resignations";
 import Contracts from "./core/modules/HR/pages/Contracts";
@@ -64,7 +63,6 @@ const appRouter = createBrowserRouter([
         element: <JobRequisitionDetail />,
       },
       { path: "payroll", element: <Payroll /> },
-      { path: "accepted-candidates", element: <AcceptedCandidates /> },
       { path: "terminations", element: <Terminations /> },
       { path: "resignations", element: <Resignations /> },
       { path: "contracts", element: <Contracts /> },

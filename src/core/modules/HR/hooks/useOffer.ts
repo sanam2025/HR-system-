@@ -1,20 +1,31 @@
-// src/core/modules/HR/hooks/useOffer.ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { OfferService } from '../../../../api/service/HrService/OfferService';
 import type { CreateOfferData } from '../../../../api/service/HrService/Types/OfferService.types';
 import { AxiosError } from 'axios';
 
+// ✅ دالة استخراج الخطأ بدقة
 const getErrorMessage = (err: unknown): string => {
-  if (err instanceof AxiosError) {
+  if (err instanceof AxiosError && err.response) {
+    // طباعة تفاصيل الـ 422 للتصحيح (اكتبها في الـ Console)
+    if (err.response.status === 422) {
+      console.log('🔴 Validation Errors:', err.response.data);
+      
+      const data = err.response.data as Record<string, string[]>;
+      const firstKey = Object.keys(data)[0];
+      if (firstKey && data[firstKey]?.[0]) {
+        return `❌ ${data[firstKey][0]}`;
+      }
+    }
+    // باقي الأخطاء
     const data = err.response?.data as { message?: string };
-    return data?.message || err.message || 'Failed to send offer';
+    return data?.message || err.message || 'Request failed';
   }
   if (err instanceof Error) return err.message;
-  return 'Failed to send offer';
+  return 'Request failed';
 };
 
-// ✅ استخدام `useSendOffer` لإرسال العرض
+// ✅ هوك إرسال العرض
 export const useSendOffer = (jobPostingId?: number) => {
   const queryClient = useQueryClient();
 
@@ -36,7 +47,7 @@ export const useSendOffer = (jobPostingId?: number) => {
   });
 };
 
-// ✅ إضافة `useOffers` لجلب كل العروض
+// ✅ هوك العروض
 export const useOffers = (jobPostingId?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['offers', jobPostingId],

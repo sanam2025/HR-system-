@@ -1,377 +1,411 @@
 // src/core/modules/HR/pages/Interviews/Interviews.tsx
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, XCircle, Send } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  ArrowLeft,
+  Eye,
+  FileText,
+  Calendar,
+  MapPin,
+  Star,
+  Trophy,
+  UserPlus,
+} from "lucide-react";
+import { useState } from "react";
 import { useInterviews } from "../../hooks/useInterviews";
-import { useSendOffer } from "../../hooks/useOffer";
-import InterviewCard from "./InterviewCard";
-import InterviewStats from "./InterviewStats";
-import InterviewFilters from "./InterviewFilters";
-import { useState, useEffect, useMemo } from "react";
-import type { Interview } from "../../../../../api/service/HrService/Types/InterviewsService.types";
+import { useSendOffer, useOffers } from "../../hooks/useOffer";
+import Loading from "../../../../../shared/components/Loading";
 import toast from "react-hot-toast";
+import type { Interview } from "../../../../../api/service/HrService/Types/InterviewsService.types";
+import { AxiosError } from "axios";
+import type { CreateOfferData } from "../../../../../api/service/HrService/Types/OfferService.types";
+import { apiClient } from "../../../../../api/client";
 
-export const Interviews = () => {
+// ✅ هوك تحويل المتقدم لموظف
+const useConvertToEmployee = () => {
+  const [isPending, setIsPending] = useState(false);
+
+  const mutate = async (candidateId: number, jobPostingId: number) => {
+    setIsPending(true);
+    try {
+      const response = await apiClient.post("/employees", {
+        user_id: candidateId,
+        job_posting_id: jobPostingId,
+        start_date: new Date().toISOString().split("T")[0],
+      });
+      toast.success("🎉 Converted to Employee successfully!");
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      const data = err.response?.data as { message?: string };
+      toast.error(data?.message || "Failed to convert to employee");
+      throw error;
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  return { mutate, isPending };
+};
+
+export default function Interviews() {
   const navigate = useNavigate();
-  const { jobId: jobIdFromParams } = useParams<{ jobId: string }>();
-  const [searchParams] = useSearchParams();
-  const jobIdFromQuery = searchParams.get("jobId");
+  const { jobId } = useParams<{ jobId: string }>();
+  const parsedJobId = parseInt(jobId || "0");
 
-  const jobId = jobIdFromParams || jobIdFromQuery;
-  const jobIdNumber = jobId ? Number(jobId) : undefined;
+  // 1. جلب المقابلات وجلب العروض
+  const { interviews, isLoading, error } = useInterviews(parsedJobId);
+  const { offers, refetch: refetchOffers } = useOffers(parsedJobId);
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [showOfferModal, setShowOfferModal] = useState(false);
-  const [selectedCandidate, setSelectedCandidate] = useState<{
-    id: number;
-    name: string;
-    interviewId: number;
-    email?: string;
-  } | null>(null);
+  const sendOfferMutation = useSendOffer(parsedJobId);
+  const convertMutation = useConvertToEmployee();
 
-  const { interviews, isLoading, error, cancelInterview, isUpdating, refetch } =
-    useInterviews(jobIdNumber);
-
-  const { mutate: sendOffer, isPending: isSendingOffer } =
-    useSendOffer(jobIdNumber);
-
-  useEffect(() => {
-    if (jobIdNumber) {
-      refetch();
-    }
-  }, [jobIdNumber, refetch]);
-
-  // ✅ ترتيب المقابلات حسب الرتبة (الأقل رقم أولاً)
-  const sortedInterviews = useMemo(() => {
-    return [...interviews].sort((a, b) => {
-      // إذا كان هناك رتبة، رتب حسبها
-      if (a.rank !== undefined && b.rank !== undefined) {
-        return a.rank - b.rank;
-      }
-      // إذا كانت إحداهما لها رتبة والأخرى لا، التي لها رتبة تسبق
-      if (a.rank !== undefined) return -1;
-      if (b.rank !== undefined) return 1;
-      // إذا لم تكن هناك رتب، رتب حسب التاريخ
-      return (
-        new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime()
-      );
-    });
-  }, [interviews]);
-
-  const stats = {
-    total: interviews.length,
-    scheduled: interviews.filter((i: Interview) => i.status === "scheduled")
-      .length,
-    completed: interviews.filter(
-      (i: Interview) => i.status === "completed" || i.status === "done",
-    ).length,
-    cancelled: interviews.filter((i: Interview) => i.status === "cancelled")
-      .length,
-  };
-
-  const getCandidateName = (interview: Interview): string => {
-    if (interview.candidate?.full_name) {
-      return interview.candidate.full_name;
-    }
-    if (interview.candidate_id) {
-      return `Candidate #${interview.candidate_id}`;
-    }
-    return "N/A";
-  };
-
-  const filteredInterviews = sortedInterviews.filter((interview: Interview) => {
-    const candidateName = getCandidateName(interview).toLowerCase();
-    const search = searchTerm.toLowerCase();
-    const matchesSearch = candidateName.includes(search);
-    const matchesStatus =
-      statusFilter === "all" || interview.status === statusFilter;
-    return matchesSearch && matchesStatus;
+  const [selectedCandidateId, setSelectedCandidateId] = useState<number | null>(
+    null,
+  );
+  const [offerData, setOfferData] = useState({
+    hour_price: 15,
+    start_date: new Date().toISOString().split("T")[0],
+    weekend_days: ["friday", "saturday"],
+    working_hour_per_day: 8,
   });
 
-  const handleOpenOfferModal = (
-    candidateId: number,
-    candidateName: string,
-    interviewId: number,
-    email?: string,
-  ) => {
-    if (!jobIdNumber) {
-      toast.error("No job ID found");
-      return;
-    }
-    setSelectedCandidate({
-      id: candidateId,
-      name: candidateName,
-      interviewId: interviewId,
-      email: email,
+  // 2. دالة إرسال العرض
+  const handleSendOffer = () => {
+    if (!selectedCandidateId || !parsedJobId) return;
+
+    const payload = {
+      candidate_id: selectedCandidateId,
+      hour_price: Number(offerData.hour_price),
+      start_date: offerData.start_date,
+      weekend_days: offerData.weekend_days,
+      working_hours_per_day: Number(offerData.working_hour_per_day),
+    };
+
+    sendOfferMutation.mutate(payload as unknown as CreateOfferData, {
+      onSuccess: () => {
+        toast.success("🎉 Offer sent successfully!");
+        setSelectedCandidateId(null);
+        refetchOffers();
+      },
+      onError: (err: unknown) => {
+        if (err instanceof AxiosError && err.response?.status === 422) {
+          const errors = err.response.data as Record<string, string[]>;
+          const firstErrorKey = Object.keys(errors)[0];
+          const firstErrorMessage = errors[firstErrorKey]?.[0];
+
+          // ✅ إذا كان الباك إند يقول أن المتقدم موظف بالفعل، نخفي الزر فوراً
+          if (firstErrorMessage?.includes("already an employee")) {
+            toast.error("⚠️ This candidate is already an employee.");
+            refetchOffers(); // تحديث قائمة العروض لإخفاء زر الإرسال
+          } else if (firstErrorMessage) {
+            toast.error(`❌ ${firstErrorMessage}`);
+          } else {
+            toast.error("❌ Validation error: Please check the offer data.");
+          }
+        } else {
+          toast.error("❌ Failed to send offer. Please try again.");
+        }
+        // تحديث العروض دائماً لضمان إخفاء الزر إذا فشل الإرسال
+        refetchOffers();
+      },
     });
-    setShowOfferModal(true);
   };
 
-  const handleConfirmSendOffer = () => {
-    if (!selectedCandidate || !jobIdNumber) return;
-
-    sendOffer(
-      {
-        candidate_id: selectedCandidate.id,
-        hour_price: 15,
-        start_date: new Date().toISOString().split("T")[0],
-        weekend_days: ["friday", "saturday"],
-        working_hour_per_day: 8,
-      },
-      {
-        onSuccess: () => {
-          setShowOfferModal(false);
-          setSelectedCandidate(null);
-          refetch();
-        },
-      },
-    );
+  // 3. دالة التحويل لموظف
+  const handleConvertToEmployee = (candidateId: number) => {
+    if (!parsedJobId) return;
+    convertMutation.mutate(candidateId, parsedJobId);
   };
 
   if (isLoading) {
     return (
-      <div className="p-6 bg-gray-50 min-h-screen">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-        </div>
+      <div className="p-6 bg-gray-50 min-h-screen flex items-center justify-center">
+        <Loading />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-6 bg-gray-50 min-h-screen">
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-          <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <p className="text-red-500">Error loading interviews: {error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 text-blue-500 hover:text-blue-700 font-medium"
-          >
-            Try Again
-          </button>
-        </div>
+      <div className="p-6 bg-gray-50 min-h-screen text-center">
+        <p className="text-red-500">Error: {error}</p>
       </div>
     );
   }
 
+  const stats = {
+    total: interviews.length,
+    scheduled: interviews.filter((i: Interview) => i.status === "scheduled")
+      .length,
+    completed: interviews.filter(
+      (i: Interview) => i.status === "done" || i.status === "completed",
+    ).length,
+    cancelled: interviews.filter((i: Interview) => i.status === "cancelled")
+      .length,
+  };
+
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
       <div className="mb-8">
         <button
           onClick={() => navigate("/Hr/job-postings")}
-          className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3"
+          className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Job Postings
         </button>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Interviews</h1>
-            <p className="text-gray-500 text-sm mt-1">
-              Manage interviews for this job posting
-            </p>
-          </div>
-        </div>
+        <h1 className="text-2xl font-bold text-gray-900">Interviews</h1>
+        <p className="text-gray-500 text-sm mt-1">
+          Manage interviews for this job posting
+        </p>
       </div>
 
-      <InterviewStats stats={stats} />
-      <InterviewFilters
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
-      />
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100 flex items-center justify-between">
+          <div>
+            <p className="text-sm text-gray-500 font-medium">Total</p>
+            <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+          </div>
+          <Calendar className="w-8 h-8 text-blue-500" />
+        </div>
+      </div>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
                   Candidate
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
                   Scheduled At
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
                   Location
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
                   Interviewer
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
                   Status
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredInterviews.map((interview: Interview) => {
-                const isDone =
+            <tbody className="divide-y divide-gray-100">
+              {interviews.map((interview: Interview) => {
+                const isCompleted =
                   interview.status === "done" ||
                   interview.status === "completed";
-                const candidateId = interview.candidate_id;
-                const candidateName = getCandidateName(interview);
-                const candidateEmail = interview.candidate?.email;
+                const candidateId =
+                  interview.candidate?.id || interview.candidate_id;
+
+                // ✅ البحث عن العرض الخاص بهذا المتقدم
+                const candidateOffer = offers.find(
+                  (o) => o.candidate_id === candidateId,
+                );
+                // ✅ هل العرض مقبول؟ (حتى لو كان موظفاً سابقاً، أو قبل العرض)
+                const isOfferAccepted = candidateOffer?.status === "accepted";
 
                 return (
-                  <InterviewCard
+                  <tr
                     key={interview.id}
-                    interview={interview}
-                    onCancel={(id) => cancelInterview(id)}
-                    isUpdating={isUpdating}
-                    onViewDetails={() =>
-                      navigate(`/Hr/interviews/${interview.id}`)
-                    }
-                    onSendOffer={
-                      isDone && candidateId
-                        ? () =>
-                            handleOpenOfferModal(
-                              candidateId,
-                              candidateName,
-                              interview.id,
-                              candidateEmail,
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-sm">
+                          {interview.candidate?.full_name?.charAt(0) || "?"}
+                        </div>
+                        <div>
+                          <div className="font-medium text-gray-900">
+                            {interview.candidate?.full_name || "Unknown"}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {interview.candidate?.email || ""}
+                          </div>
+                          {interview.rank && (
+                            <div className="flex items-center gap-1 text-xs text-yellow-600 mt-1 font-medium">
+                              <Trophy className="w-3 h-3" /> Rank #
+                              {interview.rank}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <Calendar className="w-4 h-4 text-gray-400" />
+                        {interview.scheduled_at
+                          ? new Date(interview.scheduled_at).toLocaleString()
+                          : "-"}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <MapPin className="w-4 h-4 text-gray-400" />
+                        {interview.location_details ||
+                          interview.location_type ||
+                          "On Site"}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-700">
+                      {interview.interviewer?.full_name || "Unknown"}
+                    </td>
+                    <td className="px-6 py-4">
+                      {isCompleted ? (
+                        <div className="flex flex-col gap-1">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 w-fit">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>{" "}
+                            done
+                          </span>
+                          {interview.rate && (
+                            <span className="flex items-center gap-1 text-xs text-yellow-600 mt-1">
+                              <Star className="w-3 h-3" /> Rate:{" "}
+                              {interview.rate}/10
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 w-fit">
+                          <span className="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>{" "}
+                          {interview.status}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
+                      <button
+                        onClick={() =>
+                          navigate(`/Hr/interviews/${interview.id}`)
+                        }
+                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="View Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+
+                      {/* ✅ منطق جديد: إخفاء زر الإرسال فوراً إذا كان العرض مقبولاً */}
+                      {isCompleted && candidateId && (
+                        <>
+                          {isOfferAccepted ? (
+                            // ✅ إذا قبل العرض (أو كان موظفاً من قبل)، يظهر زر تحويل لموظف (أخضر)
+                            <button
+                              onClick={() =>
+                                handleConvertToEmployee(candidateId)
+                              }
+                              disabled={convertMutation.isPending}
+                              className="flex items-center gap-2 px-5 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <UserPlus className="w-4 h-4" />
+                              {convertMutation.isPending
+                                ? "Converting..."
+                                : "Convert to Employee"}
+                            </button>
+                          ) : (
+                            // ✅ إذا لم يكن مقبولاً ولم يتم إرسال عرض من قبل، نظهر زر الإرسال (أزرق)
+                            // إذا كان العرض معلقاً (Pending) ولكن ليس مقبولاً، لن يظهر أي زر (لأن الشرط !candidateOffer سيفشل)
+                            !candidateOffer && (
+                              <button
+                                onClick={() =>
+                                  setSelectedCandidateId(candidateId)
+                                }
+                                className="flex items-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold shadow-sm"
+                              >
+                                <FileText className="w-4 h-4" /> Send Offer
+                              </button>
                             )
-                        : undefined
-                    }
-                    showOfferButton={isDone && !!candidateId}
-                  />
+                          )}
+                        </>
+                      )}
+                    </td>
+                  </tr>
                 );
               })}
-              {filteredInterviews.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-6 py-12 text-center text-gray-400"
-                  >
-                    No interviews found
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
+        {interviews.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-400">No interviews found.</p>
+          </div>
+        )}
       </div>
 
-      {/* Send Offer Confirmation Modal */}
-      {showOfferModal && selectedCandidate && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          onClick={() => setShowOfferModal(false)}
-        >
-          <div
-            className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Send className="w-8 h-8 text-orange-500" />
+      {/* Modal إرسال العرض */}
+      {selectedCandidateId && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Send Job Offer
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Hour Price ($)
+                </label>
+                <input
+                  type="number"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={offerData.hour_price}
+                  onChange={(e) =>
+                    setOfferData({
+                      ...offerData,
+                      hour_price: Number(e.target.value),
+                    })
+                  }
+                />
               </div>
-              <h3 className="text-xl font-bold text-gray-900">Send Offer</h3>
-              <p className="text-sm text-gray-500 mt-1">
-                Are you sure you want to send an offer to <br />
-                <span className="font-semibold text-gray-700">
-                  {selectedCandidate.name}
-                </span>
-                ?
-              </p>
-            </div>
-
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <p className="text-gray-500">Candidate ID</p>
-                  <p className="font-medium text-gray-900">
-                    #{selectedCandidate.id}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Job Posting</p>
-                  <p className="font-medium text-gray-900">#{jobIdNumber}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Interview</p>
-                  <p className="font-medium text-gray-900">
-                    #{selectedCandidate.interviewId}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Status</p>
-                  <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
-                    Completed
-                  </span>
-                </div>
-                {selectedCandidate.email && (
-                  <div className="col-span-2">
-                    <p className="text-gray-500">Email</p>
-                    <p className="font-medium text-gray-900 text-sm">
-                      {selectedCandidate.email}
-                    </p>
-                  </div>
-                )}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={offerData.start_date}
+                  onChange={(e) =>
+                    setOfferData({ ...offerData, start_date: e.target.value })
+                  }
+                />
               </div>
-            </div>
-
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
-              <p className="text-xs text-orange-600 font-medium mb-2">
-                Offer Details
-              </p>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div>
-                  <p className="text-gray-500">Hour Price</p>
-                  <p className="font-medium text-gray-900">$15.00</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Start Date</p>
-                  <p className="font-medium text-gray-900">
-                    {new Date().toISOString().split("T")[0]}
-                  </p>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-gray-500">Working Hours</p>
-                  <p className="font-medium text-gray-900">
-                    8 hours/day | Fri, Sat off
-                  </p>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Working Hours / Day
+                </label>
+                <input
+                  type="number"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={offerData.working_hour_per_day}
+                  onChange={(e) =>
+                    setOfferData({
+                      ...offerData,
+                      working_hour_per_day: Number(e.target.value),
+                    })
+                  }
+                />
               </div>
-            </div>
 
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowOfferModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmSendOffer}
-                disabled={isSendingOffer}
-                className={`flex-1 px-4 py-2 rounded-lg text-white font-medium transition-all flex items-center justify-center gap-2 ${
-                  isSendingOffer
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-orange-500 hover:bg-orange-600 hover:shadow-lg"
-                }`}
-              >
-                {isSendingOffer ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    Send Offer
-                  </>
-                )}
-              </button>
+              <div className="flex justify-end gap-3 mt-6 border-t pt-4">
+                <button
+                  onClick={() => setSelectedCandidateId(null)}
+                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSendOffer}
+                  disabled={sendOfferMutation.isPending}
+                  className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {sendOfferMutation.isPending ? "Sending..." : "Confirm Offer"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
     </div>
   );
-};
-
-export default Interviews;
+}
