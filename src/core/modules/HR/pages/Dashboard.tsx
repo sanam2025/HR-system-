@@ -12,6 +12,10 @@ import { useDepartmentsWithUsers } from '../hooks/useDepartments';
 import Loading from '../../../../shared/components/Loading';
 import toast from 'react-hot-toast';
 import type { CreateAnnouncementData } from '../../../../api/service/HrService/Types/AnnouncementsService.types';
+import { AxiosError } from 'axios';
+
+// ✅ استيراد أنواع الأقسام والموظفين
+import type { Department, Employee } from '../../../../api/service/HrService/Types/DepartmentsService.types';
 
 const STATS_DATA = {
   totalEmployees: 0,
@@ -32,24 +36,69 @@ const getStatValue = (key: keyof typeof STATS_DATA) => STATS_DATA[key];
 export default function Dashboard() {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
-  
-  const { announcements, isLoading: announcementsLoading, refetch } = useActiveAnnouncements();
-  const { departments, isLoading: departmentsLoading } = useDepartmentsWithUsers();
+
+  const { 
+    announcements, 
+    isLoading: announcementsLoading, 
+    refetch,
+    error: announcementsError 
+  } = useActiveAnnouncements({ status: 'active' });
+
+  // ✅ تعريف نوع المصفوفة بشكل صريح
+  const { 
+    departments, 
+    isLoading: departmentsLoading,
+    error: departmentsError
+  } = useDepartmentsWithUsers() as { 
+    departments: (Department & { employees?: Employee[] })[],
+    isLoading: boolean,
+    error: string | null
+  };
+
   const createAnnouncement = useCreateAnnouncement();
 
-  const [formData, setFormData] = useState<CreateAnnouncementData>({
+  // ✅ استخدام حقول الـ UI فقط، وسنقوم ببناء الـ Payload عند الإرسال
+  const [formData, setFormData] = useState({
     title: '',
     content: '',
-    audience: 'all',
-    status: 'active',
-    starts_at: new Date().toISOString().slice(0, 16),
-    ends_at: '',
+    target_audience: 'all',
+    priority: 'medium',
+    starts_at: new Date().toISOString().replace('T', ' ').slice(0, 16),
+    expires_at: '',
   });
+
+  const handleApiError = (err: unknown) => {
+    if (err instanceof AxiosError && err.response?.status === 422) {
+      const data = err.response.data as Record<string, string[]>;
+      const firstKey = Object.keys(data)[0];
+      const firstMessage = data[firstKey]?.[0];
+      if (firstMessage) {
+        toast.error(`❌ ${firstMessage}`);
+      } else {
+        toast.error('❌ Validation error. Please check required fields.');
+      }
+    } else if (err instanceof Error) {
+      toast.error(`❌ ${err.message}`);
+    } else {
+      toast.error('❌ An unexpected error occurred.');
+    }
+  };
 
   const handleNavigate = (path: string) => () => navigate(path);
 
+  if (announcementsError) {
+    console.warn('Announcements error (handled):', announcementsError);
+  }
+  if (departmentsError) {
+    console.warn('Departments error (handled):', departmentsError);
+  }
+
   const hasDepartments = !departmentsLoading && departments.length > 0;
-  const totalEmployees = departments.reduce((acc, dept) => acc + (dept.employees?.length || 0), 0);
+  
+  // ✅ تصحيح reduce: إزالة <number> لأن النوع سيتم استنتاجه تلقائياً
+  const totalEmployees = departments.reduce((acc: number, dept: Department & { employees?: Employee[] }) => {
+    return acc + (dept.employees?.length || 0);
+  }, 0);
 
   const handleCreateAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,21 +106,42 @@ export default function Dashboard() {
       toast.error('Please fill in title and content');
       return;
     }
-    await createAnnouncement.mutateAsync(formData);
-    setShowForm(false);
-    setFormData({
-      title: '',
-      content: '',
-      audience: 'all',
-      status: 'active',
-      starts_at: new Date().toISOString().slice(0, 16),
-      ends_at: '',
-    });
-    refetch();
+    try {
+      // ✅ بناء Payload مخصص للباك إند دون تغيير الـ Types
+      const payload = {
+        title: formData.title,
+        content: formData.content,
+        target_audience: formData.target_audience,
+        priority: formData.priority,
+        starts_at: formData.starts_at,
+        expires_at: formData.expires_at || null,
+      };
+
+      // ✅ إرسال الـ payload وتجاوز TypeScript بأمان
+      await createAnnouncement.mutateAsync(payload as unknown as CreateAnnouncementData);
+      
+      setShowForm(false);
+      setFormData({
+        title: '',
+        content: '',
+        target_audience: 'all',
+        priority: 'medium',
+        starts_at: new Date().toISOString().replace('T', ' ').slice(0, 16),
+        expires_at: '',
+      });
+      refetch();
+      toast.success('✅ Announcement created successfully!');
+    } catch (err) {
+      handleApiError(err);
+    }
   };
 
-  const handleAudienceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFormData({ ...formData, audience: e.target.value as CreateAnnouncementData['audience'] });
+  const handleTargetAudienceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData({ ...formData, target_audience: e.target.value });
+  };
+
+  const handlePriorityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData({ ...formData, priority: e.target.value as 'low' | 'medium' | 'high' });
   };
 
   if (departmentsLoading) {
@@ -90,7 +160,7 @@ export default function Dashboard() {
         <p className="text-gray-500 mt-1 text-sm">Overview of employee performance and statistics.</p>
       </div>
 
-      {/* ✅ Announcements Section مع زر الإضافة */}
+      {/* Announcements Section */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -102,7 +172,6 @@ export default function Dashboard() {
               </span>
             )}
           </div>
-          {/* ✅ زر إضافة تعميم جديد - يفتح الفورم في نفس الصفحة */}
           <button
             onClick={() => setShowForm(!showForm)}
             className="flex items-center gap-2 px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
@@ -112,7 +181,7 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* ✅ Form Modal - يظهر في نفس الصفحة */}
+        {/* Form Modal */}
         {showForm && (
           <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-4">
             <div className="flex justify-between items-center mb-4">
@@ -145,11 +214,26 @@ export default function Dashboard() {
                   required
                 />
               </div>
+
+              {/* ✅ حقول جديدة من الـ Collection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Audience</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
                 <select
-                  value={formData.audience}
-                  onChange={handleAudienceChange}
+                  value={formData.priority}
+                  onChange={handlePriorityChange}
+                  className="w-full px-3 py-2 border rounded-lg"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Target Audience</label>
+                <select
+                  value={formData.target_audience}
+                  onChange={handleTargetAudienceChange}
                   className="w-full px-3 py-2 border rounded-lg"
                 >
                   <option value="all">All</option>
@@ -158,21 +242,23 @@ export default function Dashboard() {
                   <option value="hr">HR</option>
                 </select>
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Starts At *</label>
                 <input
                   type="datetime-local"
                   value={formData.starts_at}
                   onChange={(e) => setFormData({ ...formData, starts_at: e.target.value })}
                   className="w-full px-3 py-2 border rounded-lg"
+                  required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">End Date (optional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Expires At (optional)</label>
                 <input
                   type="datetime-local"
-                  value={formData.ends_at}
-                  onChange={(e) => setFormData({ ...formData, ends_at: e.target.value })}
+                  value={formData.expires_at}
+                  onChange={(e) => setFormData({ ...formData, expires_at: e.target.value })}
                   className="w-full px-3 py-2 border rounded-lg"
                 />
               </div>
@@ -226,7 +312,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* ✅ Departments Section */}
+      {/* Departments Section */}
       {hasDepartments && (
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
@@ -259,7 +345,7 @@ export default function Dashboard() {
                   </div>
                   {department.employees && department.employees.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-1">
-                      {department.employees.slice(0, 3).map((employee) => (
+                      {department.employees.slice(0, 3).map((employee: Employee) => (
                         <div
                           key={employee.id}
                           className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium text-xs"

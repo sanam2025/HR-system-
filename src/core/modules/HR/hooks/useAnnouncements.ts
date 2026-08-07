@@ -2,18 +2,16 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { AnnouncementsService } from '../../../../api/service/HrService/AnnouncementsService';
-import type {
-  CreateAnnouncementData,
-  UpdateAnnouncementData,
-} from '../../../../api/service/HrService/Types/AnnouncementsService.types';
+import type { CreateAnnouncementData, UpdateAnnouncementData } from '../../../../api/service/HrService/Types/AnnouncementsService.types';
+import { AxiosError } from 'axios';
 
-// ✅ جلب جميع التعميمات
-export const useAnnouncements = () => {
+// ✅ جلب التعميمات النشطة (استخدام /announcements/active كما في الـ Collection)
+export const useActiveAnnouncements = (params: Record<string, unknown> = {}) => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['announcements'],
+    queryKey: ['announcements', 'active', params],
     queryFn: async () => {
-      const res = await AnnouncementsService.getAll();
-      return res.data?.data || [];
+      const response = await AnnouncementsService.getActive(params);
+      return response.data?.data || [];
     },
   });
 
@@ -25,63 +23,31 @@ export const useAnnouncements = () => {
   };
 };
 
-// ✅ جلب التعميمات النشطة
-export const useActiveAnnouncements = () => {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['announcements-active'],
-    queryFn: async () => {
-      const res = await AnnouncementsService.getActive();
-      return res.data?.data || [];
-    },
-    refetchInterval: 60000,
-  });
-
-  return {
-    announcements: data || [],
-    isLoading,
-    error: error?.message || null,
-    refetch,
-  };
-};
-
-// ✅ جلب تعميم واحد
-export const useAnnouncement = (id?: number) => {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['announcement', id],
-    queryFn: async () => {
-      if (!id) return null;
-      const res = await AnnouncementsService.getById(id);
-      return res.data?.data || null;
-    },
-    enabled: !!id,
-  });
-
-  return {
-    announcement: data,
-    isLoading,
-    error: error?.message || null,
-    refetch,
-  };
-};
-
-// ✅ إنشاء تعميم
+// ✅ إنشاء تعميم جديد
 export const useCreateAnnouncement = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateAnnouncementData) => AnnouncementsService.create(data),
+    mutationFn: (data: CreateAnnouncementData) => 
+      AnnouncementsService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['announcements'] });
-      queryClient.invalidateQueries({ queryKey: ['announcements-active'] });
-      toast.success('✅ تم إنشاء التعميم بنجاح');
+      toast.success('✅ Announcement created successfully!');
     },
-    onError: (err: Error) => {
-      toast.error(err.message || 'فشل إنشاء التعميم');
+    onError: (err: unknown) => {
+      if (err instanceof AxiosError && err.response?.status === 422) {
+        const data = err.response.data as Record<string, string[]>;
+        const firstKey = Object.keys(data)[0];
+        const msg = data[firstKey]?.[0];
+        toast.error(`❌ ${msg || 'Validation error'}`);
+      } else {
+        toast.error('❌ Failed to create announcement');
+      }
     },
   });
 };
 
-// ✅ تحديث تعميم
+// ✅ تحديث تعميم (جديد)
 export const useUpdateAnnouncement = () => {
   const queryClient = useQueryClient();
 
@@ -90,11 +56,17 @@ export const useUpdateAnnouncement = () => {
       AnnouncementsService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['announcements'] });
-      queryClient.invalidateQueries({ queryKey: ['announcements-active'] });
-      toast.success('✅ تم تحديث التعميم بنجاح');
+      toast.success('✅ Announcement updated successfully!');
     },
-    onError: (err: Error) => {
-      toast.error(err.message || 'فشل تحديث التعميم');
+    onError: (err: unknown) => {
+      if (err instanceof AxiosError && err.response?.status === 422) {
+        const data = err.response.data as Record<string, string[]>;
+        const firstKey = Object.keys(data)[0];
+        const msg = data[firstKey]?.[0];
+        toast.error(`❌ ${msg || 'Validation error'}`);
+      } else {
+        toast.error('❌ Failed to update announcement');
+      }
     },
   });
 };
@@ -107,16 +79,38 @@ export const useDeleteAnnouncement = () => {
     mutationFn: (id: number) => AnnouncementsService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['announcements'] });
-      queryClient.invalidateQueries({ queryKey: ['announcements-active'] });
-      toast.success('✅ تم حذف التعميم بنجاح');
+      toast.success('🗑️ Announcement deleted successfully!');
     },
-    onError: (err: Error) => {
-      toast.error(err.message || 'فشل حذف التعميم');
+    onError: (err: unknown) => {
+      if (err instanceof AxiosError) {
+        const data = err.response?.data as { message?: string };
+        toast.error(data?.message || 'Failed to delete announcement');
+      } else {
+        toast.error('Failed to delete announcement');
+      }
     },
   });
 };
 
-// ✅ نشر فوري
+// ✅ جلب كل التعميمات (للمسؤول، إذا احتجتها لاحقاً)
+export const useAnnouncements = (params: Record<string, unknown> = {}) => {
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['announcements', params],
+    queryFn: async () => {
+      const response = await AnnouncementsService.getAll(params);
+      return response.data?.data || [];
+    },
+  });
+
+  return {
+    announcements: data || [],
+    isLoading,
+    error: error?.message || null,
+    refetch,
+  };
+};
+
+// ✅ نشر تعميم فوراً
 export const usePublishAnnouncement = () => {
   const queryClient = useQueryClient();
 
@@ -124,11 +118,15 @@ export const usePublishAnnouncement = () => {
     mutationFn: (id: number) => AnnouncementsService.publishNow(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['announcements'] });
-      queryClient.invalidateQueries({ queryKey: ['announcements-active'] });
-      toast.success('✅ تم النشر الفوري للتعميم');
+      toast.success('✅ Announcement published successfully!');
     },
-    onError: (err: Error) => {
-      toast.error(err.message || 'فشل النشر الفوري');
+    onError: (err: unknown) => {
+      if (err instanceof AxiosError) {
+        const data = err.response?.data as { message?: string };
+        toast.error(data?.message || 'Failed to publish announcement');
+      } else {
+        toast.error('Failed to publish announcement');
+      }
     },
   });
 };

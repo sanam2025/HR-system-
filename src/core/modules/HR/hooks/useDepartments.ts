@@ -2,12 +2,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { DepartmentsService } from '../../../../api/service/HrService/DepartmentsService';
 
-// ✅ جلب كل الأقسام مع الموظفين
+// ✅ جلب الأقسام مع الموظفين
 export const useDepartmentsWithUsers = () => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['departments-with-users'],
+    queryKey: ['departments', 'withUsers'],
     queryFn: async () => {
-      const res = await DepartmentsService.getAllWithUsers();
+      const res = await DepartmentsService.getDepartmentsWithUsers();
       return res.data?.data || [];
     },
   });
@@ -20,58 +20,37 @@ export const useDepartmentsWithUsers = () => {
   };
 };
 
-// ✅ جلب موظفي قسم معين
-export const useDepartmentEmployees = (departmentId?: number) => {
+// ✅ جلب كل الأقسام
+export const useDepartments = () => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['department-employees', departmentId],
+    queryKey: ['departments'],
     queryFn: async () => {
-      if (!departmentId) return [];
-      const res = await DepartmentsService.getDepartmentEmployees(departmentId);
+      const res = await DepartmentsService.getAll();
       return res.data?.data || [];
     },
-    enabled: !!departmentId,
   });
 
   return {
-    employees: data || [],
+    departments: data || [],
     isLoading,
     error: error?.message || null,
     refetch,
   };
 };
 
-// ✅ جلب بروفايل موظف
-export const useProfile = (userId?: number) => {
+// ✅ جلب قسم معين مع موظفيه (جديد)
+export const useDepartmentEmployees = (id: number) => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['profile', userId],
+    queryKey: ['department', id, 'employees'],
     queryFn: async () => {
-      if (!userId) return null;
-      const res = await DepartmentsService.getProfile(userId);
+      const res = await DepartmentsService.getByIdWithUsers(id);
       return res.data?.data || null;
     },
-    enabled: !!userId,
+    enabled: !!id,
   });
 
   return {
-    profile: data,
-    isLoading,
-    error: error?.message || null,
-    refetch,
-  };
-};
-
-// ✅ جلب موظفي المدير
-export const useManagerEmployees = () => {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['manager-employees'],
-    queryFn: async () => {
-      const res = await DepartmentsService.getManagerEmployees();
-      return res.data?.data || [];
-    },
-  });
-
-  return {
-    employees: data || [],
+    department: data,
     isLoading,
     error: error?.message || null,
     refetch,

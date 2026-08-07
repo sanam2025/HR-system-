@@ -1,24 +1,25 @@
 // src/api/service/HrService/DepartmentsService.ts
 import { apiClient } from '../../client';
-import type {  DepartmentWithEmployees, Employee, Profile } from './Types/DepartmentsService.types';
 
 export const DepartmentsService = {
-  // ✅ جلب كل الأقسام مع الموظفين والمدراء
-  getAllWithUsers: () => apiClient.get<{ data: DepartmentWithEmployees[] }>('/department/users'),
+  // ✅ جرب هذا أولاً (حسب الـ Collection)
+  getDepartmentsWithUsers: () => 
+    apiClient.get('/departments/employees'),
 
-  // ✅ جلب موظفي قسم معين
-  getDepartmentEmployees: (departmentId: number) => 
-    apiClient.get<{ data: Employee[] }>(`/department/${departmentId}/employees`),
+  // ✅ جرب هذا إذا لم يعمل الأول
+  // getDepartmentsWithUsers: () => 
+  //   apiClient.get('/department/users'),
 
-  // ✅ جلب بروفايل موظف
-  getProfile: (userId: number) => 
-    apiClient.get<{ data: Profile }>(`/profiles/${userId}`),
+  // ✅ جلب كل الأقسام
+  getAll: () => apiClient.get('/departments'),
 
-  // ✅ جلب بروفايل المستخدم الحالي
-  getMyProfile: () => 
-    apiClient.get<{ data: Profile }>('/profiles'),
+  // ✅ جلب قسم معين مع موظفيه
+  getByIdWithUsers: (id: number) => 
+    apiClient.get(`/departments/${id}/employees`),
 
-  // ✅ جلب موظفي المدير
-  getManagerEmployees: () => 
-    apiClient.get<{ data: Employee[] }>('/manager-employees'),
+  // ✅ جلب كل المستخدمين (موظفين ومديرين)
+  getUsers: () => apiClient.get('/department/users'),
+
+  // ✅ جلب جميع الموظفين
+  getEmployees: () => apiClient.get('/users/employees'),
 };

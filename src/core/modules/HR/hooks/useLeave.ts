@@ -6,7 +6,7 @@ import { LeaveService } from '../../../../api/service/HrService/LeaveService';
 // ✅ جلب كل الطلبات
 export const useLeaveRequests = () => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['leave-requests'],
+    queryKey: ['/leaveRequests'],
     queryFn: async () => {
       const res = await LeaveService.getAll();
       return res.data?.data || [];

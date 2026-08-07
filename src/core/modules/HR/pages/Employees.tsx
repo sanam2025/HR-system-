@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Users, Building2, ChevronRight, Mail } from 'lucide-react';
 import { useDepartmentsWithUsers } from '../hooks/useDepartments';
 import Loading from '../../../../shared/components/Loading';
+import type { Department, Employee } from '../../../../api/service/HrService/Types/DepartmentsService.types';
 
 export default function Employees() {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ export default function Employees() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {departments.map((department) => (
+        {departments.map((department: Department & { employees?: Employee[] }) => (
           <div
             key={department.id}
             className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
@@ -47,7 +48,7 @@ export default function Employees() {
             </div>
             <div className="divide-y divide-gray-50">
               {department.employees && department.employees.length > 0 ? (
-                department.employees.map((employee) => (
+                department.employees.map((employee: Employee) => (
                   <div
                     key={employee.id}
                     className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center justify-between"

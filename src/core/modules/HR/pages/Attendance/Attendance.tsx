@@ -11,7 +11,6 @@ import toast from 'react-hot-toast';
 
 export const Attendance = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [isFiltered, setIsFiltered] = useState(false);
@@ -50,9 +49,6 @@ export const Attendance = () => {
 
   // ✅ عرض البيانات
   const records = isFiltered ? filteredRecords : todayRecords;
-  const filtered = records.filter((record) =>
-    record.employee_name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   const isLoading = todayLoading || analysisLoading || filterLoading;
 
@@ -92,8 +88,6 @@ export const Attendance = () => {
 
       {/* Filters */}
       <AttendanceFilters
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
         fromDate={fromDate}
         setFromDate={setFromDate}
         toDate={toDate}
@@ -106,7 +100,7 @@ export const Attendance = () => {
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
           <h3 className="text-lg font-semibold text-gray-800">
-            Attendance Records ({filtered.length})
+            Attendance Records ({records.length})
           </h3>
           {isFiltered && (
             <button
@@ -122,7 +116,7 @@ export const Attendance = () => {
           )}
         </div>
 
-        {filtered.length > 0 ? (
+        {records.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">
@@ -145,7 +139,7 @@ export const Attendance = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {filtered.map((record) => (
+                {records.map((record) => (
                   <AttendanceCard key={record.id} record={record} />
                 ))}
               </tbody>

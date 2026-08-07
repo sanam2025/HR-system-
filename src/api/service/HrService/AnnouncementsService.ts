@@ -8,10 +8,12 @@ import type {
 
 export const AnnouncementsService = {
   // ✅ جلب جميع التعميمات
-  getAll: () => apiClient.get<{ data: Announcement[] }>('/announcements'),
+  getAll: (params?: Record<string, unknown>) => 
+    apiClient.get<{ data: Announcement[] }>('/announcements', { params }),
 
-  // ✅ جلب التعميمات النشطة (للواجهة الرئيسية)
-  getActive: () => apiClient.get<{ data: Announcement[] }>('/announcements/active'),
+  // ✅ جلب التعميمات النشطة (تصحيح المسار: announcements/active)
+  getActive: (params?: Record<string, unknown>) => 
+    apiClient.get<{ data: Announcement[] }>('/announcements/active', { params }),
 
   // ✅ جلب تعميم واحد
   getById: (id: number) => apiClient.get<{ data: Announcement }>(`/announcements/${id}`),

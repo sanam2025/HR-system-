@@ -10,11 +10,13 @@ import Loading from '../../../../../shared/components/Loading';
 
 export const Leaves = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
 
+  // ✅ جلب طلبات الإجازات
   const { requests, isLoading, refetch } = useLeaveRequests();
+  
+  // ✅ هوك الموافقة والرفض
   const approveMutation = useApproveLeave();
   const rejectMutation = useRejectLeave();
 
@@ -26,12 +28,11 @@ export const Leaves = () => {
     rejected: requests.filter((r) => r.status === 'rejected').length,
   };
 
-  // ✅ فلترة الطلبات
+  // ✅ فلترة الطلبات (حذف البحث بالاسم واعتماد الفلترة بالحالة والنوع فقط)
   const filtered = requests.filter((request) => {
-    const matchesSearch = request.employee_name?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
     const matchesType = typeFilter === 'all' || request.type === typeFilter;
-    return matchesSearch && matchesStatus && matchesType;
+    return matchesStatus && matchesType;
   });
 
   if (isLoading) {
@@ -68,10 +69,8 @@ export const Leaves = () => {
       {/* Stats */}
       <LeaveStats stats={stats} />
 
-      {/* Filters */}
+      {/* Filters (حذفنا searchTerm) */}
       <LeaveFilters
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
         typeFilter={typeFilter}
