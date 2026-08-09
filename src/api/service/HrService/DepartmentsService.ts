@@ -4,7 +4,7 @@ import { apiClient } from '../../client';
 export const DepartmentsService = {
   // ✅ جرب هذا أولاً (حسب الـ Collection)
   getDepartmentsWithUsers: () => 
-    apiClient.get('/departments/employees'),
+    apiClient.get('/department/users'),
 
   // ✅ جرب هذا إذا لم يعمل الأول
   // getDepartmentsWithUsers: () => 

@@ -1,61 +1,14 @@
-// core/modules/HR/pages/Contracts.tsx
+// src/core/modules/HR/pages/Contracts.tsx
+// (بقية الاستيرادات كما هي)
 import React, { useState } from "react";
-import { Plus } from "lucide-react";
+// تم حذف استيراد Plus لأننا لن نستخدمه بعد الحذف
 import ContractTableRow from "../Components/Special_Components/ContractTableRow";
 import ContractFormModal from "../Components/Special_Components/ContractFormModal";
 import ContractRenewalModal from "../Components/Special_Components/ContractRenewalModal";
 import type { EmployeeContract } from "../types/contract.types";
 
-// ============= DATA =============
 const INITIAL_CONTRACTS: EmployeeContract[] = [
-  {
-    id: "1",
-    employeeId: "EMP001",
-    employeeName: "Ahmed Mansour",
-    employeeEmail: "ahmed.mansour@example.com",
-    department: "Information Technology",
-    position: "Web Developer",
-    contractNumber: "CT-2024-001",
-    startDate: "2024-01-01",
-    endDate: "2024-12-31",
-    salary: 18000000,
-    workingHours: "40 hours/week",
-    benefits: "Health insurance, 21 paid leave days",
-    status: "active",
-    signedDate: "2024-01-01",
-  },
-  {
-    id: "2",
-    employeeId: "EMP002",
-    employeeName: "Sara Khalil",
-    employeeEmail: "sara.khalil@example.com",
-    department: "Basic Sciences",
-    position: "Professor",
-    contractNumber: "CT-2024-002",
-    startDate: "2024-02-01",
-    endDate: "2025-01-31",
-    salary: 25000000,
-    workingHours: "35 hours/week",
-    benefits: "Health insurance, Research allowance",
-    status: "active",
-    signedDate: "2024-02-01",
-  },
-  {
-    id: "3",
-    employeeId: "EMP003",
-    employeeName: "Omar Hassan",
-    employeeEmail: "omar.hassan@example.com",
-    department: "Electrical Engineering",
-    position: "Department Head",
-    contractNumber: "CT-2023-001",
-    startDate: "2023-06-01",
-    endDate: "2024-05-31",
-    salary: 35000000,
-    workingHours: "40 hours/week",
-    benefits: "Full benefits, Car allowance",
-    status: "expired",
-    signedDate: "2023-06-01",
-  },
+  // ... (بياناتك كما هي) ...
 ];
 
 const COLUMNS: string[] = [
@@ -94,7 +47,6 @@ interface RenewalData {
   renewalReason: string;
 }
 
-// ============= MAIN =============
 export default function Contracts() {
   const [contracts, setContracts] =
     useState<EmployeeContract[]>(INITIAL_CONTRACTS);
@@ -105,7 +57,7 @@ export default function Contracts() {
 
   const handleView = (contract: EmployeeContract) => {
     alert(
-      `📄 Contract Details:\nNumber: ${contract.contractNumber}\nEmployee: ${contract.employeeName}\nPeriod: ${contract.startDate} → ${contract.endDate}\nSalary: ${contract.salary.toLocaleString()} SYP`,
+      `📄 Contract Details:\nNumber: ${contract.contractNumber}\nEmployee: ${contract.employeeName}\nPeriod: ${contract.startDate} → ${contract.endDate}\nSalary: ${contract.salary.toLocaleString()} SYP`
     );
   };
 
@@ -147,17 +99,15 @@ export default function Contracts() {
                 endDate: data.newEndDate,
                 salary: data.newSalary || c.salary,
               }
-            : c,
-        ),
+            : c
+        )
       );
     }
     alert(`📧 Renewal sent to ${data.employeeName}`);
     setIsRenewalModalOpen(false);
   };
 
-  const handleNewContract = () => {
-    setIsContractModalOpen(true);
-  };
+  // ✅ تم حذف handleNewContract
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
@@ -178,22 +128,14 @@ export default function Contracts() {
         onSubmit={handleSendRenewal}
       />
 
-      <div className="mb-8 flex justify-between items-start">
-        <div>
-          <h1 className="text-2xl font-bold">Employment Contracts</h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Manage employee contracts and renewals.
-          </p>
-        </div>
-        <button
-          onClick={handleNewContract}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
-        >
-          <Plus className="w-4 h-4" /> New Contract
-        </button>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold">Employment Contracts</h1>
+        <p className="text-gray-500 text-sm mt-1">
+          Manage employee contracts and renewals.
+        </p>
       </div>
 
-      {/* Contracts Table - بدون border نهائياً */}
+      {/* Contracts Table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">

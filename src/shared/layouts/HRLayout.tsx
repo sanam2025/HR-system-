@@ -16,6 +16,7 @@ import {
   Clock,
   Scale,
   Megaphone,
+  CheckCircle, // ✅ تمت إضافة أيقونة CheckCircle
 } from "lucide-react";
 import { useState } from "react";
 
@@ -36,6 +37,13 @@ export default function HRLayout() {
       path: "all-applicants",
       label: t("applicants"),
       icon: UsersRound,
+      exact: false,
+    },
+    // ✅ إضافة Accepted Candidates في الـ Sidebar
+    {
+      path: "accepted-candidates",
+      label: t("acceptedCandidates") || "Accepted Candidates",
+      icon: CheckCircle,
       exact: false,
     },
     { path: "attendance", label: t("attendance"), icon: Clock, exact: false },
@@ -66,14 +74,12 @@ export default function HRLayout() {
       icon: Briefcase,
       exact: false,
     },
-    // ✅ إضافة Announcements في الـ Sidebar
     {
       path: "announcements",
       label: t("announcements") || "التعميمات",
       icon: Megaphone,
       exact: false,
     },
-    // ✅ إضافة الشكاوي في الـ Sidebar
     {
       path: "complaints",
       label: t("complaints") || "الشكاوي",
