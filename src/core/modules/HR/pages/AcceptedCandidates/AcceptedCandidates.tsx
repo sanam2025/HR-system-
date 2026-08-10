@@ -1,7 +1,7 @@
 // src/core/modules/HR/pages/AcceptedCandidates/AcceptedCandidates.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Briefcase, ChevronRight, ArrowLeft, CheckCircle, Mail } from 'lucide-react';
+import { Briefcase, ChevronRight, ArrowLeft, CheckCircle, Mail, Award } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { apiClient } from '../../../../../api/client';
 import Loading from '../../../../../shared/components/Loading';
@@ -11,6 +11,8 @@ interface Candidate {
   full_name: string;
   email: string;
   status: string;
+  rank?: number;
+  rate?: number;
 }
 
 interface JobPosting {
@@ -19,39 +21,54 @@ interface JobPosting {
   candidates?: Candidate[];
 }
 
+interface RankingItem {
+  candidate_id: number;
+  rank: number;
+  rate: number;
+}
+
 export default function AcceptedCandidates() {
   const navigate = useNavigate();
   const [jobPostings, setJobPostings] = useState<JobPosting[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [expandedJobId, setExpandedJobId] = useState<number | null>(null);
 
-  // جلب الوظائف والمرشحين المقبولين
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      // 1. جلب كل الوظائف
       const jobsRes = await apiClient.get('/HRjob-postings');
       const jobs = jobsRes.data?.data || [];
 
-      // 2. لكل وظيفة، جلب مرشحيها وتصفية المقبولين (pass/ accepted)
       const jobsWithCandidates = await Promise.all(
         jobs.map(async (job: JobPosting) => {
           try {
-            const candidatesRes = await apiClient.get(`/job-postings/${job.id}/candidates`);
-            // فلترة المرشحين الذين حالتهم 'passed' أو 'accepted' (حسب الباك إند)
+            // 1. جلب المرشحين الذين اجتازوا المقابلة
+            const candidatesRes = await apiClient.get(`/job-postings/${job.id}/candidates/interview`);
+            // 2. جلب الترتيب حسب التقييم (Ranking)
+            const rankingRes = await apiClient.get(`/job-postings/${job.id}/interviews/ranked-by-rate`);
+
+            // دمج البيانات: جلب المرشحين الذين اجتازوا المقابلة
             const acceptedCandidates = (candidatesRes.data?.data || []).filter(
               (c: Candidate) => c.status === 'passed' || c.status === 'accepted'
             );
-            return { ...job, candidates: acceptedCandidates };
+
+            // إضافة الرتبة (Rank) والتقييم (Rate) من الـ Ranking API
+            const rankingData = rankingRes.data?.data || [];
+            const enhancedCandidates = acceptedCandidates.map((c: Candidate) => {
+              // ✅ تصحيح: استخدام نوع محدد بدلاً من any
+              const rankInfo = rankingData.find((r: RankingItem) => r.candidate_id === c.id);
+              return { ...c, rank: rankInfo?.rank, rate: rankInfo?.rate };
+            });
+
+            return { ...job, candidates: enhancedCandidates };
           } catch {
-            // تم تجاهل الخطأ للسماح للوظائف الأخرى بالعمل
             return { ...job, candidates: [] };
           }
         })
       );
 
       setJobPostings(jobsWithCandidates);
-    } catch  {
+    } catch {
       toast.error('Failed to load accepted candidates');
     } finally {
       setIsLoading(false);
@@ -102,7 +119,6 @@ export default function AcceptedCandidates() {
               key={job.id}
               className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all"
             >
-              {/* Card Header: Job Title */}
               <div
                 className="p-5 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors flex justify-between items-center"
                 onClick={() => toggleExpand(job.id)}
@@ -123,7 +139,6 @@ export default function AcceptedCandidates() {
                 />
               </div>
 
-              {/* Expanded List of Candidates */}
               {expandedJobId === job.id && (
                 <div className="divide-y divide-gray-50">
                   {job.candidates && job.candidates.length > 0 ? (
@@ -143,6 +158,11 @@ export default function AcceptedCandidates() {
                               <Mail className="w-3 h-3" />
                               <span>{candidate.email}</span>
                             </div>
+                            {candidate.rank && (
+                              <p className="text-xs text-yellow-600 mt-1 flex items-center gap-1">
+                                <Award className="w-3 h-3" /> Rank #{candidate.rank} (Rate: {candidate.rate}/10)
+                              </p>
+                            )}
                           </div>
                         </div>
                         <div className="flex items-center gap-2">

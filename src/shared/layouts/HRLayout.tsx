@@ -34,6 +34,12 @@ export default function HRLayout() {
       exact: false,
     },
     {
+  path: "offers", // أو "job-postings/offers" حسب تنسيقك
+  label: t("offers") || "Offers",
+  icon: FileText, // أيقونة مناسبة
+  exact: false,
+},
+    {
       path: "all-applicants",
       label: t("applicants"),
       icon: UsersRound,
@@ -67,6 +73,13 @@ export default function HRLayout() {
       icon: LogOut,
       exact: false,
     },
+    {
+  
+  path: "overtime",
+  label: t("overtime") || "Overtime",
+  icon: Clock,
+  exact: false,
+},
     { path: "contracts", label: t("contracts"), icon: FileText, exact: false },
     {
       path: "job-postings",

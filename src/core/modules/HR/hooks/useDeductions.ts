@@ -3,19 +3,19 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { DeductionsService } from '../../../../api/service/HrService/DeductionsService';
 import { AxiosError } from 'axios';
-import type { DeductionRecord } from '../../../../api/service/HrService/Types/payroll.types';
 
 export const useDeductions = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['deductions'],
     queryFn: async () => {
       const res = await DeductionsService.getAll();
+      // ✅ إرجاع البيانات مباشرة بدون استخدام as
       return res.data?.data || [];
     },
   });
 
   return {
-    deductions: data as DeductionRecord[] || [],
+    deductions: data || [], // ✅ TypeScript سيستنتج النوع تلقائياً
     isLoading,
     error: error?.message || null,
     refetch,

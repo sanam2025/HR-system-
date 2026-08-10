@@ -7,18 +7,15 @@ import {
   TrendingDown,
   Users,
   Plus,
-  X,
   List,
+  X,
 } from "lucide-react";
 import { useCreateDeduction, useDeductions } from "../hooks/useDeductions";
 import { useCreateIncentive, useIncentives } from "../hooks/useIncentives";
+import { PayrollsService } from "../../../../api/service/HrService/PayrollsService";
 import { apiClient } from "../../../../api/client";
 import type { PayrollRecord } from "../types/payroll.types";
 import toast from "react-hot-toast";
-
-// ============= Helpers & Constants =============
-const CURRENT_MONTH = "April";
-const CURRENT_YEAR = 2026;
 
 const formatSalary = (amount: number) => {
   return new Intl.NumberFormat("en-US", {
@@ -29,18 +26,8 @@ const formatSalary = (amount: number) => {
 };
 
 const CalendarIcon = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-    />
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
   </svg>
 );
 
@@ -51,7 +38,6 @@ const EmptyState = () => (
   </div>
 );
 
-// ============= Main Component =============
 export default function Payroll() {
   // ------------------- Hooks -------------------
   const { incentives } = useIncentives();
@@ -60,15 +46,14 @@ export default function Payroll() {
   const createDeduction = useCreateDeduction();
 
   // ------------------- Local States -------------------
-  const [records] = useState<PayrollRecord[]>([]); // سيتم ربط هذا لاحقاً بـ /payroll/current عند توفره
-  const [employees, setEmployees] = useState<
-    { id: number; full_name: string }[]
-  >([]);
+  const [records, setRecords] = useState<PayrollRecord[]>([]);
+  // ✅ إعادة تفعيل employees وتعريفه بنوع صحيح
+  const [employees, setEmployees] = useState<{ id: number; full_name: string }[]>([]);
+  
   const [showIncentiveModal, setShowIncentiveModal] = useState(false);
   const [showDeductionModal, setShowDeductionModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
-  // ------------------- Form Data -------------------
   const [newIncentive, setNewIncentive] = useState({
     user_id: 0,
     amount: 0,
@@ -83,19 +68,22 @@ export default function Payroll() {
     date: new Date().toISOString().split("T")[0],
   });
 
-  // ------------------- جلب الموظفين -------------------
+  // ------------------- جلب البيانات -------------------
   useEffect(() => {
-    const fetchEmployees = async () => {
+    const fetchData = async () => {
       try {
-        const response = await apiClient.get("/users/employees");
-        if (response.data?.data) {
-          setEmployees(response.data.data);
-        }
+        // ✅ جلب الموظفين (للاستخدام في الـ Dropdown)
+        const empRes = await apiClient.get("/users/employees");
+        if (empRes.data?.data) setEmployees(empRes.data.data);
+
+        // جلب كشف الرواتب الحالي
+        const payrollRes = await PayrollsService.getCurrentPayroll();
+        if (payrollRes.data?.data) setRecords(payrollRes.data.data);
       } catch {
-        toast.error("Failed to load employees list");
+        toast.error("Failed to load payroll data");
       }
     };
-    fetchEmployees();
+    fetchData();
   }, []);
 
   // ------------------- Handlers -------------------
@@ -107,12 +95,7 @@ export default function Payroll() {
     createIncentive.mutate(newIncentive, {
       onSuccess: () => {
         setShowIncentiveModal(false);
-        setNewIncentive({
-          user_id: 0,
-          amount: 0,
-          reason: "",
-          date: new Date().toISOString().split("T")[0],
-        });
+        setNewIncentive({ user_id: 0, amount: 0, reason: "", date: new Date().toISOString().split("T")[0] });
       },
     });
   };
@@ -125,12 +108,7 @@ export default function Payroll() {
     createDeduction.mutate(newDeduction, {
       onSuccess: () => {
         setShowDeductionModal(false);
-        setNewDeduction({
-          user_id: 0,
-          amount: 0,
-          reason: "",
-          date: new Date().toISOString().split("T")[0],
-        });
+        setNewDeduction({ user_id: 0, amount: 0, reason: "", date: new Date().toISOString().split("T")[0] });
       },
     });
   };
@@ -143,58 +121,45 @@ export default function Payroll() {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
-      {/* Header */}
       <div className="mb-8">
         <div className="flex justify-between items-start flex-wrap gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              Payroll Management
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-900">Payroll Management</h1>
             <p className="text-gray-500 mt-1 text-sm">
               Manage employee salaries, incentives, and deductions.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <button
+            <button 
               onClick={() => setShowIncentiveModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium"
             >
               <Plus className="w-4 h-4" /> Create Incentive
             </button>
-            <button
+            <button 
               onClick={() => setShowDeductionModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
             >
               <Plus className="w-4 h-4" /> Create Deduction
             </button>
-            <button
-              onClick={() => setShowHistory(!showHistory)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-            >
+            <button onClick={() => setShowHistory(!showHistory)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
               <List className="w-4 h-4" /> History
             </button>
             <div className="flex items-center gap-2 bg-white rounded-xl shadow-sm border border-gray-100 px-4 py-2">
               <CalendarIcon className="w-4 h-4 text-gray-400" />
-              <span className="text-sm font-medium text-gray-700">
-                {CURRENT_MONTH} {CURRENT_YEAR}
-              </span>
+              <span className="text-sm font-medium text-gray-700">{new Date().toLocaleString('default', { month: 'long' })} {new Date().getFullYear()}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Total Salaries Card */}
       <div className="mb-8">
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-blue-100 text-sm mb-1">Total Salaries Due</p>
-              <p className="text-3xl font-bold">
-                {formatSalary(totalNetSalary)}
-              </p>
-              <p className="text-blue-100 text-xs mt-2">
-                {CURRENT_MONTH} {CURRENT_YEAR}
-              </p>
+              <p className="text-3xl font-bold">{formatSalary(totalNetSalary)}</p>
+              <p className="text-blue-100 text-xs mt-2">{new Date().toLocaleString('default', { month: 'long' })} {new Date().getFullYear()}</p>
             </div>
             <div className="bg-white/20 p-4 rounded-2xl">
               <Wallet className="w-8 h-8" />
@@ -203,7 +168,6 @@ export default function Payroll() {
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
           <div className="flex items-center gap-3">
@@ -212,9 +176,7 @@ export default function Payroll() {
             </div>
             <div>
               <p className="text-xs text-gray-400">Total Employees</p>
-              <p className="text-lg font-bold text-gray-800">
-                {records.length}
-              </p>
+              <p className="text-lg font-bold text-gray-800">{records.length}</p>
             </div>
           </div>
         </div>
@@ -226,9 +188,7 @@ export default function Payroll() {
             </div>
             <div>
               <p className="text-xs text-gray-400">Total Incentives</p>
-              <p className="text-lg font-bold text-gray-800">
-                {formatSalary(totalIncentives)}
-              </p>
+              <p className="text-lg font-bold text-gray-800">{formatSalary(totalIncentives)}</p>
             </div>
           </div>
         </div>
@@ -240,9 +200,7 @@ export default function Payroll() {
             </div>
             <div>
               <p className="text-xs text-gray-400">Total Deductions</p>
-              <p className="text-lg font-bold text-gray-800">
-                {formatSalary(totalDeductions)}
-              </p>
+              <p className="text-lg font-bold text-gray-800">{formatSalary(totalDeductions)}</p>
             </div>
           </div>
         </div>
@@ -254,38 +212,23 @@ export default function Payroll() {
             </div>
             <div>
               <p className="text-xs text-gray-400">Base Salary</p>
-              <p className="text-lg font-bold text-gray-800">
-                {formatSalary(totalBaseSalary)}
-              </p>
+              <p className="text-lg font-bold text-gray-800">{formatSalary(totalBaseSalary)}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Payroll Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/30">
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Employee
-                </th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Department
-                </th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Base Salary
-                </th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Deductions
-                </th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Incentives
-                </th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Net Salary
-                </th>
+                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Employee</th>
+                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Department</th>
+                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Base Salary</th>
+                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Deductions</th>
+                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Incentives</th>
+                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Net Salary</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -296,26 +239,14 @@ export default function Payroll() {
                       <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">
                         {record.employeeName.charAt(0)}
                       </div>
-                      <span className="text-sm font-medium text-gray-800">
-                        {record.employeeName}
-                      </span>
+                      <span className="text-sm font-medium text-gray-800">{record.employeeName}</span>
                     </div>
                   </td>
-                  <td className="px-5 py-4 text-sm text-gray-600">
-                    {record.department}
-                  </td>
-                  <td className="px-5 py-4 text-sm text-gray-800">
-                    {formatSalary(record.baseSalary)}
-                  </td>
-                  <td className="px-5 py-4 text-sm text-red-600">
-                    - {formatSalary(record.deductions)}
-                  </td>
-                  <td className="px-5 py-4 text-sm text-emerald-600">
-                    + {formatSalary(record.bonuses)}
-                  </td>
-                  <td className="px-5 py-4 text-sm font-bold text-gray-900">
-                    {formatSalary(record.netSalary)}
-                  </td>
+                  <td className="px-5 py-4 text-sm text-gray-600">{record.department}</td>
+                  <td className="px-5 py-4 text-sm text-gray-800">{formatSalary(record.baseSalary)}</td>
+                  <td className="px-5 py-4 text-sm text-red-600">- {formatSalary(record.deductions)}</td>
+                  <td className="px-5 py-4 text-sm text-emerald-600">+ {formatSalary(record.bonuses)}</td>
+                  <td className="px-5 py-4 text-sm font-bold text-gray-900">{formatSalary(record.netSalary)}</td>
                 </tr>
               ))}
             </tbody>
@@ -324,17 +255,11 @@ export default function Payroll() {
         {records.length === 0 && <EmptyState />}
       </div>
 
-      {/* History Section - Incentives & Deductions */}
       {showHistory && (
         <div className="mt-12 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden p-6">
           <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
-            <h3 className="text-lg font-bold text-gray-800">
-              📜 Incentives & Deductions History
-            </h3>
-            <button
-              onClick={() => setShowHistory(false)}
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
+            <h3 className="text-lg font-bold text-gray-800">📜 Incentives & Deductions History</h3>
+            <button onClick={() => setShowHistory(false)} className="text-sm text-blue-600 hover:text-blue-800 font-medium">
               Hide History
             </button>
           </div>
@@ -346,64 +271,34 @@ export default function Payroll() {
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">
-                      Employee
-                    </th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">
-                      Type
-                    </th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">
-                      Amount
-                    </th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">
-                      Reason
-                    </th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">
-                      Date
-                    </th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Employee</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Type</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Amount</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Reason</th>
+                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Date</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {incentives.map((item) => (
                     <tr key={`inc-${item.id}`}>
-                      <td className="px-5 py-3 text-sm text-gray-800">
-                        {item.user?.full_name || `User #${item.user_id}`}
-                      </td>
+                      <td className="px-5 py-3 text-sm text-gray-800">{item.user?.full_name || `User #${item.user_id}`}</td>
                       <td className="px-5 py-3 text-sm">
-                        <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
-                          Incentive
-                        </span>
+                        <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">Incentive</span>
                       </td>
-                      <td className="px-5 py-3 text-sm font-semibold text-emerald-600">
-                        + {formatSalary(item.amount)}
-                      </td>
-                      <td className="px-5 py-3 text-sm text-gray-600">
-                        {item.reason || "-"}
-                      </td>
-                      <td className="px-5 py-3 text-sm text-gray-600">
-                        {new Date(item.date).toLocaleDateString()}
-                      </td>
+                      <td className="px-5 py-3 text-sm font-semibold text-emerald-600">+ {formatSalary(item.amount)}</td>
+                      <td className="px-5 py-3 text-sm text-gray-600">{item.reason || '-'}</td>
+                      <td className="px-5 py-3 text-sm text-gray-600">{new Date(item.date).toLocaleDateString()}</td>
                     </tr>
                   ))}
                   {deductions.map((item) => (
                     <tr key={`ded-${item.id}`}>
-                      <td className="px-5 py-3 text-sm text-gray-800">
-                        {item.user?.full_name || `User #${item.user_id}`}
-                      </td>
+                      <td className="px-5 py-3 text-sm text-gray-800">{item.user?.full_name || `User #${item.user_id}`}</td>
                       <td className="px-5 py-3 text-sm">
-                        <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">
-                          Deduction
-                        </span>
+                        <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">Deduction</span>
                       </td>
-                      <td className="px-5 py-3 text-sm font-semibold text-red-600">
-                        - {formatSalary(item.amount)}
-                      </td>
-                      <td className="px-5 py-3 text-sm text-gray-600">
-                        {item.reason || "-"}
-                      </td>
-                      <td className="px-5 py-3 text-sm text-gray-600">
-                        {new Date(item.date).toLocaleDateString()}
-                      </td>
+                      <td className="px-5 py-3 text-sm font-semibold text-red-600">- {formatSalary(item.amount)}</td>
+                      <td className="px-5 py-3 text-sm text-gray-600">{item.reason || '-'}</td>
+                      <td className="px-5 py-3 text-sm text-gray-600">{new Date(item.date).toLocaleDateString()}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -418,21 +313,14 @@ export default function Payroll() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-gray-900">
-                Create Incentive
-              </h3>
-              <button
-                onClick={() => setShowIncentiveModal(false)}
-                className="p-1 hover:bg-gray-100 rounded"
-              >
+              <h3 className="text-xl font-bold text-gray-900">Create Incentive</h3>
+              <button onClick={() => setShowIncentiveModal(false)} className="p-1 hover:bg-gray-100 rounded">
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Employee *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Employee *</label>
                 <select
                   value={newIncentive.user_id}
                   onChange={(e) =>
@@ -444,7 +332,8 @@ export default function Payroll() {
                   className="w-full border rounded-lg px-3 py-2 bg-white"
                 >
                   <option value={0}>Select Employee</option>
-                  {employees.map((emp) => (
+                  {/* ✅ تصحيح: employees معرفة الآن، وتم إزالة any بوضع النوع مباشرة */}
+                  {employees.map((emp: { id: number; full_name: string }) => (
                     <option key={emp.id} value={emp.id}>
                       {emp.full_name}
                     </option>
@@ -517,21 +406,14 @@ export default function Payroll() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-gray-900">
-                Create Deduction
-              </h3>
-              <button
-                onClick={() => setShowDeductionModal(false)}
-                className="p-1 hover:bg-gray-100 rounded"
-              >
+              <h3 className="text-xl font-bold text-gray-900">Create Deduction</h3>
+              <button onClick={() => setShowDeductionModal(false)} className="p-1 hover:bg-gray-100 rounded">
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Employee *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Employee *</label>
                 <select
                   value={newDeduction.user_id}
                   onChange={(e) =>
@@ -543,7 +425,8 @@ export default function Payroll() {
                   className="w-full border rounded-lg px-3 py-2 bg-white"
                 >
                   <option value={0}>Select Employee</option>
-                  {employees.map((emp) => (
+                  {/* ✅ تصحيح: employees معرفة الآن، وتم إزالة any بوضع النوع مباشرة */}
+                  {employees.map((emp: { id: number; full_name: string }) => (
                     <option key={emp.id} value={emp.id}>
                       {emp.full_name}
                     </option>

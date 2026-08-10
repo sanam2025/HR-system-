@@ -47,6 +47,8 @@ import EmployeeDashboard from "./core/modules/employee/pages/EmployeeDashboard";
 import EmployeeProfile_E from "./core/modules/employee/pages/EmployeeProfile";
 import EmployeeTasksFinance from "./core/modules/employee/pages/EmployeeTasksFinance";
 import EmployeeAttendance from "./core/modules/employee/pages/EmployeeAttendance";
+import Overtime from "./core/modules/HR/pages/Overtime/Overtime";
+import OvertimeDetail from "./core/modules/HR/pages/Overtime/OvertimeDetail";
 
 // ============= Helper Component =============
 function Page({ title }: { title: string }) {
@@ -68,10 +70,22 @@ const appRouter = createBrowserRouter([
       { path: "employees", element: <Employees /> },
       { path: "Recruitment", element: <Recruitment /> },
       { path: "recruitment/:id", element: <JobRequisitionDetail /> },
+      {
+  path: "offers",
+  element: <Offers />, // أو <AllOffers /> إذا أنشأت صفحة عامة
+},
       { path: "payroll", element: <Payroll /> },
       { path: "terminations", element: <Terminations /> },
       { path: "resignations", element: <Resignations /> },
       { path: "contracts", element: <Contracts /> },
+     {
+  path: "overtime",
+  element: <Overtime />,
+},
+{
+  path: "overtime/:id",
+  element: <OvertimeDetail />,
+},
       { path: "job-postings", element: <JobPostings /> },
       { path: "job-postings/:id", element: <JobPostingDetail /> },
       { path: "job-postings/edit/:id", element: <JobPostingForm /> },

@@ -3,19 +3,19 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { IncentivesService } from '../../../../api/service/HrService/IncentivesService';
 import { AxiosError } from 'axios';
-import type { IncentiveRecord } from '../../../../api/service/HrService/Types/payroll.types';
 
 export const useIncentives = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['incentives'],
     queryFn: async () => {
       const res = await IncentivesService.getAll();
+      // ✅ إرجاع البيانات مباشرة بدون استخدام as
       return res.data?.data || [];
     },
   });
 
   return {
-    incentives: data as IncentiveRecord[] || [],
+    incentives: data || [], // ✅ TypeScript سيستنتج النوع تلقائياً
     isLoading,
     error: error?.message || null,
     refetch,
