@@ -13,7 +13,6 @@ import Recruitment from "./core/modules/HR/pages/Recruitment/Recruitment";
 import Payroll from "./core/modules/HR/pages/Payroll";
 import Terminations from "./core/modules/HR/pages/Terminations";
 import Resignations from "./core/modules/HR/pages/Resignations";
-import Contracts from "./core/modules/HR/pages/Contracts";
 import JobPostingForm from "./core/modules/HR/pages/JobPostings/JobPostingForm";
 import JobPostingDetail from "./core/modules/HR/pages/JobPostings/JobPostingDetail";
 import JobPostings from "./core/modules/HR/pages/JobPostings/JobPostings";
@@ -49,6 +48,8 @@ import EmployeeTasksFinance from "./core/modules/employee/pages/EmployeeTasksFin
 import EmployeeAttendance from "./core/modules/employee/pages/EmployeeAttendance";
 import Overtime from "./core/modules/HR/pages/Overtime/Overtime";
 import OvertimeDetail from "./core/modules/HR/pages/Overtime/OvertimeDetail";
+import Contracts from "./core/modules/HR/pages/Contracts/Contracts";
+import ContractDetail from "./core/modules/HR/pages/Contracts/ContractDetail";
 
 // ============= Helper Component =============
 function Page({ title }: { title: string }) {
@@ -78,6 +79,10 @@ const appRouter = createBrowserRouter([
       { path: "terminations", element: <Terminations /> },
       { path: "resignations", element: <Resignations /> },
       { path: "contracts", element: <Contracts /> },
+      {
+  path: "contracts/:id",
+  element: <ContractDetail />,
+},
      {
   path: "overtime",
   element: <Overtime />,

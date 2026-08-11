@@ -1,6 +1,5 @@
 // src/core/modules/HR/pages/JobPostings/JobPostings.tsx
-import { useState } from 'react';
-import JobPostingsStats from './JobPostingsStats';
+import { useState, useEffect } from 'react';
 import JobPostingsFilters from './JobPostingsFilters';
 import JobPostingsCard from './JobPostingsCard';
 import Loading from '../../../../../shared/components/Loading';
@@ -9,28 +8,46 @@ import {
   useCloseJobPosting, 
   useDeleteJobPosting 
 } from '../../hooks/useJobPostings';
+import { JobPostingsService } from '../../../../../api/service/HrService/JobPostingsService';
+import { Briefcase, Lock, Unlock } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function JobPostings() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [jobCount, setJobCount] = useState({ total: 0 });
 
-  // 1. جلب الوظائف (هذا موجود عندك)
+  // 1. جلب الوظائف
   const { postings, isLoading, error, refetch } = useJobPostings();
 
-  // 2. هوك الإغلاق (موجود عندك في ملف منفصل)
-  const closeMutation = useCloseJobPosting();
+  // 2. جلب عدد الوظائف من الـ API الجديد
+  useEffect(() => {
+    const fetchCount = async () => {
+      try {
+        const res = await JobPostingsService.getCount();
+        setJobCount(res.data?.data || { total: 0 });
+      } catch {
+        toast.error('Failed to load job count');
+      }
+    };
+    fetchCount();
+  }, []);
 
-  // 3. هوك الحذف (موجود عندك في ملف منفصل)
+  // 3. هوك الإغلاق والحذف
+  const closeMutation = useCloseJobPosting();
   const deleteMutation = useDeleteJobPosting();
 
-  // دالة الإغلاق
   const handleClose = (id: number) => {
     closeMutation.mutate(id);
   };
 
-  // دالة الحذف
   const handleDelete = (id: number) => {
     deleteMutation.mutate(id);
   };
+
+  // حساب الإحصائيات للكارت
+  const openJobs = postings.filter(p => p.status === 'open').length;
+  const closedJobs = postings.filter(p => p.status === 'closed').length;
+  const totalFromCount = jobCount.total || postings.length;
 
   const filteredPostings = postings.filter(p =>
     p.job_title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -65,7 +82,31 @@ export default function JobPostings() {
         <p className="text-gray-500 text-sm mt-1">Manage all job postings.</p>
       </div>
 
-      <JobPostingsStats postings={postings} />
+      {/* ✅ إضافة كارت الإحصائيات الجديد */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100 flex items-center justify-between">
+          <div>
+            <p className="text-sm text-gray-500 font-medium">Total Jobs</p>
+            <p className="text-2xl font-bold text-gray-900">{totalFromCount}</p>
+          </div>
+          <Briefcase className="w-8 h-8 text-blue-500" />
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100 flex items-center justify-between">
+          <div>
+            <p className="text-sm text-gray-500 font-medium">Open</p>
+            <p className="text-2xl font-bold text-green-600">{openJobs}</p>
+          </div>
+          <Unlock className="w-8 h-8 text-green-500" />
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100 flex items-center justify-between">
+          <div>
+            <p className="text-sm text-gray-500 font-medium">Closed</p>
+            <p className="text-2xl font-bold text-red-600">{closedJobs}</p>
+          </div>
+          <Lock className="w-8 h-8 text-red-500" />
+        </div>
+      </div>
+
       <JobPostingsFilters searchTerm={searchTerm} setSearchTerm={setSearchTerm} refetch={refetch} />
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -87,7 +128,6 @@ export default function JobPostings() {
                   posting={posting}
                   onClose={handleClose}
                   onDelete={handleDelete}
-                  // ✅ تمرير حالات التحميل الخاصة بكل عملية
                   isClosing={closeMutation.isPending}
                   isDeleting={deleteMutation.isPending}
                 />

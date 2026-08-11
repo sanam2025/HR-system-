@@ -2,24 +2,18 @@
 import { apiClient } from '../../client';
 
 export const DepartmentsService = {
-  // ✅ جرب هذا أولاً (حسب الـ Collection)
-  getDepartmentsWithUsers: () => 
-    apiClient.get('/department/users'),
+  // ✅ جلب عدد الأقسام (بناءً على الصورة الأولى: count department)
+  getCount: () => apiClient.get('/departments/count'),
 
-  // ✅ جرب هذا إذا لم يعمل الأول
-  // getDepartmentsWithUsers: () => 
-  //   apiClient.get('/department/users'),
+  // ✅ جلب أسماء الأقسام فقط (للعرض ككروت)
+  getAllNames: () => apiClient.get('/departments/names'),
 
-  // ✅ جلب كل الأقسام
-  getAll: () => apiClient.get('/departments'),
+  // ✅ جلب تفاصيل كل الأقسام (الاسم، المدير، عدد الموظفين)
+  getAllDetails: () => apiClient.get('/departments/all'),
 
-  // ✅ جلب قسم معين مع موظفيه
-  getByIdWithUsers: (id: number) => 
-    apiClient.get(`/departments/${id}/employees`),
+  // ✅ جلب موظفي قسم معين (للضغط على الكارد والذهاب للتفاصيل)
+  getDepartmentEmployees: (id: number) => apiClient.get(`/departments/${id}/employees`),
 
-  // ✅ جلب كل المستخدمين (موظفين ومديرين)
-  getUsers: () => apiClient.get('/department/users'),
-
-  // ✅ جلب جميع الموظفين
-  getEmployees: () => apiClient.get('/users/employees'),
+  // ✅ جلب جميع الموظفين مع أقسامهم دفعة واحدة
+  getAllWithEmployees: () => apiClient.get('/departments/employees'),
 };
