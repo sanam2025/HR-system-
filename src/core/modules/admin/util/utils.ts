@@ -49,3 +49,17 @@ export const getTargetAudienceLabel = (target: string) => {
             return target;
     }
 };
+
+export const formatTimeSettings = (time: string) => {
+  if (!time) return "N/A";
+  const [hours, minutes] = time.split(':');
+  const h = parseInt(hours);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 || 12;
+  return `${h12}:${minutes} ${ampm}`;
+};
+
+export const formatWeekendDays = (days: string[]) => {
+  if (!days || days.length === 0) return "None";
+  return days.map(day => day.charAt(0).toUpperCase() + day.slice(1)).join(", ");
+};

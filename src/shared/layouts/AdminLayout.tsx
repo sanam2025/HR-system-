@@ -1,6 +1,6 @@
 import SideBar from '../components/SideBar'
 import { Outlet } from 'react-router-dom'
-import { LayoutDashboard  , Settings , Megaphone , FolderTree , BarChart , Search, CalendarDays} from 'lucide-react'
+import { LayoutDashboard  , Settings , Megaphone , FolderTree , BarChart , Search, CalendarDays, UserX} from 'lucide-react'
 import { useState } from 'react'
 
 function AdminLayout() {
@@ -10,9 +10,10 @@ function AdminLayout() {
     {path: '/admin/setting' , label: 'Settings' , icon: Settings , exact: false},
     {path: '/admin/announcement' , label: 'Announcements' , icon: Megaphone , exact: false},
     {path: '/admin/organization' , label: 'Organization Structure' , icon: FolderTree , exact: false},
-    {path: '/admin/report' , label: 'Reports & Analytics' , icon: BarChart , exact: false},
+    {path: '/admin/overview' , label: 'Overview' , icon: BarChart , exact: false},
     {path: '/admin/search' , label: 'Employee Search' , icon: Search , exact: false},
     {path: '/admin/holidays' , label: 'Holidays' , icon: CalendarDays , exact: false},
+    {path: '/admin/termination' , label: 'Terminations' , icon: UserX , exact: false},
   ]
 
   const [open , setopen] = useState(false);

@@ -35,3 +35,45 @@ export interface APIResponseWithToken<T>{
   Token: string;
   status_code: number;
 }
+
+export type EmployeeRole = "admin" | "HR" | "manager" | "employee";
+
+export type EmployeeStatus = "active" | "inactive";
+
+export interface Employee {
+  id: number;
+  name: string;
+  email: string;
+  department: string;
+  job_title: string | null;
+  status: EmployeeStatus;
+  profile_id: number | null;
+}
+
+export interface EmployeesByRole {
+  admin: Employee[];
+  HR: Employee[];
+  manager: Employee[];
+  employee: Employee[];
+}
+
+export interface EmployeesCounts {
+  admin: number;
+  HR: number;
+  manager: number;
+  employee: number;
+}
+
+
+export interface EmployeesResponseData {
+  data: EmployeesByRole;
+  counts: EmployeesCounts;
+}
+
+export type EmployeesAPIResponse = APIResponse<EmployeesResponseData>;
+
+export type EmployeesAPIResponseSimple = {
+  success: boolean;
+  data: EmployeesByRole;
+  counts: EmployeesCounts;
+};

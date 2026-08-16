@@ -1,7 +1,7 @@
 import { Mail, Lock, LogIn, Eye, EyeOff, ArrowRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
-import { useLogin } from './hooks/useLogin';
+import { useLogin } from './hooks/useAuth';
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
