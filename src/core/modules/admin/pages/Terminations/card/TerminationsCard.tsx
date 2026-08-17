@@ -1,4 +1,4 @@
-import { Briefcase, Calendar, AlertCircle, CheckCircle, XCircle, Eye, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
+import { Briefcase, Calendar, AlertCircle, CheckCircle, XCircle, Eye, ChevronUp, ChevronDown, Loader2, Clock } from "lucide-react";
 import React, { useState } from "react";
 import { StatusBadge } from "./StatusBadge";
 import type { Termination } from "../../../types/types";
@@ -30,7 +30,6 @@ export const TerminationCard = ({ termination }: { termination: Termination }) =
       const response = await approve(termination.id);
       toast.success(response?.message || `Termination for ${termination.user?.name} approved successfully`);
     } catch (error: any) {
-      // Check for specific error message
       const errorMessage = error?.response?.data?.message || error?.message || 'Failed to approve termination';
       toast.error(errorMessage);
     }
@@ -41,7 +40,6 @@ export const TerminationCard = ({ termination }: { termination: Termination }) =
       const response = await reject(termination.id);
       toast.success(response?.message || `Termination for ${termination.user?.name} rejected successfully`);
     } catch (error: any) {
-      // Check for specific error message
       const errorMessage = error?.response?.data?.message || error?.message || 'Failed to reject termination';
       toast.error(errorMessage);
     }
@@ -201,9 +199,15 @@ export const TerminationCard = ({ termination }: { termination: Termination }) =
                 <p className="text-xs text-gray-400 uppercase tracking-wider">Ready for Admin</p>
                 <p className="text-sm font-medium text-gray-700 mt-1">
                   {termination.ready_for_admin ? (
-                    <span className="text-emerald-600">✓ Yes</span>
+                    <span className="text-emerald-600 flex items-center gap-1">
+                      <CheckCircle className="w-4 h-4" />
+                      Yes
+                    </span>
                   ) : (
-                    <span className="text-amber-600">⏳ Pending</span>
+                    <span className="text-amber-600 flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      Pending
+                    </span>
                   )}
                 </p>
               </div>

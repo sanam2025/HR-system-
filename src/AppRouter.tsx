@@ -4,7 +4,7 @@ import EmployeeSearch from "./core/modules/admin/pages/Employees/EmployeeSearch"
 import OrganizationlStructure from "./core/modules/admin/pages/Organization/OrganizationlStructure";
 import SystemSettings from "./core/modules/admin/pages/settings/SystemSettings";
 import AdminLayout from "./shared/layouts/AdminLayout";
-import DashboardAdmin from "./core/modules/admin/pages/Dashboard";
+import DashboardAdmin from "./core/modules/admin/pages/Dashboard/Dashboard";
 import Holidays from "./core/modules/admin/pages/Holidays/Holidays";
 import Login from "./core/modules/auth/Login";
 import Overview from "./core/modules/admin/pages/Overview/Overview";
