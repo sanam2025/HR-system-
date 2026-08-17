@@ -12,7 +12,6 @@ import Employees from "./core/modules/HR/pages/Employees";
 import Recruitment from "./core/modules/HR/pages/Recruitment/Recruitment";
 import Payroll from "./core/modules/HR/pages/Payroll";
 import Terminations from "./core/modules/HR/pages/Terminations";
-import Resignations from "./core/modules/HR/pages/Resignations";
 import JobPostingForm from "./core/modules/HR/pages/JobPostings/JobPostingForm";
 import JobPostingDetail from "./core/modules/HR/pages/JobPostings/JobPostingDetail";
 import JobPostings from "./core/modules/HR/pages/JobPostings/JobPostings";
@@ -50,6 +49,10 @@ import Overtime from "./core/modules/HR/pages/Overtime/Overtime";
 import OvertimeDetail from "./core/modules/HR/pages/Overtime/OvertimeDetail";
 import Contracts from "./core/modules/HR/pages/Contracts/Contracts";
 import ContractDetail from "./core/modules/HR/pages/Contracts/ContractDetail";
+import PerformanceDetail from "./core/modules/HR/pages/Performance/PerformanceDetail";
+import ResignationDetail from "./core/modules/HR/pages/Resignations/ResignationDetail";
+import Resignations from "./core/modules/HR/pages/Resignations/Resignations";
+import Performance from "./core/modules/HR/pages/Performance/Performance";
 
 // ============= Helper Component =============
 function Page({ title }: { title: string }) {
@@ -132,6 +135,22 @@ const appRouter = createBrowserRouter([
       { path: "complaints/:id", element: <ComplaintDetail /> },
       { path: "employee/:id", element: <EmployeeProfileHR /> },
       { path: "department/:id", element: <DepartmentDetail /> },
+      {
+    path: "Performance",
+     element: <Performance/>,
+},
+{
+  path: "performance/:id",
+  element: <PerformanceDetail />,
+},
+{
+  path: "resignations",
+  element: <Resignations />,
+},
+{
+  path: "resignations/:id",
+  element: <ResignationDetail />,
+},
     ],
   },
 

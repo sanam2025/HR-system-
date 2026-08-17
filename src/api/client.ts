@@ -14,7 +14,7 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
     (config) =>{
-        const token = '4|v6droM3DZU2kBKAJbHklmaJCLxx2Zh6Gmr58RXgi769ae958'
+        const token = '"44|Lh877rvDmHVI9fpmvtEIS6PVQYTmvLXgM1LMdC88dab13690'
         if(token){
             config.headers.Authorization = `Bearer ${token}`;
         }
