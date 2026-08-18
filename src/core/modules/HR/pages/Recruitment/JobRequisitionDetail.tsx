@@ -30,7 +30,7 @@ export default function JobRequisitionDetail() {
           <p className="text-red-600 mb-4">Error loading requisition details</p>
           <button
             onClick={() => navigate("/Hr/recruitment")}
-            className="px-4 py-2 bg-green text-white rounded-lg"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
           >
             Back to Recruitment
           </button>

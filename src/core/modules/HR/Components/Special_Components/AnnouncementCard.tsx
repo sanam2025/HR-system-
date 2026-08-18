@@ -19,11 +19,11 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({ announcement }) => 
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'active': return '';
-      case 'scheduled': return '';
-      case 'draft': return '';
-      case 'expired': return '';
-      default: return '';
+      case 'active': return '🔴';
+      case 'scheduled': return '🟡';
+      case 'draft': return '⚪';
+      case 'expired': return '🔘';
+      default: return '🔵';
     }
   };
 
@@ -45,9 +45,9 @@ const AnnouncementCard: React.FC<AnnouncementCardProps> = ({ announcement }) => 
           </div>
           <p className="text-sm text-gray-600 mt-1">{announcement.content}</p>
           <div className="flex items-center gap-4 mt-2 text-xs text-gray-400">
-            <span>{new Date(announcement.starts_at).toLocaleDateString()}</span>
+            <span>📅 {new Date(announcement.starts_at).toLocaleDateString()}</span>
             {announcement.audience && (
-              <span>{announcement.audience}</span>
+              <span>👥 {announcement.audience}</span>
             )}
           </div>
         </div>

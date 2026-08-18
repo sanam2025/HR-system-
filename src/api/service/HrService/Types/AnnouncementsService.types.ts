@@ -1,18 +1,12 @@
 // src/api/service/HrService/Types/AnnouncementsService.types.ts
-export type Priority = 'high' | 'medium' | 'low';
-export type AnnouncementStatus = 'active' | 'scheduled' | 'draft' | 'expired';
-
 export interface Announcement {
   id: number;
   title: string;
   content: string;
-  priority: Priority;
-  target_audience: string;
-  department?: { id: number; name: string } | null;
-  author?: { id: number; full_name: string } | null;
-  status: AnnouncementStatus;
+  audience: 'all' | 'employees' | 'managers' | 'hr';
+  status: 'active' | 'scheduled' | 'draft' | 'expired';
   starts_at: string;
-  expires_at: string;
+  ends_at?: string;
   created_at: string;
   updated_at: string;
 }
@@ -20,19 +14,17 @@ export interface Announcement {
 export interface CreateAnnouncementData {
   title: string;
   content: string;
-  priority: Priority;
-  audience?: string;
-  status?: 'draft' | 'scheduled' | 'active';
+  audience: 'all' | 'employees' | 'managers' | 'hr';
+  status: 'draft' | 'scheduled' | 'active';
   starts_at: string;
-  expires_at: string;
+  ends_at?: string;
 }
 
 export interface UpdateAnnouncementData {
   title?: string;
   content?: string;
-  priority?: Priority;
-  audience?: string;
-  status?: AnnouncementStatus;
+  audience?: 'all' | 'employees' | 'managers' | 'hr';
+  status?: 'draft' | 'scheduled' | 'active' | 'expired';
   starts_at?: string;
-  expires_at?: string;
+  ends_at?: string;
 }

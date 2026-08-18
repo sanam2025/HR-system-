@@ -9,7 +9,7 @@ import {
   AlertCircle,
   Send,
 } from "lucide-react";
-import type { JobPosting as JobPostingData } from "../../../../../api/service/HrService/Types/JobPostingsService.types";
+import type { JobPostingData } from "../../types/recruitment.types";
 
 interface JobPostingFormProps {
   isOpen: boolean;
@@ -76,7 +76,8 @@ export const JobPostingForm: React.FC<JobPostingFormProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      dir="ltr"
     >
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
@@ -258,7 +259,7 @@ export const JobPostingForm: React.FC<JobPostingFormProps> = ({
             </button>
             <button
               type="submit"
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green rounded-lg hover:bg-green-dark transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Send className="w-4 h-4" />
               Post Job Opening

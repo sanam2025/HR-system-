@@ -1,6 +1,6 @@
-﻿// src/api/service/HrService/RequestionService.ts
+// src/api/service/HrService/RequestionService.ts
 import type { APIResponseWithData } from "../../../Types/types.types";
-import apiClient from '@/api/axios';
+import { apiClient } from "../../client";
 import type { JobRequisitionReject, JobRequisition, JobRequisitionApprove } from "./Types/HRService.types";
 
 export const RequestionService = {
@@ -8,6 +8,6 @@ export const RequestionService = {
   approveRequestion: (id: number) => apiClient.post<APIResponseWithData<JobRequisitionApprove>>(`job-requisitions/${id}/approve`),
   rejectRequestion: (id: number) => apiClient.post<APIResponseWithData<JobRequisitionReject>>(`job-requisitions/${id}/reject`),
   
-  // إضافة دالة getById
+  // ✅ إضافة دالة getById
   getById: (id: number) => apiClient.get<JobRequisition>(`job-requisitions/${id}`),
 };

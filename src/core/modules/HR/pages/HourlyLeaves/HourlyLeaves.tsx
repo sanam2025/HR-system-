@@ -1,7 +1,7 @@
+// src/core/modules/HR/pages/HourlyLeaves/HourlyLeaves.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, RefreshCw, Clock, ChevronRight } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { ArrowLeft, RefreshCw, Clock } from 'lucide-react';
 import { useHourlyLeaveRequests, useApproveHourlyLeave, useRejectHourlyLeave } from '../../hooks/useHourlyLeave';
 import HourlyLeaveStats from './HourlyLeaveStats';
 import HourlyLeaveCard from './HourlyLeaveCard';
@@ -9,7 +9,6 @@ import HourlyLeaveFilters from './HourlyLeaveFilters';
 import Loading from '../../../../../shared/components/Loading';
 
 export const HourlyLeaves = () => {
-  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -47,16 +46,16 @@ export const HourlyLeaves = () => {
             onClick={() => navigate('/Hr')}
             className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-2"
           >
-            {i18n.dir() === 'rtl' ? <ChevronRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />} {t('backToDashboard') || 'Back to Dashboard'}
+            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">{t('hourlyLeaveRequests') || 'Hourly Leave Requests'}</h1>
-          <p className="text-gray-500 text-sm mt-1">{t('manageHourlyLeaveRequests') || 'Manage hourly leave requests'}</p>
+          <h1 className="text-2xl font-bold text-gray-900">Hourly Leave Requests</h1>
+          <p className="text-gray-500 text-sm mt-1">Manage hourly leave requests</p>
         </div>
         <button
           onClick={() => refetch()}
           className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
         >
-          <RefreshCw className="w-4 h-4" /> {t('refresh') || 'Refresh'}
+          <RefreshCw className="w-4 h-4" /> Refresh
         </button>
       </div>
 
@@ -70,7 +69,7 @@ export const HourlyLeaves = () => {
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800">{t('requests') || 'Requests'} ({filtered.length})</h3>
+          <h3 className="text-lg font-semibold text-gray-800">Requests ({filtered.length})</h3>
         </div>
 
         {filtered.length > 0 ? (
@@ -78,13 +77,13 @@ export const HourlyLeaves = () => {
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('employee') || 'Employee'}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('department') || 'Department'}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('date') || 'Date'}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('time') || 'Time'}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('hours') || 'Hours'}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('status') || 'Status'}</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('actions') || 'Actions'}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Department</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hours</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -102,9 +101,9 @@ export const HourlyLeaves = () => {
             </table>
           </div>
         ) : (
-          <div className="p-12 text-center">
+          <div className="p-12 text-center text-gray-400">
             <Clock className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p className="text-gray-500 text-lg">{t('noHourlyLeaveRequests') || 'No hourly leave requests found'}</p>
+            <p>No hourly leave requests found</p>
           </div>
         )}
       </div>

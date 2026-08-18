@@ -28,7 +28,7 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({ isOpen, employ
   if (!isOpen || !employee) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" dir="ltr">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
         {/* Header */}
         <div className="border-b border-gray-100 px-6 py-4 flex justify-between items-center">
@@ -102,7 +102,7 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({ isOpen, employ
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-green rounded-lg hover:bg-green-dark transition-colors">
+            <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
               Save Evaluation
             </button>
           </div>

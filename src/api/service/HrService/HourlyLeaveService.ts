@@ -1,5 +1,5 @@
-﻿// src/api/service/HrService/HourlyLeaveService.ts
-import apiClient from '@/api/axios';
+// src/api/service/HrService/HourlyLeaveService.ts
+import { apiClient } from '../../client';
 
 export interface HourlyLeaveRequest {
   id: number;
@@ -15,25 +15,25 @@ export interface HourlyLeaveRequest {
 }
 
 export const HourlyLeaveService = {
-  // جلب كل الطلبات
+  // ✅ جلب كل الطلبات
   getAll: () => apiClient.get<{ data: HourlyLeaveRequest[] }>('/hourly-leave-Requests'),
 
-  // جلب تفاصيل طلب
+  // ✅ جلب تفاصيل طلب
   getById: (id: number) => apiClient.get<{ data: HourlyLeaveRequest }>(`/hourly-leave-Requests/${id}`),
 
-  // موافقة على طلب
+  // ✅ موافقة على طلب
   approve: (id: number) => apiClient.put(`/hourly-leave-requests/${id}/approve`),
 
-  // رفض طلب
+  // ✅ رفض طلب
   reject: (id: number) => apiClient.put(`/hourly-leave-requests/${id}/reject`),
 
-  // طلبات قسم معين
+  // ✅ طلبات قسم معين
   getDepartmentRequests: (status?: string) =>
     apiClient.get<{ data: HourlyLeaveRequest[] }>(
       `/department-hourly-leave-request${status ? `?status=${status}` : ''}`
     ),
 
-  // كل طلبات القسم
+  // ✅ كل طلبات القسم
   getAllDepartmentRequests: (depId?: number) => {
     let url = '/all-hourly-leave-request';
     if (depId) url += `?dep_id=${depId}`;

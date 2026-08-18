@@ -1,7 +1,6 @@
 // src/core/modules/HR/pages/Announcements/Announcements.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { Edit, Trash2, Send, Eye, X } from 'lucide-react';
 import {
   useAnnouncements,
@@ -17,7 +16,6 @@ import type {
 
 export default function Announcements() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const { announcements, isLoading, refetch } = useAnnouncements();
   const createAnnouncement = useCreateAnnouncement();
   const updateAnnouncement = useUpdateAnnouncement();
@@ -94,16 +92,16 @@ export default function Announcements() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('manageAnnouncements') || 'Manage Announcements'}</h1>
-          <p className="text-gray-500 text-sm">{t('createManageAnnouncements') || 'Create and manage announcements for employees'}</p>
+          <h1 className="text-2xl font-bold text-gray-900">📢 Manage Announcements</h1>
+          <p className="text-gray-500 text-sm">Create and manage announcements for employees</p>
         </div>
-        {/* تم حذف زر Add Announcement من هنا */}
+        {/* ❌ تم حذف زر Add Announcement من هنا */}
         {/* <button
           onClick={() => { setShowForm(true); setEditingId(null); setFormData({ title: '', content: '', audience: 'all', status: 'draft', starts_at: '', ends_at: '' }); }}
-          className="flex items-center gap-2 px-4 py-2 bg-green text-white rounded-lg hover:bg-green transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
         >
           <Plus className="w-4 h-4" /> Add Announcement
         </button> */}
@@ -114,7 +112,7 @@ export default function Announcements() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">{editingId ? (t('editAnnouncement') || 'Edit Announcement') : (t('addAnnouncement') || 'Add Announcement')}</h2>
+              <h2 className="text-xl font-bold">{editingId ? 'Edit Announcement' : 'Add Announcement'}</h2>
               <button onClick={() => setShowForm(false)} className="p-1 hover:bg-gray-100 rounded"><X className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleSave} className="space-y-4">
@@ -152,7 +150,7 @@ export default function Announcements() {
                 </select>
               </div>
               <div className="flex gap-3 pt-4">
-                <button type="submit" className="flex-1 px-4 py-2 bg-green text-white rounded-lg hover:bg-green">{editingId ? 'Update' : 'Create'}</button>
+                <button type="submit" className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">{editingId ? 'Update' : 'Create'}</button>
                 <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
               </div>
             </form>
@@ -167,11 +165,11 @@ export default function Announcements() {
             <thead className="bg-gray-50 border-b">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('titleStar') || 'Title'}</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('audience') || 'Audience'}</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('status') || 'Status'}</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('startDate') || 'Start Date'}</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('actions') || 'Actions'}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Audience</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Start Date</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -195,7 +193,7 @@ export default function Announcements() {
                 </tr>
               ))}
               {announcements.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">{t('noAnnouncements') || 'No announcements found'}</td></tr>
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">No announcements found</td></tr>
               )}
             </tbody>
           </table>

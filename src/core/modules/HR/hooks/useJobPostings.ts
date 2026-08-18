@@ -30,7 +30,7 @@ const getErrorMessage = (err: unknown): string => {
   return 'An error occurred';
 };
 
-// جلب جميع الوظائف
+// ✅ جلب جميع الوظائف
 export const useJobPostings = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['job-postings'],
@@ -47,7 +47,7 @@ export const useJobPostings = () => {
   };
 };
 
-// جلب وظيفة واحدة
+// ✅ جلب وظيفة واحدة
 export const useJobPosting = (jobId?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['jobPosting', jobId],
@@ -67,7 +67,7 @@ export const useJobPosting = (jobId?: number) => {
   };
 };
 
-// تحديث وظيفة
+// ✅ تحديث وظيفة
 export const useUpdateJobPosting = () => {
   const queryClient = useQueryClient();
 
@@ -83,7 +83,7 @@ export const useUpdateJobPosting = () => {
   });
 };
 
-// إغلاق وظيفة
+// ✅ إغلاق وظيفة
 export const useCloseJobPosting = () => {
   const queryClient = useQueryClient();
 
@@ -98,7 +98,7 @@ export const useCloseJobPosting = () => {
   });
 };
 
-// حذف وظيفة
+// ✅ حذف وظيفة
 export const useDeleteJobPosting = () => {
   const queryClient = useQueryClient();
 

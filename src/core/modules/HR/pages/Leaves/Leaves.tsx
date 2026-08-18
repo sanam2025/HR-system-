@@ -1,7 +1,7 @@
+// src/core/modules/HR/pages/Leaves/Leaves.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, RefreshCw, FileText, ChevronRight } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { ArrowLeft, RefreshCw, FileText } from 'lucide-react';
 import { useLeaveRequests, useApproveLeave, useRejectLeave } from '../../hooks/useLeave';
 import LeaveStats from './LeaveStats';
 import LeaveCard from './LeaveCard';
@@ -9,17 +9,18 @@ import LeaveFilters from './LeaveFilters';
 import Loading from '../../../../../shared/components/Loading';
 
 export const Leaves = () => {
-  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
 
+  // ✅ جلب طلبات الإجازات
   const { requests, isLoading, refetch } = useLeaveRequests();
+  
+  // ✅ هوك الموافقة والرفض
   const approveMutation = useApproveLeave();
   const rejectMutation = useRejectLeave();
 
-  // حساب الإحصائيات
+  // ✅ حساب الإحصائيات
   const stats = {
     total: requests.length,
     pending: requests.filter((r) => r.status === 'pending').length,
@@ -27,12 +28,11 @@ export const Leaves = () => {
     rejected: requests.filter((r) => r.status === 'rejected').length,
   };
 
-  // فلترة الطلبات
+  // ✅ فلترة الطلبات (حذف البحث بالاسم واعتماد الفلترة بالحالة والنوع فقط)
   const filtered = requests.filter((request) => {
-    const matchesSearch = request.employee_name?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
     const matchesType = typeFilter === 'all' || request.type === typeFilter;
-    return matchesSearch && matchesStatus && matchesType;
+    return matchesStatus && matchesType;
   });
 
   if (isLoading) {
@@ -52,27 +52,25 @@ export const Leaves = () => {
             onClick={() => navigate('/Hr')}
             className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-2"
           >
-            {i18n.dir() === 'rtl' ? <ChevronRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />} {t('backToDashboard') || 'Back to Dashboard'}
+            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">{t('leaveRequests') || 'Leave Requests'}</h1>
-          <p className="text-gray-500 text-sm mt-1">{t('manageLeaveRequests') || 'Manage employee leave requests'}</p>
+          <h1 className="text-2xl font-bold text-gray-900">Leave Requests</h1>
+          <p className="text-gray-500 text-sm mt-1">Manage employee leave requests</p>
         </div>
         <button
           onClick={() => refetch()}
           className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
-          {t('refresh') || 'Refresh'}
+          Refresh
         </button>
       </div>
 
       {/* Stats */}
       <LeaveStats stats={stats} />
 
-      {/* Filters */}
+      {/* Filters (حذفنا searchTerm) */}
       <LeaveFilters
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
         typeFilter={typeFilter}
@@ -83,7 +81,7 @@ export const Leaves = () => {
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
           <h3 className="text-lg font-semibold text-gray-800">
-            {t('leaveRequests') || 'Leave Requests'} ({filtered.length})
+            Leave Requests ({filtered.length})
           </h3>
         </div>
 
@@ -93,25 +91,25 @@ export const Leaves = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('employee') || 'Employee'}
+                    Employee
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('department') || 'Department'}
+                    Department
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('startDate') || 'Start Date'}
+                    Start Date
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('days') || 'Days'}
+                    Days
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('type') || 'Type'}
+                    Type
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('status') || 'Status'}
+                    Status
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('actions') || 'Actions'}
+                    Actions
                   </th>
                 </tr>
               </thead>
@@ -130,9 +128,9 @@ export const Leaves = () => {
             </table>
           </div>
         ) : (
-          <div className="p-12 text-center">
+          <div className="p-12 text-center text-gray-400">
             <FileText className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p className="text-gray-500 text-lg">{t('noLeaveRequests') || 'No leave requests found'}</p>
+            <p>No leave requests found</p>
           </div>
         )}
       </div>

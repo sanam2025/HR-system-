@@ -1,24 +1,20 @@
-﻿// src/api/service/HrService/DepartmentsService.ts
-import apiClient from '@/api/axios';
-import type {  DepartmentWithEmployees, Employee, Profile } from './Types/DepartmentsService.types';
+// src/api/service/HrService/DepartmentsService.ts
+import { apiClient } from '../../client';
 
 export const DepartmentsService = {
-  // جلب كل الأقسام مع الموظفين والمدراء
-  getAllWithUsers: () => apiClient.get<{ data: DepartmentWithEmployees[] }>('/department/users'),
+  // ✅ جلب عدد الأقسام (بناءً على الصورة الأولى: count department)
+  getCount: () => apiClient.get('/departments/count'),
 
-  // جلب موظفي قسم معين
-  getDepartmentEmployees: (departmentId: number) => 
-    apiClient.get<{ data: Employee[] }>(`/department/${departmentId}/employees`),
+  // ✅ جلب أسماء الأقسام فقط (للعرض ككروت)
+  getAllNames: () => apiClient.get('/departments/names'),
 
-  // جلب بروفايل موظف
-  getProfile: (userId: number) => 
-    apiClient.get<{ data: Profile }>(`/profiles/${userId}`),
+  // ✅ جلب تفاصيل كل الأقسام (الاسم، المدير، عدد الموظفين)
+  getAllDetails: () => apiClient.get('/departments/all'),
 
-  // جلب بروفايل المستخدم الحالي
-  getMyProfile: () => 
-    apiClient.get<{ data: Profile }>('/profiles'),
+  // ✅ جلب موظفي قسم معين (للضغط على الكارد والذهاب للتفاصيل)
+  getDepartmentEmployees: (id: number) => apiClient.get(`/departments/${id}/employees`),
 
-  // جلب موظفي المدير
-  getManagerEmployees: () => 
-    apiClient.get<{ data: Employee[] }>('/manager-employees'),
+  // ✅ جلب جميع الموظفين مع أقسامهم دفعة واحدة
+  getAllWithEmployees: () => apiClient.get('/departments/employees'),
+   getDepartmentsWithUsers: () => apiClient.get('/departments/employees'),
 };

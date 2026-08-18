@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { HourlyLeaveService } from '../../../../api/service/HrService/HourlyLeaveService';
 
-// جلب كل الطلبات
+// ✅ جلب كل الطلبات
 export const useHourlyLeaveRequests = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['hourly-leave-requests'],
@@ -21,7 +21,7 @@ export const useHourlyLeaveRequests = () => {
   };
 };
 
-// جلب تفاصيل طلب
+// ✅ جلب تفاصيل طلب
 export const useHourlyLeaveRequest = (id?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['hourly-leave-request', id],
@@ -41,7 +41,7 @@ export const useHourlyLeaveRequest = (id?: number) => {
   };
 };
 
-// موافقة على طلب
+// ✅ موافقة على طلب
 export const useApproveHourlyLeave = () => {
   const queryClient = useQueryClient();
 
@@ -57,7 +57,7 @@ export const useApproveHourlyLeave = () => {
   });
 };
 
-// رفض طلب
+// ✅ رفض طلب
 export const useRejectHourlyLeave = () => {
   const queryClient = useQueryClient();
 
@@ -73,7 +73,7 @@ export const useRejectHourlyLeave = () => {
   });
 };
 
-// طلبات قسم معين
+// ✅ طلبات قسم معين
 export const useDepartmentHourlyLeaveRequests = (status?: string) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['department-hourly-leave-requests', status],
@@ -91,7 +91,7 @@ export const useDepartmentHourlyLeaveRequests = (status?: string) => {
   };
 };
 
-// كل طلبات القسم
+// ✅ كل طلبات القسم
 export const useAllDepartmentHourlyLeaveRequests = (depId?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['all-department-hourly-leave-requests', depId],

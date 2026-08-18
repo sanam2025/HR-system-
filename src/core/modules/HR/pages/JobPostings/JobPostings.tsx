@@ -1,14 +1,31 @@
 // src/core/modules/HR/pages/JobPostings/JobPostings.tsx
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import JobPostingsStats from './JobPostingsStats';
 import JobPostingsFilters from './JobPostingsFilters';
 import JobPostingsCard from './JobPostingsCard';
 import Loading from '../../../../../shared/components/Loading';
-import { useJobPostings } from '../../hooks/useJobPostings';
+import { 
+  useJobPostings, 
+  useCloseJobPosting, 
+  useDeleteJobPosting 
+} from '../../hooks/useJobPostings';
 
 export default function JobPostings() {
-  const { postings, isLoading, error, refetch, close, delete: deletePosting, isClosing, isDeleting } = useJobPostings();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+
+  const { postings, isLoading, error, refetch } = useJobPostings();
+  const closeMutation = useCloseJobPosting();
+  const deleteMutation = useDeleteJobPosting();
+
+  const handleClose = (id: number) => {
+    closeMutation.mutate(id);
+  };
+
+  const handleDelete = (id: number) => {
+    deleteMutation.mutate(id);
+  };
 
   const filteredPostings = postings.filter(p =>
     p.job_title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -37,10 +54,21 @@ export default function JobPostings() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Job Postings (HR)</h1>
-        <p className="text-gray-500 text-sm mt-1">Manage all job postings.</p>
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Job Postings (HR)</h1>
+            <p className="text-gray-500 text-sm mt-1">Manage all job postings.</p>
+          </div>
+          {/* ✅ زر المقابلات يعمل الآن */}
+          <button
+            onClick={() => navigate('/Hr/interviews')}
+            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+          >
+            Manage Interviews
+          </button>
+        </div>
       </div>
 
       <JobPostingsStats postings={postings} />
@@ -63,10 +91,10 @@ export default function JobPostings() {
                 <JobPostingsCard
                   key={posting.id}
                   posting={posting}
-                  onClose={close}
-                  onDelete={deletePosting}
-                  isClosing={isClosing}
-                  isDeleting={isDeleting}
+                  onClose={handleClose}
+                  onDelete={handleDelete}
+                  isClosing={closeMutation.isPending}
+                  isDeleting={deleteMutation.isPending}
                 />
               ))}
             </tbody>

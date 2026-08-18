@@ -1,46 +1,36 @@
-﻿// src/api/service/HrService/InterviewsService.ts
-import apiClient from '@/api/axios';
+// src/api/service/HrService/InterviewsService.ts
+import { apiClient } from '../../client';
 
-// تعريف أنواع البيانات
-export interface ScheduleInterviewData {
+// ✅ تعريف أنواع البيانات للإرسال
+export interface CreateInterviewData {
   candidate_id: number;
+  interviewed_by: number;
   scheduled_at: string;
   location_type: string;
   location_details?: string;
-  // interviewed_by محذوف (يتم تعيينه تلقائياً)
 }
 
-export interface UpdateResultData {
+export interface UpdateInterviewResultData {
   rate: number;
-  notes?: string;
-}
-
-export interface SubmitRankingData {
-  ranking: { interview_id: number; rank: number }[];
+  note?: string;
 }
 
 export const InterviewsService = {
-  // جلب كل المقابلات (للسايد بار)
-  getAll: () => apiClient.get('/interviews'),
+  // جلب كل المقابلات لوظيفة معينة
+  getAll: (jobId: number) => apiClient.get(`/job-postings/${jobId}/interviews`),
   
-  // جلب مقابلات وظيفة معينة
-  getByJobId: (jobId: number) => apiClient.get(`/job-postings/${jobId}/interviews`),
-  
-  // جدولة مقابلة جديدة (بدون interviewed_by)
-  schedule: (jobId: number, data: ScheduleInterviewData) => 
-    apiClient.post(`/job-postings/${jobId}/interviews`, data),
-  
-  // تحديث نتيجة مقابلة
-  updateResult: (id: number, data: UpdateResultData) => 
-    apiClient.patch(`/interviews/${id}/result`, data),
-  
+  // جلب الترتيب حسب التقييم (Ranked by rate)
+  getRankedByRate: (jobId: number) => apiClient.get(`/job-postings/${jobId}/interviews/ranked-by-rate`),
+
+  // جلب تفاصيل مقابلة معينة
+  getById: (id: number) => apiClient.get(`/interviews/${id}`),
+
+  // جدولة مقابلة جديدة
+  create: (jobId: number, data: CreateInterviewData) => apiClient.post(`/job-postings/${jobId}/interviews`, data),
+
   // إلغاء مقابلة
   cancel: (id: number) => apiClient.patch(`/interviews/${id}/cancel`),
-  
-  // جلب ترتيب المقابلات
-  getRanking: (jobId: number) => apiClient.get(`/job-postings/${jobId}/interviews/ranking`),
-  
-  // حفظ ترتيب المقابلات
-  submitRanking: (jobId: number, data: SubmitRankingData) => 
-    apiClient.post(`/job-postings/${jobId}/interviews/ranking`, data),
+
+  // تحديث نتيجة المقابلة
+  updateResult: (id: number, data: UpdateInterviewResultData) => apiClient.patch(`/interviews/${id}/result`, data),
 };

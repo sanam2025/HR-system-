@@ -1,48 +1,85 @@
 // src/core/modules/HR/pages/Interviews/ScheduleInterview.tsx
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Calendar, User, MapPin } from 'lucide-react';
+import { ArrowLeft, Calendar, MapPin } from 'lucide-react';
 import { useInterviews } from '../../hooks/useInterviews';
 import toast from 'react-hot-toast';
+import { AxiosError } from 'axios';
 
 export const ScheduleInterview = () => {
   const navigate = useNavigate();
-  const { jobId } = useParams<{ jobId: string }>();
+  const { jobId: jobIdFromParams } = useParams<{ jobId: string }>();
   const [searchParams] = useSearchParams();
   const candidateIdFromUrl = searchParams.get('candidateId');
+  const jobIdFromQuery = searchParams.get('jobId');
   
-  const { scheduleInterview, isScheduling } = useInterviews(Number(jobId));
+  const jobId = jobIdFromParams || jobIdFromQuery;
+  const jobIdNumber = jobId ? Number(jobId) : undefined;
+  
+  const { scheduleInterview, isScheduling } = useInterviews(jobIdNumber);
 
+  // ✅ candidate_id و interviewed_by تلقائي (مخفيين عن المستخدم)
   const [form, setForm] = useState({
-    candidate_id: '',
-    interviewed_by: '',
     scheduled_at: '',
     location_type: 'on_site',
     location_details: '',
   });
 
-  // ✅ تعبئة candidate_id تلقائياً من الـ URL
-  useEffect(() => {
-    if (candidateIdFromUrl) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setForm(prev => ({ ...prev, candidate_id: candidateIdFromUrl }));
+  // ✅ التحقق من يوم العطلة
+  const isWeekend = (date: string) => {
+    const day = new Date(date).getDay();
+    return day === 5 || day === 6;
+  };
+
+  const getErrorMessage = (err: unknown): string => {
+    if (err instanceof AxiosError) {
+      const data = err.response?.data as { message?: string };
+      return data?.message || err.message || 'Failed to schedule interview';
     }
-  }, [candidateIdFromUrl]);
+    if (err instanceof Error) {
+      return err.message;
+    }
+    return 'Failed to schedule interview';
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.candidate_id || !form.interviewed_by || !form.scheduled_at) {
-      toast.error('Please fill in all required fields');
+    
+    if (!form.scheduled_at) {
+      toast.error('Please select a date and time');
       return;
     }
-    scheduleInterview({
-      candidate_id: Number(form.candidate_id),
-      interviewed_by: Number(form.interviewed_by),
+    
+    if (isWeekend(form.scheduled_at)) {
+      toast.error('Interviews cannot be scheduled on weekends (Friday, Saturday)');
+      return;
+    }
+    
+    // ✅ البيانات مع candidate_id من الـ URL و interviewed_by تلقائي (4)
+    const data = {
+      candidate_id: Number(candidateIdFromUrl || 1),
+      interviewed_by: 4, // ✅ تلقائي
       scheduled_at: form.scheduled_at,
       location_type: form.location_type,
       location_details: form.location_details || '',
+    };
+    
+    console.log('📅 Sending data:', data);
+    
+    scheduleInterview(data, {
+      onSuccess: () => {
+        toast.success('✅ Interview added to schedule successfully!');
+        if (jobId) {
+          navigate(`/Hr/job-postings/${jobId}/interviews`);
+        } else {
+          navigate('/Hr/interviews');
+        }
+      },
+      onError: (err) => {
+        console.error('❌ Schedule error:', err);
+        toast.error(getErrorMessage(err));
+      },
     });
-    navigate(`/Hr/job-postings/${jobId}/interviews`);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -54,7 +91,13 @@ export const ScheduleInterview = () => {
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
           <button
-            onClick={() => navigate(`/Hr/job-postings/${jobId}/interviews`)}
+            onClick={() => {
+              if (jobId) {
+                navigate(`/Hr/job-postings/${jobId}/interviews`);
+              } else {
+                navigate('/Hr/interviews');
+              }
+            }}
             className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Interviews
@@ -70,37 +113,26 @@ export const ScheduleInterview = () => {
 
         <div className="bg-white rounded-xl shadow-sm p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Candidate ID *</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            {/* ✅ Candidate ID - مخفي */}
+            {candidateIdFromUrl && (
+              <div className="hidden">
                 <input
                   type="number"
                   name="candidate_id"
-                  value={form.candidate_id}
-                  onChange={handleChange}
-                  placeholder="Enter candidate ID"
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  required
-                  readOnly={!!candidateIdFromUrl}
+                  value={candidateIdFromUrl}
+                  readOnly
                 />
               </div>
-            </div>
+            )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Interviewer ID *</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="number"
-                  name="interviewed_by"
-                  value={form.interviewed_by}
-                  onChange={handleChange}
-                  placeholder="Enter interviewer ID"
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
+            {/* ✅ Interviewer ID - مخفي */}
+            <div className="hidden">
+              <input
+                type="number"
+                name="interviewed_by"
+                value="4"
+                readOnly
+              />
             </div>
 
             <div>
@@ -116,6 +148,7 @@ export const ScheduleInterview = () => {
                   required
                 />
               </div>
+              <p className="text-xs text-gray-400 mt-1">Choose a weekday (Sunday - Thursday, avoid Friday/Saturday)</p>
             </div>
 
             <div>
@@ -154,13 +187,19 @@ export const ScheduleInterview = () => {
               <button
                 type="submit"
                 disabled={isScheduling}
-                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50"
               >
                 {isScheduling ? 'Scheduling...' : 'Schedule Interview'}
               </button>
               <button
                 type="button"
-                onClick={() => navigate(`/Hr/job-postings/${jobId}/interviews`)}
+                onClick={() => {
+                  if (jobId) {
+                    navigate(`/Hr/job-postings/${jobId}/interviews`);
+                  } else {
+                    navigate('/Hr/interviews');
+                  }
+                }}
                 className="px-4 py-2 border text-gray-700 rounded-lg hover:bg-gray-50"
               >
                 Cancel

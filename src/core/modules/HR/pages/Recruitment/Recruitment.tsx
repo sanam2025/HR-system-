@@ -1,5 +1,5 @@
 // src/core/modules/HR/pages/Recruitment/Recruitment.tsx
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useJobRequisitions } from "../../hooks/useJobRequisitions";
 import RecruitmentCard from "./RecruitmentCard";
 import Loading from "../../../../../shared/components/Loading";
@@ -10,12 +10,10 @@ import { useJobRequisitionsReject } from "../../hooks/useJobRequisitionsReject";
 import toast from "react-hot-toast";
 import type { RecruitmentStatus } from "../../../../../api/service/HrService/Types/HRService.types";
 import ConfirmModal from "../../Components/Special_Components/ConfirmModal";
-import { useTranslation } from "react-i18next";
 
 export type FilterStatus = RecruitmentStatus | "all";
 
 export default function Recruitment() {
-  const { t } = useTranslation();
   const { data, isLoading, error, refetch } = useJobRequisitions();
   const approveRequisition = useJobRequisitionsApprove();
   const rejectRequisition = useJobRequisitionsReject();
@@ -35,6 +33,8 @@ export default function Recruitment() {
     id: null,
   });
 
+  const requests = Array.isArray(data) ? data : [];
+
   const openConfirmModal = (id: number, type: "approve" | "reject") => {
     setModal({ isOpen: true, type, id });
   };
@@ -49,57 +49,47 @@ export default function Recruitment() {
     if (modal.type === "approve") {
       approveRequisition.mutate(modal.id, {
         onSuccess: () => {
-          toast.success(t('jobApproved') || "Job approved successfully");
+          toast.success("✅ Job approved successfully");
           refetch();
           closeConfirmModal();
         },
         onError: (e) => {
-          toast.error((t('failedToApprove') || "Failed to approve:") + " " + e);
+          toast.error("❌ Failed to approve: " + e);
           closeConfirmModal();
         },
       });
     } else {
       rejectRequisition.mutate(modal.id, {
         onSuccess: () => {
-          toast.success(t('jobRejected') || "Job rejected successfully");
+          toast.success("✅ Job rejected successfully");
           refetch();
           closeConfirmModal();
         },
         onError: (e) => {
-          toast.error((t('failedToReject') || "Failed to reject:") + " " + e);
+          toast.error("❌ Failed to reject: " + e);
           closeConfirmModal();
         },
       });
     }
   };
 
-  const EMPTY_ARRAY = React.useMemo(() => [], []);
-  const requests = Array.isArray(data) ? data : EMPTY_ARRAY;
-
-  const filteredRequests = React.useMemo(() => {
-    return requests.filter((req) => {
-      return statusFilter === "all" || req.status === statusFilter;
-    });
-  }, [requests, statusFilter]);
-
-  const handleApproveClick = React.useCallback((id: number) => {
-    openConfirmModal(id, "approve");
-  }, []);
-
-  const handleRejectClick = React.useCallback((id: number) => {
-    openConfirmModal(id, "reject");
-  }, []);
+  const filteredRequests = requests.filter((req) => {
+    const matchesStatus = statusFilter === "all" || req.status === statusFilter;
+    return matchesStatus;
+  });
 
   useEffect(() => {
-    console.log("Requests length:", requests.length);
-  }, [requests.length]);
+    console.log("📊 Raw data:", data);
+    console.log("📊 Requests array:", requests);
+    console.log("📊 Requests length:", requests.length);
+  }, [data, requests]);
 
   if (isLoading) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center justify-center gap-3 text-center">
           <Loading />
-          <p className="text-gray-500">{t('loadingRequests') || 'Loading requests...'}</p>
+          <p className="text-gray-500">Loading requests...</p>
         </div>
       </div>
     );
@@ -109,12 +99,12 @@ export default function Recruitment() {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-          <p className="text-red-600 mb-4">{t('error') || 'Error'}: {error.message}</p>
+          <p className="text-red-600 mb-4">Error: {error.message}</p>
           <button
             onClick={() => refetch()}
             className="px-4 py-2 bg-red-600 text-white rounded-lg"
           >
-            {t('retry') || 'Retry'}
+            Retry
           </button>
         </div>
       </div>
@@ -123,18 +113,18 @@ export default function Recruitment() {
 
   return (
     <>
-      <div className="p-6 bg-gray-50">
+      <div className="p-6 bg-gray-50" dir="ltr">
         <ConfirmModal
           isOpen={modal.isOpen}
           onClose={closeConfirmModal}
           onConfirm={handleConfirm}
           title={
-            modal.type === "approve" ? (t('approveRequest') || "Approve Request") : (t('rejectRequest') || "Reject Request")
+            modal.type === "approve" ? "Approve Request" : "Reject Request"
           }
           message={
             modal.type === "approve"
-              ? (t('approveRequestConfirm') || "Are you sure you want to approve this recruitment request?")
-              : (t('rejectRequestConfirm') || "Are you sure you want to reject this recruitment request?")
+              ? "Are you sure you want to approve this recruitment request?"
+              : "Are you sure you want to reject this recruitment request?"
           }
           type={modal.type}
           isLoading={isLoadingApprove || isLoadingReject}
@@ -144,10 +134,10 @@ export default function Recruitment() {
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                {t('recruitmentRequests') || 'Recruitment Requests'}
+                Recruitment Requests
               </h1>
               <p className="text-gray-500 text-sm mt-1">
-                {t('manageRecruitmentRequests') || 'Review and manage recruitment requests.'}
+                Review and manage recruitment requests.
               </p>
             </div>
           </div>
@@ -166,25 +156,25 @@ export default function Recruitment() {
               <thead className="bg-gray-50 border-b">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    {t('jobTitle') || 'Job Title'}
+                    Job Title
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    {t('department') || 'Department'}
+                    Department
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    {t('exp') || 'Exp'}
+                    Exp
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    {t('requester') || 'Requester'}
+                    Requester
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    {t('skills') || 'Skills'}
+                    Skills
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    {t('status') || 'Status'}
+                    Status
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    {t('actions') || 'Actions'}
+                    Actions
                   </th>
                 </tr>
               </thead>
@@ -194,8 +184,8 @@ export default function Recruitment() {
                     <RecruitmentCard
                       key={req.id}
                       req={req}
-                      onApprove={handleApproveClick}
-                      onReject={handleRejectClick}
+                      onApprove={() => openConfirmModal(req.id, "approve")}
+                      onReject={() => openConfirmModal(req.id, "reject")}
                       isLoadingApprove={isLoadingApprove}
                       isLoadingReject={isLoadingReject}
                     />
@@ -206,7 +196,7 @@ export default function Recruitment() {
                       colSpan={7}
                       className="px-4 py-8 text-center text-gray-400"
                     >
-                      {t('noRecruitmentRequests') || 'No recruitment requests found'}
+                      No recruitment requests found
                     </td>
                   </tr>
                 )}

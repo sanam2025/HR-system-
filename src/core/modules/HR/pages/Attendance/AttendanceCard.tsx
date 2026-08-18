@@ -18,10 +18,10 @@ const AttendanceCard = ({ record }: AttendanceCardProps) => {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'present': return 'Present';
-      case 'absent': return 'Absent';
-      case 'late': return 'Late';
-      case 'leave': return 'Leave';
+      case 'present': return '✅ Present';
+      case 'absent': return '❌ Absent';
+      case 'late': return '🕐 Late';
+      case 'leave': return '📋 Leave';
       default: return status;
     }
   };

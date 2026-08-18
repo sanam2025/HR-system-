@@ -1,12 +1,12 @@
-﻿// src/api/service/HrService/CandidatesService.ts
-import apiClient from '@/api/axios';
+// src/api/service/HrService/CandidatesService.ts
+import { apiClient } from "../../client";
 import type { CandidateResponse, CandidatesResponse } from "./Types/CandidatesService.types";
 import type { APIResponseWithData } from "./Types/types.types";
 
 export const CandidatesService = {
   // جلب كل المتقدمين على وظيفة معينة
   getByJobId: (jobId: number) => {
-    // تحقق من صحة jobId
+    // ✅ تحقق من صحة jobId
     if (!jobId || isNaN(jobId)) {
       throw new Error('Invalid job ID');
     }
