@@ -9,7 +9,7 @@ import {
   CalendarDays,
   DollarSign,
   UserPlus,
-  UsersRound,
+ 
   LogOut,
   FileText,
   Briefcase,
@@ -39,12 +39,7 @@ export default function HRLayout() {
   icon: FileText, // أيقونة مناسبة
   exact: false,
 },
-    {
-      path: "all-applicants",
-      label: t("applicants"),
-      icon: UsersRound,
-      exact: false,
-    },
+    
     // ✅ إضافة Accepted Candidates في الـ Sidebar
     {
       path: "accepted-candidates",

@@ -3,13 +3,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Users, Building2, Phone } from 'lucide-react';
 import Loading from '../../../../shared/components/Loading';
 import { useDepartmentEmployees } from '../hooks/useDepartments';
+import type { Employee } from '../../../../api/service/HrService/Types/DepartmentsService.types';
 
 export default function DepartmentDetail() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const departmentId = parseInt(id || '0');
 
-  // ✅ استخدام الهوك الصحيح لجلب موظفي القسم
   const { department, isLoading, error, refetch } = useDepartmentEmployees(departmentId);
 
   if (isLoading) {
@@ -24,10 +24,10 @@ export default function DepartmentDetail() {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
         <button
-          onClick={() => navigate('/Hr')}
+          onClick={() => navigate('/Hr/employees')}
           className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className="w-4 h-4" /> Back to Employees
         </button>
         <div className="bg-white rounded-xl shadow-sm p-12 text-center">
           <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -42,15 +42,13 @@ export default function DepartmentDetail() {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Back Button */}
       <button
-        onClick={() => navigate('/Hr')}
+        onClick={() => navigate('/Hr/employees')}
         className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3"
       >
-        <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+        <ArrowLeft className="w-4 h-4" /> Back to Employees
       </button>
 
-      {/* Department Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">{department.name}</h1>
         <p className="text-gray-500 text-sm mt-1">
@@ -58,7 +56,6 @@ export default function DepartmentDetail() {
         </p>
       </div>
 
-      {/* Department Info Card */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Department Information</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -75,7 +72,6 @@ export default function DepartmentDetail() {
         </div>
       </div>
 
-      {/* Employees List */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 flex items-center gap-2">
           <Users className="w-4 h-4 text-blue-500" />
@@ -87,7 +83,7 @@ export default function DepartmentDetail() {
 
         {department.employees && department.employees.length > 0 ? (
           <div className="divide-y divide-gray-200">
-            {department.employees.map((employee: { id: number; name?: string; full_name?: string; first_name?: string; email?: string; phone?: string }) => (
+            {department.employees.map((employee: Employee) => (
               <div
                 key={employee.id}
                 className="p-4 hover:bg-gray-50 transition-colors cursor-pointer"
@@ -96,17 +92,14 @@ export default function DepartmentDetail() {
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
-                      {/* ✅ استخدام الحقل الفعلي الموجود في الباك إند */}
-                      {employee.name?.charAt(0) || employee.full_name?.charAt(0) || employee.first_name?.charAt(0) || '?'}
+                      {employee.full_name?.charAt(0) || '?'}
                     </div>
                     <div>
-                      {/* ✅ استخدام الحقل الفعلي الموجود في الباك إند */}
-                      <p className="font-medium text-gray-800">{employee.name || employee.full_name || employee.first_name || 'Unknown'}</p>
+                      <p className="font-medium text-gray-800">{employee.full_name}</p>
                       <p className="text-sm text-gray-500">{employee.email}</p>
                     </div>
                   </div>
                   <div className="text-sm text-gray-500 flex flex-col items-end">
-                    {/* ✅ استخدام الحقل الفعلي الموجود في الباك إند */}
                     {employee.phone && (
                       <div className="flex items-center gap-1">
                         <Phone className="w-3 h-3" />

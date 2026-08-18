@@ -16,4 +16,5 @@ export const DepartmentsService = {
 
   // ✅ جلب جميع الموظفين مع أقسامهم دفعة واحدة
   getAllWithEmployees: () => apiClient.get('/departments/employees'),
+   getDepartmentsWithUsers: () => apiClient.get('/departments/employees'),
 };

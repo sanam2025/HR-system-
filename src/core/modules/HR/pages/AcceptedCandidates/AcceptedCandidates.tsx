@@ -1,7 +1,7 @@
 // src/core/modules/HR/pages/AcceptedCandidates/AcceptedCandidates.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Briefcase, ChevronRight, ArrowLeft, CheckCircle, Mail, Award } from 'lucide-react';
+import { Briefcase, ChevronRight, ArrowLeft, CheckCircle, Mail, Award, Calendar } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { apiClient } from '../../../../../api/client';
 import Loading from '../../../../../shared/components/Loading';
@@ -21,7 +21,7 @@ interface JobPosting {
   candidates?: Candidate[];
 }
 
-interface RankingItem {
+interface RankingInfo {
   candidate_id: number;
   rank: number;
   rate: number;
@@ -42,21 +42,19 @@ export default function AcceptedCandidates() {
       const jobsWithCandidates = await Promise.all(
         jobs.map(async (job: JobPosting) => {
           try {
-            // 1. جلب المرشحين الذين اجتازوا المقابلة
-            const candidatesRes = await apiClient.get(`/job-postings/${job.id}/candidates/interview`);
-            // 2. جلب الترتيب حسب التقييم (Ranking)
+            // ✅ تغيير الـ API لجلب كل المتقدمين ثم فلترة المقبولين
+            const candidatesRes = await apiClient.get(`/job-postings/${job.id}/candidates`);
             const rankingRes = await apiClient.get(`/job-postings/${job.id}/interviews/ranked-by-rate`);
 
-            // دمج البيانات: جلب المرشحين الذين اجتازوا المقابلة
+            // فلترة المتقدمين الذين حالتهم 'accepted' أو 'passed'
             const acceptedCandidates = (candidatesRes.data?.data || []).filter(
-              (c: Candidate) => c.status === 'passed' || c.status === 'accepted'
+              (c: Candidate) => c.status === 'accepted' || c.status === 'passed'
             );
 
-            // إضافة الرتبة (Rank) والتقييم (Rate) من الـ Ranking API
+            // إضافة الترتيب والتقييم من الـ Ranking API
             const rankingData = rankingRes.data?.data || [];
             const enhancedCandidates = acceptedCandidates.map((c: Candidate) => {
-              // ✅ تصحيح: استخدام نوع محدد بدلاً من any
-              const rankInfo = rankingData.find((r: RankingItem) => r.candidate_id === c.id);
+              const rankInfo = rankingData.find((r: RankingInfo) => r.candidate_id === c.id);
               return { ...c, rank: rankInfo?.rank, rate: rankInfo?.rate };
             });
 
@@ -145,30 +143,38 @@ export default function AcceptedCandidates() {
                     job.candidates.map((candidate) => (
                       <div
                         key={candidate.id}
-                        className="p-4 hover:bg-gray-50 transition-colors cursor-pointer flex items-center justify-between"
-                        onClick={() => navigate(`/Hr/candidates/${candidate.id}`)}
+                        className="p-4 hover:bg-gray-50 transition-colors flex flex-col gap-2"
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold text-xs">
-                            {candidate.full_name.charAt(0)}
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">{candidate.full_name}</p>
-                            <div className="flex items-center gap-1 text-xs text-gray-500">
-                              <Mail className="w-3 h-3" />
-                              <span>{candidate.email}</span>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold text-xs">
+                              {candidate.full_name.charAt(0)}
                             </div>
-                            {candidate.rank && (
-                              <p className="text-xs text-yellow-600 mt-1 flex items-center gap-1">
-                                <Award className="w-3 h-3" /> Rank #{candidate.rank} (Rate: {candidate.rate}/10)
-                              </p>
-                            )}
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">{candidate.full_name}</p>
+                              <div className="flex items-center gap-1 text-xs text-gray-500">
+                                <Mail className="w-3 h-3" />
+                                <span>{candidate.email}</span>
+                              </div>
+                              {candidate.rank && (
+                                <p className="text-xs text-yellow-600 mt-1 flex items-center gap-1">
+                                  <Award className="w-3 h-3" /> Rank #{candidate.rank} (Rate: {candidate.rate}/10)
+                                </p>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full flex items-center gap-1">
-                            <CheckCircle className="w-3 h-3" /> Passed
-                          </span>
+                          <div className="flex flex-col gap-1 items-end">
+                            <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full flex items-center gap-1">
+                              <CheckCircle className="w-3 h-3" /> Passed
+                            </span>
+                            {/* ✅ زر جدولة المقابلة */}
+                            <button
+                              onClick={() => navigate(`/Hr/job-postings/${job.id}/interviews/schedule?candidateId=${candidate.id}`)}
+                              className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs mt-1"
+                            >
+                              <Calendar className="w-3 h-3" /> Schedule
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))

@@ -28,5 +28,5 @@ export const AnnouncementsService = {
   delete: (id: number) => apiClient.delete(`/announcements/${id}`),
 
   // ✅ نشر فوري
-  publishNow: (id: number) => apiClient.post(`/announcements/${id}/publish`),
+  publishNow: (id: number) => apiClient.patch(`/announcements/${id}/publish`),
 };

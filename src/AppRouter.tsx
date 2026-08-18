@@ -16,7 +16,6 @@ import JobPostingForm from "./core/modules/HR/pages/JobPostings/JobPostingForm";
 import JobPostingDetail from "./core/modules/HR/pages/JobPostings/JobPostingDetail";
 import JobPostings from "./core/modules/HR/pages/JobPostings/JobPostings";
 import ApplicantDetail from "./core/modules/HR/pages/ApplicantDetail";
-import { AllApplicants } from "./core/modules/HR/pages/AllApplicants/AllApplicants";
 import ScheduleInterview from "./core/modules/HR/pages/Interviews/ScheduleInterview";
 import Interviews from "./core/modules/HR/pages/Interviews/Interviews";
 import Attendance from "./core/modules/HR/pages/Attendance/Attendance";
@@ -75,6 +74,10 @@ const appRouter = createBrowserRouter([
       { path: "Recruitment", element: <Recruitment /> },
       { path: "recruitment/:id", element: <JobRequisitionDetail /> },
       {
+  path: "job-postings/:jobId/interviews",
+  element: <Interviews />, // تم تحديثها لتعرض الكل
+},
+      {
   path: "offers",
   element: <Offers />, // أو <AllOffers /> إذا أنشأت صفحة عامة
 },
@@ -97,8 +100,7 @@ const appRouter = createBrowserRouter([
       { path: "job-postings", element: <JobPostings /> },
       { path: "job-postings/:id", element: <JobPostingDetail /> },
       { path: "job-postings/edit/:id", element: <JobPostingForm /> },
-      { path: "all-applicants", element: <AllApplicants /> },
-      { path: "recruitment/applicants/:jobId", element: <AllApplicants /> },
+     
       // ✅ إضافة مسار Accepted Candidates
       {
         path: "accepted-candidates",

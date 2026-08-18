@@ -15,6 +15,7 @@ export interface DepartmentWithEmployees extends Department {
 }
 
 export interface Employee {
+  phone: ReactI18NextChildren | Iterable<ReactI18NextChildren>;
   id: number;
   full_name: string;
   email: string;

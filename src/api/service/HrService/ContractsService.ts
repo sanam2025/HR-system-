@@ -3,7 +3,7 @@ import { apiClient } from '../../client';
 
 export const ContractsService = {
   // 1. جلب كل العقود
-  getAll: () => apiClient.get('/employees/contracts'), // المسار سيتم تعديله حسب الكوليكشن الخاصة بك
+  getAll: () => apiClient.get('/allcontracts'), // المسار سيتم تعديله حسب الكوليكشن الخاصة بك
 
   // 2. جلب العقود التي ستنتهي قريباً
   getExpiringSoon: () => apiClient.get('/contracts/expiring-soon'),

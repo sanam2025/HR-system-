@@ -1,212 +1,158 @@
 // src/core/modules/HR/pages/ApplicantDetail.tsx
-import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, FileText, Calendar } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { CandidatesService } from "../../../../api/service/HrService/CandidatesService";
-import ApplicantInfo from "./ApplicantDetail/ApplicantInfo";
-import ApplicantSkills from "./ApplicantDetail/ApplicantSkills";
-import Loading from "../../../../shared/components/Loading";
-import toast from "react-hot-toast";
-import type {
-  CandidateStatus,
-  Candidate,
-} from "../../../../api/service/HrService/Types/CandidatesService.types";
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Download, } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { apiClient } from '../../../../api/client';
+import Loading from '../../../../shared/components/Loading';
 
-interface ApiError {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
+// ✅ تعريف الأنواع الخاصة بالمتقدم
+interface Skill {
+  id: number;
+  name: string;
 }
 
-// ✅ نوع ممتد من Candidate مع الحقول الإضافية (مع جعلها اختيارية)
-interface ExtendedCandidate extends Candidate {
-  job_posting_id?: number;
-  job_id?: number;
+interface JobPosting {
+  id: number;
+  job_title: string;
+  description: string;
+  status: string;
+  posted_at: string;
 }
 
-const statusColors: Record<CandidateStatus, string> = {
-  pending: "bg-amber-100 text-amber-700",
-  reviewed: "bg-blue-100 text-blue-700",
-  interview: "bg-purple-100 text-purple-700",
-  accepted: "bg-emerald-100 text-emerald-700",
-  rejected: "bg-red-100 text-red-700",
-};
+interface Candidate {
+  id: number;
+  full_name: string;
+  email: string;
+  cover_letter: string | null;
+  more_skill: string | null;
+  status: string;
+  experience: number;
+  skills: Skill[];
+  matched_skills: Skill[];
+  cv_url: string | null;
+  job_posting: JobPosting;
+  created_at: string;
+}
 
 export default function ApplicantDetail() {
-  const { id } = useParams();
   const navigate = useNavigate();
-  const [isUpdating, setIsUpdating] = useState(false);
+  const { id } = useParams<{ id: string }>();
+  const candidateId = parseInt(id || '0');
 
-  const {
-    data: response,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ["candidate", id],
-    queryFn: () => CandidatesService.getById(Number(id)),
-    enabled: !!id && !isNaN(Number(id)),
-  });
+  const [candidate, setCandidate] = useState<Candidate | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
 
-  const candidate = response?.data?.data as ExtendedCandidate;
+  // جلب بيانات المتقدم
+  useEffect(() => {
+    const fetchCandidate = async () => {
+      try {
+        const res = await apiClient.get(`/candidates/${candidateId}`);
+        setCandidate(res.data?.data);
+      } catch (error) {
+        console.error(error);
+        toast.error('Failed to load candidate details');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (candidateId) fetchCandidate();
+  }, [candidateId]);
 
-  // ✅ استخراج jobId من المتقدم (باستخدام ExtendedCandidate)
-  const jobId = candidate?.job_posting_id || candidate?.job_id;
-
-  const handleStatusChange = async (status: CandidateStatus) => {
-    if (!id) return;
-    setIsUpdating(true);
-    try {
-      await CandidatesService.updateStatus(Number(id), status);
-      toast.success(`Status updated to ${status}`);
-      refetch();
-    } catch (err) {
-      const error = err as ApiError;
-      toast.error(error?.response?.data?.message || "Failed to update status");
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
+  // دالة تحميل السيرة الذاتية (CV)
   const handleDownloadCV = async () => {
-    if (!id) return;
-    try {
-      const res = await CandidatesService.getCV(Number(id));
-      const url = res.data?.data?.url;
-      if (url) window.open(url, "_blank");
-    } catch (err) {
-      const error = err as ApiError;
-      toast.error(error?.response?.data?.message || "Failed to load CV");
-    }
-  };
-
-  const handleScheduleInterview = () => {
-    if (!jobId) {
-      toast.error("No job associated with this candidate");
+    if (!candidate?.cv_url) {
+      toast.error('No CV available');
       return;
     }
-    navigate(`/Hr/job-postings/${jobId}/interviews/schedule?candidateId=${id}`);
+    setDownloading(true);
+    try {
+      // فتح الرابط في نافذة جديدة للتحميل
+      window.open(candidate.cv_url, '_blank');
+    } catch {
+      toast.error('Failed to download CV');
+    } finally {
+      setDownloading(false);
+    }
   };
 
-  if (!id || id === "NaN" || isNaN(Number(id))) {
-    return (
-      <div className="p-6 bg-gray-50 min-h-screen">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
-          <p className="text-yellow-600 mb-4">Invalid Applicant ID</p>
-          <button
-            onClick={() => navigate("/Hr/all-applicants")}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-          >
-            Back to Applicants
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="p-6 bg-gray-50 min-h-screen flex items-center justify-center">
-        <Loading />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-6 bg-gray-50 min-h-screen">
-        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-          <p className="text-red-600 mb-4">Error loading applicant details</p>
-          <button
-            onClick={() => navigate("/Hr/all-applicants")}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-          >
-            Back to Applicants
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!candidate) {
-    return (
-      <div className="p-6 bg-gray-50 min-h-screen">
-        <div className="text-center py-12">
-          <p className="text-gray-500">Applicant not found</p>
-          <button
-            onClick={() => navigate("/Hr/all-applicants")}
-            className="mt-4 text-blue-500"
-          >
-            Back
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <Loading />;
+  if (!candidate) return <p className="text-red-500">Candidate not found</p>;
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
-      <div className="mb-6">
-        <button
-          onClick={() => navigate("/Hr/all-applicants")}
-          className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-4"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to Applicants
-        </button>
-        <div className="flex justify-between items-start flex-wrap gap-4">
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <button
+        onClick={() => navigate('/Hr/job-postings')}
+        className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3"
+      >
+        <ArrowLeft className="w-4 h-4" /> Back
+      </button>
+
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        {/* رأس البطاقة */}
+        <div className="flex justify-between items-start mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {candidate.full_name}
-            </h1>
-            <p className="text-gray-500 mt-1">{candidate.position || "N/A"}</p>
+            <h1 className="text-2xl font-bold text-gray-900">{candidate.full_name}</h1>
+            <p className="text-gray-500 text-sm">{candidate.email}</p>
           </div>
-          <div className="flex gap-2 flex-wrap">
+          {candidate.cv_url && (
             <button
               onClick={handleDownloadCV}
+              disabled={downloading}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
-              <FileText className="w-4 h-4" /> Download CV
+              <Download className="w-4 h-4" />
+              {downloading ? 'Downloading...' : 'Download CV'}
             </button>
-            <button
-              onClick={handleScheduleInterview}
-              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-            >
-              <Calendar className="w-4 h-4" /> Schedule Interview
-            </button>
-            <select
-              value={candidate.status}
-              onChange={(e) =>
-                handleStatusChange(e.target.value as CandidateStatus)
-              }
-              disabled={isUpdating}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="pending">Pending</option>
-              <option value="reviewed">Reviewed</option>
-              <option value="interview">Interview</option>
-              <option value="accepted">Accepted</option>
-              <option value="rejected">Rejected</option>
-            </select>
-          </div>
+          )}
         </div>
-        <div className="mt-2">
-          <span
-            className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${statusColors[candidate.status]}`}
-          >
-            {candidate.status}
-          </span>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1">
-          <ApplicantInfo candidate={candidate} />
-        </div>
-        <div className="lg:col-span-2">
-          <ApplicantSkills candidate={candidate} />
+        {/* محتوى البطاقة */}
+        <div className="space-y-4">
+          {/* الخبرة */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700">Experience</h3>
+            <p className="text-gray-600">{candidate.experience} years</p>
+          </div>
+
+          {/* رسالة الغلاف */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700">Cover Letter</h3>
+            <p className="text-gray-600">{candidate.cover_letter || 'No cover letter provided.'}</p>
+          </div>
+
+          {/* المهارات */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700">Skills</h3>
+            <div className="flex flex-wrap gap-2">
+              {candidate.skills?.map((skill: Skill) => (
+                <span
+                  key={skill.id}
+                  className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"
+                >
+                  {skill.name}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* الحالة */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700">Status</h3>
+            <span className="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">
+              {candidate.status}
+            </span>
+          </div>
+
+          {/* الوظيفة المتقدم لها */}
+          {candidate.job_posting && (
+            <div className="border-t pt-4">
+              <h3 className="text-sm font-semibold text-gray-700">Job Posting</h3>
+              <p className="text-gray-600 font-medium">{candidate.job_posting.job_title}</p>
+              <p className="text-gray-500 text-sm">{candidate.job_posting.description}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
