@@ -11,6 +11,7 @@ function App() {
         position="top-center"
         reverseOrder={false}
         gutter={10}
+        containerStyle={{ zIndex: 9999999 }}
         toastOptions={{
           duration: 4500,
           style: {
@@ -23,6 +24,7 @@ function App() {
             fontWeight: '600',
             maxWidth: '480px',
             fontFamily: 'Tajawal, Cairo, sans-serif',
+            zIndex: 9999999,
             direction: 'rtl',
           },
           success: {
