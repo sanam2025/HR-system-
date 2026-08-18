@@ -32,7 +32,6 @@ import ComplaintDetail from "./core/modules/HR/pages/Complaints/ComplaintDetail"
 import EmployeeProfileHR from "./core/modules/HR/pages/EmployeeProfile";
 import DepartmentDetail from "./core/modules/HR/pages/DepartmentDetail";
 // ✅ استيراد الصفحة الجديدة
-import AcceptedCandidates from "./core/modules/HR/pages/AcceptedCandidates/AcceptedCandidates";
 
 // Manager Pages
 import EmployeesList from "./core/pages/manager/EmployeesList";
@@ -52,6 +51,7 @@ import PerformanceDetail from "./core/modules/HR/pages/Performance/PerformanceDe
 import ResignationDetail from "./core/modules/HR/pages/Resignations/ResignationDetail";
 import Resignations from "./core/modules/HR/pages/Resignations/Resignations";
 import Performance from "./core/modules/HR/pages/Performance/Performance";
+import InterviewsDashboard from "./core/modules/HR/pages/Interviews/Interviews";
 
 // ============= Helper Component =============
 function Page({ title }: { title: string }) {
@@ -85,6 +85,10 @@ const appRouter = createBrowserRouter([
       { path: "terminations", element: <Terminations /> },
       { path: "resignations", element: <Resignations /> },
       { path: "contracts", element: <Contracts /> },
+       {
+      path: "interviews",  // هذا هو الرابط اللي بيوديك عليه زر Manage Interviews
+      element: <InterviewsDashboard />,
+    },
       {
   path: "contracts/:id",
   element: <ContractDetail />,
@@ -101,11 +105,7 @@ const appRouter = createBrowserRouter([
       { path: "job-postings/:id", element: <JobPostingDetail /> },
       { path: "job-postings/edit/:id", element: <JobPostingForm /> },
      
-      // ✅ إضافة مسار Accepted Candidates
-      {
-        path: "accepted-candidates",
-        element: <AcceptedCandidates />,
-      },
+      
       { path: "recruitment/applicant/:id", element: <ApplicantDetail /> },
       {
         path: "job-postings/:jobId/interviews",

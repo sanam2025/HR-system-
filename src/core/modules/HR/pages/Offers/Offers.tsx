@@ -1,8 +1,8 @@
 // src/core/modules/HR/pages/Offers/Offers.tsx
-import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Plus, Briefcase, Calendar, DollarSign } from "lucide-react";
-import { useOffers } from "../../hooks/useOffer";
-import Loading from "../../../../../shared/components/Loading";
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Plus, Briefcase, Calendar, DollarSign } from 'lucide-react';
+import { useOffers } from '../../hooks/useOffer';
+import Loading from '../../../../../shared/components/Loading';
 
 export const Offers = () => {
   const navigate = useNavigate();
@@ -72,21 +72,11 @@ export const Offers = () => {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Candidate
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Hour Price
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Start Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                    Actions
-                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Candidate</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hour Price</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Start Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -94,8 +84,7 @@ export const Offers = () => {
                   <tr key={offer.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-gray-900">
-                        {offer.candidate?.full_name ||
-                          `Candidate #${offer.candidate_id}`}
+                        {offer.candidate?.full_name || `Candidate #${offer.candidate_id}`}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -111,17 +100,15 @@ export const Offers = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span
-                        className={`px-2 py-1 text-xs rounded-full ${
-                          offer.status === "accepted"
-                            ? "bg-green-100 text-green-700"
-                            : offer.status === "pending"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : offer.status === "rejected"
-                                ? "bg-red-100 text-red-700"
-                                : "bg-gray-100 text-gray-500"
-                        }`}
-                      >
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        offer.status === "accepted"
+                          ? "bg-green-100 text-green-700"
+                          : offer.status === "pending"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : offer.status === "rejected"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-gray-100 text-gray-500"
+                      }`}>
                         {offer.status}
                       </span>
                     </td>

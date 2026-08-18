@@ -3,9 +3,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, Eye, Calendar, MapPin, Star, Trophy, 
-  CheckCircle, XCircle, Clock, FileText, Plus, X 
+  CheckCircle, XCircle, Clock, X 
 } from 'lucide-react';
-import { useSendOffer } from '../../hooks/useOffer';
 import { apiClient } from '../../../../../api/client';
 import Loading from '../../../../../shared/components/Loading';
 import toast from 'react-hot-toast';
@@ -31,18 +30,6 @@ export default function InterviewsDashboard() {
     location_details: '',
   });
 
-  // حالة الفورم (إرسال العرض)
-  const [showOfferForm, setShowOfferForm] = useState(false);
-  const [offerData, setOfferData] = useState({
-    candidate_id: 0,
-    hour_price: 15,
-    start_date: new Date().toISOString().split('T')[0],
-    weekend_days: ['friday', 'saturday'],
-    working_hour_per_day: 8,
-  });
-
-  const sendOfferMutation = useSendOffer();
-
   // جلب كل المقابلات من كل الوظائف
   const fetchAllInterviews = async () => {
     setIsLoading(true);
@@ -63,7 +50,6 @@ export default function InterviewsDashboard() {
           });
           allInterviews.push(...jobInterviews);
         } catch {
-          // تم حذف error لأننا لا نستخدمه
           console.warn(`Failed to fetch interviews for job ${job.id}`);
         }
       }
@@ -104,28 +90,6 @@ export default function InterviewsDashboard() {
     }
   };
 
-  // دالة إرسال العرض (تفتح الفورم أولاً)
-  const handleSendOfferClick = (candidateId: number) => {
-    setOfferData({ ...offerData, candidate_id: candidateId });
-    setShowOfferForm(true);
-  };
-
-  // تأكيد إرسال العرض
-  const confirmSendOffer = () => {
-    sendOfferMutation.mutate(offerData, {
-      onSuccess: () => {
-        toast.success('Offer sent successfully!');
-        setShowOfferForm(false);
-        fetchAllInterviews();
-      },
-    });
-  };
-
-  // دالة إنهاء الخدمة (الانتقال لصفحة Terminations)
-  const handleGoToTerminations = () => {
-    navigate('/Hr/terminations');
-  };
-
   // حساب الإحصائيات
   const stats = {
     total: interviews.length,
@@ -139,31 +103,15 @@ export default function InterviewsDashboard() {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
-      <div className="mb-8 flex justify-between items-center">
-        <div>
-          <button
-            onClick={() => navigate('/Hr')}
-            className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-          </button>
-          <h1 className="text-2xl font-bold text-gray-900">Interviews & Offers Dashboard</h1>
-          <p className="text-gray-500 text-sm mt-1">Manage all interviews, track rankings, and send offers.</p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setShowScheduleForm(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            <Plus className="w-4 h-4" /> Schedule Interview
-          </button>
-          <button
-            onClick={handleGoToTerminations}
-            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-          >
-            <XCircle className="w-4 h-4" /> End Service
-          </button>
-        </div>
+      <div className="mb-8">
+        <button
+          onClick={() => navigate('/Hr')}
+          className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+        </button>
+        <h1 className="text-2xl font-bold text-gray-900">Interviews & Offers Dashboard</h1>
+        <p className="text-gray-500 text-sm mt-1">Manage all interviews, track rankings, and send offers.</p>
       </div>
 
       {/* بطاقات الإحصائيات */}
@@ -278,7 +226,6 @@ export default function InterviewsDashboard() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
-                    {/* زر عرض التفاصيل */}
                     <button
                       onClick={() => navigate(`/Hr/interviews/${interview.id}`)}
                       className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -286,16 +233,6 @@ export default function InterviewsDashboard() {
                     >
                       <Eye className="w-4 h-4" />
                     </button>
-
-                    {/* زر إرسال العرض (يظهر فقط إذا كانت المقابلة مكتملة وتم التقييم) */}
-                    {interview.status === 'done' && interview.rank && (
-                      <button
-                        onClick={() => handleSendOfferClick(interview.candidate_id || 0)}
-                        className="flex items-center gap-2 px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs"
-                      >
-                        <FileText className="w-3 h-3" /> Send Offer
-                      </button>
-                    )}
                   </td>
                 </tr>
               ))}
@@ -381,60 +318,6 @@ export default function InterviewsDashboard() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* ✅ فورم إرسال العرض (لإدخال البيانات الناقصة) */}
-      {showOfferForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-gray-900">Send Job Offer</h3>
-              <button onClick={() => setShowOfferForm(false)} className="p-1 hover:bg-gray-100 rounded">
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Hour Price ($) *</label>
-                <input
-                  type="number"
-                  value={offerData.hour_price}
-                  onChange={(e) => setOfferData({ ...offerData, hour_price: Number(e.target.value) })}
-                  className="w-full border rounded-lg px-3 py-2"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Start Date *</label>
-                <input
-                  type="date"
-                  value={offerData.start_date}
-                  onChange={(e) => setOfferData({ ...offerData, start_date: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Working Hours / Day *</label>
-                <input
-                  type="number"
-                  value={offerData.working_hour_per_day}
-                  onChange={(e) => setOfferData({ ...offerData, working_hour_per_day: Number(e.target.value) })}
-                  className="w-full border rounded-lg px-3 py-2"
-                  required
-                />
-              </div>
-              <div className="flex justify-end gap-3 mt-6 border-t pt-4">
-                <button onClick={() => setShowOfferForm(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">
-                  Cancel
-                </button>
-                <button onClick={confirmSendOffer} disabled={sendOfferMutation.isPending} className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                  {sendOfferMutation.isPending ? 'Sending...' : 'Confirm Offer'}
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       )}

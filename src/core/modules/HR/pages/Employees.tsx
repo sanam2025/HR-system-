@@ -48,12 +48,11 @@ export default function Employees() {
                 <Users className="w-4 h-4" />
                 <span>{department.employees?.length || 0} employees</span>
               </div>
-              {/* ✅ عرض الموظفين كأيقونات */}
               {department.employees && department.employees.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1">
                   {department.employees.slice(0, 3).map((employee: Employee) => (
                     <div
-                      key={employee.id}
+                      key={employee.id} // ✅ تم إضافة المفتاح هنا
                       className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium text-xs"
                       title={employee.full_name}
                       onClick={(e) => {

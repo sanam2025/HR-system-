@@ -56,10 +56,9 @@ export default function JobPostingDetail() {
     }
 
     try {
-      // افترضنا أن interviewer_id ثابت = 1 (لأنك حذفته من الفورم)
       await apiClient.post(`/job-postings/${jobId}/interviews`, {
         candidate_id: selectedCandidateId,
-        interviewed_by: 1, // يمكنك تغييره حسب الحاجة
+        interviewed_by: 1,
         scheduled_at: formData.scheduled_at,
         location_type: formData.location_type,
         location_details: formData.location_details,
@@ -118,15 +117,18 @@ export default function JobPostingDetail() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
-                    <button
-                      onClick={() => {
-                        setSelectedCandidateId(c.id);
-                        setShowScheduleForm(true);
-                      }}
-                      className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs flex items-center gap-1"
-                    >
-                      <Calendar className="w-3 h-3" /> Schedule
-                    </button>
+                    {/* ✅ إخفاء الزر إذا كان المتقدم حالته offered */}
+                    {c.status !== 'offered' && c.status !== 'interviewed' && (
+                      <button
+                        onClick={() => {
+                          setSelectedCandidateId(c.id);
+                          setShowScheduleForm(true);
+                        }}
+                        className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs flex items-center gap-1"
+                      >
+                        <Calendar className="w-3 h-3" /> Schedule
+                      </button>
+                    )}
                     <button onClick={() => navigate(`/Hr/recruitment/applicant/${c.id}`)} className="text-blue-600 hover:text-blue-800 text-sm">
                       View
                     </button>
@@ -138,7 +140,7 @@ export default function JobPostingDetail() {
         )}
       </div>
 
-      {/* ✅ الفورم المحسن (حذفنا interviewed_by) */}
+      {/* ✅ الفورم المحسن */}
       {showScheduleForm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
