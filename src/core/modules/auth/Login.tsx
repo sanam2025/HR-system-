@@ -70,7 +70,7 @@ function Login() {
         <div className="min-h-screen bg-surface flex items-center justify-center p-4">
             <div className="w-full max-w-md">
                 <div className="text-center mb-8 flex flex-col items-center">
-                    <img src="/logo.png" alt="MasarHR Logo" className="w-48 h-auto object-contain" />
+                    <img src="/logo.jpg" alt="MasarHR Logo" className="w-48 h-auto object-contain" />
                 </div>
 
                 <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-6 md:p-8">
