@@ -2,13 +2,15 @@ import React from 'react';
 import { SuspenseWrapper } from './SuspenseWrapper';
 import AdminLayout from "../shared/layouts/AdminLayout";
 
-const DashboardAdmin = React.lazy(() => import('@/core/modules/admin/pages/Dashboard'));
-const SystemSettings = React.lazy(() => import('@/core/modules/admin/pages/SystemSettings'));
-const AdminAnnouncements = React.lazy(() => import('@/core/modules/admin/pages/Announcements'));
-const OrganizationlStructure = React.lazy(() => import('@/core/modules/admin/pages/OrganizationlStructure'));
-const Reports = React.lazy(() => import('@/core/modules/admin/pages/Reports'));
-const EmployeeSearch = React.lazy(() => import('@/core/modules/admin/pages/EmployeeSearch'));
-const AdminHolidays = React.lazy(() => import('@/core/modules/admin/pages/Holidays'));
+// ── Admin pages (new AdminBranch structure) ──
+const DashboardAdmin = React.lazy(() => import('@/core/modules/admin/pages/Dashboard/Dashboard'));
+const SystemSettings = React.lazy(() => import('@/core/modules/admin/pages/settings/SystemSettings'));
+const AdminAnnouncements = React.lazy(() => import('@/core/modules/admin/pages/Announcements/Announcements'));
+const OrganizationlStructure = React.lazy(() => import('@/core/modules/admin/pages/Organization/OrganizationlStructure'));
+const EmployeeSearch = React.lazy(() => import('@/core/modules/admin/pages/Employees/EmployeeSearch'));
+const AdminHolidays = React.lazy(() => import('@/core/modules/admin/pages/Holidays/Holidays'));
+const Overview = React.lazy(() => import('@/core/modules/admin/pages/Overview/Overview'));
+const AdminTerminations = React.lazy(() => import('@/core/modules/admin/pages/Terminations/Termination'));
 const MyProfile = React.lazy(() => import('@/core/modules/employee/pages/EmployeeProfile'));
 
 export const adminRoutes = {
@@ -20,8 +22,10 @@ export const adminRoutes = {
     { path: 'setting', element: <SuspenseWrapper><SystemSettings /></SuspenseWrapper> },
     { path: 'announcement', element: <SuspenseWrapper><AdminAnnouncements /></SuspenseWrapper> },
     { path: 'organization', element: <SuspenseWrapper><OrganizationlStructure /></SuspenseWrapper> },
-    { path: 'report', element: <SuspenseWrapper><Reports /></SuspenseWrapper> },
     { path: 'search', element: <SuspenseWrapper><EmployeeSearch /></SuspenseWrapper> },
-    { path: 'holidays', element: <SuspenseWrapper><AdminHolidays /></SuspenseWrapper> }
+    { path: 'holidays', element: <SuspenseWrapper><AdminHolidays /></SuspenseWrapper> },
+    // ── New routes from AdminBranch ──
+    { path: 'Overview', element: <SuspenseWrapper><Overview /></SuspenseWrapper> },
+    { path: 'termination', element: <SuspenseWrapper><AdminTerminations /></SuspenseWrapper> },
   ]
 };
