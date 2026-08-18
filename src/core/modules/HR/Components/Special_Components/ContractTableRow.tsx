@@ -39,7 +39,7 @@ export const ContractTableRow: React.FC<ContractTableRowProps> = ({ contract, on
             <Eye className="w-4 h-4" />
           </button>
           {contract.status === "active" && (
-            <button onClick={() => onRenew(contract)} className="flex items-center gap-1 px-2 py-1 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button onClick={() => onRenew(contract)} className="flex items-center gap-1 px-2 py-1 text-xs bg-green text-white rounded-lg hover:bg-green-dark">
               <RefreshCw className="w-3 h-3" />
               Renew
             </button>

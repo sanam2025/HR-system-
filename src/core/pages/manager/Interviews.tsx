@@ -1,17 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { CalendarClock, Star, Clock, XCircle, CheckCircle, Video, User, Loader2 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
-import { useRequestsStore } from '../../../store/requestsStore';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getMyInterviews, submitInterviewResult, cancelInterview } from '../../../api/recruitment';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
-import CandidateModal from './components/CandidateModal';
 
 export default function Interviews() {
   const { t } = useLanguage();
-  const myInterviews = useRequestsStore((state) => state.myInterviews);
-  const myInterviewsLoading = useRequestsStore((state) => state.myInterviewsLoading);
-  const fetchMyInterviews = useRequestsStore((state) => state.fetchMyInterviews);
-  const rateInterview = useRequestsStore((state) => state.rateInterview);
-  const cancelMyInterview = useRequestsStore((state) => state.cancelMyInterview);
+  const queryClient = useQueryClient();
 
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
   const [selectedInterview, setSelectedInterview] = useState<number | null>(null);
@@ -19,17 +15,38 @@ export default function Interviews() {
   const [rateValue, setRateValue] = useState(0);
   const [notes, setNotes] = useState('');
 
-  useEffect(() => {
-    fetchMyInterviews();
-  }, [fetchMyInterviews]);
+  const { data: myInterviews = [], isLoading: myInterviewsLoading } = useQuery({
+    queryKey: ['my-interviews'],
+    queryFn: getMyInterviews
+  });
+
+  const cancelMutation = useMutation({
+    mutationFn: (id: number) => cancelInterview(id),
+    onSuccess: () => {
+      toast.success('تم إلغاء المقابلة بنجاح');
+      queryClient.invalidateQueries({ queryKey: ['my-interviews'] });
+    },
+    onError: () => toast.error('فشل في إلغاء المقابلة')
+  });
 
   const handleCancel = (id: number) => {
     if (confirm('هل أنت متأكد من إلغاء هذه المقابلة؟')) {
-      cancelMyInterview(id)
-        .then(() => toast.success('تم إلغاء المقابلة بنجاح'))
-        .catch(() => toast.error('فشل في إلغاء المقابلة'));
+      cancelMutation.mutate(id);
     }
   };
+
+  const rateMutation = useMutation({
+    mutationFn: ({ id, rate, notes }: { id: number; rate: number; notes: string }) => submitInterviewResult(id, { rate, notes }),
+    onSuccess: () => {
+      toast.success('تم تقييم المقابلة بنجاح');
+      setRatingModalOpen(false);
+      setSelectedInterview(null);
+      setRateValue(0);
+      setNotes('');
+      queryClient.invalidateQueries({ queryKey: ['my-interviews'] });
+    },
+    onError: () => toast.error('فشل في إرسال التقييم')
+  });
 
   const handleRate = async () => {
     if (!selectedInterview) return;
@@ -37,17 +54,7 @@ export default function Interviews() {
       toast.error('يرجى تحديد التقييم');
       return;
     }
-
-    try {
-      await rateInterview(selectedInterview, rateValue, notes);
-      toast.success('تم تقييم المقابلة بنجاح');
-      setRatingModalOpen(false);
-      setSelectedInterview(null);
-      setRateValue(0);
-      setNotes('');
-    } catch {
-      toast.error('فشل في إرسال التقييم');
-    }
+    rateMutation.mutate({ id: selectedInterview, rate: rateValue, notes });
   };
 
   const openRatingModal = (id: number) => {
@@ -176,9 +183,10 @@ export default function Interviews() {
             <div className="flex gap-3">
               <button
                 onClick={handleRate}
-                className="btn btn-primary flex-1"
+                disabled={rateMutation.isPending}
+                className="btn btn-primary flex-1 disabled:opacity-50 flex justify-center items-center"
               >
-                حفظ التقييم
+                {rateMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : 'حفظ التقييم'}
               </button>
               <button
                 onClick={() => setRatingModalOpen(false)}
@@ -191,13 +199,7 @@ export default function Interviews() {
         </div>
       )}
 
-      {/* نافذة تفاصيل المرشح */}
-      {candidateProfileId && (
-        <CandidateModal
-          candidateId={candidateProfileId}
-          onClose={() => setCandidateProfileId(null)}
-        />
-      )}
+
     </div>
   );
 }

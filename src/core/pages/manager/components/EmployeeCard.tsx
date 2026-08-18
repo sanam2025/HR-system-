@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { CheckSquare, Calendar } from 'lucide-react';
+import { CheckSquare } from 'lucide-react';
 import { useLanguage } from '../../../../i18n/translations/LanguageContext';
 
 const statusColor: Record<string, string> = {
@@ -9,14 +9,11 @@ const statusColor: Record<string, string> = {
   'Leave': 'bg-blue-50 text-blue-700',
 };
 
-function renderStars(rating: number) {
-  return Array.from({ length: 5 }, (_, i) => (
-    <span key={i} className={i < Math.round(rating) ? 'text-gold' : 'text-gray-200'}>★</span>
-  ));
-}
+
 
 interface Employee {
   id: number;
+  profile_id?: number;
   name: string;
   title: string;
   avatar: string;
@@ -34,36 +31,30 @@ export default function EmployeeCard({ employee }: { employee: Employee }) {
 
   return (
     <div
-      onClick={() => navigate(`/manager/employees/${employee.id}`)}
-      className="bg-white rounded-2xl border border-gray-100 p-6 cursor-pointer transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 hover:border-green/30"
+      onClick={() => navigate(`/manager/employees/${employee.profile_id || employee.id}`)}
+      className="bg-white rounded-3xl border border-gray-100 p-6 cursor-pointer transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 hover:border-green/20 group relative overflow-hidden"
     >
+      <div className="absolute top-0 right-0 w-24 h-24 bg-green/5 rounded-full blur-xl -mr-12 -mt-12 group-hover:bg-green/10 transition-colors"></div>
+      
       {/* Avatar + Status */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-green to-green-dark flex items-center justify-center text-white text-xl font-bold">
+      <div className="flex items-start justify-between mb-5 relative z-10">
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green to-green-dark flex items-center justify-center text-white text-2xl font-bold shadow-md ring-4 ring-gray-50 group-hover:ring-green/10 transition-all">
           {employee.avatar}
         </div>
-        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusColor[employee.todayStatus] || 'bg-gray-50 text-gray-600'}`}>
+        <span className={`text-xs font-bold px-3 py-1.5 rounded-xl backdrop-blur-sm ${statusColor[employee.todayStatus] || 'bg-gray-50 text-gray-600'}`}>
           {statusLabel}
         </span>
       </div>
 
       {/* Info */}
-      <h3 className="font-bold text-dark text-base">{employee.name}</h3>
-      <p className="text-brown text-sm mt-1">{employee.title}</p>
-
-      {/* Stars */}
-      <div className="flex gap-0.5 mt-2 text-sm">{renderStars(employee.avgRating)}</div>
-      <p className="text-xs text-gray-400 mt-0.5">{employee.avgRating} / 5</p>
+      <h3 className="font-extrabold text-dark text-lg relative z-10">{employee.name}</h3>
+      <p className="text-brown text-sm font-medium mt-1 relative z-10">{employee.title}</p>
 
       {/* Stats */}
-      <div className="flex gap-4 mt-4 pt-4 border-t border-gray-100">
-        <div className="flex items-center gap-1.5 text-xs text-brown">
-          <CheckSquare size={13} className="text-green" />
+      <div className="flex gap-4 mt-5 pt-4 border-t border-gray-100/60 relative z-10">
+        <div className="flex items-center gap-2 text-xs font-bold text-brown bg-gray-50 px-3 py-1.5 rounded-lg">
+          <CheckSquare size={14} className="text-green" />
           <span>{employee.tasksCount} {t.employees.tasks}</span>
-        </div>
-        <div className="flex items-center gap-1.5 text-xs text-brown">
-          <Calendar size={13} className="text-gold" />
-          <span>{employee.leaveBalance} {t.employees.leaves}</span>
         </div>
       </div>
     </div>

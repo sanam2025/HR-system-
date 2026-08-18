@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { mockEmployees, mockTasks, mockAttendance, mockPerformanceChart } from '../../../../data/mockData';
-import { ArrowRight, ArrowLeft, Phone, Mail, Calendar, Star, CheckSquare, Clock } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { getEmployeeProfile, getEmployeeContract, getEmployeeDocuments, getEmployeeContractDownloadUrl, getEmployeeDocumentDownloadUrl, getEmployeePerformanceSummary, getTasks } from '../../../../api/manager';
+import { ArrowRight, ArrowLeft, Phone, Mail, Calendar, Star, CheckSquare, Clock, Loader2, MapPin, User, Briefcase, FileText, Download, File } from 'lucide-react';
 import { useLanguage } from '../../../../i18n/translations/LanguageContext';
-import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
 import { TASK_STATUS_COLORS, TASK_STATUS_EN, CHART_MONTHS_EN, ATTENDANCE_STATUS_INFO } from '../../../constants';
 
 // ── Helpers ──
@@ -29,23 +30,137 @@ export default function EmployeeProfile() {
   const es = t.employees.status;
   const BackIcon = isRTL ? ArrowRight : ArrowLeft;
 
-  const employee  = mockEmployees.find(e => e.id === Number(id));
-  const empTasks  = mockTasks.filter(tk => tk.assigneeId === Number(id));
-  const ratedTasks = empTasks.filter(tk => tk.rating);
-  const avgRating = ratedTasks.length
-    ? (ratedTasks.reduce((sum, tk) => sum + (tk.rating ?? 0), 0) / ratedTasks.length).toFixed(1)
-    : employee?.avgRating;
+  const [employee, setEmployee] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [contract, setContract] = useState<any>(null);
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [performance, setPerformance] = useState<any>(null);
+  const [attendance, setAttendance] = useState<any[]>([]);
+  const [empTasks, setEmpTasks] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        const data = await getEmployeeProfile(Number(id));
+        const profile = data?.data || data;
+
+        const deptRaw = profile.department || '';
+        const DEPT_MAP: Record<string, string> = {
+          'marketing': 'التسويق',
+          'hr': 'الموارد البشرية',
+          'human resources': 'الموارد البشرية',
+          'it': 'تقنية المعلومات',
+          'engineering': 'الهندسة',
+          'finance': 'المالية',
+          'sales': 'المبيعات',
+          'operations': 'العمليات',
+          'support': 'الدعم الفني',
+          'design': 'التصميم',
+          'management': 'الإدارة',
+          'accounting': 'المحاسبة',
+        };
+        const deptLower = deptRaw.toLowerCase();
+        const deptAr = DEPT_MAP[deptLower] || deptRaw;
+        const deptEn = deptRaw.charAt(0).toUpperCase() + deptRaw.slice(1);
+
+        setEmployee({
+          id: profile.id || Number(id),
+          name: profile.user_name || profile.name || profile.user?.name || 'بدون اسم',
+          title: profile.job_title || profile.title || 'موظف',
+          department: deptRaw,
+          departmentAr: deptAr,
+          departmentEn: deptEn,
+          email: profile.user_email || profile.email || profile.user?.email || 'غير متوفر',
+          phone: profile.phone_number || 'غير متوفر',
+          joinDate: profile.hiring_date || profile.join_date || 'غير متوفر',
+          gender: profile.gender || '',
+          address: profile.address || '',
+          birthDate: profile.birth_date || '',
+          manager: profile.manager || '',
+          avatar: profile.user_name ? profile.user_name.charAt(0).toUpperCase() : (profile.name ? profile.name.charAt(0).toUpperCase() : 'م'),
+          picture: profile.picture,
+          todayStatus: 'حاضر',
+          avgRating: '0.0',
+          leaveBalance: profile.leave_balance || 0,
+        });
+
+        try {
+          const contractRes = await getEmployeeContract(Number(id));
+          setContract(contractRes?.data || contractRes);
+        } catch (e) {
+          console.error("Contract fetch error:", e);
+        }
+
+        try {
+          const docsRes = await getEmployeeDocuments(Number(id));
+          const docs = Array.isArray(docsRes?.data) ? docsRes.data : Array.isArray(docsRes) ? docsRes : [];
+          setDocuments(docs);
+        } catch (e) {
+          console.error("Docs fetch error:", e);
+        }
+
+        try {
+          const perfRes = await getEmployeePerformanceSummary(Number(id));
+          setPerformance(perfRes);
+        } catch (e) {
+          console.error("Performance fetch error:", e);
+        }
+
+        try {
+          const { getMyMonthlyAttendance } = await import('../../../../api/manager');
+          const { default: apiClient } = await import('../../../../api/axios');
+          const attRes = await apiClient.get(`my-monthly-attendance?user_id=${id}`);
+          const attData = attRes.data?.data || attRes.data;
+          setAttendance(Array.isArray(attData) ? attData : []);
+        } catch (e) {
+          console.error("Attendance fetch error:", e);
+        }
+
+        try {
+          const allTasks = await getTasks();
+          const targetUserId = profile?.user_id || profile?.user?.id || Number(id);
+          const empName = profile?.user_name || profile?.name || profile?.user?.name;
+          const employeeTasks = allTasks.filter((t: any) => 
+            t.assignee?.id === targetUserId || 
+            t.assignee?.id === Number(id) ||
+            (empName && t.assignee?.name && t.assignee.name.toLowerCase() === empName.toLowerCase())
+          );
+          setEmpTasks(employeeTasks);
+        } catch (e) {
+          console.error("Tasks fetch error:", e);
+        }
+
+      } catch (err) {
+        setError('تعذر جلب ملف الموظف (قد لا يوجد ملف شخصي لهذا الموظف بعد في قاعدة البيانات).');
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (id) fetchProfile();
+  }, [id]);
+
+  const tasksCount = performance?.tasks_assigned_count || 0;
+  const avgRating = performance?.latest_evaluation?.final_score || employee?.avgRating || '0.0';
 
   const getAttendanceLabel = (status: string) =>
     lang === 'ar'
       ? status
       : ({ 'حاضر': es.present, 'غائب': es.absent, 'تأخير': es.late } as Record<string, string>)[status] ?? status;
 
-  if (!employee) {
+  if (loading) {
     return (
-      <div className="text-center py-20 text-gray-400">
-        <div className="text-5xl mb-4">🔍</div>
-        <p className="text-lg font-semibold">{ep.notFound}</p>
+      <div className="flex justify-center items-center py-20 text-green">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !employee) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 bg-white rounded-3xl border border-gray-100 shadow-sm mt-6">
+        <h3 className="text-xl font-bold text-dark">{error || ep.notFound}</h3>
         <button onClick={() => navigate('/manager/employees')} className="btn-primary btn mt-4">
           {ep.backToList}
         </button>
@@ -56,15 +171,12 @@ export default function EmployeeProfile() {
   const todayLabel = getAttendanceLabel(employee.todayStatus);
   const todayStatusColor = ATTENDANCE_COLOR[employee.todayStatus] ?? 'bg-yellow-50 text-yellow-700';
 
-  const chartData = mockPerformanceChart.map(row => ({
-    ...row,
-    month: lang === 'en' ? (CHART_MONTHS_EN[row.month] ?? row.month) : row.month,
-  }));
+
 
   const profileStats = [
-    { label: ep.leaveBalance, value: `${employee.leaveBalance} ${ep.days}`, icon: '🗓️', bg: 'bg-gold/10 text-yellow-800'  },
-    { label: ep.totalTasks,   value: empTasks.length,                         icon: '📋', bg: 'bg-green/10 text-green-700' },
-    { label: ep.avgRating,    value: `${avgRating} ★`,                        icon: '⭐', bg: 'bg-brown/10 text-brown'     },
+    { label: ep.leaveBalance, value: `${employee.leaveBalance} ${ep.days}`, bg: 'bg-gold/10 text-yellow-800' },
+    { label: ep.totalTasks, value: tasksCount, bg: 'bg-green/10 text-green-700' },
+    { label: ep.avgRating, value: `${avgRating}`, bg: 'bg-brown/10 text-brown' },
   ];
 
   return (
@@ -78,103 +190,163 @@ export default function EmployeeProfile() {
       </button>
 
       {/* Profile Header */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green to-green-dark flex items-center justify-center text-white text-3xl font-bold flex-shrink-0">
-            {employee.avatar}
+      <div className="bg-gradient-to-br from-white to-slate-50 rounded-3xl border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 relative overflow-hidden">
+        {/* Decorative background element */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-green/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-gold/5 rounded-full blur-2xl -ml-20 -mb-20 pointer-events-none"></div>
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 relative z-10">
+          <div className="relative">
+            <div className="absolute inset-0 bg-green/20 blur-xl rounded-full"></div>
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-green to-green-dark flex items-center justify-center text-white text-4xl font-extrabold flex-shrink-0 relative overflow-hidden ring-4 ring-white shadow-lg">
+              <span>{employee.avatar}</span>
+              {employee.picture && !employee.picture.includes('default.jpg') && (
+                <img
+                  src={employee.picture}
+                  alt={employee.name}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+              )}
+            </div>
           </div>
           <div className="flex-1">
-            <h2 className="text-xl font-extrabold text-dark">{employee.name}</h2>
-            <p className="text-brown mt-1">{lang === 'ar' ? employee.title : (employee.titleEn ?? employee.title)}</p>
-            <p className="text-xs text-gray-400 mt-1">{lang === 'ar' ? employee.department : (employee.departmentEn ?? employee.department)}</p>
-            <div className="flex gap-0.5 mt-2">{renderStars(Number(avgRating))}</div>
+            <h2 className="text-2xl font-extrabold text-dark tracking-tight">{employee.name}</h2>
+
+            <div className="flex gap-1 mt-3 bg-white/50 w-fit px-3 py-1.5 rounded-full border border-white shadow-sm">{renderStars(Number(avgRating))}</div>
           </div>
-          <div className={`px-3 py-1.5 rounded-full text-sm font-semibold ${todayStatusColor}`}>
+          <div className={`px-5 py-2.5 rounded-2xl text-sm font-bold shadow-sm border border-white/50 backdrop-blur-sm ${todayStatusColor}`}>
             {todayLabel} {ep.today}
           </div>
         </div>
 
         {/* Contact Details */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-100">
-          <div className="flex items-center gap-2 text-sm text-brown"><Phone size={15} className="text-green" />{employee.phone}</div>
-          <div className="flex items-center gap-2 text-sm text-brown"><Mail size={15} className="text-green" />{employee.email}</div>
-          <div className="flex items-center gap-2 text-sm text-brown">
-            <Calendar size={15} className="text-gold" />{ep.joinDate} {employee.joinDate}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t border-gray-100/60 relative z-10">
+          <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
+            <div className="p-2 bg-green/10 rounded-lg text-green"><Phone size={16} /></div>
+            <span className="font-medium truncate">{employee.phone}</span>
           </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Star size={15} className="text-gold" />
-            <span className="font-bold text-dark">{avgRating}</span>
-            <span className="text-gray-400">{ep.avgRating}</span>
+          <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
+            <div className="p-2 bg-green/10 rounded-lg text-green"><Mail size={16} /></div>
+            <span className="font-medium truncate">{employee.email}</span>
+          </div>
+          {employee.address && (
+            <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
+              <div className="p-2 bg-green/10 rounded-lg text-green"><MapPin size={16} /></div>
+              <span className="font-medium truncate">{employee.address}</span>
+            </div>
+          )}
+          {employee.manager && (
+            <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
+              <div className="p-2 bg-green/10 rounded-lg text-green"><Briefcase size={16} /></div>
+              <span className="font-medium truncate">{employee.manager}</span>
+            </div>
+          )}
+          <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
+            <div className="p-2 bg-gold/10 rounded-lg text-gold"><Calendar size={16} /></div>
+            <div className="flex flex-col leading-tight">
+              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{ep.joinDate}</span>
+              <span className="font-semibold">{employee.joinDate}</span>
+            </div>
+          </div>
+          {employee.birthDate && (
+            <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
+              <div className="p-2 bg-gold/10 rounded-lg text-gold"><User size={16} /></div>
+              <span className="font-medium">{employee.birthDate}</span>
+            </div>
+          )}
+          {employee.gender && (
+            <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
+              <div className="p-2 bg-gold/10 rounded-lg text-gold"><User size={16} /></div>
+              <span className="font-medium">
+                {employee.gender === 'male' || employee.gender === 'ذكر'
+                  ? (isRTL ? 'ذكر' : 'Male')
+                  : employee.gender === 'female' || employee.gender === 'أنثى'
+                    ? (isRTL ? 'أنثى' : 'Female')
+                    : employee.gender}
+              </span>
+            </div>
+          )}
+          <div className="flex items-center gap-3 text-sm bg-white/60 p-3 rounded-xl shadow-sm border border-white">
+            <div className="p-2 bg-gold/10 rounded-lg text-gold"><Star size={16} /></div>
+            <div className="flex flex-col leading-tight">
+              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{ep.avgRating}</span>
+              <span className="font-bold text-dark">{avgRating}</span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {profileStats.map(s => (
-          <div key={s.label} className={`rounded-2xl p-5 text-center ${s.bg}`}>
-            <div className="text-3xl mb-2">{s.icon}</div>
-            <p className="text-xl font-extrabold">{s.value}</p>
-            <p className="text-xs font-semibold mt-1 opacity-80">{s.label}</p>
+          <div key={s.label} className={`rounded-2xl p-5 text-center border border-white/60 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group ${s.bg}`}>
+            <div className="absolute inset-0 bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10">
+              <div className="text-3xl mb-2 drop-shadow-sm">{s.icon}</div>
+              <p className="text-2xl font-black tracking-tight">{s.value}</p>
+              <p className="text-xs font-bold mt-1 opacity-70 uppercase tracking-wider">{s.label}</p>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-card">
-          <h2 className="font-bold text-dark text-base mb-5">{t.dashboard.performanceChart}</h2>
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={chartData}>
-              <defs>
-                <linearGradient id="gGreenEmp" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#4A7C59" stopOpacity={0.15} />
-                  <stop offset="95%" stopColor="#4A7C59" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-              <YAxis domain={[3, 5]} tick={{ fontSize: 12 }} />
-              <Tooltip />
-              <Area type="monotone" dataKey="avgRating" name={t.dashboard.avgRating} stroke="#4A7C59" fill="url(#gGreenEmp)" strokeWidth={2} dot={{ r: 4, fill: '#4A7C59' }} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-card">
-          <h2 className="font-bold text-dark text-base mb-5">{t.dashboard.attendanceChart}</h2>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-              <YAxis domain={[70, 100]} tick={{ fontSize: 12 }} />
-              <Tooltip />
-              <Bar dataKey="attendance" name={t.dashboard.attendancePct} fill="#C4A66A" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
 
       {/* Tasks */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-card">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h3 className="font-bold text-dark flex items-center gap-2">
-            <CheckSquare size={16} className="text-green" /> {ep.activeTasks}
+      <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+        <div className="px-6 py-5 border-b border-gray-100 bg-slate-50/50">
+          <h3 className="font-extrabold text-dark flex items-center gap-2 text-lg">
+            <div className="p-1.5 bg-green/10 rounded-lg"><CheckSquare size={18} className="text-green" /></div>
+            {ep.activeTasks}
           </h3>
         </div>
         {empTasks.length === 0 ? (
-          <p className="text-center text-gray-400 py-10 text-sm">{ep.noTasks}</p>
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mb-3">
+              <CheckSquare size={24} className="text-gray-300" />
+            </div>
+            <p className="text-gray-400 font-medium">{ep.noTasks}</p>
+          </div>
         ) : (
           <div className="divide-y divide-gray-50">
             {empTasks.map(task => (
-              <div key={task.id} className="flex items-center justify-between px-6 py-4">
+              <div key={task.id} className="flex items-center justify-between px-6 py-4 hover:bg-slate-50 transition-colors">
                 <div>
-                  <p className="font-semibold text-dark text-sm">{task.title}</p>
-                  <p className="text-xs text-gray-400 mt-1">{ep.dueDate} {task.dueDate}</p>
+                  <p className="font-bold text-dark">{task.title}</p>
+                  <p className="text-xs text-gray-400 mt-1.5 flex items-center gap-1.5 font-medium">
+                    <Calendar size={12} /> {ep.dueDate} {task.due_date || task.dueDate}
+                  </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  {task.rating && <span className="text-gold text-sm font-bold">{task.rating}★</span>}
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${TASK_STATUS_COLORS[task.status]}`}>
-                    {lang === 'en' ? (TASK_STATUS_EN[task.status] ?? task.status) : task.status}
+                  {(task.score || task.rating) && <span className="bg-gold/10 text-yellow-700 text-sm font-bold px-2 py-1 rounded-lg">{task.score || task.rating}</span>}
+                  <span className={`text-xs font-bold px-3 py-1.5 rounded-xl ${
+                    {
+                      'pending': 'bg-blue-50 text-blue-700',
+                      'in_progress': 'bg-yellow-50 text-yellow-700',
+                      'completed': 'bg-green-50 text-green-700',
+                      'overdue': 'bg-red-50 text-red-600',
+                      'approved': 'bg-green-50 text-green-700',
+                      'rejected': 'bg-red-50 text-red-600'
+                    }[task.status as string] || TASK_STATUS_COLORS[task.status] || 'bg-gray-50 text-gray-700'
+                  }`}>
+                    {lang === 'ar' 
+                      ? ({
+                          'pending': 'قيد الانتظار',
+                          'in_progress': 'قيد التنفيذ',
+                          'completed': 'مكتملة',
+                          'overdue': 'متأخرة',
+                          'approved': 'معتمدة',
+                          'rejected': 'مرفوضة'
+                        }[task.status as string] || task.status)
+                      : ({
+                          'pending': 'Pending',
+                          'in_progress': 'In Progress',
+                          'completed': 'Completed',
+                          'overdue': 'Overdue',
+                          'approved': 'Approved',
+                          'rejected': 'Rejected'
+                        }[task.status as string] || TASK_STATUS_EN[task.status] || task.status)
+                    }
                   </span>
                 </div>
               </div>
@@ -184,35 +356,132 @@ export default function EmployeeProfile() {
       </div>
 
       {/* Attendance */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-card">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h3 className="font-bold text-dark flex items-center gap-2">
-            <Clock size={16} className="text-gold" /> {ep.attendanceRecord}
+      <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+        <div className="px-6 py-5 border-b border-gray-100 bg-slate-50/50">
+          <h3 className="font-extrabold text-dark flex items-center gap-2 text-lg">
+            <div className="p-1.5 bg-gold/10 rounded-lg"><Clock size={18} className="text-gold" /></div>
+            {ep.attendanceRecord}
           </h3>
         </div>
         <div className="divide-y divide-gray-50">
-          {mockAttendance.map((rec, i) => {
-            const info = ATTENDANCE_STATUS_INFO[rec.status];
-            return (
-              <div key={i} className="flex items-center gap-4 px-6 py-3">
-                <span className="text-xs text-gray-400 w-24 flex-shrink-0">{rec.date}</span>
-                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${info?.colorClass ?? 'bg-gray-50 text-gray-700'}`}>
-                  {lang === 'ar' ? (info?.labelAr ?? rec.status) : (info?.labelEn ?? rec.status)}
-                </span>
-                {rec.checkIn && (
-                  <span className="text-sm text-brown">
-                    {ep.checkIn} {rec.checkIn} {ep.checkOut} {rec.checkOut}
-                  </span>
-                )}
-                {rec.delay > 0 && (
-                  <span className="text-xs text-red-500 ms-auto">
-                    {ep.delay} {rec.delay} {ep.mins}
-                  </span>
-                )}
+          {attendance.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mb-3">
+                <Clock size={24} className="text-gray-300" />
               </div>
-            );
-          })}
+              <p className="text-gray-400 font-medium">{ep.noAttendance}</p>
+            </div>
+          ) : (
+            attendance.map((rec: any, i: number) => {
+              const info = ATTENDANCE_STATUS_INFO[rec.status];
+              const recDate = rec.date ? new Date(rec.date).toLocaleDateString() : '';
+              return (
+                <div key={rec.id || i} className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-colors">
+                  <span className="text-xs text-gray-500 font-semibold w-24 flex-shrink-0 bg-gray-100 px-2 py-1 rounded-lg text-center">{recDate}</span>
+                  <span className={`text-xs font-bold px-3 py-1.5 rounded-xl flex-shrink-0 ${info?.colorClass ?? 'bg-gray-50 text-gray-700'}`}>
+                    {lang === 'ar' ? (info?.labelAr ?? rec.status) : (info?.labelEn ?? rec.status)}
+                  </span>
+                  {(rec.check_in || rec.check_out || rec.checkIn || rec.checkOut) && (
+                    <span className="text-sm text-brown font-medium flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-gray-100 shadow-sm">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green"></div> {ep.checkIn} <strong className="text-dark">{rec.check_in || rec.checkIn || '—'}</strong>
+                      <span className="text-gray-300 mx-1">|</span>
+                      <div className="w-1.5 h-1.5 rounded-full bg-red-400"></div> {ep.checkOut} <strong className="text-dark">{rec.check_out || rec.checkOut || '—'}</strong>
+                    </span>
+                  )}
+                  {(rec.late_minutes > 0 || rec.delay > 0) && (
+                    <span className="text-xs text-red-600 bg-red-50 px-2 py-1 rounded-lg font-bold ms-auto">
+                      {ep.delay} {rec.late_minutes || rec.delay} {ep.mins}
+                    </span>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
+      </div>
+      {/* Contract Section */}
+      <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden mt-6">
+        <div className="px-6 py-5 border-b border-gray-100 bg-slate-50/50">
+          <h3 className="font-extrabold text-dark flex items-center gap-2 text-lg">
+            <div className="p-1.5 bg-blue-50 rounded-lg"><FileText size={18} className="text-blue-600" /></div>
+            {ep.contract || 'Contract'}
+          </h3>
+        </div>
+        {!contract ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mb-3">
+              <FileText size={24} className="text-gray-300" />
+            </div>
+            <p className="text-gray-400 font-medium">{ep.noContract || 'No contract available'}</p>
+          </div>
+        ) : (
+          <div className="p-6">
+            <div className="flex items-center justify-between p-4 border border-gray-100 rounded-2xl bg-gray-50/50 hover:bg-slate-50 transition-colors">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm text-blue-500 border border-gray-100">
+                  <FileText size={24} />
+                </div>
+                <div>
+                  <p className="font-bold text-dark">{contract.contract_type || contract.type || ep.employmentContract}</p>
+                  <p className="text-sm text-gray-500 mt-0.5">{contract.start_date} {contract.end_date ? ` - ${contract.end_date}` : ''}</p>
+                </div>
+              </div>
+              <a
+                href={getEmployeeContractDownloadUrl(Number(id))}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-200 px-4 py-2 rounded-xl transition-all"
+              >
+                <Download size={16} /> {ep.download || 'Download'}
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Documents Section */}
+      <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden mt-6">
+        <div className="px-6 py-5 border-b border-gray-100 bg-slate-50/50">
+          <h3 className="font-extrabold text-dark flex items-center gap-2 text-lg">
+            <div className="p-1.5 bg-purple-50 rounded-lg"><File size={18} className="text-purple-600" /></div>
+            {ep.documents || 'Documents'}
+          </h3>
+        </div>
+        {documents.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mb-3">
+              <File size={24} className="text-gray-300" />
+            </div>
+            <p className="text-gray-400 font-medium">{ep.noDocuments || 'No documents uploaded'}</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-50">
+            {documents.map((doc: any) => (
+              <div key={doc.id} className="flex items-center justify-between px-6 py-4 hover:bg-slate-50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-purple-500 border border-gray-100">
+                    <File size={20} />
+                  </div>
+                  <div>
+                    <p className="font-bold text-dark">{doc.document_type || doc.name || (ep.documentName || 'Document')}</p>
+                    <p className="text-xs text-gray-400 mt-1 flex items-center gap-1.5 font-medium">
+                      <Calendar size={12} /> {(ep.dateAdded || 'Added:')} {doc.created_at ? new Date(doc.created_at).toLocaleDateString() : doc.date || ''}
+                    </p>
+                  </div>
+                </div>
+                <a
+                  href={getEmployeeDocumentDownloadUrl(Number(id), doc.id)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-center w-10 h-10 text-purple-500 hover:text-white hover:bg-purple-500 border border-purple-100 rounded-xl transition-all"
+                  title={ep.download || 'Download'}
+                >
+                  <Download size={18} />
+                </a>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

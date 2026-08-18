@@ -9,6 +9,9 @@ const en = {
     attendance: 'Attendance',
     evaluation: 'Periodic Review',
     recruitment: 'Recruitment',
+    interviews: 'Interviews',
+    announcements: 'Announcements',
+    terminations: 'Terminations',
     mainMenu: 'Main Menu',
   },
 
@@ -43,13 +46,82 @@ const en = {
     presentEmployees: 'Present Employees'
   },
 
+  // ── Announcements ──
+  announcements: {
+    title: 'Announcements Management',
+    subtitle: 'Create and track announcements for your department',
+    createNew: 'Create Announcement',
+    activeTitle: 'Announcements',
+    form: {
+      createTitle: 'Create New Announcement',
+      editTitle: 'Edit Announcement',
+      titleLabel: 'Announcement Title',
+      bodyLabel: 'Announcement Body',
+      priorityLabel: 'Priority',
+      startsAtLabel: 'Publish Date',
+      endsAtLabel: 'End Date (Optional)',
+      audienceNote: '📢 This announcement will be directed automatically to all employees in your department.',
+      saveBtn: 'Save Announcement',
+      savingBtn: 'Saving...',
+      cancelBtn: 'Cancel',
+      fillRequired: 'Please fill all required fields',
+      createdSuccess: 'Announcement created successfully ✅',
+      updatedSuccess: 'Announcement updated successfully ✅',
+    },
+    list: {
+      title: 'Announcements List',
+      loading: 'Loading...',
+      emptyMsg: 'No announcements yet',
+      createFirst: '+ Create First Announcement',
+      columns: {
+        title: 'Title',
+        audience: 'Audience',
+        priority: 'Priority',
+        status: 'Status',
+        date: 'Publish Date',
+        actions: 'Actions',
+      },
+      publishNow: 'Publish Now',
+      edit: 'Edit',
+      delete: 'Delete',
+      publishedSuccess: 'Published immediately ✅',
+      hrNote: 'You cannot edit or delete HR announcements',
+    },
+    deleteConfirm: {
+      title: 'Confirm Delete',
+      desc: 'Are you sure you want to delete the announcement "{title}"? This action cannot be undone.',
+      yesBtn: 'Yes, delete',
+      cancelBtn: 'Cancel',
+      success: 'Deleted successfully',
+    },
+    priorities: {
+      urgent: '🔴 Urgent',
+      normal: '🟡 Normal',
+      info: '🟢 Info',
+      high:   '🔴 Urgent',
+      medium: '🟡 Normal',
+      low:    '🟢 Info',
+    },
+    audiences: {
+      all: 'All',
+      department: 'Department',
+      managers: 'Managers',
+    },
+    statuses: {
+      draft: 'Draft',
+      scheduled: 'Scheduled',
+      active: 'Active',
+      expired: 'Expired',
+    }
+  },
+
   // ── Sidebar / Topbar ─
   layout: {
     systemName: 'HR System',
     university: 'University of Damascus',
     managerRole: 'Department Manager',
-    userName: 'Mohamed Ahmed',
-    userAvatar: 'M',
+    userName: 'Ahmad Front',
+    userAvatar: 'A',
   },
 
   // ── Tasks ──
@@ -65,6 +137,8 @@ const en = {
     },
     noTasks: 'No tasks found',
     rateTask: 'Rate Task',
+    reviewTask: 'Review',
+    completedThisMonth: 'completed this month',
     createModal: {
       title: 'Create New Task',
       taskTitle: 'Task Title',
@@ -79,6 +153,19 @@ const en = {
       createBtn: 'Create & Assign Task',
       requiredError: 'Please fill in all required fields',
       success: 'Task created successfully',
+    },
+    reviewModal: {
+      title: 'Review Task Submission',
+      submissionDetails: 'Submission Details',
+      notes: 'Notes:',
+      noNotes: 'No notes provided',
+      attachment: 'Attachment:',
+      viewAttachment: 'View Attachment',
+      noAttachment: 'No attachment for this submission',
+      decision: 'Decision',
+      approve: 'Approve',
+      reject: 'Reject',
+      rejectNotice: 'The employee will be notified of the rejection and can resubmit.',
     },
     rateModal: {
       title: 'Rate Task',
@@ -140,14 +227,55 @@ const en = {
     checkIn: 'Check-In:',
     checkOut: '— Check-Out:',
     delay: 'Delay',
-    mins: 'mins'
+    mins: 'mins',
+    contract: 'Contract',
+    documents: 'Documents',
+    download: 'Download',
+    noContract: 'No contract available',
+    noDocuments: 'No documents uploaded',
+    documentName: 'Document Name',
+    dateAdded: 'Date Added',
+    noAttendance: 'No attendance record available',
+    employmentContract: 'Employment Contract'
   },
 
   // ── Leaves ──
   leaves: {
-    title: 'Leave Requests',
+    title: 'Leaves',
+    subtitle: 'Manage leave and hourly requests for your department and personal account',
     pendingReview: 'pending requests awaiting your review',
     pendingAttention: 'pending requests need attention',
+    mainTabs: {
+      teamLeaves: 'Team Leaves',
+      myLeaves: 'My Leaves'
+    },
+    myLeaves: {
+      newRequest: 'New Leave Request',
+      newHourlyRequest: 'New Hourly Request',
+      balanceTitle: 'Remaining Leave Balance',
+      form: {
+        title: 'Submit Leave Request',
+        hourlyTitle: 'Submit Hourly Request',
+        type: 'Leave Type',
+        startDate: 'Start Date',
+        date: 'Date',
+        daysCount: 'Number of Days',
+        startTime: 'Start Time',
+        endTime: 'End Time',
+        reason: 'Reason',
+        submit: 'Submit Request',
+        submitting: 'Submitting...',
+        cancel: 'Cancel'
+      },
+      status: {
+        pending: 'Pending Review',
+        approved: 'Approved',
+        rejected: 'Rejected'
+      },
+      toast: {
+        success: 'Leave request submitted successfully'
+      }
+    },
     tabs: {
       all: 'All',
       pending: 'Pending',
@@ -160,7 +288,9 @@ const en = {
       emergency: 'Emergency',
       unpaid: 'Unpaid'
     },
-    noRequests: 'No leave requests found',
+    dailyToggle: 'Daily Leave',
+    hourlyToggle: 'Hourly Leave',
+    noRequests: 'No requests found',
     requestedOn: 'Requested on:',
     days: 'days',
     reason: 'Reason:',
@@ -188,25 +318,56 @@ const en = {
 
   // ── Overtime ──
   overtime: {
-    title: 'Overtime Requests',
-    subtitle: 'pending requests',
-    pendingRequests: 'pending requests',
-    pendingAlert: 'requests awaiting your action',
-    awaitingAction: 'requests awaiting your action',
-    tabs: {
-      all: 'All',
-      pending: 'Pending',
-      approved: 'Approved',
-      rejected: 'Rejected'
+    title: 'Overtime Management',
+    subtitle: 'Track and assign overtime hours for department employees',
+    assignBtn: 'Assign Overtime',
+    personalBtn: 'Personal Overtime',
+    mainTabs: {
+      department: 'Department Voluntary Requests',
+      myCreated: 'My Assignments',
+      myOwn: 'My Personal Overtimes'
     },
-    noRequests: 'No overtime requests',
-    requestedOn: 'Requested on',
-    hours: 'hours',
-    hoursLabel: 'hours',
-    date: 'Date',
-    dateLabel: 'Date',
-    reason: 'Reason',
-    reasonLabel: 'Reason',
+    alerts: {
+      pending: 'There are pending overtime requests waiting for your approval.'
+    },
+    emptyStates: {
+      department: 'No overtime requests currently in the department',
+      myCreated: 'You have not assigned any overtime to employees yet',
+      myOwn: 'You have no personal overtime hours recorded'
+    },
+    card: {
+      date: 'Date:',
+      time: 'Time:',
+      notes: 'Notes:',
+      noNotes: 'No notes',
+      cancelBtn: 'Cancel Assignment',
+      employeeFallback: 'Employee #{id}',
+      from: 'From',
+      to: 'To',
+      hours: 'Hours:'
+    },
+    status: {
+      approved: 'Approved',
+      completed: 'Completed',
+      rejected: 'Rejected',
+      pending: 'Pending'
+    },
+    form: {
+      assignTitle: 'Assign Employee to Overtime',
+      personalTitle: 'Personal Overtime Request',
+      selectEmployee: 'Select Employee',
+      selectEmployeePlaceholder: '-- Select Employee --',
+      date: 'Date',
+      startTime: 'Start Time',
+      endTime: 'End Time',
+      notes: 'Notes / Reason',
+      notesPlaceholder: 'Example: Urgent project completion...',
+      personalNotesPlaceholder: 'Reason for overtime...',
+      submitAssign: 'Save Assignment',
+      submitPersonal: 'Submit Request',
+      cancel: 'Cancel',
+      requiredError: 'Please fill all required fields'
+    },
     approveBtn: 'Approve',
     rejectBtn: 'Reject',
     confirmModal: {
@@ -349,6 +510,94 @@ const en = {
       }
     }
   },
+  interviews: {
+    title: 'Interviews Management',
+    subtitle: 'Candidates awaiting evaluation · Rate and submit final ranking',
+    searchPlaceholder: 'Search for a candidate...',
+    candidatesCount: 'candidate(s)',
+    ratedCount: 'rated',
+    rateAllWarning: 'Rate all candidates with stars to be able to send the final ranking',
+    sendRanking: 'Submit Final Ranking',
+    sendingRanking: 'Submitting...',
+    rankingSent: 'Submitted ✅',
+    rankingPanel: 'Live Ranking',
+    rankingSubtitle: 'Updates automatically · Use arrows to break ties manually',
+    readyToSend: '🎉 All candidates rated! You can submit the final ranking now.',
+    rankingDone: '✅ Final ranking submitted successfully',
+    interviewRating: 'Interview Rating',
+    notRatedYet: 'Not rated yet',
+    notes: 'Notes',
+    yearsExp: 'yrs exp.',
+    cvScore: 'CV Score',
+    noResults: 'No results matching your search',
+    statusPending: 'Awaiting Interview',
+    statusDone: 'Evaluated',
+    statusRejected: 'Rejected',
+    toasts: {
+      success: 'Ratings and ranking submitted successfully ✅',
+      error: 'An error occurred, please check your connection',
+      rateFirst: 'Please rate all candidates first'
+    }
+  },
+
+  // ── Terminations ──
+  terminations: {
+    title: 'Termination Requests',
+    subtitle: 'Manage and track employee termination requests',
+    createRequest: 'New Termination Request',
+    noRequests: 'No termination requests found',
+    columns: {
+      employee: 'Employee',
+      type: 'Type',
+      subtype: 'Subtype',
+      date: 'Termination Date',
+      status: 'Status',
+      actions: 'Actions'
+    },
+    types: {
+      immediate: 'Immediate',
+      standard: 'Standard'
+    },
+    subtypes: {
+      misconduct: 'Misconduct',
+      company_composition: 'Company Composition',
+      mutual_agreement: 'Mutual Agreement'
+    },
+    status: {
+      pending: 'Pending',
+      approved: 'Approved',
+      rejected: 'Rejected'
+    },
+    form: {
+      title: 'Submit Termination Request',
+      employee: 'Employee',
+      selectEmployee: '-- Select Employee --',
+      type: 'Termination Type',
+      subtype: 'Subtype',
+      date: 'Termination Date',
+      reason: 'Legal Reason',
+      compensationAmount: 'Compensation Amount',
+      documents: 'Attached Documents',
+      submit: 'Submit Request',
+      submitting: 'Submitting...',
+      cancel: 'Cancel'
+    },
+    modal: {
+      approveTitle: 'Approve Termination',
+      rejectTitle: 'Reject Termination',
+      reasonLabel: 'Decision Reason (Optional)',
+      confirmApprove: 'Confirm Approval',
+      confirmReject: 'Confirm Rejection',
+      cancel: 'Cancel'
+    },
+    toasts: {
+      created: 'Termination request created successfully',
+      approved: 'Request approved successfully',
+      rejected: 'Request rejected successfully',
+      deleted: 'Deleted successfully',
+      error: 'An error occurred while processing the request'
+    }
+  }
 };
 
 export default en;

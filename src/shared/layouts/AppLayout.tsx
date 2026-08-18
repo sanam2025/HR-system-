@@ -3,8 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import type { NavItem } from '../components/SideBar';
 import Sidebar from '../components/SideBar';
 import Topbar from '../components/Topbar';
-import { useTranslation } from 'react-i18next';
-import { useAuthStore } from '../../store/authStore';
+import { useLanguage } from '../../i18n/translations/LanguageContext';
 
 interface AppLayoutProps {
   navItems: NavItem[];
@@ -24,15 +23,8 @@ export default function AppLayout({
   defaultTitle = 'لوحة التحكم',
 }: AppLayoutProps) {
   const location = useLocation();
-  const { i18n, t } = useTranslation();
+  const { dir } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
-  const { currentUser } = useAuthStore();
-  
-  const displayUser = user || {
-    name: currentUser?.name || t('userName'),
-    role: currentUser?.role || t('managerRole'),
-    avatar: currentUser?.name ? currentUser.name[0] : t('userAvatar')
-  };
 
   const toggleSidebar = useCallback(() => setSidebarOpen(open => !open), []);
 
@@ -40,20 +32,20 @@ export default function AppLayout({
   const title =
     pageTitles[location.pathname] ||
     pageTitles[basePath] ||
-    t('dashboard');
+    defaultTitle;
 
   return (
-    <div className="flex min-h-screen bg-surface" dir={i18n.dir()}>
+    <div className="flex min-h-screen bg-surface" dir={dir}>
       <Sidebar
         open={sidebarOpen}
         onToggle={toggleSidebar}
         navItems={navItems}
         brand={brand}
-        user={displayUser}
+        user={user}
         navSectionLabel={navSectionLabel}
       />
       <div className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${sidebarOpen ? 'md:ms-64' : 'md:ms-16'}`}>
-        <Topbar title={title} onToggleSidebar={toggleSidebar} />
+        <Topbar title={title} onToggleSidebar={toggleSidebar} user={user} navItems={navItems} />
         <main className="flex-1 p-6 pb-16 overflow-x-hidden overflow-y-auto">
           <Outlet />
         </main>

@@ -1,428 +1,351 @@
 import { useState } from 'react';
-import { mockCandidates } from '../../../data/mockData';
-import { Send, ClipboardList, Trophy } from 'lucide-react';
+import { Send, ClipboardList, Loader2, Briefcase, Calendar, CheckCircle2, Clock, XCircle, Edit, Trash2 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { createJobRequisition, getJobRequisitions, updateJobRequisition, deleteJobRequisition, getSkills, createSkill } from '../../../api/recruitment';
 
-import type ar from '../../../i18n/translations/ar';
-type RecruitmentTranslation = typeof ar['recruitment'];
-
-const SKILL_OPTIONS = [
-  'PHP', 'Laravel', 'JavaScript', 'Vue.js', 'MySQL',
-  'Project Management', 'Problem Solving', 'Communication Skills',
-  'Teamwork', 'Time Management'
-];
-
-// ── Job Vacancy Request ───────
-function JobVacancyRequest({ r }: { r: RecruitmentTranslation }) {
+export default function Recruitment() {
+  const { t, lang } = useLanguage();
+  const r = t.recruitment;
   const v = r.vacancy;
+  const queryClient = useQueryClient();
 
-  const [form, setForm] = useState({ title: '', description: '', experience: 0, skills: [] as string[] });
-  const [sent, setSent] = useState(false);
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    experience: 1,
+    skills: [] as number[],
+  });
   const [selectedSkill, setSelectedSkill] = useState('');
   const [customSkill, setCustomSkill] = useState('');
+  const [editingId, setEditingId] = useState<number | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.title) { toast.error(v.toasts.fillAll); return; }
-    setSent(true);
-    toast.success(v.toasts.success);
-  };
+  // Query: get existing requisitions
+  const { data: rawRequisitions = [], isLoading: isRequisitionsLoading } = useQuery({
+    queryKey: ['my-job-requisitions'],
+    queryFn: getJobRequisitions
+  });
 
-  const toggleSkill = (skill: string) => {
+  // Query: get skills
+  const { data: skillsList = [] } = useQuery({
+    queryKey: ['skills'],
+    queryFn: getSkills
+  });
+
+  const requisitionsList = Array.isArray(rawRequisitions) ? rawRequisitions : Array.isArray(rawRequisitions?.data) ? rawRequisitions.data : [];
+
+  const createMutation = useMutation({
+    mutationFn: createJobRequisition,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-job-requisitions'] });
+      toast.success(v.toasts?.success || 'تم إرسال طلب الاحتياج الوظيفي بنجاح ✅');
+      setForm({ title: '', description: '', experience: 1, skills: [] });
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.message || err?.response?.data?.error || 'حدث خطأ أثناء إرسال طلب الاحتياج الوظيفي';
+      toast.error(msg);
+    }
+  });
+
+  const createSkillMutation = useMutation({
+    mutationFn: createSkill,
+    onSuccess: (newSkill) => {
+      queryClient.invalidateQueries({ queryKey: ['skills'] });
+      setForm(prev => ({ ...prev, skills: [...prev.skills.filter(id => id !== newSkill.id), newSkill.id] }));
+      setCustomSkill('');
+      toast.success('تمت إضافة المهارة الجديدة ✅');
+    },
+    onError: () => toast.error('حدث خطأ أثناء إضافة المهارة')
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number, data: any }) => updateJobRequisition(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-job-requisitions'] });
+      toast.success('تم تعديل طلب الاحتياج بنجاح ✅');
+      setForm({ title: '', description: '', experience: 1, skills: [] });
+      setEditingId(null);
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.message || err?.response?.data?.error || 'حدث خطأ أثناء تعديل طلب الاحتياج';
+      toast.error(msg);
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteJobRequisition,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-job-requisitions'] });
+      toast.success('تم حذف طلب الاحتياج بنجاح 🗑️');
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.message || err?.response?.data?.error || 'حدث خطأ أثناء حذف طلب الاحتياج';
+      toast.error(msg);
+    }
+  });
+
+  const toggleSkill = (skillId: number) => {
     setForm(prev => ({
       ...prev,
-      skills: prev.skills.includes(skill)
-        ? prev.skills.filter(s => s !== skill)
-        : [...prev.skills, skill],
+      skills: prev.skills.includes(skillId)
+        ? prev.skills.filter(s => s !== skillId)
+        : [...prev.skills, skillId],
     }));
   };
 
-  const availableSkills = SKILL_OPTIONS.filter(s => !form.skills.includes(s));
+  const availableSkills = skillsList.filter((s: any) => !form.skills.includes(s.id));
 
-  if (sent) return (
-    <div className="bg-white rounded-2xl border border-green/20 shadow-card p-10 text-center">
-      <div className="text-5xl mb-4">📨</div>
-      <h3 className="text-lg font-bold text-green mb-2">{v.successTitle}</h3>
-      <p className="text-brown text-sm mb-5">{v.successNote} <strong>{form.title}</strong> {v.successNote2}</p>
-      <button onClick={() => { setSent(false); setForm({ title: '', description: '', experience: 0, skills: [] }); }}
-        className="btn-primary btn">{v.sendAnother}</button>
-    </div>
-  );
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.title.trim()) {
+      toast.error(v.toasts?.fillAll || 'يرجى إدخال مسمى الوظيفة المطلوب');
+      return;
+    }
 
-  return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 shadow-card p-6 space-y-5">
-      <h3 className="font-bold text-dark text-lg flex items-center gap-2 mb-4">
-        <ClipboardList className="text-[#6B6358]" size={20} />
-        {v.title}
-      </h3>
+    const payload = {
+      job_title: form.title,
+      description: form.description,
+      experience: Number(form.experience),
+      skills: form.skills,
+    };
 
-      {/* Job Title */}
-      <div>
-        <label className="form-label">{v.positionTitle} <span className="text-red-500">*</span></label>
-        <input
-          className="form-input"
-          placeholder={v.positionPlaceholder}
-          value={form.title}
-          onChange={e => setForm({ ...form, title: e.target.value })}
-        />
-      </div>
-
-      {/* Description */}
-      <div>
-        <label className="form-label">{v.description} <span className="text-red-500">*</span></label>
-        <textarea
-          className="form-input resize-none h-24"
-          placeholder={v.descriptionPlaceholder}
-          value={form.description}
-          onChange={e => setForm({ ...form, description: e.target.value })}
-        />
-      </div>
-
-      {/* Experience */}
-      <div>
-        <label className="form-label">{v.experience} <span className="text-red-500">*</span></label>
-        <input
-          type="number"
-          min="0"
-          className="form-input"
-          placeholder="0"
-          value={form.experience}
-          onChange={e => setForm({ ...form, experience: parseInt(e.target.value) || 0 })}
-        />
-      </div>
-
-      {/* Skills Multi-Select */}
-      <div>
-        <label className="form-label">{v.requirements}</label>
-
-        {form.skills.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-2">
-            {form.skills.map(skill => (
-              <span
-                key={skill}
-                className="flex items-center gap-1.5 bg-green/10 text-green text-xs font-semibold px-3 py-1.5 rounded-full border border-green/20 cursor-pointer hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all"
-                onClick={() => toggleSkill(skill)}
-                title="انقر للحذف"
-              >
-                {skill}
-                <span className="text-[10px] opacity-70">✕</span>
-              </span>
-            ))}
-          </div>
-        )}
-
-        <div className="flex flex-col gap-3">
-          {/* Select Existing Skill */}
-          <select
-            className="form-input w-full cursor-pointer hover:border-green transition-colors"
-            value={selectedSkill}
-            onChange={e => {
-              const val = e.target.value;
-              if (val && !form.skills.includes(val)) {
-                toggleSkill(val);
-              }
-              setSelectedSkill('');
-            }}
-          >
-            <option value="">{v.selectSkill || '-- اختر مهارة --'}</option>
-            {availableSkills.map(skill => (
-              <option key={skill} value={skill}>{skill}</option>
-            ))}
-          </select>
-
-          {/* Add Custom Skill */}
-          <div className="flex gap-2">
-            <input
-              type="text"
-              className="form-input flex-1"
-              placeholder={v.customSkillPlaceholder || 'أو اكتب مهارة غير موجودة في القائمة...'}
-              value={customSkill}
-              onChange={e => setCustomSkill(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  if (customSkill.trim() && !form.skills.includes(customSkill.trim())) {
-                    toggleSkill(customSkill.trim());
-                    setCustomSkill('');
-                  }
-                }
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => {
-                if (customSkill.trim() && !form.skills.includes(customSkill.trim())) {
-                  toggleSkill(customSkill.trim());
-                  setCustomSkill('');
-                }
-              }}
-              className="btn bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200 px-6"
-            >
-              {v.addCustomSkillBtn || 'إضافة مهارة'}
-            </button>
-          </div>
-        </div>
-
-        {form.skills.length === 0 && (
-          <p className="text-xs text-gray-400 mt-1.5">{v.requirementsHint}</p>
-        )}
-      </div>
-
-      <button type="submit" className="btn-primary btn w-full flex items-center justify-center gap-2">
-        <Send size={16} /> {v.submitBtn}
-      </button>
-    </form>
-  );
-}
-
-// ── Star Rating Widget ───────
-function StarRating({ value, onChange, max = 5 }: { value: number; onChange?: (v: number) => void; max?: number }) {
-  const [hover, setHover] = useState(0);
-  return (
-    <div className="flex gap-0.5">
-      {Array.from({ length: max }, (_, i) => i + 1).map(star => (
-        <button
-          key={star}
-          type="button"
-          onClick={() => onChange?.(star)}
-          onMouseEnter={() => onChange && setHover(star)}
-          onMouseLeave={() => onChange && setHover(0)}
-          className={`text-lg transition-all ${star <= (hover || value)
-              ? 'text-amber-400 scale-110'
-              : 'text-gray-200 hover:text-amber-300'
-            } ${!onChange ? 'cursor-default' : 'cursor-pointer'}`}
-        >
-          ★
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// ── Candidate Evaluation ───
-function CandidateEvaluation({ r }: { r: RecruitmentTranslation }) {
-  const cd = r.candidates;
-
-  // interview rating per candidate (0 = not rated)
-  const [ratings, setRatings] = useState<Record<number, number>>(
-    Object.fromEntries(mockCandidates.map(c => [c.id, 0]))
-  );
-  // manual order IDs (used to break ties)
-  const [order, setOrder] = useState<number[]>(mockCandidates.map(c => c.id));
-  const [sent, setSent] = useState(false);
-
-  const allRated = mockCandidates.every(c => ratings[c.id] > 0);
-
-  // Sort: primary = rating descending, secondary = manual order position
-  const ranked = [...mockCandidates].sort((a, b) => {
-    const diff = ratings[b.id] - ratings[a.id];
-    if (diff !== 0) return diff;
-    return order.indexOf(a.id) - order.indexOf(b.id);
-  });
-
-  // Move within same-score group only
-  const moveInOrder = (id: number, dir: -1 | 1) => {
-    const currentScore = ratings[id];
-    const sameScore = ranked.filter(c => ratings[c.id] === currentScore).map(c => c.id);
-    const pos = sameScore.indexOf(id);
-    if (dir === -1 && pos === 0) return;
-    if (dir === 1 && pos === sameScore.length - 1) return;
-
-    const newOrder = [...order];
-    const idxA = newOrder.indexOf(id);
-    const idxB = newOrder.indexOf(sameScore[pos + dir]);
-    [newOrder[idxA], newOrder[idxB]] = [newOrder[idxB], newOrder[idxA]];
-    setOrder(newOrder);
+    if (editingId) {
+      updateMutation.mutate({ id: editingId, data: payload });
+    } else {
+      createMutation.mutate(payload);
+    }
   };
 
-  const handleSend = () => {
-    if (!allRated) { toast.error(cd.rateAllFirst); return; }
-    setSent(true);
-    toast.success(cd.toasts.success);
+  const handleEdit = (req: any) => {
+    setEditingId(req.id);
+    setForm({
+      title: req.job_title || req.title || '',
+      description: req.description || '',
+      experience: req.experience || 1,
+      skills: Array.isArray(req.skills) ? req.skills.map((s: any) => typeof s === 'object' ? s.id : Number(s)) : [],
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const medalColors = [
-    'bg-gradient-to-br from-amber-400 to-yellow-500 text-white shadow-lg shadow-amber-200',
-    'bg-gradient-to-br from-gray-300 to-gray-400 text-white shadow-lg shadow-gray-200',
-    'bg-gradient-to-br from-amber-600 to-amber-700 text-white shadow-lg shadow-amber-300',
-  ];
-  const medalEmojis = ['🥇', '🥈', '🥉'];
+  const handleDelete = (id: number) => {
+    if (window.confirm('هل أنت متأكد من حذف طلب الاحتياج؟')) {
+      deleteMutation.mutate(id);
+    }
+  };
 
-  if (sent) return (
-    <div className="bg-white rounded-2xl border border-gold/20 shadow-card p-10 text-center">
-      <div className="text-5xl mb-4">🏆</div>
-      <h3 className="text-lg font-bold text-gold mb-2">{cd.successTitle}</h3>
-      <p className="text-brown text-sm mb-6">{cd.successNote}</p>
-      <div className="space-y-3 max-w-md mx-auto">
-        {ranked.map((c, i) => (
-          <div key={c.id} className="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
-            <span className="text-xl">{medalEmojis[i] || String(i + 1)}</span>
-            <div className="flex-1 text-start">
-              <p className="font-bold text-dark text-sm">{c.name}</p>
-              <p className="text-xs text-brown">{c.position}</p>
-            </div>
-            <StarRating value={ratings[c.id]} max={5} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setForm({ title: '', description: '', experience: 1, skills: [] });
+  };
 
-  return (
-    <div className="space-y-5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h3 className="font-bold text-dark text-lg flex items-center gap-2">
-          <Trophy className="text-[#C4A66A]" size={20} /> {cd.title}
-        </h3>
-        <button
-          onClick={handleSend}
-          disabled={!allRated}
-          className={`btn flex items-center gap-2 transition-all ${allRated ? 'btn-gold' : 'bg-gray-100 text-gray-400 cursor-not-allowed px-4 py-2 rounded-xl text-sm font-semibold'}`}
-        >
-          <Send size={15} /> {cd.sendRanking}
-        </button>
-      </div>
-
-      {!allRated && (
-        <p className="text-xs text-amber-600 bg-amber-50 border border-amber-100 rounded-xl px-4 py-2.5 font-medium">
-          ⚠️ {cd.rateAllFirst}
-        </p>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-        {/* Left: Rating Cards */}
-        <div className="lg:col-span-3 space-y-3">
-          {mockCandidates.map(c => {
-            const score = ratings[c.id];
-            return (
-              <div key={c.id} className="bg-white rounded-2xl border border-gray-100 shadow-card p-4 flex items-center gap-4">
-                {/* Avatar */}
-                <div className="w-10 h-10 rounded-full bg-green/15 flex items-center justify-center text-green font-bold text-sm flex-shrink-0">
-                  {c.name.charAt(0)}
-                </div>
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-dark text-sm">{c.name}</p>
-                  <p className="text-xs text-brown mb-1.5">{c.experience} {cd.experience} · {c.position}</p>
-                  <div className="flex gap-1 flex-wrap">
-                    {c.skills.map(s => (
-                      <span key={s} className="bg-green/10 text-green text-[10px] font-semibold px-2 py-0.5 rounded-full">{s}</span>
-                    ))}
-                  </div>
-                </div>
-                {/* Star Rating */}
-                <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                  <span className="text-xs font-semibold text-brown">{cd.interviewScore}</span>
-                  <StarRating
-                    value={score}
-                    onChange={v => setRatings(prev => ({ ...prev, [c.id]: v }))}
-                    max={5}
-                  />
-                  {score === 0 && (
-                    <span className="text-[10px] text-gray-400">{cd.notRatedYet}</span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Right: Live Ranking */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5 sticky top-4">
-            <h4 className="font-bold text-dark text-sm mb-1 flex items-center gap-2">
-              <span>🏆</span> {cd.liveRanking}
-            </h4>
-            <p className="text-[11px] text-gray-400 mb-4">{cd.tieHint}</p>
-            <div className="space-y-2.5">
-              {ranked.map((c, i) => {
-                const score = ratings[c.id];
-                const sameScore = ranked.filter(x => ratings[x.id] === score);
-                const isTied = sameScore.length > 1 && score > 0;
-                const posInTie = sameScore.findIndex(x => x.id === c.id);
-
-                return (
-                  <div
-                    key={c.id}
-                    className={`flex items-center gap-3 p-3 rounded-xl transition-all ${i === 0 && score > 0 ? 'bg-amber-50 border border-amber-100' : 'bg-gray-50'
-                      }`}
-                  >
-                    {/* Medal */}
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0 ${medalColors[i] || 'bg-gray-100 text-gray-600'
-                      }`}>
-                      {i < 3 ? medalEmojis[i] : i + 1}
-                    </div>
-                    {/* Name + Stars */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-dark truncate">{c.name}</p>
-                      <StarRating value={score} max={5} />
-                    </div>
-                    {/* Score or Tie Controls */}
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      {isTied && (
-                        <div className="flex flex-col gap-0.5">
-                          <button
-                            onClick={() => moveInOrder(c.id, -1)}
-                            disabled={posInTie === 0}
-                            className="w-6 h-6 rounded-md bg-gray-200 hover:bg-green/20 hover:text-green text-gray-500 text-xs font-bold transition-colors flex items-center justify-center disabled:opacity-30"
-                          >↑</button>
-                          <button
-                            onClick={() => moveInOrder(c.id, 1)}
-                            disabled={posInTie === sameScore.length - 1}
-                            className="w-6 h-6 rounded-md bg-gray-200 hover:bg-green/20 hover:text-green text-gray-500 text-xs font-bold transition-colors flex items-center justify-center disabled:opacity-30"
-                          >↓</button>
-                        </div>
-                      )}
-                      <span className={`text-sm font-extrabold w-8 text-end ${score > 0
-                          ? i === 0 ? 'text-amber-500' : i === 1 ? 'text-gray-500' : i === 2 ? 'text-amber-700' : 'text-dark'
-                          : 'text-gray-300'
-                        }`}>
-                        {score > 0 ? `${score}/5` : '—'}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
-
-// ── Main Page ──
-export default function Recruitment() {
-  const { t } = useLanguage();
-  const r = t.recruitment;
-  const tabs = [r.tabVacancy, r.tabCandidates];
-  const [activeTab, setActiveTab] = useState(0);
+  const getRequisitionStatusBadge = (status: string) => {
+    const isApproved = status === 'approved' || status === 'موافقة';
+    const isRejected = status === 'rejected' || status === 'مرفوضة';
+    const cls = isApproved ? 'bg-green-50 text-green-700 border-green-200' : isRejected ? 'bg-red-50 text-red-600 border-red-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200';
+    const label = isApproved ? 'معتمد' : isRejected ? 'مرفوض' : 'قيد النظر (معلق)';
+    return <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${cls}`}>{label}</span>;
+  };
 
   return (
     <div className="space-y-6">
       <Toaster position="top-center" />
+
       <div>
-        <h2 className="text-xl font-extrabold text-dark">{r.title}</h2>
-        <p className="text-sm text-brown mt-1">{r.subtitle}</p>
+        <h2 className="text-2xl font-extrabold text-dark">{r.title || 'إدارة التوظيف'}</h2>
+        <p className="text-sm text-brown mt-1">{r.subtitle || 'إرسال طلبات الاحتياج الوظيفي ومتابعة حالات الاعتماد من إدارة الموارد البشرية'}</p>
       </div>
 
-      <div className="flex gap-2 bg-gray-100 p-1 rounded-xl w-fit">
-        {tabs.map((tab, i) => (
-          <button key={tab} onClick={() => setActiveTab(i)}
-            className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === i ? 'bg-white text-green shadow-sm' : 'text-brown hover:text-dark'}`}>
-            {tab}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        {/* Form Panel */}
+        <form onSubmit={handleSubmit} className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-card p-6 space-y-5">
+          <h3 className="font-bold text-dark text-lg flex items-center justify-between gap-2 mb-4 border-b border-gray-100 pb-3">
+            <div className="flex items-center gap-2">
+              <ClipboardList className="text-green" size={20} />
+              {editingId ? 'تعديل طلب احتياج وظيفي' : (v.title || 'تقديم طلب احتياج وظيفي جديد')}
+            </div>
+            {editingId && (
+              <button type="button" onClick={handleCancelEdit} className="text-sm text-gray-500 hover:text-gray-700">
+                إلغاء التعديل
+              </button>
+            )}
+          </h3>
+
+          {/* Job Title */}
+          <div>
+            <label className="form-label">{v.positionTitle || 'المسمى الوظيفي المطلوب'} <span className="text-red-500">*</span></label>
+            <input
+              className="form-input"
+              required
+              placeholder={v.positionPlaceholder || 'مثال: مطور ويب، مهندس برمجيات...'}
+              value={form.title}
+              onChange={e => setForm({ ...form, title: e.target.value })}
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="form-label">{v.description || 'الوصف الوظيفي والمسؤوليات'} <span className="text-red-500">*</span></label>
+            <textarea
+              className="form-input resize-none h-24"
+              required
+              placeholder={v.descriptionPlaceholder || 'اكتب وصفاً مختصراً للمهام والمسؤوليات المتوقعة...'}
+              value={form.description}
+              onChange={e => setForm({ ...form, description: e.target.value })}
+            />
+          </div>
+
+          {/* Experience */}
+          <div>
+            <label className="form-label">{v.experience || 'سنوات الخبرة المطلوبة'} <span className="text-red-500">*</span></label>
+            <input
+              type="number"
+              min="0"
+              className="form-input"
+              required
+              placeholder="1"
+              value={form.experience}
+              onChange={e => setForm({ ...form, experience: parseInt(e.target.value) || 0 })}
+            />
+          </div>
+
+          {/* Skills */}
+          <div>
+            <label className="form-label">{v.requirements || 'المهارات والاشتراطات المطلوبة'}</label>
+
+            {form.skills.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {form.skills.map(skillId => {
+                  const skillObj = skillsList.find((s: any) => s.id === skillId);
+                  return (
+                    <span
+                      key={skillId}
+                      onClick={() => toggleSkill(skillId)}
+                      title="انقر للحذف"
+                      className="flex items-center gap-1.5 bg-green/10 text-green text-xs font-semibold px-3 py-1.5 rounded-full border border-green/20 cursor-pointer hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all"
+                    >
+                      {skillObj?.name || `Skill ${skillId}`}
+                      <span className="text-[10px] opacity-70">✕</span>
+                    </span>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <select
+                className="form-input flex-1 cursor-pointer"
+                value={selectedSkill}
+                onChange={e => {
+                  const val = Number(e.target.value);
+                  if (val && !form.skills.includes(val)) toggleSkill(val);
+                  setSelectedSkill('');
+                }}
+              >
+                <option value="">{v.selectSkill || '-- اختر مهارة --'}</option>
+                {availableSkills.map((skill: any) => (
+                  <option key={skill.id} value={skill.id}>{skill.name}</option>
+                ))}
+              </select>
+
+              <div className="flex gap-2 flex-1">
+                <input
+                  type="text"
+                  className="form-input flex-1"
+                  placeholder={v.customSkillPlaceholder || 'أو اكتب مهارة مخصصة...'}
+                  value={customSkill}
+                  onChange={e => setCustomSkill(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (customSkill.trim() && !createSkillMutation.isPending) {
+                        createSkillMutation.mutate(customSkill.trim());
+                      }
+                    }
+                  }}
+                  disabled={createSkillMutation.isPending}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (customSkill.trim() && !createSkillMutation.isPending) {
+                      createSkillMutation.mutate(customSkill.trim());
+                    }
+                  }}
+                  disabled={createSkillMutation.isPending || !customSkill.trim()}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200 font-semibold rounded-xl text-sm flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {createSkillMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : 'إضافة'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={createMutation.isPending || updateMutation.isPending}
+            className="btn-primary py-3 w-full flex items-center justify-center gap-2 text-sm font-bold disabled:opacity-50"
+          >
+            {(createMutation.isPending || updateMutation.isPending) ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+            {(createMutation.isPending || updateMutation.isPending) ? 'جاري الإرسال...' : editingId ? 'حفظ التعديلات' : (v.submitBtn || 'إرسال طلب الاحتياج')}
           </button>
-        ))}
-      </div>
+        </form>
 
-      {activeTab === 0
-        ? <JobVacancyRequest r={r} />
-        : <CandidateEvaluation r={r} />
-      }
+        {/* Existing Job Requisitions List Panel */}
+        <div className="lg:col-span-1 space-y-4">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5">
+            <h3 className="font-bold text-dark text-base flex items-center gap-2 mb-4 border-b border-gray-100 pb-3">
+              <Briefcase size={18} className="text-green" />
+              طلبات الاحتياج السابقة
+            </h3>
+
+            {isRequisitionsLoading ? (
+              <div className="text-center py-10"><Loader2 className="animate-spin text-green mx-auto" size={24} /></div>
+            ) : requisitionsList.length === 0 ? (
+              <div className="text-center py-8 text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                <p className="text-xs">لم تقم بإرسال طلبات احتياج وظيفي بعد</p>
+              </div>
+            ) : (
+              <div className="space-y-3 max-h-[480px] overflow-y-auto pe-1">
+                {requisitionsList.map((req: any) => (
+                  <div key={req.id} className="bg-gray-50/70 rounded-xl p-3.5 border border-gray-100 hover:border-green/30 transition-all space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <h4 className="font-bold text-dark text-sm leading-tight">{req.job_title || req.title}</h4>
+                      {getRequisitionStatusBadge(req.status)}
+                    </div>
+                    <p className="text-xs text-brown line-clamp-2">{req.description}</p>
+                    <div className="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-gray-200/40">
+                      <div className="flex gap-3">
+                        <span>🎓 الخبرة: <strong>{req.experience} سنة</strong></span>
+                        <span>📅 {req.created_at ? new Date(req.created_at).toLocaleDateString('ar-EG') : ''}</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleEdit(req)}
+                          className="text-blue-500 hover:bg-blue-50 p-1 rounded transition-colors"
+                          title="تعديل"
+                        >
+                          <Edit size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(req.id)}
+                          disabled={deleteMutation.isPending}
+                          className="text-red-500 hover:bg-red-50 p-1 rounded transition-colors disabled:opacity-50"
+                          title="حذف"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

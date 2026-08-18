@@ -258,7 +258,7 @@ export const JobPostingForm: React.FC<JobPostingFormProps> = ({
             </button>
             <button
               type="submit"
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green rounded-lg hover:bg-green-dark transition-colors"
             >
               <Send className="w-4 h-4" />
               Post Job Opening

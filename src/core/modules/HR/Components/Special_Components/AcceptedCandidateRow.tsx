@@ -55,7 +55,7 @@ export const AcceptedCandidateRow: React.FC<AcceptedCandidateRowProps> = ({
           {candidate.offerStatus === "pending" && (
             <button
               onClick={() => onSendOffer(candidate)}
-              className="flex items-center gap-1 px-2 py-1 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-1 px-2 py-1 text-xs bg-green text-white rounded-lg hover:bg-green-dark transition-colors"
             >
               <Send className="w-3 h-3" />
               Send Offer

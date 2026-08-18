@@ -39,7 +39,7 @@ export const JobPostingDetail = () => {
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
           <p className="text-red-600 mb-4">Error loading job details</p>
-          <button onClick={() => navigate('/Hr/job-postings')} className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+          <button onClick={() => navigate('/Hr/job-postings')} className="px-4 py-2 bg-green text-white rounded-lg">
             Back to Job Postings
           </button>
         </div>

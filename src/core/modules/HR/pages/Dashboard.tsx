@@ -108,7 +108,7 @@ export default function Dashboard() {
           {/* زر إضافة تعميم جديد - يفتح الفورم في نفس الصفحة */}
           <button
             onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-2 px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 bg-green text-white text-sm rounded-lg hover:bg-green transition-colors"
           >
             <Plus className="w-4 h-4" />
             {t('addAnnouncement')}
@@ -183,7 +183,7 @@ export default function Dashboard() {
                 <button
                   type="submit"
                   disabled={createAnnouncement.isPending}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+                  className="px-4 py-2 bg-green text-white rounded-lg hover:bg-green disabled:opacity-50"
                 >
                   {createAnnouncement.isPending ? t('creating') : t('createAnnouncementBtn')}
                 </button>

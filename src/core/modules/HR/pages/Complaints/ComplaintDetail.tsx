@@ -117,7 +117,7 @@ export default function ComplaintDetail() {
               <button
                 onClick={handleMarkUnderReview}
                 disabled={markUnderReview.isPending}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+                className="px-4 py-2 bg-green text-white rounded-lg hover:bg-green disabled:opacity-50"
               >
                 {markUnderReview.isPending ? (t('processing') || 'Processing...') : `🔄 ${t('startReview') || 'Start Review'}`}
               </button>

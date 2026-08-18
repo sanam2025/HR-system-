@@ -1,0 +1,1246 @@
+[
+  {
+    "name": "login",
+    "url": "{{base_url}}login?email=sososy672005@gmail.com&password=11111111",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "putPassword",
+    "url": "{{base_url}}user?email=omar14@gmail.com",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "logout",
+    "url": "{{base_url}}logout",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "Forget Password",
+    "url": "{{base_url}}forgot-password",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "store requestion m",
+    "url": "{{base_url}}job-requisitions",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "all-requestion h",
+    "url": "{{base_url}}job-requisitions/all",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "show one requestion m/h",
+    "url": "{{base_url}}job-requisitions/1",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "update requestion m",
+    "url": "{{base_url}}job-requisitions/10",
+    "method": "PATCH",
+    "response": []
+  },
+  {
+    "name": "delete m",
+    "url": "{{base_url}}job-requisitions/6",
+    "method": "DELETE",
+    "response": []
+  },
+  {
+    "name": "index m/h",
+    "url": "http://127.0.0.1:8000/api/job-requisitions/",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "approve h",
+    "url": "{{base_url}}job-requisitions/1/approve",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "reject h",
+    "url": "{{base_url}}job-requisitions/9/reject",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "prefill h",
+    "url": "http://127.0.0.1:8000/api/job-requisitions/1/prefill",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "new-hires",
+    "url": "{{base_url}}new-hires",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "show all posting by visitor",
+    "url": "{{base_url}}job-postings",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "show  post details v",
+    "url": "{{base_url}}job-postings/8",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "index all posts H",
+    "url": "{{base_url}}HRjob-postings",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "show post details H",
+    "url": "{{base_url}}HRjob-postings/7",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "update post",
+    "url": "http://127.0.0.1:8000/api/HRjob-postings/1",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "closed post",
+    "url": "{{base_url}}HRjob-postings/7/close",
+    "method": "PATCH",
+    "response": []
+  },
+  {
+    "name": "delete post",
+    "url": "{{base_url}}HRjob-postings/5",
+    "method": "DELETE",
+    "response": []
+  },
+  {
+    "name": "job posting count h",
+    "url": "{{base_url}}jobpostings/count",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "index all candidate h",
+    "url": "{{base_url}}job-postings/8/candidates",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "show candidate details m/h",
+    "url": "{{base_url}}candidates/1",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "cv m/h",
+    "url": "\"http://127.0.0.1:8000/api/candidates/5/cv?expires=1779972088&signature=037d0a1b913fc09236d8b2ec6d5a35e4f0ab3f858b07509b79fc7563a2820c4c",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "update status",
+    "url": "{{base_url}}candidates/2/status?status=",
+    "method": "PATCH",
+    "response": []
+  },
+  {
+    "name": "store candidate",
+    "url": "{{base_url}}job-postings/2/apply",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "Candidate cv and skills For AI",
+    "url": "{{base_url}}CV-candidateSkills/1/requiedSkills",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Extract text from CV",
+    "url": "{{base_url}}cv/extract-text",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "store",
+    "url": "{{base_url}}job-postings/1/interviews?candidate_id=1&interviewed_by=4&scheduled_at=2026-06-29 11:50&location_type=on_site&location_details=Damascus, Syria",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "ranking h",
+    "url": "{{base_url}}job-postings/1/interviews/ranking",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "submitRanking m",
+    "url": "{{base_url}}job-postings/1/interviews/ranking",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "updateResultInterveiw manger",
+    "url": "{{base_url}}interviews/1/result",
+    "method": "PATCH",
+    "response": []
+  },
+  {
+    "name": "eligibleCandidates m/h",
+    "url": "http://127.0.0.1:8000/api/job-postings/8/candidates/interview",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "show m/h",
+    "url": "http://127.0.0.1:8000/api/interviews/1",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "cancel m/h",
+    "url": "http://127.0.0.1:8000/api/interviews/8/cancel",
+    "method": "PATCH",
+    "response": []
+  },
+  {
+    "name": "index",
+    "url": "http://127.0.0.1:8000/api/job-postings/1/interviews",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "my interview manager",
+    "url": "{{base_url}}my-interviews",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "ranked by rate for manager//بعد مايقيمهم",
+    "url": "{{base_url}}job-postings/1/interviews/ranked-by-rate",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "reject after interview",
+    "url": "{{base_url}}/interviews/{interview}/reject",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "show",
+    "url": "{{base_url}}settings",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "update setting",
+    "url": "{{base_url}}settings",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "send offer h",
+    "url": "{{base_url}}job-postings/1/offers",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "show all offers h",
+    "url": "{{base_url}}job-postings/1/offers",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "uplode document",
+    "url": "{{base_url}}onboarding/upload",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "change password",
+    "url": "{{base_url}}change-password",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "onboarding status",
+    "url": {
+      "raw": ""
+    },
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "my contract",
+    "url": "{{base_url}}my/contract",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "download my contract m",
+    "url": "{{base_url}}my-contract/download",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "my document",
+    "url": {
+      "raw": ""
+    },
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "downlode one document m /h /e",
+    "url": "{{base_url}}my-documents/9/download",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "show contract h/m",
+    "url": "{{base_url}}employees/9/contract",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "down contract h/m",
+    "url": "{{base_url}}employees/9/contract/download",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "show docs h/m",
+    "url": "{{base_url}}employees/9/documents",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "New Request",
+    "url": "",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "index skills m/h",
+    "url": "{{base_url}}skills",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "store skill m/h",
+    "url": "{{base_url}}skills?name=skill1",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "create profile",
+    "url": "{{base_url}}profiles",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "specific profile",
+    "url": "{{base_url}}profiles/2",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Update Profile",
+    "url": "{{base_url}}profiles/1",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "employee profile",
+    "url": "{{base_url}}profiles",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Manager's Employees m",
+    "url": "{{base_url}}manager-employees",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Search  Employees",
+    "url": "{{base_url}}search-employees?search=bac",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "all employees and manager  in dep m",
+    "url": "{{base_url}}department/users",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "all employees",
+    "url": "{{base_url}}users/employees",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "count employees , managers",
+    "url": "{{base_url}}users/count",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "all managers",
+    "url": "{{base_url}}users/managers",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "by-role-users  admin",
+    "url": "{{base_url}}by-role-users",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "contracts expiring-soon",
+    "url": "{{base_url}}contracts/expiring-soon",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "store contracts renwel",
+    "url": "{{base_url}}contracts/2/renewals",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "non renwel",
+    "url": "{{base_url}}contracts/2/non-renewable",
+    "method": "PATCH",
+    "response": []
+  },
+  {
+    "name": "all contracts",
+    "url": "{{base_url}}allcontracts",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Check in",
+    "url": "{{base_url}}check-in",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "Check out",
+    "url": "{{base_url}}check-out",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "Today Attendance Analysis",
+    "url": "{{base_url}}attendance-today-analysis",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Daily Attendance",
+    "url": "{{base_url}}attendance-today",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "My Monthly Attendance",
+    "url": "{{base_url}}my-monthly-attendance",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Filtered Attendance",
+    "url": "{{base_url}}attendance-filter?from=2026-06-04&to=2026-06-09",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Percentage",
+    "url": "{{base_url}}attendance-percentage",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "percentage Last 4 month",
+    "url": "{{base_url}}attendance-percentage-4month",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Store Leave Request employee",
+    "url": "{{base_url}}leaveRequests",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "All Leaves Request employee",
+    "url": "{{base_url}}leaveRequests",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Spacific Leave Request employee",
+    "url": "{{base_url}}leaveRequests/2",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Delete Leave Request employee",
+    "url": "{{base_url}}leaveRequests/1",
+    "method": "DELETE",
+    "response": []
+  },
+  {
+    "name": "Update Leave Request employee",
+    "url": "{{base_url}}leaveRequests/7",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "Approve Leave Request",
+    "url": "{{base_url}}leave-requests/6/approve",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "Reject Leave Request",
+    "url": "{{base_url}}leave-requests/100/reject",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "Department Leave Request",
+    "url": "{{base_url}}department-leave-request?status=rejected",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "My  Leave Request",
+    "url": "{{base_url}}my-leave-request?status=approved",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Employee Approved Leaves",
+    "url": "{{base_url}}employee-approved/7/leave-request",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Employee leave Balance",
+    "url": "{{base_url}}employee-leave/8/balance",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Filtered Employees Leave Request hr",
+    "url": "{{base_url}}filtered-leave-request?from=2026-06-06",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "My leave Balance employee",
+    "url": "{{base_url}}my-leave-balance",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "All leave request hr",
+    "url": "{{base_url}}all-leave-request",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Store  Hourly Leave Request employee",
+    "url": "{{base_url}}hourly-leave-Requests",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "All Hourly Leave Requests employee",
+    "url": "{{base_url}}hourly-leave-Requests",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Spacific Hourly Leave Request employee",
+    "url": "{{base_url}}hourly-leave-Requests/3",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Update Hourly Leave Request employee",
+    "url": "{{base_url}}hourly-leave-Requests/3",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "Delete Hourly Leave Request employee",
+    "url": "{{base_url}}hourly-leave-Requests/5",
+    "method": "DELETE",
+    "response": []
+  },
+  {
+    "name": "Approve Hourly Leave Request",
+    "url": "{{base_url}}hourly-leave-requests/4/approve",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "Filtered Hourly Leave Request hr",
+    "url": "{{base_url}}filtered-hourly-leave-request?status=rejected",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Employee Approved Hourly Leaves",
+    "url": "{{base_url}}employee-approved/7/hourly-leave-request",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "My  Hourly Leave Requests",
+    "url": "{{base_url}}my-hourly-leave-request?status=pending",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Department Hourly Leave Request",
+    "url": "{{base_url}}department-hourly-leave-request?status=pending",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Reject Hourly Leave Request",
+    "url": "{{base_url}}hourly-leave-requests/2/reject",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "All hourly leave request hr",
+    "url": "{{base_url}}all-hourly-leave-request",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Store holiday",
+    "url": "{{base_url}}holidays",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "All Holidays",
+    "url": "{{base_url}}holidays",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "spacific Holiday",
+    "url": "{{base_url}}holidays/22",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Delete Holiday",
+    "url": "{{base_url}}holidays/87",
+    "method": "DELETE",
+    "response": []
+  },
+  {
+    "name": "Update Holiday",
+    "url": "{{base_url}}holidays/45",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "job requisition",
+    "url": "{{base_url}}job-requisitions",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "Mark as read",
+    "url": "{{base_url}}notifications/c38b971d-2824-4aa7-8055-4abaa87cfe98/read",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "Get notification",
+    "url": "{{base_url}}notifications",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "store  m\\h\\admin",
+    "url": "{{base_url}}announcements",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "get active m\\h\\a",
+    "url": "{{base_url}}announcements/active",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "publish m\\h\\a",
+    "url": "{{base_url}}announcements/5/publish",
+    "method": "PATCH",
+    "response": []
+  },
+  {
+    "name": "show m\\h\\a",
+    "url": "{{base_url}}announcements/34",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "delete m\\h\\a",
+    "url": "{{base_url}}announcements/35",
+    "method": "DELETE",
+    "response": []
+  },
+  {
+    "name": "update m\\h\\a",
+    "url": "{{base_url}}announcements/35",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "index m\\h\\a",
+    "url": "{{base_url}}announcements",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "count annon... admin",
+    "url": "{{base_url}}announcements/count",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Store complaints",
+    "url": "{{base_url}}complaints",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "all complints",
+    "url": "{{base_url}}complaints",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "mark-under-review",
+    "url": "{{base_url}}complaints/4/mark-under-review",
+    "method": "PATCH",
+    "response": []
+  },
+  {
+    "name": "respond",
+    "url": "",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "my complaints",
+    "url": "http://127.0.0.1:8000/api/my-complaints",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "show",
+    "url": "",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "count complaints  a",
+    "url": "",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "post task m",
+    "url": "{{base_url}}tasks",
+    "method": "POST",
+    "response": [
+      "{\n    \"data\": {\n        \"id\": 3,\n        \"title\": \"طويرصفحة جيل ل\",\n        \"description\": \"إعادة تصميم صفحة تسجيل الدخول باستخدام Tailwind\",\n        \"priority\": \"high\",\n        \"status\": \"pending\",\n        \"due_date\": \"2026-08-29\",\n        \"assigned_at\": \"2026-08-17T03:26:15.000000Z\",\n        \"submitted_at\": null,\n        \"reviewed_at\": null,\n        \"score\": null,\n        \"is_overdue\": false,\n        \"creator\": {\n            \"id\": 3,\n            \"name\": \"ahmadMarketing\"\n        },\n        \"assignee\": {\n            \"id\": 7,\n            \"name\": \"employeeMarketing\"\n        },\n        \"created_at\": \"2026-08-17T03:26:15.000000Z\",\n        \"updated_at\": \"2026-08-17T03:26:15.000000Z\"\n    }\n}"
+    ]
+  },
+  {
+    "name": "all tasks m \\ employee",
+    "url": "{{base_url}}tasks",
+    "method": "GET",
+    "response": [
+      "{\n    \"data\": [\n        {\n            \"id\": 3,\n            \"title\": \"طويرصفحة جيل ل\",\n            \"description\": \"إعادة تصميم صفحة تسجيل الدخول باستخدام Tailwind\",\n            \"priority\": \"high\",\n            \"status\": \"approved\",\n            \"due_date\": \"2026-08-29\",\n            \"assigned_at\": \"2026-08-17T03:26:15.000000Z\",\n            \"submitted_at\": \"2026-08-17T03:27:33.000000Z\",\n            \"reviewed_at\": \"2026-08-17T03:30:08.000000Z\",\n            \"score\": \"85.00\",\n            \"is_overdue\": false,\n            \"creator\": {\n                \"id\": 3,\n                \"name\": \"ahmadMarketing\"\n            },\n            \"assignee\": {\n                \"id\": 7,\n                \"name\": \"employeeMarketing\"\n            },\n            \"reviewer\": {\n                \"id\": 3,\n                \"name\": \"ahmadMarketing\"\n            },\n            \"created_at\": \"2026-08-17T03:26:15.000000Z\",\n            \"updated_at\": \"2026-08-17T03:30:08.000000Z\"\n        },\n        {\n            \"id\": 2,\n            \"title\": \"تطويرصفحة جيل ل\",\n            \"description\": \"إعادة تصميم صفحة تسجيل الدخول باستخدام Tailwind\",\n            \"priority\": \"high\",\n            \"status\": \"approved\",\n            \"due_date\": \"2026-08-29\",\n            \"assigned_at\": \"2026-08-17T03:16:16.000000Z\",\n            \"submitted_at\": null,\n            \"reviewed_at\": null,\n            \"score\": null,\n            \"is_overdue\": false,\n            \"creator\": {\n                \"id\": 3,\n                \"name\": \"ahmadMarketing\"\n            },\n            \"assignee\": {\n                \"id\": 7,\n                \"name\": \"employeeMarketing\"\n            },\n            \"reviewer\": null,\n            \"created_at\": \"2026-08-17T03:16:16.000000Z\",\n            \"updated_at\": \"2026-08-17T03:17:16.000000Z\"\n        }\n    ],\n    \"links\": {\n        \"first\": \"http://127.0.0.1:8000/api/tasks?page=1\",\n        \"last\": \"http://127.0.0.1:8000/api/tasks?page=1\",\n        \"prev\": null,\n        \"next\": null\n    },\n    \"meta\": {\n        \"current_page\": 1,\n        \"from\": 1,\n        \"last_page\": 1,\n        \"links\": [\n            {\n                \"url\": null,\n                \"label\": \"&laquo; Previous\",\n                \"page\": null,\n                \"active\": false\n            },\n            {\n                \"url\": \"http://127.0.0.1:8000/api/tasks?page=1\",\n                \"label\": \"1\",\n                \"page\": 1,\n                \"active\": true\n            },\n            {\n                \"url\": null,\n                \"label\": \"Next &raquo;\",\n                \"page\": null,\n                \"active\": false\n            }\n        ],\n        \"path\": \"http://127.0.0.1:8000/api/tasks\",\n        \"per_page\": 20,\n        \"to\": 2,\n        \"total\": 2\n    }\n}"
+    ]
+  },
+  {
+    "name": "update task m",
+    "url": "",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "cancel m",
+    "url": "{{base_url}}tasks/5/cancel",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "start task employee",
+    "url": "{{base_url}}tasks/8/start",
+    "method": "POST",
+    "response": [
+      "{\n    \"data\": {\n        \"id\": 3,\n        \"title\": \"طويرصفحة جيل ل\",\n        \"description\": \"إعادة تصميم صفحة تسجيل الدخول باستخدام Tailwind\",\n        \"priority\": \"high\",\n        \"status\": \"in_progress\",\n        \"due_date\": \"2026-08-29\",\n        \"assigned_at\": \"2026-08-17T03:26:15.000000Z\",\n        \"submitted_at\": null,\n        \"reviewed_at\": null,\n        \"score\": null,\n        \"is_overdue\": false,\n        \"created_at\": \"2026-08-17T03:26:15.000000Z\",\n        \"updated_at\": \"2026-08-17T03:26:28.000000Z\"\n    }\n}"
+    ]
+  },
+  {
+    "name": "submit employee",
+    "url": "{{base_url}}tasks/8/submit",
+    "method": "POST",
+    "response": [
+      "{\n    \"data\": {\n        \"id\": 1,\n        \"task_id\": 3,\n        \"notes\": \"تم الانتهاء من التطوير وجاهز للمراجعة\",\n        \"attachment_url\": \"http://127.0.0.1:8000/api/task-submissions/1/attachment?expires=1786939053&signature=2e502b804abfb0b6c61664419e4cb9087e3078e141b48a1d8d0527561d682093\",\n        \"submitter\": {\n            \"id\": 7,\n            \"name\": \"employeeMarketing\"\n        },\n        \"created_at\": \"2026-08-17T03:27:33.000000Z\"\n    }\n}"
+    ]
+  },
+  {
+    "name": "review m",
+    "url": "{{base_url}}task-submissions/5/review",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "show one task m\\ /employee",
+    "url": "{{base_url}}tasks/9",
+    "method": "GET",
+    "response": [
+      "{\n    \"data\": {\n        \"id\": 3,\n        \"title\": \"طويرصفحة جيل ل\",\n        \"description\": \"إعادة تصميم صفحة تسجيل الدخول باستخدام Tailwind\",\n        \"priority\": \"high\",\n        \"status\": \"approved\",\n        \"due_date\": \"2026-08-29\",\n        \"assigned_at\": \"2026-08-17T03:26:15.000000Z\",\n        \"submitted_at\": \"2026-08-17T03:27:33.000000Z\",\n        \"reviewed_at\": \"2026-08-17T03:30:08.000000Z\",\n        \"score\": \"85.00\",\n        \"is_overdue\": false,\n        \"creator\": {\n            \"id\": 3,\n            \"name\": \"ahmadMarketing\"\n        },\n        \"assignee\": {\n            \"id\": 7,\n            \"name\": \"employeeMarketing\"\n        },\n        \"reviewer\": {\n            \"id\": 3,\n            \"name\": \"ahmadMarketing\"\n        },\n        \"latest_submission\": {\n            \"id\": 1,\n            \"task_id\": 3,\n            \"notes\": \"تم الانتهاء من التطوير وجاهز للمراجعة\",\n            \"attachment_url\": \"http://127.0.0.1:8000/api/task-submissions/1/attachment?expires=1786939240&signature=a1adab6185781a01efe8016fc5b611a88d50675120286301f005f33d51652c9c\",\n            \"review\": {\n                \"id\": 1,\n                \"score\": 85,\n                \"comment\": \"Great work! Just minor improvements needed.\",\n                \"status\": \"approved\",\n                \"created_at\": \"2026-08-17T03:30:08.000000Z\"\n            },\n            \"created_at\": \"2026-08-17T03:27:33.000000Z\"\n        },\n        \"created_at\": \"2026-08-17T03:26:15.000000Z\",\n        \"updated_at\": \"2026-08-17T03:30:08.000000Z\"\n    }\n}"
+    ]
+  },
+  {
+    "name": "down submit task",
+    "url": "",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "المهام يلي تم تسليمها m/employee",
+    "url": "{{base_url}}tasks?status=submitted",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "عدد المهام المنجزة خلال هذا الشهر .. m",
+    "url": "{{base_url}}counttasks/completed-count-this-month",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "My base salaries",
+    "url": "{{base_url}}my-base-salaries",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "spacific employee base salary",
+    "url": "{{base_url}}base/4/employee-salaries",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Increase Hour price",
+    "url": "{{base_url}}increase/4/employee-hour-price",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "Create dedution",
+    "url": "{{base_url}}deductions",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "My deductions",
+    "url": "{{base_url}}my-deductions",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Employee deductions",
+    "url": "{{base_url}}deduction/7/employee",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Store over time by manager",
+    "url": "{{base_url}}store-overtime-bymanager",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "Reject overtime by HR",
+    "url": "{{base_url}}mandatory-overtime/9/reject",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "Spacific over time employee",
+    "url": "{{base_url}}overtimes/17",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Approve over time by HR",
+    "url": "{{base_url}}mandatory-overtime/3/approve",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "Mandatory over time requests",
+    "url": "{{base_url}}mandatory-overtime",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Voluntary over time requests",
+    "url": "{{base_url}}voluntary-overtime",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Manager created over time",
+    "url": "{{base_url}}my-created-overtime-manager",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "My department over time requests",
+    "url": "{{base_url}}my-department-overtime",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Delete over time employee",
+    "url": "{{base_url}}delete-overtime/3/request",
+    "method": "DELETE",
+    "response": []
+  },
+  {
+    "name": "Store over time by employee",
+    "url": "{{base_url}}store-overtime-byemployee",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "Approve over time by manager",
+    "url": "{{base_url}}voluntary-overtime/8/approve",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "Reject over time by manager",
+    "url": "{{base_url}}voluntary-overtime/8/reject",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "My over times employee",
+    "url": "{{base_url}}my-overtimes",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "get notes m \\h",
+    "url": "{{base_url}}users/9/notes",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "store notes m\\h",
+    "url": "{{base_url}}users/9/notes",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "get evalution m",
+    "url": "{{base_url}}evaluations",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "get evalu pending to hr",
+    "url": "{{base_url}}evaluations?pending_only=true",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "get my evalution e",
+    "url": "{{base_url}}myevaluations",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "approve evaluetion from hr",
+    "url": "{{base_url}}evaluations/1/hr-approve",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "submit-assessment m",
+    "url": "{{base_url}}evaluations/1/submit-assessment",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "show details evalu m/ h",
+    "url": "{{base_url}}evaluations/9",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "أداء القسم الشهري .. m",
+    "url": "{{base_url}}department/performance",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "top-performance a",
+    "url": "{{base_url}}top-performance",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "New Request",
+    "url": "",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "تقييم + عدد التاسكات للمنجر",
+    "url": "{{base_url}}summary-performance/users/6",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Store incentive",
+    "url": "{{base_url}}incentives",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "Update incentive",
+    "url": "{{base_url}}incentives/2",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "All incentives",
+    "url": "{{base_url}}incentives",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Show incentive",
+    "url": "{{base_url}}incentives/2",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Delete incentive",
+    "url": "{{base_url}}incentives/2",
+    "method": "DELETE",
+    "response": []
+  },
+  {
+    "name": "My incentive",
+    "url": "{{base_url}}my-incentives",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Current Payroll",
+    "url": "{{base_url}}payroll/current",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "All payroll",
+    "url": "{{base_url}}payrolls",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Generate Payroll",
+    "url": "{{base_url}}payroll/generate",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "count department",
+    "url": "{{base_url}}departments/count",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "all name departments",
+    "url": "{{base_url}}departments/names",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "details all departments",
+    "url": "{{base_url}}departments/all",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "employee department with manager",
+    "url": "{{base_url}}departments/4/employees",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "all dep with employee",
+    "url": "{{base_url}}departments/employees",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "My payslips employee",
+    "url": "{{base_url}}my-payslips",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Show Payslip employee",
+    "url": "{{base_url}}payslips/7",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Current month payslips",
+    "url": "{{base_url}}current-month-payslips",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Payslips Summary",
+    "url": "{{base_url}}summary-payslips",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Preview payslips employee",
+    "url": "{{base_url}}payslips/1/preview",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Download Payslip employee",
+    "url": "{{base_url}}payslips/1/download",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Store termination request",
+    "url": "{{base_url}}store-termination",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "Delete Termination",
+    "url": "{{base_url}}termination-requests/8",
+    "method": "DELETE",
+    "response": []
+  },
+  {
+    "name": "Show Termination",
+    "url": "{{base_url}}termination-requests/9",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "My Created Terminations",
+    "url": "{{base_url}}my-termination-requests",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Termination requests",
+    "url": "{{base_url}}termination-requests",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "Approve termination",
+    "url": "{{base_url}}approve/2/termination",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "Reject termination",
+    "url": "{{base_url}}reject/1/termination",
+    "method": "PUT",
+    "response": []
+  },
+  {
+    "name": "store resignations employee",
+    "url": "{{base_url}}resignations",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "all resignations for HR",
+    "url": "{{base_url}}resignations?type=",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "classify resigration HR //تصنيف الاستقالات الفورية",
+    "url": "{{base_url}}resignations/8/classify",
+    "method": "POST",
+    "response": []
+  },
+  {
+    "name": "my resignation employee",
+    "url": "{{base_url}}resignations/mine",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "show details resignation hr",
+    "url": "",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "downlode file resignation",
+    "url": "",
+    "method": "GET",
+    "response": []
+  },
+  {
+    "name": "New Request",
+    "url": "",
+    "method": "GET",
+    "response": []
+  }
+]

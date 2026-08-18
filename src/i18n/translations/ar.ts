@@ -1,5 +1,5 @@
 const ar = {
-// ── Navigation ─
+  // ── Navigation ─
   nav: {
     dashboard: 'لوحة التحكم',
     employees: 'الموظفون',
@@ -9,6 +9,9 @@ const ar = {
     attendance: 'الحضور',
     evaluation: 'التقييم الدوري',
     recruitment: 'التوظيف',
+    interviews: 'المقابلات',
+    announcements: 'التعميمات',
+    terminations: 'إنهاء الخدمة',
     mainMenu: 'القائمة الرئيسية',
   },
 
@@ -32,7 +35,7 @@ const ar = {
     completedThisMonth: 'مكتملة هذا الشهر',
     performanceChart: '📈 أداء القسم الشهري',
     avgRating: 'متوسط التقييم',
-    attendanceChart: 'نسبة الحضور الشهرية',
+    attendanceChart: '📊 نسبة الحضور الشهرية',
     attendancePct: 'نسبة الحضور %',
     pendingTasksList: '⏳ المهام المعلقة',
     pendingLeavesList: '📋 طلبات الإجازة المعلقة',
@@ -43,14 +46,83 @@ const ar = {
     presentEmployees: 'موظفون حاضرون'
   },
 
-  
+  // ── Announcements ──
+  announcements: {
+    title: 'إدارة التعميمات',
+    subtitle: 'إنشاء ومتابعة التعميمات الخاصة بقسمك',
+    createNew: 'إنشاء تعميم',
+    activeTitle: 'الإعلانات',
+    form: {
+      createTitle: 'إنشاء تعميم جديد',
+      editTitle: 'تعديل التعميم',
+      titleLabel: 'عنوان التعميم',
+      bodyLabel: 'نص التعميم',
+      priorityLabel: 'الأولوية',
+      startsAtLabel: 'تاريخ النشر',
+      endsAtLabel: 'تاريخ الانتهاء (اختياري)',
+      audienceNote: '📢 سيتم توجيه هذا التعميم تلقائياً لجميع موظفي قسمك.',
+      saveBtn: 'حفظ التعميم',
+      savingBtn: 'جاري الحفظ...',
+      cancelBtn: 'إلغاء',
+      fillRequired: 'يرجى ملء جميع الحقول المطلوبة',
+      createdSuccess: 'تم إنشاء التعميم بنجاح ✅',
+      updatedSuccess: 'تم تعديل التعميم بنجاح ✅',
+    },
+    list: {
+      title: 'قائمة التعميمات',
+      loading: 'جاري التحميل...',
+      emptyMsg: 'لا توجد تعميمات حتى الآن',
+      createFirst: '+ إنشاء أول تعميم',
+      columns: {
+        title: 'العنوان',
+        audience: 'الجمهور',
+        priority: 'الأولوية',
+        status: 'الحالة',
+        date: 'تاريخ النشر',
+        actions: 'الإجراءات',
+      },
+      publishNow: 'نشر الآن',
+      edit: 'تعديل',
+      delete: 'حذف',
+      publishedSuccess: 'تم النشر فوراً ✅',
+      hrNote: 'لا يمكنك تعديل أو حذف تعميمات الموارد البشرية',
+    },
+    deleteConfirm: {
+      title: 'تأكيد الحذف',
+      desc: 'هل أنت متأكد من حذف التعميم "{title}"؟ لا يمكن التراجع عن هذا الإجراء.',
+      yesBtn: 'نعم، احذف',
+      cancelBtn: 'إلغاء',
+      success: 'تم الحذف بنجاح',
+    },
+    priorities: {
+      urgent: '🔴 عاجل',
+      normal: '🟡 عادي',
+      info: '🟢 إشعار عام',
+      high:   '🔴 عاجل',
+      medium: '🟡 عادي',
+      low:    '🟢 إشعار عام',
+    },
+    audiences: {
+      all: 'الكل',
+      department: 'القسم',
+      managers: 'المدراء',
+    },
+    statuses: {
+      draft: 'مسودة',
+      scheduled: 'مجدول',
+      active: 'نشط',
+      expired: 'منتهي',
+    }
+  },
+
+
   // ── Sidebar / Topbar ──
   layout: {
     systemName: 'HR System',
     university: 'جامعة دمشق',
     managerRole: 'مدير القسم',
-    userName: 'Mohamed Ahmed',
-    userAvatar: 'M',
+    userName: 'Ahmad Front',
+    userAvatar: 'A',
   },
 
   // ── Tasks ──
@@ -66,6 +138,8 @@ const ar = {
     },
     noTasks: 'لا توجد مهام',
     rateTask: 'تقييم المهمة',
+    reviewTask: 'مراجعة',
+    completedThisMonth: 'مكتملة هذا الشهر',
     createModal: {
       title: 'إنشاء مهمة جديدة',
       taskTitle: 'عنوان المهمة',
@@ -80,6 +154,19 @@ const ar = {
       createBtn: 'إنشاء وتعيين المهمة',
       requiredError: 'يرجى ملء جميع الحقول المطلوبة',
       success: 'تم إنشاء المهمة بنجاح',
+    },
+    reviewModal: {
+      title: 'مراجعة تسليم المهمة',
+      submissionDetails: 'تفاصيل التسليم',
+      notes: 'الملاحظة:',
+      noNotes: 'لا توجد ملاحظات',
+      attachment: 'الملف المرفق:',
+      viewAttachment: 'عرض المرفق',
+      noAttachment: 'لا يوجد مرفق لتسليم هذه المهمة',
+      decision: 'القرار',
+      approve: 'موافقة',
+      reject: 'رفض',
+      rejectNotice: 'سيتم إخطار الموظف برفض التسليم وإمكانية إعادة التقديم.',
     },
     rateModal: {
       title: 'تقييم المهمة',
@@ -141,14 +228,55 @@ const ar = {
     checkIn: 'دخول:',
     checkOut: '— خروج:',
     delay: 'تأخير',
-    mins: 'دقيقة'
+    mins: 'دقيقة',
+    contract: 'العقد',
+    documents: 'المستندات',
+    download: 'تحميل',
+    noContract: 'لا يوجد عقد متاح',
+    noDocuments: 'لا توجد مستندات مرفوعة',
+    documentName: 'اسم المستند',
+    dateAdded: 'تاريخ الإضافة',
+    noAttendance: 'لا يوجد سجل حضور متاح حالياً',
+    employmentContract: 'عقد العمل'
   },
 
   // ── Leaves ──
   leaves: {
-    title: 'طلبات الإجازة',
+    title: 'الإجازات',
+    subtitle: 'إدارة طلبات الإجازات والمغادرات الساعية للقسم ولحسابك الشخصي',
     pendingReview: 'طلبات معلقة بانتظار مراجعتك',
     pendingAttention: 'طلبات معلقة تحتاج لاهتمامك',
+    mainTabs: {
+      teamLeaves: 'إجازات الفريق',
+      myLeaves: 'إجازاتي'
+    },
+    myLeaves: {
+      newRequest: 'طلب إجازة جديد',
+      newHourlyRequest: 'طلب مغادرة ساعية جديدة',
+      balanceTitle: 'رصيد الإجازات المتبقي',
+      form: {
+        title: 'تقديم طلب إجازة',
+        hourlyTitle: 'طلب مغادرة ساعية',
+        type: 'نوع الإجازة',
+        startDate: 'تاريخ البدء',
+        date: 'التاريخ',
+        daysCount: 'عدد الأيام',
+        startTime: 'وقت البدء',
+        endTime: 'وقت الانتهاء',
+        reason: 'السبب',
+        submit: 'تقديم الطلب',
+        submitting: 'جاري التقديم...',
+        cancel: 'إلغاء'
+      },
+      status: {
+        pending: 'قيد المراجعة',
+        approved: 'تمت الموافقة',
+        rejected: 'مرفوض'
+      },
+      toast: {
+        success: 'تم تقديم طلب الإجازة بنجاح'
+      }
+    },
     tabs: {
       all: 'الكل',
       pending: 'معلقة',
@@ -161,7 +289,9 @@ const ar = {
       emergency: 'اضطرارية',
       unpaid: 'غير مدفوعة'
     },
-    noRequests: 'لا توجد طلبات إجازة',
+    dailyToggle: 'إجازة يومية',
+    hourlyToggle: 'مغادرة (ساعيّة)',
+    noRequests: 'لا توجد طلبات',
     requestedOn: 'تاريخ الطلب:',
     days: 'أيام',
     reason: 'السبب:',
@@ -185,32 +315,63 @@ const ar = {
 
   // ── Overtime ──
   overtime: {
-    title: 'طلبات العمل الإضافي',
-    subtitle: 'طلبات معلقة',
-    pendingRequests: 'طلبات معلقة',
-    pendingAlert: 'طلبات بانتظار اتخاذ إجراء',
-    awaitingAction: 'طلبات بانتظار اتخاذ إجراء',
-    tabs: {
-      all: 'الكل',
-      pending: 'معلقة',
-      approved: 'مقبولة',
-      rejected: 'مرفوضة'
+    title: 'إدارة العمل الإضافي',
+    subtitle: 'متابعة وتكليف ساعات العمل الإضافي لموظفي القسم',
+    assignBtn: 'تكليف عمل إضافي',
+    personalBtn: 'طلب إضافي شخصي',
+    mainTabs: {
+      department: 'طلبات القسم التطوعية',
+      myCreated: 'التكاليف الصادرة منّي',
+      myOwn: 'ساعاتي الإضافية الشخصية'
     },
-    noRequests: 'لا توجد طلبات عمل إضافي',
-    requestedOn: 'تاريخ الطلب',
-    hours: 'ساعات',
-    hoursLabel: 'ساعات',
-    date: 'التاريخ',
-    dateLabel: 'التاريخ',
-    reason: 'السبب',
-    reasonLabel: 'السبب',
+    alerts: {
+      pending: 'يوجد طلبات عمل إضافي بانتظار موافقتك.'
+    },
+    emptyStates: {
+      department: 'لا توجد طلبات عمل إضافي حالياً بالقسم',
+      myCreated: 'لم تقم بتكليف أي موظف بعمل إضافي بعد',
+      myOwn: 'لا توجد ساعات عمل إضافية خاصة بك مسجلة'
+    },
+    card: {
+      date: 'التاريخ:',
+      time: 'التوقيت:',
+      notes: 'الملاحظات:',
+      noNotes: 'بدون ملاحظات',
+      cancelBtn: 'إلغاء التكليف',
+      employeeFallback: 'موظف #{id}',
+      from: 'من',
+      to: 'إلى',
+      hours: 'الساعات:'
+    },
+    status: {
+      approved: 'مقبول',
+      completed: 'مكتمل',
+      rejected: 'مرفوض',
+      pending: 'قيد الانتظار'
+    },
+    form: {
+      assignTitle: 'تكليف موظف بعمل إضافي',
+      personalTitle: 'طلب عمل إضافي شخصي',
+      selectEmployee: 'اختر الموظف',
+      selectEmployeePlaceholder: '-- حدد الموظف --',
+      date: 'التاريخ',
+      startTime: 'وقت البداية',
+      endTime: 'وقت النهاية',
+      notes: 'الملاحظات / سبب التكليف',
+      notesPlaceholder: 'مثال: إنجاز المشروع العاجل...',
+      personalNotesPlaceholder: 'سبب ساعات الإضافي...',
+      submitAssign: 'حفظ التكليف',
+      submitPersonal: 'تقديم الطلب',
+      cancel: 'إلغاء',
+      requiredError: 'يرجى ملء جميع الحقول المطلوبة'
+    },
     approveBtn: 'موافقة',
     rejectBtn: 'رفض',
     confirmModal: {
       approveTitle: 'تأكيد الموافقة',
       rejectTitle: 'تأكيد الرفض',
-      approveDesc: 'هل أنت متأكد أنك تريد الموافقة على طلب العمل الإضافي هذا؟ لا يمكن التراجع عن هذا الإجراء.',
-      rejectDesc: 'هل أنت متأكد أنك تريد رفض طلب العمل الإضافي هذا؟ لا يمكن التراجع عن هذا الإجراء.',
+      approveDesc: 'هل أنت متأكد من موافقتك على طلب العمل الإضافي؟ لا يمكن التراجع عن هذا الإجراء.',
+      rejectDesc: 'هل أنت متأكد من رفض طلب العمل الإضافي؟ لا يمكن التراجع عن هذا الإجراء.',
       confirm: 'تأكيد',
       cancel: 'إلغاء'
     },
@@ -240,6 +401,7 @@ const ar = {
       byEmployee: 'حسب الموظف',
       generalReport: 'تقرير الحضور العام'
     },
+
     filter: {
       fromDate: 'من تاريخ',
       toDate: 'إلى تاريخ',
@@ -295,8 +457,8 @@ const ar = {
 
   // ── Recruitment ──
   recruitment: {
-    title: 'التوظيف والمرشحين',
-    subtitle: 'إدارة الشواغر الوظيفية وتقييم المرشحين',
+    title: 'التوظيف',
+    subtitle: 'إدارة الشواغر الوظيفية',
     tabVacancy: 'طلب شاغر وظيفي',
     tabCandidates: 'تقييم المرشحين',
     vacancy: {
@@ -346,6 +508,94 @@ const ar = {
       }
     }
   },
+  interviews: {
+    title: 'إدارة المقابلات',
+    subtitle: 'مرشحون بانتظار التقييم · أدر النجوم وأرسل الترتيب النهائي',
+    searchPlaceholder: 'ابحث عن مرشح...',
+    candidatesCount: 'مرشح',
+    ratedCount: 'تم تقييمه',
+    rateAllWarning: 'قيّم جميع المرشحين بالنجوم لتتمكن من إرسال الترتيب النهائي',
+    sendRanking: 'إرسال الترتيب النهائي',
+    sendingRanking: 'جاري الإرسال...',
+    rankingSent: 'تم الإرسال ✅',
+    rankingPanel: 'الترتيب الحالي',
+    rankingSubtitle: 'يتحدّث تلقائياً عند تغيير التقييم · في حالة التساوي يمكنك ترتيبهم يدوياً',
+    readyToSend: '🎉 جميع المرشحين تم تقييمهم! يمكنك إرسال الترتيب النهائي الآن.',
+    rankingDone: '✅ تم إرسال الترتيب النهائي بنجاح',
+    interviewRating: 'تقييم المقابلة',
+    notRatedYet: 'لم يُقيَّم بعد',
+    notes: 'ملاحظات',
+    yearsExp: 'سنوات خبرة',
+    cvScore: 'CV Score',
+    noResults: 'لا توجد نتائج مطابقة للبحث',
+    statusPending: 'بانتظار المقابلة',
+    statusDone: 'تم التقييم',
+    statusRejected: 'مرفوض',
+    toasts: {
+      success: 'تم إرسال التقييمات والترتيب بنجاح ✅',
+      error: 'حدث خطأ أثناء الإرسال، تأكد من اتصالك بالخادم',
+      rateFirst: 'قيّم جميع المرشحين أولاً'
+    }
+  },
+
+  // ── Terminations ──
+  terminations: {
+    title: 'طلبات إنهاء الخدمة',
+    subtitle: 'إدارة ومتابعة طلبات إنهاء الخدمة للموظفين',
+    createRequest: 'طلب إنهاء خدمة',
+    noRequests: 'لا توجد طلبات إنهاء خدمة',
+    columns: {
+      employee: 'الموظف',
+      type: 'النوع',
+      subtype: 'السبب الفرعي',
+      date: 'تاريخ الإنهاء',
+      status: 'الحالة',
+      actions: 'الإجراءات'
+    },
+    types: {
+      immediate: 'فوري',
+      standard: 'عادي'
+    },
+    subtypes: {
+      misconduct: 'سوء سلوك',
+      company_composition: 'إعادة هيكلة الشركة',
+      mutual_agreement: 'اتفاق متبادل'
+    },
+    status: {
+      pending: 'قيد المراجعة',
+      approved: 'مقبول',
+      rejected: 'مرفوض'
+    },
+    form: {
+      title: 'تقديم طلب إنهاء خدمة',
+      employee: 'الموظف',
+      selectEmployee: '-- اختر الموظف --',
+      type: 'نوع الإنهاء',
+      subtype: 'السبب الفرعي',
+      date: 'تاريخ الإنهاء',
+      reason: 'السبب القانوني',
+      compensationAmount: 'مبلغ التعويض',
+      documents: 'المستندات المرفقة',
+      submit: 'إرسال الطلب',
+      submitting: 'جاري الإرسال...',
+      cancel: 'إلغاء'
+    },
+    modal: {
+      approveTitle: 'الموافقة على إنهاء الخدمة',
+      rejectTitle: 'رفض طلب إنهاء الخدمة',
+      reasonLabel: 'سبب القرار (اختياري)',
+      confirmApprove: 'تأكيد الموافقة',
+      confirmReject: 'تأكيد الرفض',
+      cancel: 'إلغاء'
+    },
+    toasts: {
+      created: 'تم إنشاء طلب إنهاء الخدمة بنجاح',
+      approved: 'تمت الموافقة على الطلب بنجاح',
+      rejected: 'تم رفض الطلب بنجاح',
+      deleted: 'تم الحذف بنجاح',
+      error: 'حدث خطأ أثناء معالجة الطلب'
+    }
+  }
 };
 
 export default ar;

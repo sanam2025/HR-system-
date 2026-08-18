@@ -102,7 +102,7 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({ isOpen, employ
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+            <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-green rounded-lg hover:bg-green-dark transition-colors">
               Save Evaluation
             </button>
           </div>

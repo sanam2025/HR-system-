@@ -8,6 +8,7 @@ const AdminAnnouncements = React.lazy(() => import('@/core/modules/admin/pages/A
 const OrganizationlStructure = React.lazy(() => import('@/core/modules/admin/pages/OrganizationlStructure'));
 const Reports = React.lazy(() => import('@/core/modules/admin/pages/Reports'));
 const EmployeeSearch = React.lazy(() => import('@/core/modules/admin/pages/EmployeeSearch'));
+const AdminHolidays = React.lazy(() => import('@/core/modules/admin/pages/Holidays'));
 const MyProfile = React.lazy(() => import('@/core/modules/employee/pages/EmployeeProfile'));
 
 export const adminRoutes = {
@@ -20,6 +21,7 @@ export const adminRoutes = {
     { path: 'announcement', element: <SuspenseWrapper><AdminAnnouncements /></SuspenseWrapper> },
     { path: 'organization', element: <SuspenseWrapper><OrganizationlStructure /></SuspenseWrapper> },
     { path: 'report', element: <SuspenseWrapper><Reports /></SuspenseWrapper> },
-    { path: 'search', element: <SuspenseWrapper><EmployeeSearch /></SuspenseWrapper> }
+    { path: 'search', element: <SuspenseWrapper><EmployeeSearch /></SuspenseWrapper> },
+    { path: 'holidays', element: <SuspenseWrapper><AdminHolidays /></SuspenseWrapper> }
   ]
 };

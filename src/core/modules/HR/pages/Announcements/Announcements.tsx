@@ -103,7 +103,7 @@ export default function Announcements() {
         {/* تم حذف زر Add Announcement من هنا */}
         {/* <button
           onClick={() => { setShowForm(true); setEditingId(null); setFormData({ title: '', content: '', audience: 'all', status: 'draft', starts_at: '', ends_at: '' }); }}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-green text-white rounded-lg hover:bg-green transition-colors"
         >
           <Plus className="w-4 h-4" /> Add Announcement
         </button> */}
@@ -152,7 +152,7 @@ export default function Announcements() {
                 </select>
               </div>
               <div className="flex gap-3 pt-4">
-                <button type="submit" className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">{editingId ? 'Update' : 'Create'}</button>
+                <button type="submit" className="flex-1 px-4 py-2 bg-green text-white rounded-lg hover:bg-green">{editingId ? 'Update' : 'Create'}</button>
                 <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
               </div>
             </form>

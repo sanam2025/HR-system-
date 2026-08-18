@@ -10,9 +10,8 @@ import './i18n';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1, // Only retry once instead of 3 times to fail faster
-      refetchOnWindowFocus: false, // Don't refetch every time the window is focused
-      staleTime: 5 * 60 * 1000, // 5 minutes cache to prevent over-fetching
+      retry: false,
+      refetchOnWindowFocus: false,
     },
   },
 });

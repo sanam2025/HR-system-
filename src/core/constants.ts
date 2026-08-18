@@ -38,8 +38,12 @@ export const ATTENDANCE_STATUS_INFO: Record<string, { labelAr: string; labelEn: 
   'إجازة':   { labelAr: 'إجازة', labelEn: 'On Leave', colorClass: 'bg-blue-50 text-blue-700 border border-blue-200' },
   // English aliases (legacy data)
   'Present': { labelAr: 'حاضر',  labelEn: 'Present',  colorClass: 'bg-green-50 text-green-700 border border-green-200' },
+  'present': { labelAr: 'حاضر',  labelEn: 'Present',  colorClass: 'bg-green-50 text-green-700 border border-green-200' },
   'Absent':  { labelAr: 'غائب',  labelEn: 'Absent',   colorClass: 'bg-red-50 text-red-600 border border-red-200' },
+  'absent':  { labelAr: 'غائب',  labelEn: 'Absent',   colorClass: 'bg-red-50 text-red-600 border border-red-200' },
   'Late':    { labelAr: 'تأخير', labelEn: 'Late',     colorClass: 'bg-yellow-50 text-yellow-700 border border-yellow-200' },
+  'late':    { labelAr: 'تأخير', labelEn: 'Late',     colorClass: 'bg-yellow-50 text-yellow-700 border border-yellow-200' },
   'Leave':   { labelAr: 'إجازة', labelEn: 'On Leave', colorClass: 'bg-blue-50 text-blue-700 border border-blue-200' },
+  'leave':   { labelAr: 'إجازة', labelEn: 'On Leave', colorClass: 'bg-blue-50 text-blue-700 border border-blue-200' },
   'On Leave':{ labelAr: 'إجازة', labelEn: 'On Leave', colorClass: 'bg-blue-50 text-blue-700 border border-blue-200' },
 };

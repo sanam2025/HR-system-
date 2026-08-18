@@ -98,7 +98,7 @@ export default function ApplicantDetail() {
           <p className="text-yellow-600 mb-4">Invalid Applicant ID</p>
           <button
             onClick={() => navigate("/Hr/all-applicants")}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+            className="px-4 py-2 bg-green text-white rounded-lg"
           >
             Back to Applicants
           </button>
@@ -122,7 +122,7 @@ export default function ApplicantDetail() {
           <p className="text-red-600 mb-4">Error loading applicant details</p>
           <button
             onClick={() => navigate("/Hr/all-applicants")}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+            className="px-4 py-2 bg-green text-white rounded-lg"
           >
             Back to Applicants
           </button>
@@ -166,7 +166,7 @@ export default function ApplicantDetail() {
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={handleDownloadCV}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="flex items-center gap-2 px-4 py-2 bg-green text-white rounded-lg hover:bg-green-dark"
             >
               <FileText className="w-4 h-4" /> Download CV
             </button>

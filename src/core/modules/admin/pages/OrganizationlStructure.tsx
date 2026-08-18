@@ -59,7 +59,7 @@ export default function Organization() {
             {t('manageHierarchy')}
           </p>
         </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2">
+        <button className="bg-green text-white px-4 py-2 rounded-xl hover:bg-green-dark transition-all flex items-center gap-2">
           <Plus className="w-4 h-4" />
           {t('addDepartment')}
         </button>

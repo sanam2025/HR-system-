@@ -60,7 +60,7 @@ const AttendanceFilters = ({
         <button
           onClick={onFilter}
           disabled={isLoading}
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
+          className="w-full bg-green text-white py-2 px-4 rounded-lg hover:bg-green transition-colors disabled:opacity-50"
         >
           {isLoading ? (t('loading') || 'Loading...') : (t('applyFilter') || 'Apply Filter')}
         </button>

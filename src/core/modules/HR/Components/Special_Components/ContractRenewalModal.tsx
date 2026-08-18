@@ -119,7 +119,7 @@ export const ContractRenewalModal: React.FC<ContractRenewalModalProps> = ({
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm bg-gray-100 rounded-lg hover:bg-gray-200">
               Cancel
             </button>
-            <button type="submit" className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button type="submit" className="flex items-center gap-2 px-4 py-2 text-sm bg-green text-white rounded-lg hover:bg-green-dark">
               <Send className="w-4 h-4" />
               Send Renewal Proposal
             </button>
