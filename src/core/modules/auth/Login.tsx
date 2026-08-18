@@ -69,12 +69,8 @@ function Login() {
     return (
         <div className="min-h-screen bg-surface flex items-center justify-center p-4">
             <div className="w-full max-w-md">
-                <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-green rounded-2xl shadow-lg shadow-green/20 mb-4">
-                        <LogIn className="w-8 h-8 text-white" />
-                    </div>
-                    <h1 className="text-2xl font-bold text-dark">Welcome Back</h1>
-                    <p className="text-brown mt-1 text-sm">Sign in to your account to continue</p>
+                <div className="text-center mb-8 flex flex-col items-center">
+                    <img src="/logo.png" alt="MasarHR Logo" className="w-48 h-auto object-contain" />
                 </div>
 
                 <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-6 md:p-8">
