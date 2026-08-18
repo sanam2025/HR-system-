@@ -1,11 +1,10 @@
 import {
-  LayoutDashboard, User, CalendarCheck, ListTodo, Wallet, Inbox,
+  LayoutDashboard, User, CalendarCheck, ListTodo, Wallet, MessageSquareWarning,
 } from "lucide-react";
 import type { NavItem } from "../components/SideBar";
 import AppLayout from "./AppLayout";
 import useAuthStore from "../../store/authStore";
 import { useLogout } from "../../api/hooks/useAuth";
-import NotificationBell from "../../core/modules/employee/components/speciel-components/NotificationBell";
 
 const navItems: NavItem[] = [
   { label: "Dashboard",          icon: LayoutDashboard, path: "/employee",             exact: true  },
@@ -13,7 +12,7 @@ const navItems: NavItem[] = [
   { label: "Attendance & Leaves", icon: CalendarCheck,  path: "/employee/attendance",   exact: false },
   { label: "Tasks",              icon: ListTodo,        path: "/employee/tasks",        exact: false },
   { label: "Finance",            icon: Wallet,          path: "/employee/finance",      exact: false },
-  { label: "Requests",           icon: Inbox,           path: "/employee/requests",     exact: false },
+  { label: "Complaints",         icon: MessageSquareWarning, path: "/employee/complaints", exact: false },
 ];
 
 const pageTitles: Record<string, string> = {
@@ -22,7 +21,7 @@ const pageTitles: Record<string, string> = {
   "/employee/attendance":  "Attendance & Leaves",
   "/employee/tasks":       "Tasks",
   "/employee/finance":     "Finance",
-  "/employee/requests":    "Requests",
+  "/employee/complaints":  "Complaints",
 };
 
 export default function EmployeeLayout() {
@@ -44,7 +43,6 @@ export default function EmployeeLayout() {
       user={{ avatar: initials, name: displayName, role: "Employee" }}
       navSectionLabel="Main Menu"
       onSignOut={() => logout.mutate()}
-      topbarRightSlot={<NotificationBell />}
     />
   );
 }

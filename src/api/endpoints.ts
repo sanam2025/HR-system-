@@ -1,9 +1,11 @@
 /**
  * Single source of truth for every API path this frontend calls. Scope is
- * intentionally limited to the employee-role workflows (auth, own profile,
- * onboarding, own documents/contract, own attendance, own leave requests) —
- * see CHANGELOG.md for the manager/HR/admin endpoints that exist in the
- * Postman collection but are explicitly out of scope for this pass.
+ * intentionally limited to the employee-role, self-service workflows (auth,
+ * own profile, onboarding, own documents/contract, own attendance, own
+ * leave/hourly-leave requests, own tasks, own payroll data, own complaints,
+ * notifications, active announcements) — see CHANGELOG.md for the
+ * manager/HR/admin-only endpoints that exist in the Postman collection but
+ * are explicitly out of scope for this pass.
  *
  * Paths are transcribed directly from the Masar-HR Postman collection.
  * Centralizing them here means a backend rename only has to be fixed in one
@@ -54,21 +56,19 @@ export const endpoints = {
   attendance: {
     checkIn: "check-in",
     checkOut: "check-out",
-    // CONFIRMED via live backend testing: this route exists but currently
-    // fails with a 500 error due to an invalid ORDER BY clause on `check_in`.
+    // CONFIRMED via live backend testing (2026-08-18, employee-role
+    // account): this route works and returns real records — the earlier
+    // "500 due to invalid ORDER BY" note no longer reproduces.
     myMonthly: "my-monthly-attendance",
-    // Collection-only, newly wired up. The collection's saved example also
-    // has `status` and `dep_id` query params (both disabled/commented out
-    // there) — `dep_id` is a manager/HR department filter and out of scope
-    // for the employee role, so only `from`/`to`/`status` are exposed here.
-    // Unclear from the collection alone whether this is already scoped to
-    // "my" attendance server-side or returns company-wide records for any
-    // authenticated user — flag this if the real response turns out to
-    // include other employees' rows.
-    filtered: "attendance-filter",
-    // Collection-only, newly wired up. Shape entirely unknown — no saved
-    // example.
-    percentage: "attendance-percentage",
+    // NOTE: `attendance-today-analysis` and `attendance-percentage` were
+    // in this object in an earlier pass but CONFIRMED via live testing
+    // (2026-08-18) to 403 "User does not have the right roles." for a real
+    // employee account — they're manager/HR-only, not self-service, so
+    // they were removed along with the frontend code that called them.
+    // `attendance-today` (all-employees daily roster) and
+    // `attendance-filter` (date-range query) were never wired to begin
+    // with and are almost certainly the same manager/HR scope as those
+    // two, going by the naming — left out for the same reason.
   },
 
   leaveRequests: {
@@ -81,8 +81,9 @@ export const endpoints = {
     update: (id: number | string) => `leaveRequests/${id}`,
     remove: (id: number | string) => `leaveRequests/${id}`,
     mine: "my-leave-request",
-    // The CHANGELOG note this superseded ("No self-service leave balance
-    // endpoint") is now stale — the collection added this route.
+    // Added to the collection since the last pass — a genuine self-service
+    // balance route now exists, closing the gap noted in CHANGELOG.md
+    // ("No self-service leave balance endpoint").
     myBalance: "my-leave-balance",
   },
 
@@ -101,83 +102,68 @@ export const endpoints = {
     show: (id: number | string) => `tasks/${id}`,
     start: (id: number | string) => `tasks/${id}/start`,
     submit: (id: number | string) => `tasks/${id}/submit`,
+    // CONFIRMED via live backend testing (2026-08-18, employee-role
+    // account): 404 "Route Not Found" — genuinely doesn't exist despite
+    // being in the collection. Not called anywhere; left out entirely
+    // rather than wired to a route that can't work.
   },
 
-  // Collection-only, newly wired up. Not role-suffixed in the collection
-  // (unlike most other folders, which tag requests "e"/"m"/"h"), but the
-  // shape (list + mark-a-single-id-as-read) is a standard per-user
-  // notification inbox, so treated as employee-accessible like every other
-  // authenticated GET without an explicit manager/HR-only marker.
+  payroll: {
+    myPayslips: "my-payslips",
+    payslip: (id: number | string) => `payslips/${id}`,
+    currentMonthPayslips: "current-month-payslips",
+    payslipsSummary: "summary-payslips",
+    payslipPreview: (id: number | string) => `payslips/${id}/preview`,
+    payslipDownload: (id: number | string) => `payslips/${id}/download`,
+    myBaseSalaries: "my-base-salaries",
+    myDeductions: "my-deductions",
+    myIncentives: "my-incentives",
+  },
+
+  overtime: {
+    storeByEmployee: "store-overtime-byemployee",
+    mine: "my-overtimes",
+  },
+
+  complaints: {
+    create: "complaints",
+    mine: "my-complaints",
+  },
+
   notifications: {
     list: "notifications",
     markRead: (id: string) => `notifications/${id}/read`,
   },
 
-  // ── Payroll & money (collection-only, newly wired up) ──────────────────
-  baseSalaries: {
-    // "My base salaries" (plural) — presumably a history of base-salary
-    // changes over time rather than a single current figure, since a
-    // dedicated `payroll/current` route exists separately below.
-    mine: "my-base-salaries",
+  announcements: {
+    active: "announcements/active",
   },
 
-  deductions: {
-    mine: "my-deductions",
+  people: {
+    // CONFIRMED via live backend testing (2026-08-18, employee-role
+    // account): both of these return 200 for a plain employee, despite
+    // having no "employee" suffix in the collection (unlike most other
+    // self-service routes) — used to let an employee pick who a complaint
+    // is about by name instead of typing a raw user id (a complaint is
+    // very often about a manager, so managers need to be selectable too).
+    // `search-employees` and `by-role-users` were also tried and confirmed
+    // 403 "User does not have the right roles." for the same account —
+    // those two really are manager/HR/admin only.
+    employees: "users/employees",
+    managers: "users/managers",
   },
 
-  incentives: {
-    mine: "my-incentives",
-  },
-
-  payroll: {
-    current: "payroll/current",
-  },
-
-  payslips: {
-    mine: "my-payslips",
-    // NOTE: not "my-current-month-payslips" — no "my" prefix in the
-    // collection at all for this one or "summary-payslips" below, unlike
-    // every other self-service route in this API (which is consistently
-    // "my-*"). Left in under Payroll & money on the assumption that an
-    // authenticated non-privileged user's request is scoped server-side to
-    // their own data by default (same assumption CHANGELOG.md already
-    // documents for `attendance-filter`) — flag this if either route turns
-    // out to return company-wide data instead.
-    currentMonth: "current-month-payslips",
-    summary: "summary-payslips",
-    show: (id: number | string) => `payslips/${id}`,
-    download: (id: number | string) => `payslips/${id}/download`,
-    preview: (id: number | string) => `payslips/${id}/preview`,
-  },
-
-  // ── Performance (collection-only, newly wired up) ───────────────────────
-  evaluations: {
-    // Explicitly "e"-tagged in the collection, unlike the payroll routes
-    // above.
-    mine: "myevaluations",
-  },
-
-  // ── Overtime (collection-only, newly wired up; manager/HR approval and
-  //    "store by manager" routes intentionally omitted — employee scope
-  //    only) ────────────────────────────────────────────────────────────
-  overtime: {
-    mine: "my-overtimes",
-    store: "store-overtime-byemployee",
-    remove: (id: number | string) => `delete-overtime/${id}/request`,
-  },
-
-  // ── Termination requests (collection-only, newly wired up; approve/
-  //    reject are manager/HR-only, omitted) ────────────────────────────
-  termination: {
-    store: "store-termination",
-    mine: "my-termination-requests",
-    remove: (id: number | string) => `termination-requests/${id}`,
-  },
-
-  // ── Complaints (collection-only, newly wired up; the admin-facing list/
-  //    review/respond routes are omitted — employee scope only) ─────────
-  complaints: {
-    store: "complaints",
-    mine: "my-complaints",
+  resignations: {
+    // CONFIRMED via live backend testing: `POST /resignations` passes role
+    // checks for a real employee (a validation error on `type` came back,
+    // not a 403) so this is genuinely self-service. `GET /resignations/mine`
+    // 403s "User does not have the right roles." for the same account
+    // though — likely a backend role-middleware bug (wrong guard on that
+    // one route) rather than an intentional restriction, since submitting
+    // one's own resignation but never being able to see it back makes no
+    // product sense. Wired anyway with the "mine" call tolerating that
+    // 403 gracefully. See CHANGELOG.md.
+    create: "resignations",
+    mine: "resigna/mine",
   },
 } as const;

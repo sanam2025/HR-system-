@@ -76,25 +76,40 @@ httpClient.interceptors.response.use(
 );
 
 /**
- * Unwraps a Laravel response body, transparently handling three shapes we
+ * Keys this backend puts alongside `data` on a plain (non-paginated)
+ * envelope — confirmed live on `GET /notifications`
+ * (`{ "message": "...", "data": [...] }`), and consistent with the mixed
+ * envelopes already documented for login in CHANGELOG.md. None of these
+ * carry real payload, so their presence shouldn't stop `data` from being
+ * unwrapped.
+ */
+const ENVELOPE_ONLY_KEYS = new Set(["message", "success", "status_code", "status", "errors"]);
+
+function unwrapEnvelope<T>(body: unknown): { unwrapped: true; value: T } | { unwrapped: false } {
+  if (body && typeof body === "object" && "data" in (body as Record<string, unknown>)) {
+    const otherKeys = Object.keys(body as Record<string, unknown>).filter((k) => k !== "data");
+    if (otherKeys.length === 0 || otherKeys.every((k) => ENVELOPE_ONLY_KEYS.has(k))) {
+      return { unwrapped: true, value: (body as { data: T }).data };
+    }
+  }
+  return { unwrapped: false };
+}
+
+/**
+ * Unwraps a Laravel response body, transparently handling the shapes we
  * observe in practice: a bare payload, a Laravel API Resource wrapper
- * (`{ data: T }`), and a paginator (`{ data: T[], meta, links }`). See the
- * "Undocumented response contracts" note in CHANGELOG.md for why this exists
- * instead of a single strict type per endpoint.
+ * (`{ data: T }`), a `{ message, data: T }` envelope, and a paginator
+ * (`{ data: T[], meta, links }`). See the "Undocumented response contracts"
+ * note in CHANGELOG.md for why this exists instead of a single strict type
+ * per endpoint.
  */
 export function unwrap<T>(response: AxiosResponse<unknown>): T {
   const body = response.data;
   if (isLaravelPaginated<T extends Array<infer U> ? U : never>(body)) {
     return body as T;
   }
-  if (
-    body &&
-    typeof body === "object" &&
-    "data" in (body as Record<string, unknown>) &&
-    Object.keys(body as Record<string, unknown>).length === 1
-  ) {
-    return (body as { data: T }).data;
-  }
+  const envelope = unwrapEnvelope<T>(body);
+  if (envelope.unwrapped) return envelope.value;
   return body as T;
 }
 
@@ -103,9 +118,37 @@ export function unwrapPaginated<T>(response: AxiosResponse<unknown>): Paginated<
   if (isLaravelPaginated<T>(body)) {
     return normalizePaginated(body);
   }
-  // Fallback for endpoints that return a bare array with no pagination meta.
-  const items = Array.isArray(body) ? (body as T[]) : [];
+  const envelope = unwrapEnvelope<T[]>(body);
+  const items = envelope.unwrapped
+    ? envelope.value
+    : Array.isArray(body)
+      ? (body as T[])
+      : [];
   return { items, page: 1, perPage: items.length, total: items.length, lastPage: 1 };
 }
 
 export type RequestOptions = Pick<AxiosRequestConfig, "signal" | "params" | "headers">;
+
+/**
+ * CONFIRMED via live backend testing: `GET /my-payslips` returns
+ * `404 { "message": "No payslips found." }` rather than `200 []` when the
+ * signed-in employee simply has no payslips yet. Treating a 404 as "empty"
+ * for these self-service list endpoints turns a legitimate empty state
+ * back into one instead of surfacing it as an error banner — the same
+ * anti-pattern is plausible on every other "my-*" list route this backend
+ * exposes, so every list module in `src/api/*` routes its GET through this
+ * instead of a raw `unwrap(httpClient.get(...))`.
+ */
+export async function getListOrEmpty<T>(
+  path: string,
+  options?: RequestOptions
+): Promise<T[]> {
+  try {
+    const response = await httpClient.get(path, options);
+    return unwrap<T[]>(response);
+  } catch (error) {
+    const apiError = ApiError.from(error);
+    if (apiError.kind === "not_found") return [];
+    throw apiError;
+  }
+}

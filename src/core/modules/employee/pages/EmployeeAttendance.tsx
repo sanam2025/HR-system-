@@ -1,86 +1,48 @@
-import { useMemo, useState } from "react";
-import { Percent, Sun, Thermometer, Ban } from "lucide-react";
+import { useMemo } from "react";
 import {
   AlertBannerCard,
-  RequestLeaveCard,
+  LeaveBalanceCard,
+  PendingHourlyRequestsCard,
   PendingRequestsCard,
   RecentAttendanceLogCard,
+  RequestHourlyLeaveCard,
+  RequestLeaveCard,
 } from "../components/speciel-components/AttendanceComponents";
-import { useMyLeaveRequests, useCreateLeaveRequest, useDeleteLeaveRequest, useMyLeaveBalance } from "../../../../api/hooks/useLeaveRequests";
-import { useMyMonthlyAttendance, useFilteredAttendance, useAttendancePercentage } from "../../../../api/hooks/useAttendance";
-import { StatCard, LoadingSkeleton, QueryErrorNotice } from "../components/commend-components";
+import { useMyLeaveBalance, useMyLeaveRequests, useCreateLeaveRequest, useDeleteLeaveRequest } from "../../../../api/hooks/useLeaveRequests";
+import {
+  useCreateHourlyLeaveRequest,
+  useDeleteHourlyLeaveRequest,
+  useMyHourlyLeaveRequests,
+} from "../../../../api/hooks/useHourlyLeaveRequests";
+import { useMyMonthlyAttendance } from "../../../../api/hooks/useAttendance";
 import { ApiError } from "../../../../lib/http/ApiError";
-
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function AttendanceStatsRow() {
-  const percentage = useAttendancePercentage();
-  const balance = useMyLeaveBalance();
-
-  if (percentage.isLoading || balance.isLoading) {
-    return (
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-        <LoadingSkeleton lines={2} />
-      </div>
-    );
-  }
-  if (percentage.isError || balance.isError) {
-    return (
-      <QueryErrorNotice
-        message={((percentage.error ?? balance.error) as ApiError).message}
-      />
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      {percentage.data && (
-        <StatCard
-          icon={Percent}
-          label="Attendance rate"
-          value={`${percentage.data.percentage}%`}
-        />
-      )}
-      {balance.data && (
-        <>
-          <StatCard icon={Sun} label="Annual leave left" value={String(balance.data.annual)} />
-          <StatCard icon={Thermometer} label="Sick leave left" value={String(balance.data.sick)} />
-          <StatCard icon={Ban} label="Unpaid leave used" value={String(balance.data.unpaid)} />
-        </>
-      )}
-    </div>
-  );
-}
+import { isSameCalendarDay } from "../../../../lib/date";
 
 export default function EmployeeAttendance() {
   const pendingLeaveRequests = useMyLeaveRequests("pending");
+  const pendingHourlyLeaveRequests = useMyHourlyLeaveRequests("pending");
+  const leaveBalance = useMyLeaveBalance();
   const monthly = useMyMonthlyAttendance();
   const createLeaveRequest = useCreateLeaveRequest();
   const deleteLeaveRequest = useDeleteLeaveRequest();
-
-  const [dateFilter, setDateFilter] = useState({ from: "", to: "" });
-  const isFiltered = Boolean(dateFilter.from && dateFilter.to);
-  const filtered = useFilteredAttendance(dateFilter);
+  const createHourlyLeaveRequest = useCreateHourlyLeaveRequest();
+  const deleteHourlyLeaveRequest = useDeleteHourlyLeaveRequest();
 
   const alertMessage = useMemo(() => {
     if (!monthly.data) return null;
-    const today = monthly.data.find((r) => r.date === todayIso());
+    const today = monthly.data.find((r) => isSameCalendarDay(r.date));
     if (!today?.check_in) return "You haven't checked in yet today.";
     return null;
   }, [monthly.data]);
 
-  const log = isFiltered ? filtered.data : monthly.data;
-  const logIsLoading = isFiltered ? filtered.isLoading : monthly.isLoading;
-  const logError = isFiltered
-    ? (filtered.error as ApiError | null)?.message ?? null
-    : (monthly.error as ApiError | null)?.message ?? null;
-
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in">
       <AlertBannerCard message={alertMessage} />
-      <AttendanceStatsRow />
+      <LeaveBalanceCard
+        balance={leaveBalance.data}
+        isLoading={leaveBalance.isLoading}
+        errorMessage={(leaveBalance.error as ApiError | null)?.message ?? null}
+      />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <div className="space-y-4 sm:space-y-6 min-w-0">
           <RequestLeaveCard
@@ -98,15 +60,25 @@ export default function EmployeeAttendance() {
         </div>
         <div className="min-w-0">
           <RecentAttendanceLogCard
-            log={log}
-            isLoading={logIsLoading}
-            errorMessage={logError}
-            filter={dateFilter}
-            onFilterChange={setDateFilter}
-            onClearFilter={() => setDateFilter({ from: "", to: "" })}
-            isFiltered={isFiltered}
+            log={monthly.data}
+            isLoading={monthly.isLoading}
+            errorMessage={(monthly.error as ApiError | null)?.message ?? null}
           />
         </div>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <RequestHourlyLeaveCard
+          onSubmit={(payload) => createHourlyLeaveRequest.mutate(payload)}
+          isSubmitting={createHourlyLeaveRequest.isPending}
+          errorMessage={(createHourlyLeaveRequest.error as ApiError | null)?.message ?? null}
+        />
+        <PendingHourlyRequestsCard
+          requests={pendingHourlyLeaveRequests.data}
+          isLoading={pendingHourlyLeaveRequests.isLoading}
+          errorMessage={(pendingHourlyLeaveRequests.error as ApiError | null)?.message ?? null}
+          onCancel={(id) => deleteHourlyLeaveRequest.mutate(id)}
+          cancelingId={deleteHourlyLeaveRequest.isPending ? (deleteHourlyLeaveRequest.variables as number) : null}
+        />
       </div>
     </div>
   );

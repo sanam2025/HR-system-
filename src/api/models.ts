@@ -65,6 +65,13 @@ export interface Contract {
 export const Gender = { Male: "male", Female: "female" } as const;
 export type Gender = (typeof Gender)[keyof typeof Gender];
 
+/**
+ * CONFIRMED via live backend testing: the response also includes
+ * `user_name`, `user_email`, `hiring_date`, `department`, and `manager`
+ * (the manager's display name) — none of which were visible from the
+ * request payloads alone. `picture` is the raw field name; `profiles.ts`
+ * normalizes it onto `picture_url` for every response.
+ */
 export interface Profile {
   id: ID;
   user_id: ID;
@@ -73,6 +80,11 @@ export interface Profile {
   phone_number: string;
   address: string;
   picture_url: string | null;
+  user_name?: string;
+  user_email?: string;
+  hiring_date?: string;
+  department?: string;
+  manager?: string | null;
 }
 
 export interface CreateProfilePayload {
@@ -97,44 +109,30 @@ export const AttendanceStatus = {
 } as const;
 export type AttendanceStatus = (typeof AttendanceStatus)[keyof typeof AttendanceStatus];
 
+/**
+ * CONFIRMED via live backend testing: `date` is a full timestamp (see
+ * `src/lib/date.ts` for why exact-string "is this today" comparisons don't
+ * work), the id field is `user_id` not `employee_id`, and `check_in`/
+ * `check_out` are entirely absent from the payload on an absent day rather
+ * than present as `null` — treat both as optional.
+ */
 export interface AttendanceRecord {
   id: ID;
-  employee_id: ID;
+  user_id?: ID;
+  employee_id?: ID;
   date: string;
-  check_in: string | null;
-  check_out: string | null;
+  check_in?: string | null;
+  check_out?: string | null;
   status: AttendanceStatus;
-  worked_hours: number | null;
+  worked_hours?: number | null;
+  late_minutes?: number;
+  early_leave_minutes?: number;
 }
 
-/** Query params for `GET /attendance-filter`, `dep_id` omitted — see endpoints.ts. */
-export interface AttendanceFilterParams {
-  from: string;
-  to: string;
-  status?: AttendanceStatus;
-}
-
-/** `GET /attendance-percentage` — shape is a guess, no saved example in the collection. */
-export interface AttendancePercentage {
-  percentage: number;
-}
-
-// ── Notifications ──────────────────────────────────────────────────────────
-
-/**
- * The collection's one saved example ID
- * (`c38b971d-2824-4aa7-8055-4abaa87cfe98`) is a UUID, which matches Laravel's
- * default database-notifications table shape (`->notify()` /
- * `Illuminate\Notifications\DatabaseNotification`) rather than an
- * auto-incrementing id — modeled on that default shape since nothing else
- * in the collection documents it.
- */
-export interface Notification {
-  id: string;
-  type: string;
-  data: Record<string, unknown>;
-  read_at: string | null;
-  created_at: string;
+/** `PUT /check-in` and `/check-out` now take the employee's coordinates. */
+export interface CheckInOutPayload {
+  latitude: string;
+  longitude: string;
 }
 
 // ── Leave requests ─────────────────────────────────────────────────────────
@@ -168,20 +166,55 @@ export interface CreateLeaveRequestPayload {
   start_date: string;
   type: LeaveType;
   days_count: number;
+  // Added to the collection's "Store Leave Request" form after the leave
+  // request model above was first written — optional so existing callers
+  // that don't pass it keep compiling.
+  reason?: string;
 }
 
 export type UpdateLeaveRequestPayload = Partial<CreateLeaveRequestPayload>;
 
-/** `GET /my-leave-balance` — field names guessed from the existing `LeaveType` values, no saved example. */
-export interface LeaveBalance {
-  annual: number;
-  sick: number;
-  unpaid: number;
+/**
+ * CONFIRMED via live backend testing: `GET /my-leave-balance` returns
+ * `{ user_id, user_name, leave_balances: [{ leave_type, total_days,
+ * used_days, remaining_days }] }` — not the flat `{ annual, sick, unpaid }`
+ * shape that would've been the naive guess from the field names alone.
+ */
+export interface LeaveBalanceEntry {
+  leave_type: LeaveType | string;
+  total_days: number | null;
+  used_days: number;
+  remaining_days: number | null;
 }
 
-export type TaskStatus = "New" | "In Progress" | "Completed" | "Late" | string;
+export interface LeaveBalance {
+  user_id: ID;
+  user_name?: string;
+  leave_balances: LeaveBalanceEntry[];
+}
 
-export type TaskPriority = "High" | "Medium" | "Low" | string;
+/**
+ * CONFIRMED via live backend testing (`GET /tasks`): the real values are
+ * lowercase/snake_case (`"pending"`, presumably `"in_progress"` once
+ * started, `"submitted"` per the collection's status filter example) — not
+ * the `"New"` / `"In Progress"` casing that would've been the naive guess.
+ */
+export type TaskStatus =
+  | "pending"
+  | "in_progress"
+  | "submitted"
+  | "completed"
+  | "approved"
+  | "rejected"
+  | "cancelled"
+  | string;
+
+export type TaskPriority = "high" | "medium" | "low" | string;
+
+export interface TaskPerson {
+  id: ID;
+  name: string;
+}
 
 export interface Task {
   id: ID;
@@ -189,11 +222,25 @@ export interface Task {
   description?: string;
   status: TaskStatus;
   priority?: TaskPriority;
-  dueDate: string;
+  // CONFIRMED live: the response uses `due_date` (snake_case); `dueDate`
+  // is kept only as a fallback for any older/camelCase source.
+  dueDate?: string;
+  due_date?: string;
   assigneeId?: ID;
   assigneeName?: string;
+  assignee?: TaskPerson;
+  creator?: TaskPerson;
+  reviewer?: TaskPerson | null;
   rating?: number | null;
+  score?: number | null;
+  submitted_at?: string | null;
+  reviewed_at?: string | null;
+  is_overdue?: boolean;
   createdAt?: string;
+  // The "post task m" request in the collection uses `assigned_to` on the
+  // *create* payload; the read response uses a nested `assignee` object
+  // instead (see above) — kept as an optional fallback.
+  assigned_to?: ID;
 }
 
 export interface TaskFilterParams {
@@ -203,10 +250,28 @@ export interface TaskFilterParams {
   [key: string]: string | number | undefined;
 }
 
-/** Body for `POST /tasks/{id}/submit` — multipart, `attachment` optional per the collection's example. */
 export interface SubmitTaskPayload {
   notes: string;
   attachment?: File;
+}
+
+export const TaskSubmissionStatus = {
+  Pending: "pending",
+  Approved: "approved",
+  Rejected: "rejected",
+} as const;
+export type TaskSubmissionStatus =
+  (typeof TaskSubmissionStatus)[keyof typeof TaskSubmissionStatus];
+
+export interface TaskSubmission {
+  id: ID;
+  task_id: ID;
+  notes?: string;
+  attachment_url?: string | null;
+  status: TaskSubmissionStatus | string;
+  score?: number | null;
+  comment?: string | null;
+  submitted_at?: string;
 }
 
 // ── Hourly leave requests ─────────────────────────────────────────────────
@@ -230,88 +295,49 @@ export interface CreateHourlyLeaveRequestPayload {
 
 export type UpdateHourlyLeaveRequestPayload = Partial<CreateHourlyLeaveRequestPayload>;
 
-// ── Payroll & money ─────────────────────────────────────────────────────
+// ── Payroll: payslips, base salary, deductions, incentives ────────────────
 //
-// None of the routes below have a saved response example in the collection
-// (same situation the module header describes) — every field is inferred
-// from the route's own name and neighboring folders. Treat these as a
-// starting sketch to correct against the first real response, not a
-// contract.
+// None of these folders have a single saved response example in the
+// collection, so — same rationale as the file header — every type below
+// pins down only the fields confirmed by a request payload or a path
+// parameter and otherwise stays permissive via an index signature. Pages
+// must render unknown fields defensively rather than assuming a shape.
+
+export interface Payslip {
+  id: ID;
+  [key: string]: unknown;
+}
 
 export interface BaseSalary {
-  id: ID;
-  amount: number;
-  effective_date: string;
+  id?: ID;
+  hour_price?: number;
+  [key: string]: unknown;
 }
 
 export interface Deduction {
   id: ID;
-  amount: number;
-  reason: string;
-  date: string;
+  user_id?: ID;
+  date?: string;
+  amount?: number;
+  reason?: string;
+  [key: string]: unknown;
 }
 
 export interface Incentive {
   id: ID;
-  amount: number;
-  reason: string;
-  date: string;
+  user_id?: ID;
+  date?: string;
+  amount?: number;
+  reason?: string;
+  [key: string]: unknown;
 }
 
-/** `GET /payroll/current` — the in-progress or most recently generated payroll run covering this employee. */
-export interface CurrentPayroll {
-  id: ID;
-  period_start: string;
-  period_end: string;
-  base_amount: number;
-  deductions_total: number;
-  incentives_total: number;
-  net_amount: number;
-  status: string;
-}
-
-export interface Payslip {
-  id: ID;
-  period_start: string;
-  period_end: string;
-  net_amount: number;
-  issued_at: string;
-}
-
-/** `GET /summary-payslips` — shape is a total guess; nothing in the collection or neighboring routes suggests a structure. */
 export interface PayslipsSummary {
-  total_net: number;
-  count: number;
-}
-
-// ── Performance ─────────────────────────────────────────────────────────
-
-export interface Evaluation {
-  id: ID;
-  period_start: string;
-  period_end: string;
-  score: number | null;
-  status: string;
-  comments: string | null;
+  [key: string]: unknown;
 }
 
 // ── Overtime ────────────────────────────────────────────────────────────
-//
-// The collection has no saved response example for any overtime route.
-// `status` is modeled on `LeaveRequestStatus` (pending/approved/rejected)
-// since "Approve"/"Reject" actions exist elsewhere in the collection for
-// manager/HR, implying the same three-state workflow.
 
-export interface OvertimeRequest {
-  id: ID;
-  date: string;
-  start_time: string;
-  end_time: string;
-  notes: string;
-  status: LeaveRequestStatus;
-}
-
-/** Body for `POST /store-overtime-byemployee` — multipart per the collection's example. */
 export interface CreateOvertimePayload {
   date: string;
   start_time: string;
@@ -319,49 +345,108 @@ export interface CreateOvertimePayload {
   notes?: string;
 }
 
-// ── Termination requests ───────────────────────────────────────────────
-//
-// `type`/`subtype` are free text in the collection's one example
-// ("immediate" / "misconduct") with no enum documented anywhere, so both
-// are typed as plain strings rather than a guessed-at closed set.
-
-export interface TerminationRequest {
+export interface Overtime {
   id: ID;
-  type: string;
-  termination_date: string;
-  subtype: string;
-  legal_reason: string;
-  status: string;
-  created_at?: string;
-}
-
-/** Body for `POST /store-termination` — multipart per the collection's example. `user_id` is filled in from the signed-in user, not user-entered. */
-export interface CreateTerminationPayload {
-  user_id: number;
-  type: string;
-  termination_date: string;
-  subtype: string;
-  legal_reason: string;
+  user_id?: ID;
+  date?: string;
+  start_time?: string;
+  end_time?: string;
+  notes?: string;
+  status?: string;
+  [key: string]: unknown;
 }
 
 // ── Complaints ──────────────────────────────────────────────────────────
-//
-// `status` is modeled on the admin-only "mark-under-review" action visible
-// elsewhere in the collection, implying at least pending → under_review →
-// some resolved state, but the resolved state's exact name is unconfirmed.
 
-export interface Complaint {
-  id: ID;
-  subject_id: number;
-  title: string;
-  description: string;
-  status: string;
-  created_at?: string;
-}
-
-/** Body for `POST /complaints`. `subject_id` is the numeric ID of the person the complaint concerns — the collection gives no employee-facing lookup for this, so the form takes it as a raw ID. */
 export interface CreateComplaintPayload {
   subject_id: number;
   title: string;
   description: string;
+}
+
+export interface Complaint {
+  id: ID;
+  subject_id?: ID;
+  title: string;
+  description: string;
+  status?: string;
+  created_at?: string;
+  [key: string]: unknown;
+}
+
+// ── Notifications ───────────────────────────────────────────────────────
+
+/**
+ * CONFIRMED via live backend testing: this is Laravel's default database
+ * notification shape — the human-readable text lives at `data.message`
+ * (each notification type packs its own fields in there), not at a
+ * top-level `title`/`message`.
+ */
+export interface AppNotification {
+  id: string;
+  type?: string;
+  data?: { message?: string; [key: string]: unknown };
+  read_at?: string | null;
+  created_at?: string;
+  [key: string]: unknown;
+}
+
+// ── Announcements ───────────────────────────────────────────────────────
+
+export interface Announcement {
+  id: ID;
+  title: string;
+  content: string;
+  priority?: string;
+  target_audience?: string;
+  starts_at?: string;
+  expires_at?: string;
+  [key: string]: unknown;
+}
+
+// ── People directory (for picking a complaint subject, etc.) ─────────────
+
+/**
+ * CONFIRMED via live backend testing: `GET /users/employees` and
+ * `GET /users/managers` both return this shape for a real employee
+ * account. Names aren't unique in this dataset (multiple
+ * "employeeMarketing" entries with different emails), so any UI built on
+ * this must key/display by more than just `name`.
+ */
+export interface Colleague {
+  id: ID;
+  name: string;
+  email: string;
+  department?: string | null;
+  job_title?: string | null;
+  status?: string;
+  profile_id?: ID | null;
+  role: "employee" | "manager";
+}
+
+// ── Resignations ────────────────────────────────────────────────────────
+
+/**
+ * Only `"immediate"` is CONFIRMED valid (the collection's example payload,
+ * verified live). A probe with `"notice"` got
+ * `422 "The selected type is invalid."` — so that guess was wrong, and the
+ * full valid enum isn't known. Typed as a plain string rather than a
+ * fabricated enum so the UI doesn't offer options that don't exist.
+ */
+export type ResignationType = "immediate" | string;
+
+export interface CreateResignationPayload {
+  type: ResignationType;
+  reason: string;
+}
+
+export interface Resignation {
+  id: ID;
+  type?: string;
+  reason?: string;
+  status?: string;
+  hr_classification?: string | null;
+  hr_classification_notes?: string | null;
+  created_at?: string;
+  [key: string]: unknown;
 }

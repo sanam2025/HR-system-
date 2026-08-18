@@ -20,33 +20,27 @@ export function useTasks(
   });
 }
 
-export function useTask(id: number | string | undefined) {
+export function useTask(id: number) {
   return useQuery({
-    queryKey: queryKeys.tasks.show(id ?? ""),
-    queryFn: () => api.getTask(id as number | string),
-    enabled: id !== undefined,
+    queryKey: queryKeys.tasks.detail(id),
+    queryFn: () => api.getTask(id),
+    enabled: Number.isFinite(id),
   });
 }
 
 export function useStartTask() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: number | string) => api.startTask(id),
-    onSuccess: (_data, id) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.show(id) });
-    },
+    mutationFn: (id: number) => api.startTask(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all }),
   });
 }
 
 export function useSubmitTask() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, payload }: { id: number | string; payload: SubmitTaskPayload }) =>
+    mutationFn: ({ id, payload }: { id: number; payload: SubmitTaskPayload }) =>
       api.submitTask(id, payload),
-    onSuccess: (_data, { id }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.show(id) });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all }),
   });
 }

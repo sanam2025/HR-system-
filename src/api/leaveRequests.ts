@@ -1,4 +1,4 @@
-import { httpClient, unwrap } from "../lib/http/client";
+import { getListOrEmpty, httpClient, unwrap } from "../lib/http/client";
 import { endpoints } from "./endpoints";
 import type { RequestOptions } from "../lib/http/client";
 import type { MessageResponse } from "../lib/http/types";
@@ -48,13 +48,13 @@ export async function listMyLeaveRequests(
   params: { status?: LeaveRequestStatus } = {},
   options?: RequestOptions
 ): Promise<LeaveRequest[]> {
-  const response = await httpClient.get(endpoints.leaveRequests.mine, {
+  return getListOrEmpty<LeaveRequest>(endpoints.leaveRequests.mine, {
     ...options,
     params: { ...params, ...options?.params },
   });
-  return unwrap<LeaveRequest[]>(response);
 }
 
+/** The signed-in employee's own leave balance. */
 export async function getMyLeaveBalance(options?: RequestOptions): Promise<LeaveBalance> {
   const response = await httpClient.get(endpoints.leaveRequests.myBalance, options);
   return unwrap<LeaveBalance>(response);

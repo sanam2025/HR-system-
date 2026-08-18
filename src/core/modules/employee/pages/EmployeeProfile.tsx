@@ -5,6 +5,8 @@ import {
   ProfileForm,
   DocumentsCard,
   EmploymentStatusCard,
+  ChangePasswordCard,
+  ResignationCard,
 } from "../components/speciel-components/ProfileComponents";
 import { LoadingSkeleton, QueryErrorNotice } from "../components/commend-components";
 import { useMyProfile, useCreateProfile, useUpdateProfile } from "../../../../api/hooks/useProfiles";
@@ -13,6 +15,8 @@ import {
   useUploadOnboardingDocuments,
   useOnboardingStatus,
 } from "../../../../api/hooks/useOnboarding";
+import { useChangePassword } from "../../../../api/hooks/useAuth";
+import { useCreateResignation, useMyResignations } from "../../../../api/hooks/useResignations";
 import useAuthStore from "../../../../store/authStore";
 import { ApiError } from "../../../../lib/http/ApiError";
 import type { CreateProfilePayload, UpdateProfilePayload } from "../../../../api/models";
@@ -29,6 +33,11 @@ export default function EmployeeProfile() {
   const updateProfile = useUpdateProfile(profileQuery.data?.id ?? 0);
   const uploadDocuments = useUploadOnboardingDocuments();
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
+  const changePassword = useChangePassword();
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
+  const myResignations = useMyResignations();
+  const createResignation = useCreateResignation();
+  const [resignationSuccess, setResignationSuccess] = useState<string | null>(null);
 
   const profileNotFound =
     profileQuery.isError && (profileQuery.error as ApiError).kind === "not_found";
@@ -57,16 +66,32 @@ export default function EmployeeProfile() {
     });
   }
 
+  function handleChangePassword(payload: { password: string; password_confirmation: string }) {
+    setPasswordSuccess(null);
+    changePassword.mutate(payload, {
+      onSuccess: (response) => {
+        setPasswordSuccess(response?.message ?? "Password updated successfully.");
+      },
+    });
+  }
+
+  function handleCreateResignation(payload: { type: string; reason: string }) {
+    setResignationSuccess(null);
+    createResignation.mutate(payload, {
+      onSuccess: () => {
+        setResignationSuccess("Resignation submitted.");
+      },
+    });
+  }
+
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in">
       <ProfileHeader
         fullName={user?.fullName ?? "Employee"}
         pictureUrl={profileQuery.data?.picture_url ?? null}
-        jobTitle={
-          (profileQuery.data as any)?.title ?? (profileQuery.data as any)?.job_title ?? null
-        }
-        department={(profileQuery.data as any)?.department ?? null}
-        employeeId={(profileQuery.data as any)?.employee_id ?? (profileQuery.data as any)?.employeeId ?? null}
+        jobTitle={null}
+        department={profileQuery.data?.department ?? null}
+        employeeId={null}
         onEditToggle={() => setIsEditing((prev) => !prev)}
         isEditing={isEditing}
       />
@@ -128,8 +153,25 @@ export default function EmployeeProfile() {
       ) : contractQuery.isError ? (
         <QueryErrorNotice message={(contractQuery.error as ApiError).message} />
       ) : (
-        <EmploymentStatusCard contract={contractQuery.data} />
+        <EmploymentStatusCard contract={contractQuery.data} managerName={profileQuery.data?.manager} />
       )}
+
+      <ChangePasswordCard
+        onSubmit={handleChangePassword}
+        isSubmitting={changePassword.isPending}
+        errorMessage={(changePassword.error as ApiError | null)?.message ?? null}
+        successMessage={passwordSuccess}
+      />
+
+      <ResignationCard
+        resignations={myResignations.data}
+        isLoading={myResignations.isLoading}
+        errorMessage={(myResignations.error as ApiError | null)?.message ?? null}
+        onSubmit={handleCreateResignation}
+        isSubmitting={createResignation.isPending}
+        submitError={(createResignation.error as ApiError | null)?.message ?? null}
+        successMessage={resignationSuccess}
+      />
     </div>
   );
 }

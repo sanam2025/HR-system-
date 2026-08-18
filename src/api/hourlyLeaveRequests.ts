@@ -1,4 +1,4 @@
-import { httpClient, unwrap } from "../lib/http/client";
+import { getListOrEmpty, httpClient, unwrap } from "../lib/http/client";
 import { endpoints } from "./endpoints";
 import type { RequestOptions } from "../lib/http/client";
 import type { MessageResponse } from "../lib/http/types";
@@ -47,9 +47,8 @@ export async function listMyHourlyLeaveRequests(
   params: { status?: LeaveRequestStatus } = {},
   options?: RequestOptions
 ): Promise<HourlyLeaveRequest[]> {
-  const response = await httpClient.get(endpoints.hourlyLeaveRequests.mine, {
+  return getListOrEmpty<HourlyLeaveRequest>(endpoints.hourlyLeaveRequests.mine, {
     ...options,
     params: { ...params, ...options?.params },
   });
-  return unwrap<HourlyLeaveRequest[]>(response);
 }

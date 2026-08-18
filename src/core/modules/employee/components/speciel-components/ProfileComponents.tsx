@@ -1,7 +1,17 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Upload } from "lucide-react";
-import type { Contract, CreateProfilePayload, Gender, Profile, UpdateProfilePayload } from "../../../../../api/models";
+import { DoorOpen, KeyRound, Upload } from "lucide-react";
+import { Badge, LoadingSkeleton, QueryErrorNotice } from "../commend-components";
+import { humanizeStatus } from "../../../../../lib/text";
+import type {
+  Contract,
+  CreateProfilePayload,
+  CreateResignationPayload,
+  Gender,
+  Profile,
+  Resignation,
+  UpdateProfilePayload,
+} from "../../../../../api/models";
 
 function initialsFrom(name: string): string {
   return name
@@ -10,6 +20,41 @@ function initialsFrom(name: string): string {
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
     .join("");
+}
+
+/**
+ * CONFIRMED via live backend testing: after a profile picture upload, the
+ * `picture` URL the backend returns points at the request's temp-upload
+ * path (e.g. `.../storage//home/masarhr/admin/tmp/phpXXXXXXXX`) instead of
+ * wherever the file actually got persisted — a backend bug, not a request
+ * problem (the multipart upload itself succeeds). That temp file is gone
+ * by the time the browser requests it, so the `<img>` would otherwise show
+ * a broken-image icon forever. Falls back to initials instead once the
+ * image fails to load, and remembers the failure per URL so a legitimate
+ * new picture (a different URL) gets a fresh attempt.
+ */
+function ProfileAvatar({ fullName, pictureUrl }: { fullName: string; pictureUrl?: string | null }) {
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const showImage = pictureUrl && pictureUrl !== failedUrl;
+
+  return (
+    <div
+      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-green flex items-center justify-center text-white text-xl sm:text-2xl font-bold flex-shrink-0 overflow-hidden"
+      aria-label={`${fullName}'s avatar`}
+    >
+      {showImage ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={pictureUrl}
+          alt={`${fullName} picture`}
+          className="w-full h-full object-cover"
+          onError={() => setFailedUrl(pictureUrl)}
+        />
+      ) : (
+        initialsFrom(fullName)
+      )}
+    </div>
+  );
 }
 
 export function ProfileHeader({
@@ -31,17 +76,7 @@ export function ProfileHeader({
 }) {
   return (
     <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50 flex flex-col sm:flex-row items-center gap-4 sm:gap-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md animate-scale-in">
-      <div
-        className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-green flex items-center justify-center text-white text-xl sm:text-2xl font-bold flex-shrink-0 overflow-hidden"
-        aria-label={`${fullName}'s avatar`}
-      >
-        {pictureUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={pictureUrl} alt={`${fullName} picture`} className="w-full h-full object-cover" />
-        ) : (
-          initialsFrom(fullName)
-        )}
-      </div>
+      <ProfileAvatar fullName={fullName} pictureUrl={pictureUrl} />
       <div className="flex-1 min-w-0 text-center sm:text-left">
         <h2 className="text-lg sm:text-xl font-bold text-dark truncate">{fullName}</h2>
         {jobTitle || department || employeeId ? (
@@ -350,7 +385,102 @@ export function DocumentsCard({
   );
 }
 
-export function EmploymentStatusCard({ contract }: { contract: Contract | undefined | null }) {
+export interface ChangePasswordCardProps {
+  onSubmit: (payload: { password: string; password_confirmation: string }) => void;
+  isSubmitting: boolean;
+  errorMessage?: string | null;
+  successMessage?: string | null;
+}
+
+export function ChangePasswordCard({
+  onSubmit,
+  isSubmitting,
+  errorMessage,
+  successMessage,
+}: ChangePasswordCardProps) {
+  const [password, setPassword] = useState("");
+  const [confirmation, setConfirmation] = useState("");
+  const mismatch = confirmation.length > 0 && password !== confirmation;
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!password || mismatch) return;
+    onSubmit({ password, password_confirmation: confirmation });
+    setPassword("");
+    setConfirmation("");
+  }
+
+  return (
+    <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50">
+      <h3 className="flex items-center gap-2 text-sm font-semibold text-dark mb-3 sm:mb-4">
+        <KeyRound size={16} aria-hidden="true" />
+        Change Password
+      </h3>
+      <form onSubmit={handleSubmit} className="space-y-3">
+        {errorMessage && (
+          <p role="alert" className="text-xs text-red-600">
+            {errorMessage}
+          </p>
+        )}
+        {successMessage && (
+          <p role="status" className="text-xs text-green-600">
+            {successMessage}
+          </p>
+        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label htmlFor="new-password" className="block text-xs text-gray-500 mb-1">
+              New password
+            </label>
+            <input
+              id="new-password"
+              type="password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green/30 focus:border-green"
+            />
+          </div>
+          <div>
+            <label htmlFor="confirm-password" className="block text-xs text-gray-500 mb-1">
+              Confirm password
+            </label>
+            <input
+              id="confirm-password"
+              type="password"
+              required
+              minLength={8}
+              value={confirmation}
+              onChange={(e) => setConfirmation(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green/30 focus:border-green"
+            />
+          </div>
+        </div>
+        {mismatch && <p className="text-xs text-red-600">Passwords do not match.</p>}
+        <button
+          type="submit"
+          disabled={isSubmitting || mismatch}
+          className="w-full py-2.5 bg-green text-white rounded-xl text-sm font-medium hover:bg-green-dark transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? "Updating…" : "Update Password"}
+        </button>
+      </form>
+    </section>
+  );
+}
+
+export function EmploymentStatusCard({
+  contract,
+  managerName,
+}: {
+  contract: Contract | undefined | null;
+  // CONFIRMED via live backend testing: `GET /profiles` includes a
+  // `manager` field (the manager's name) — this used to be flagged as
+  // unavailable, but it just lives on the profile response, not the
+  // contract one.
+  managerName?: string | null;
+}) {
   return (
     <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
       <h3 className="text-sm font-semibold text-dark mb-4 sm:mb-5">Employment Status</h3>
@@ -372,12 +502,120 @@ export function EmploymentStatusCard({ contract }: { contract: Contract | undefi
           </div>
           <div>
             <p className="text-xs text-gray-400 mb-1">Manager</p>
-            <p className="text-sm text-gray-400">
-              Not available from the API yet — see CHANGELOG.md.
-            </p>
+            {managerName ? (
+              <p className="text-sm font-medium text-dark">{managerName}</p>
+            ) : (
+              <p className="text-sm text-gray-400">Not available from the API yet.</p>
+            )}
           </div>
         </div>
       )}
+    </section>
+  );
+}
+
+function resignationStatusVariant(status?: string): "success" | "warning" | "danger" | "default" {
+  const normalized = (status ?? "").toLowerCase();
+  if (normalized === "approved" || normalized === "accepted") return "success";
+  if (normalized === "rejected" || normalized === "cancelled") return "danger";
+  if (normalized.startsWith("pending")) return "warning";
+  return "default";
+}
+
+export interface ResignationCardProps {
+  resignations: Resignation[] | undefined;
+  isLoading: boolean;
+  errorMessage?: string | null;
+  onSubmit: (payload: CreateResignationPayload) => void;
+  isSubmitting: boolean;
+  submitError?: string | null;
+  successMessage?: string | null;
+}
+
+/**
+ * Only `"immediate"` is a CONFIRMED valid resignation `type` (see
+ * `CreateResignationPayload` in models.ts) — the dropdown only offers what's
+ * actually known to work rather than guessing at the rest of the enum.
+ */
+export function ResignationCard({
+  resignations,
+  isLoading,
+  errorMessage,
+  onSubmit,
+  isSubmitting,
+  submitError,
+  successMessage,
+}: ResignationCardProps) {
+  const [reason, setReason] = useState("");
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!reason) return;
+    onSubmit({ type: "immediate", reason });
+    setReason("");
+  }
+
+  return (
+    <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50">
+      <h3 className="flex items-center gap-2 text-sm font-semibold text-dark mb-3 sm:mb-4">
+        <DoorOpen size={16} aria-hidden="true" />
+        Resignation
+      </h3>
+
+      {isLoading ? (
+        <LoadingSkeleton lines={2} />
+      ) : errorMessage ? (
+        <QueryErrorNotice message={errorMessage} />
+      ) : resignations && resignations.length > 0 ? (
+        <div className="space-y-2 mb-4">
+          {resignations.map((r) => (
+            <div key={r.id} className="flex items-center justify-between gap-3 p-3 rounded-xl bg-gray-50">
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-dark truncate">{r.reason}</p>
+                {r.created_at && <p className="text-xs text-gray-400">{r.created_at}</p>}
+              </div>
+              {r.status && (
+                <Badge variant={resignationStatusVariant(r.status)}>{humanizeStatus(r.status)}</Badge>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-gray-400 mb-4">You haven't submitted a resignation.</p>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-3">
+        {submitError && (
+          <p role="alert" className="text-xs text-red-600">
+            {submitError}
+          </p>
+        )}
+        {successMessage && (
+          <p role="status" className="text-xs text-green-600">
+            {successMessage}
+          </p>
+        )}
+        <div>
+          <label htmlFor="resignation-reason" className="block text-xs text-gray-500 mb-1">
+            Reason for immediate resignation
+          </label>
+          <textarea
+            id="resignation-reason"
+            required
+            rows={3}
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm text-dark focus:outline-none focus:ring-2 focus:ring-green/30 focus:border-green"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-xl text-sm font-medium hover:bg-red-100 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? "Submitting…" : "Submit Immediate Resignation"}
+        </button>
+      </form>
     </section>
   );
 }

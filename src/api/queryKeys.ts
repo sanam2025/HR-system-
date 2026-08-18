@@ -21,9 +21,6 @@ export const queryKeys = {
   attendance: {
     all: ["attendance"] as const,
     myMonthly: () => [...queryKeys.attendance.all, "my-monthly"] as const,
-    filtered: (params: Record<string, unknown>) =>
-      [...queryKeys.attendance.all, "filtered", params] as const,
-    percentage: () => [...queryKeys.attendance.all, "percentage"] as const,
   },
   leaveRequests: {
     all: ["leave-requests"] as const,
@@ -43,49 +40,40 @@ export const queryKeys = {
   tasks: {
     all: ["tasks"] as const,
     list: (params: Record<string, unknown>) => [...queryKeys.tasks.all, "list", params] as const,
-    show: (id: number | string) => [...queryKeys.tasks.all, "show", id] as const,
-  },
-  notifications: {
-    all: ["notifications"] as const,
-    list: () => [...queryKeys.notifications.all, "list"] as const,
-  },
-  baseSalaries: {
-    all: ["baseSalaries"] as const,
-    mine: () => [...queryKeys.baseSalaries.all, "mine"] as const,
-  },
-  deductions: {
-    all: ["deductions"] as const,
-    mine: () => [...queryKeys.deductions.all, "mine"] as const,
-  },
-  incentives: {
-    all: ["incentives"] as const,
-    mine: () => [...queryKeys.incentives.all, "mine"] as const,
+    detail: (id: number) => [...queryKeys.tasks.all, "detail", id] as const,
   },
   payroll: {
     all: ["payroll"] as const,
-    current: () => [...queryKeys.payroll.all, "current"] as const,
-  },
-  payslips: {
-    all: ["payslips"] as const,
-    mine: () => [...queryKeys.payslips.all, "mine"] as const,
-    currentMonth: () => [...queryKeys.payslips.all, "current-month"] as const,
-    summary: () => [...queryKeys.payslips.all, "summary"] as const,
-    show: (id: number | string) => [...queryKeys.payslips.all, "show", id] as const,
-  },
-  evaluations: {
-    all: ["evaluations"] as const,
-    mine: () => [...queryKeys.evaluations.all, "mine"] as const,
+    myPayslips: () => [...queryKeys.payroll.all, "my-payslips"] as const,
+    currentMonthPayslips: () => [...queryKeys.payroll.all, "current-month-payslips"] as const,
+    payslipsSummary: () => [...queryKeys.payroll.all, "payslips-summary"] as const,
+    myBaseSalaries: () => [...queryKeys.payroll.all, "my-base-salaries"] as const,
+    myDeductions: () => [...queryKeys.payroll.all, "my-deductions"] as const,
+    myIncentives: () => [...queryKeys.payroll.all, "my-incentives"] as const,
   },
   overtime: {
     all: ["overtime"] as const,
     mine: () => [...queryKeys.overtime.all, "mine"] as const,
   },
-  termination: {
-    all: ["termination"] as const,
-    mine: () => [...queryKeys.termination.all, "mine"] as const,
-  },
   complaints: {
     all: ["complaints"] as const,
     mine: () => [...queryKeys.complaints.all, "mine"] as const,
+  },
+  notifications: {
+    all: ["notifications"] as const,
+    list: () => [...queryKeys.notifications.all, "list"] as const,
+  },
+  announcements: {
+    all: ["announcements"] as const,
+    active: () => [...queryKeys.announcements.all, "active"] as const,
+  },
+  people: {
+    all: ["people"] as const,
+    employees: () => [...queryKeys.people.all, "employees"] as const,
+    managers: () => [...queryKeys.people.all, "managers"] as const,
+  },
+  resignations: {
+    all: ["resignations"] as const,
+    mine: () => [...queryKeys.resignations.all, "mine"] as const,
   },
 } as const;

@@ -11,7 +11,6 @@ export default function AppLayout({
   user,
   navSectionLabel = "Main Menu",
   onSignOut,
-  topbarRightSlot,
 }: {
   navItems: NavItem[];
   pageTitles: Record<string, string>;
@@ -19,7 +18,6 @@ export default function AppLayout({
   user?: { avatar: string; name: string; role: string };
   navSectionLabel?: string;
   onSignOut?: () => void;
-  topbarRightSlot?: React.ReactNode;
 }) {
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -38,12 +36,7 @@ export default function AppLayout({
           onSignOut={onSignOut}
         />
         <div className={`flex-1 flex flex-col overflow-hidden ${sidebarOpen ? 'ml-0 md:ml-64' : 'ml-0 md:ml-16'}`}>
-          <Topbar
-            title={currentTitle}
-            onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-            sidebarOpen={sidebarOpen}
-            rightSlot={topbarRightSlot}
-          />
+          <Topbar title={currentTitle} onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} sidebarOpen={sidebarOpen} />
           <main className="flex-1 overflow-y-auto bg-beige">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
               <Outlet />
