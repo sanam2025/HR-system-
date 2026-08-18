@@ -8,11 +8,16 @@ import { employeeRoutes } from './routes/employeeRoutes';
 import { adminRoutes } from './routes/adminRoutes';
 
 const PublicJobsPage = React.lazy(() => import('@/core/pages/PublicJobs/PublicJobsPage'));
+const Login = React.lazy(() => import('@/core/modules/auth/Login'));
 
 const appRouter = createBrowserRouter([
   {
     path: "/",
     element: <Navigate to="/Hr" replace />
+  },
+  {
+    path: "/login",
+    element: <SuspenseWrapper><Login /></SuspenseWrapper>
   },
   hrRoutes,
   {
