@@ -51,7 +51,8 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
             }
     
             await AddAnnouncement(data);
-            toast.success('Announcemet Added successfully')
+            toast.success('Announcemet Added successfully');
+            setIsModalOpen(false);
         }catch (e: any) {
             console.error('Full error:', e);
             

@@ -27,6 +27,7 @@ function DeleteForm({
             if(holiday && holiday.id){
                 const  response = await deleteHoliday(holiday?.id)
                 toast.success(response.data);
+                setIsModalOpen(false);
             }
         }
         catch(e: any){

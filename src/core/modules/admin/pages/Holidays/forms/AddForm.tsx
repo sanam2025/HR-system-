@@ -47,7 +47,8 @@ function AddForm({isOpen , setIsModalOpen} : AddFromProps) {
             };
 
             const response = await create(submitData);
-            toast.success(response.data.message)
+            toast.success(response.data.message);
+            setIsModalOpen(false);
 
         }catch(e: any){
             toast.error(e as string);

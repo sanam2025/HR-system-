@@ -77,6 +77,7 @@ function UpdateForm({
 
             const response = await editHoliday({id:holidayData?.id , updatedData:editData})
             toast.success(response.data.message);
+            setIsModalOpen(false);
         }
         catch (e: any) {
             console.error('Full error:', e);
