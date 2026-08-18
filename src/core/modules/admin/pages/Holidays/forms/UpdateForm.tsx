@@ -1,7 +1,7 @@
 import { CalendarIcon, Edit, FileText, Tag, X } from 'lucide-react'
 import React, { useState } from 'react'
 import { useUpdateHoliday } from '../../../hooks/Holidays/useHolidaysMutation'
-import { toast } from 'react-toastify'
+import toast from 'react-hot-toast';
 import Loading from '../../../../../../shared/components/Loading'
 import type { Holidays } from '../../../types/types'
 
@@ -93,7 +93,7 @@ function UpdateForm({
                     const errorMessages = Object.values(errors).flat();
                     toast.error(errorMessages[0] as string || 'Validation error');
                 } else {
-                    toast.error(errorMessage);
+                    toast.error(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
                 }
             } else if (e.request) {
                 toast.error('No response from server. Please check your connection.');

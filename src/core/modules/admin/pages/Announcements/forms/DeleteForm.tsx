@@ -1,7 +1,7 @@
 import { Trash2 } from 'lucide-react'
 import Loading from '../../../../../../shared/components/Loading'
 import type { Announcements } from '../../../types/types'
-import { toast } from 'react-toastify'
+import toast from 'react-hot-toast';
 import { useDeleteAnnouncement } from '../../../hooks/Announcements/useAnnouncementsMutation'
 
 type DeleteFormProps = {

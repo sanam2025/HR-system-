@@ -2,7 +2,7 @@ import { Trash2} from 'lucide-react'
 import Loading from '../../../../../../shared/components/Loading'
 import { useDeleteHolidays } from '../../../hooks/Holidays/useHolidaysMutation'
 import type { Holidays } from '../../../types/types'
-import { toast } from 'react-toastify'
+import toast from 'react-hot-toast';
 
 
 type DeleteFormProps = {

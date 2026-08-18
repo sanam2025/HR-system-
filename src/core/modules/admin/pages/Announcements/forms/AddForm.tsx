@@ -1,6 +1,6 @@
 import { CalendarIcon, FileText, Plus, Tag, X, Users, AlertCircle, Clock } from 'lucide-react'
 import { useState } from 'react'
-import { toast } from 'react-toastify'
+import toast from 'react-hot-toast';
 import { useCreateAnnouncemet } from '../../../hooks/Announcements/useAnnouncementsMutation'
 import type { CreateAnnouncemetPayload } from '../../../types/types'
 

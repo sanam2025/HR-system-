@@ -5,7 +5,7 @@ import AnnouncementsShow from './AnnouncemetsShowPage';
 import { formatDate, getPriorityStyles, getStatusStyles, getTargetAudienceLabel } from '../../../util/utils';
 import UpdateAnnouncementForm from '../forms/UpdateForm';
 import DeleteForm from '../forms/DeleteForm';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import Loading from '../../../../../../shared/components/Loading';
 import { usePublishAnnouncemet } from '../../../hooks/Announcements/useAnnouncementsMutation';
 

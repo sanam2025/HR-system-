@@ -1,6 +1,6 @@
 import { CalendarIcon, FileText, Plus, Tag, X } from 'lucide-react'
 import { useState } from 'react'
-import { toast } from 'react-toastify'
+import toast from 'react-hot-toast';
 import { useCreateHolidays } from '../../../hooks/Holidays/useHolidaysMutation'
 import type { HolidaysType } from '../../../types/types'
 

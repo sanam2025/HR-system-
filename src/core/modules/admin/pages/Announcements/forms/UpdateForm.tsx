@@ -1,6 +1,6 @@
 import { CalendarIcon, Edit, FileText, Tag, X, Users, AlertCircle, Clock } from 'lucide-react'
 import React, { useState } from 'react'
-import { toast } from 'react-toastify'
+import toast from 'react-hot-toast';
 import Loading from '../../../../../../shared/components/Loading'
 import type { Announcements, AnnouncementsPriority, AnnouncementsTargetAudience } from '../../../types/types'
 import { useUpdateAnnouncement } from '../../../hooks/Announcements/useAnnouncementsMutation'
