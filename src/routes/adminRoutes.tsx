@@ -9,6 +9,7 @@ const AdminAnnouncements = React.lazy(() => import('@/core/modules/admin/pages/A
 const OrganizationlStructure = React.lazy(() => import('@/core/modules/admin/pages/Organization/OrganizationlStructure'));
 const EmployeeSearch = React.lazy(() => import('@/core/modules/admin/pages/Employees/EmployeeSearch'));
 const AdminHolidays = React.lazy(() => import('@/core/modules/admin/pages/Holidays/Holidays'));
+const Reports = React.lazy(() => import('@/core/modules/admin/pages/Reports'));
 const Overview = React.lazy(() => import('@/core/modules/admin/pages/Overview/Overview'));
 const AdminTerminations = React.lazy(() => import('@/core/modules/admin/pages/Terminations/Termination'));
 const MyProfile = React.lazy(() => import('@/core/modules/employee/pages/EmployeeProfile'));
@@ -22,6 +23,7 @@ export const adminRoutes = {
     { path: 'setting', element: <SuspenseWrapper><SystemSettings /></SuspenseWrapper> },
     { path: 'announcement', element: <SuspenseWrapper><AdminAnnouncements /></SuspenseWrapper> },
     { path: 'organization', element: <SuspenseWrapper><OrganizationlStructure /></SuspenseWrapper> },
+    { path: 'report', element: <SuspenseWrapper><Reports /></SuspenseWrapper> },
     { path: 'search', element: <SuspenseWrapper><EmployeeSearch /></SuspenseWrapper> },
     { path: 'holidays', element: <SuspenseWrapper><AdminHolidays /></SuspenseWrapper> },
     // ── New routes from AdminBranch ──
