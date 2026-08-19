@@ -1,5 +1,7 @@
 import { Plus } from 'lucide-react'
 import type { Payrolls } from '../../types/types';
+import { useGeneratePayroll } from '../../hooks/Overview/useOverviewMutations';
+import { toast } from 'react-toastify';
 
 
 type PayrollTableProps = {
@@ -11,13 +13,26 @@ function PayrollTable({
 }: PayrollTableProps) {
     const currentMonth = new Date().toLocaleString("default", { month: "long" });
     const currentYear = new Date().getFullYear();
+    const {mutateAsync: generate , isPending} = useGeneratePayroll();
+
+    const handleGenerate = async() =>{
+        try{
+        await generate();
+        
+        toast.success('Generate sucessfull');
+        }catch(e){
+        console.error(e)
+        toast.error('Error: ' + e)
+        }
+    }
+
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
         <h3 className="font-semibold text-gray-800">All Payroll Records</h3>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2 text-sm">
+        <button onClick={handleGenerate} className="bg-blue-600 disabled:opacity-50 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2 text-sm">
         <Plus className="w-4 h-4" />
-        Generate Payroll for {currentMonth} {currentYear}
+        {isPending ? 'Generating...' : `Generate Payroll for ${currentMonth} ${currentYear}`}
         </button>
     </div>
     <div className="overflow-x-auto">

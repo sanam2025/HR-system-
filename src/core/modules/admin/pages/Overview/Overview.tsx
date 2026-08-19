@@ -15,6 +15,8 @@ import PayrollTable from "./PayrollTable";
 import CurrentPayroll from "./cards/CurrentPayroll";
 
 import Skeleton from "./Skeleton";
+import { useGeneratePayroll } from "../../hooks/Overview/useOverviewMutations";
+import { toast } from "react-toastify";
 
 export default function Overview() {
   const { data: payrolls, isLoading: isLoadingPayrolls } = usePayrolls();
@@ -32,6 +34,7 @@ export default function Overview() {
   const hasPayrolls = payrolls?.data && payrolls.data.length > 0;
   const hasPrecentages = precentages && Object.keys(precentages).length > 0;
   const hasCurrentPayroll = currentPayroll?.data && Object.keys(currentPayroll.data).length > 0;
+
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
@@ -103,20 +106,8 @@ export default function Overview() {
         </div>
       )}
 
-      {hasPayrolls ? (
+      {hasPayrolls && (
         <PayrollTable payrollHistory={payrolls?.data} />
-      ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-          <div className="flex flex-col items-center">
-            <Users className="w-12 h-12 text-gray-300 mb-3" />
-            <p className="text-gray-500 text-lg">No payroll records found</p>
-            <p className="text-gray-400 text-sm mt-1">Generate your first payroll to get started</p>
-            <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2 text-sm">
-              <Plus className="w-4 h-4" />
-              Generate Payroll
-            </button>
-          </div>
-        </div>
       )}
     </div>
   );

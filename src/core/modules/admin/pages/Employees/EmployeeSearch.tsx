@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { useEmployees, useEmployeesSearch, useTopRateEmplyees } from "../../hooks/Employees/useEmployees";
 import EmployeeSkeleton from "./EmployeeSkeleton";
-import StatsCards from "./stats/StatsCards";
+// import StatsCards from "./stats/StatsCards";
 import EmployeeList from "./list/EmployeeList";
 import TopEmployeesSection from "./TopEmployeesSection";
 import type { UserStatus } from "../../../auth/Types/types";
@@ -134,7 +134,7 @@ export default function EmployeeSearch() {
         isLoadingTopRate={isLoadingTopRate}
       />
 
-      <StatsCards employees={displayData} />
+      {/* <StatsCards employees={displayData} /> */}
       
       <EmployeeList 
         employees={displayData} 
