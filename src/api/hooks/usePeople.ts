@@ -34,3 +34,33 @@ export function usePeopleDirectory() {
     error: employees.error ?? managers.error,
   };
 }
+
+/**
+ * Fetches only the members (manager and colleagues) in the current employee's department.
+ */
+export function useDepartmentMembers() {
+  const query = useQuery({
+    queryKey: [...queryKeys.people.all, "department"],
+    queryFn: () => api.listDepartmentMembers(),
+  });
+
+  const people: Colleague[] = [];
+  
+  if (query.data) {
+    if (query.data.manager) {
+      people.push({ ...query.data.manager, role: "manager" });
+    }
+    if (Array.isArray(query.data.colleagues)) {
+      query.data.colleagues.forEach((c) => {
+        people.push({ ...c, role: "employee" });
+      });
+    }
+  }
+
+  return {
+    people,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    error: query.error,
+  };
+}

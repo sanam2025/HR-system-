@@ -140,17 +140,9 @@ export const endpoints = {
   },
 
   people: {
-    // CONFIRMED via live backend testing (2026-08-18, employee-role
-    // account): both of these return 200 for a plain employee, despite
-    // having no "employee" suffix in the collection (unlike most other
-    // self-service routes) — used to let an employee pick who a complaint
-    // is about by name instead of typing a raw user id (a complaint is
-    // very often about a manager, so managers need to be selectable too).
-    // `search-employees` and `by-role-users` were also tried and confirmed
-    // 403 "User does not have the right roles." for the same account —
-    // those two really are manager/HR/admin only.
     employees: "users/employees",
     managers: "users/managers",
+    departmentMembers: "getMyDepartmentMembers",
   },
 
   resignations: {

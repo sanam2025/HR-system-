@@ -4,7 +4,7 @@ import { MessageSquareWarning, Search, List } from "lucide-react";
 import { Badge, LoadingSkeleton, QueryErrorNotice } from "../components/commend-components";
 import { PersonPicker } from "../components/speciel-components/PersonPicker";
 import { useCreateComplaint, useMyComplaints } from "../../../../api/hooks/useComplaints";
-import { usePeopleDirectory } from "../../../../api/hooks/usePeople";
+import { useDepartmentMembers } from "../../../../api/hooks/usePeople";
 import { ApiError } from "../../../../lib/http/ApiError";
 import { humanizeStatus } from "../../../../lib/text";
 import type { Colleague } from "../../../../api/models";
@@ -20,7 +20,7 @@ function statusVariant(status?: string): "success" | "warning" | "danger" | "def
 export default function EmployeeComplaints() {
   const myComplaints = useMyComplaints();
   const createComplaint = useCreateComplaint();
-  const directory = usePeopleDirectory();
+  const directory = useDepartmentMembers();
 
   const [subject, setSubject] = useState<Colleague | null>(null);
   const [title, setTitle] = useState("");
