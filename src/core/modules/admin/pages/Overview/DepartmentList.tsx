@@ -1,6 +1,6 @@
 import { Users } from 'lucide-react'
 import type { Department } from '../../types/types'
-
+import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
 
 type DepartmentListProps = {
     departmentData: Department[] | undefined
@@ -9,10 +9,13 @@ type DepartmentListProps = {
 function DepartmentList({
     departmentData
 }: DepartmentListProps) {
+  const { lang } = useLanguage();
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
     <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-gray-800">Department Overview</h3>
+        <h3 className="font-semibold text-gray-800">
+          {lang === 'ar' ? 'نظرة عامة على الأقسام' : 'Department Overview'}
+        </h3>
         <Users className="w-5 h-5 text-gray-400" />
     </div>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -24,14 +27,15 @@ function DepartmentList({
             <div>
             <p className="font-medium text-gray-800">{dept.name}</p>
             <p className="text-xs text-gray-400">
-                Created: {new Date(dept.created_at).toLocaleDateString()}
+                {lang === 'ar' ? 'تاريخ الإنشاء: ' : 'Created: '}
+                {new Date(dept.created_at).toLocaleDateString(lang === 'ar' ? 'ar-SA' : 'en-US')}
             </p>
             </div>
             <div className="flex items-center gap-2">
             <span className="text-sm font-semibold text-gray-600">
-                {dept.users_count}
+                {dept.users_count || 0}
             </span>
-            <span className="text-xs text-gray-400">employees</span>
+            <span className="text-xs text-gray-400">{lang === 'ar' ? 'موظف' : 'employees'}</span>
             </div>
         </div>
         ))}

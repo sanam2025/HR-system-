@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import type { NavItem } from '../components/SideBar';
 import Sidebar from '../components/SideBar';
@@ -26,7 +26,14 @@ export default function AppLayout({
   const location = useLocation();
   const { dir } = useLanguage();
   const currentUser = useAuthStore(state => state.currentUser);
-  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
+  const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth > 1024);
+
+  // Close sidebar automatically on route change on mobile
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname]);
 
   const userName = currentUser?.name || currentUser?.full_name || currentUser?.user_name || 'User';
   const activeUser = currentUser ? {
@@ -44,7 +51,7 @@ export default function AppLayout({
     defaultTitle;
 
   return (
-    <div className="flex min-h-screen bg-transparent" dir={dir}>
+    <div className="flex min-h-screen bg-transparent w-full overflow-x-hidden" dir={dir}>
       <Sidebar
         open={sidebarOpen}
         onToggle={toggleSidebar}
@@ -53,9 +60,9 @@ export default function AppLayout({
         user={activeUser}
         navSectionLabel={navSectionLabel}
       />
-      <div className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${sidebarOpen ? 'md:ms-64' : 'md:ms-16'}`}>
+      <div className={`flex flex-col flex-1 min-h-screen w-full transition-all duration-300 ${sidebarOpen ? 'md:ms-64' : 'md:ms-16'}`}>
         <Topbar title={title} onToggleSidebar={toggleSidebar} user={activeUser} navItems={navItems} />
-        <main className="flex-1 p-6 pb-16 overflow-x-hidden overflow-y-auto">
+        <main className="flex-1 p-3 sm:p-5 md:p-6 pb-16 overflow-x-hidden overflow-y-auto w-full">
           <Outlet />
         </main>
       </div>

@@ -75,7 +75,8 @@ export function ProfileHeader({
   onEditToggle,
   isEditing,
   onPictureChange,
-  onPictureClick
+  onPictureClick,
+  hasProfile
 }: {
   fullName: string;
   pictureUrl?: string | null;

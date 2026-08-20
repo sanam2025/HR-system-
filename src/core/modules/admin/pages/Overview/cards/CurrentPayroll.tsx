@@ -1,6 +1,7 @@
 // core/modules/Admin/components/cards/CurrentPayroll.tsx
 import type { CurrentPayroll as CurrentPayrollType } from '../../../types/types';
 import { Users, CheckCircle, Clock, Award, MinusCircle } from 'lucide-react';
+import { useLanguage } from '../../../../../../i18n/translations/LanguageContext';
 
 type CurrentPayrollProps = {
   currentPayroll: CurrentPayrollType | undefined;
@@ -9,6 +10,7 @@ type CurrentPayrollProps = {
 function CurrentPayroll({
   currentPayroll
 }: CurrentPayrollProps) {
+  const { lang } = useLanguage();
 
   const colorClasses = {
     emerald: "bg-emerald-50 text-emerald-600",
@@ -20,32 +22,32 @@ function CurrentPayroll({
 
   const payrollSummaryCards = [
     {
-      title: "Total Employees",
-      value: currentPayroll?.summary.employees,
+      title: lang === 'ar' ? 'إجمالي الموظفين' : 'Total Employees',
+      value: currentPayroll?.summary.employees || 0,
       icon: Users,
       color: "blue",
     },
     {
-      title: "Approved Leaves",
-      value: currentPayroll?.summary.approved_leaves,
+      title: lang === 'ar' ? 'الإجازات المقبولة' : 'Approved Leaves',
+      value: currentPayroll?.summary.approved_leaves || 0,
       icon: CheckCircle,
       color: "emerald",
     },
     {
-      title: "Completed Overtime",
-      value: currentPayroll?.summary.completed_overtime,
+      title: lang === 'ar' ? 'العمل الإضافي المنجز' : 'Completed Overtime',
+      value: currentPayroll?.summary.completed_overtime || 0,
       icon: Clock,
       color: "purple",
     },
     {
-      title: "Incentives",
-      value: `$${currentPayroll?.summary.incentives}`,
+      title: lang === 'ar' ? 'المكافآت والحوافز' : 'Incentives',
+      value: `$${currentPayroll?.summary.incentives || 0}`,
       icon: Award,
       color: "orange",
     },
     {
-      title: "Deductions",
-      value: `$${currentPayroll?.summary.deductions}`,
+      title: lang === 'ar' ? 'الخصومات' : 'Deductions',
+      value: `$${currentPayroll?.summary.deductions || 0}`,
       icon: MinusCircle,
       color: "red",
     },
@@ -56,20 +58,28 @@ function CurrentPayroll({
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div className="flex items-center justify-center h-64">
-          <p className="text-gray-500">No payroll data available</p>
+          <p className="text-gray-500">
+            {lang === 'ar' ? 'لا توجد بيانات رواتب متاحة' : 'No payroll data available'}
+          </p>
         </div>
       </div>
     );
   }
 
+  const dateStr = new Date(
+    currentPayroll.payroll.year,
+    currentPayroll.payroll.month - 1
+  ).toLocaleString(lang === 'ar' ? 'ar-SA' : 'default', { month: 'long', year: 'numeric' });
+
+  const statusLabel = currentPayroll.payroll.status === 'completed'
+    ? (lang === 'ar' ? 'مكتمل' : 'completed')
+    : (lang === 'ar' ? 'معلق' : 'pending');
+
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-semibold text-gray-800">
-          Current Payroll - {new Date(
-            currentPayroll.payroll.year,
-            currentPayroll.payroll.month - 1
-          ).toLocaleString("default", { month: "long", year: "numeric" })}
+          {lang === 'ar' ? `مسير الرواتب الحالي - ${dateStr}` : `Current Payroll - ${dateStr}`}
         </h3>
         <span
           className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
@@ -85,13 +95,13 @@ function CurrentPayroll({
                 : "bg-yellow-500"
             }`}
           ></span>
-          {currentPayroll.payroll.status}
+          {statusLabel}
         </span>
       </div>
       <div className="bg-blue-50 rounded-xl p-4 mb-4">
-        <p className="text-sm text-gray-500">Total Salaries</p>
+        <p className="text-sm text-gray-500">{lang === 'ar' ? 'إجمالي الرواتب' : 'Total Salaries'}</p>
         <p className="text-2xl font-bold text-gray-900">
-          ${currentPayroll["total salaries"].toLocaleString()}
+          ${(currentPayroll["total salaries"] || 0).toLocaleString()}
         </p>
       </div>
 

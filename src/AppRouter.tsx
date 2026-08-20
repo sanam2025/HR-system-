@@ -27,6 +27,10 @@ const appRouter = createBrowserRouter([
   managerRoutes,
   employeeRoutes,
   adminRoutes,
+  {
+    path: "*",
+    element: <Navigate to="/careers" replace />
+  }
 ]);
 
 export default function AppRouter() {

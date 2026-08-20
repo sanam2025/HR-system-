@@ -1,6 +1,7 @@
 import { Calendar, Clock, Users, XCircle } from 'lucide-react'
 import type { Holidays } from '../../../types/types';
 import { CardsSkeleton } from './StatusSkeleton';
+import { useLanguage } from '../../../../../../i18n/translations/LanguageContext';
 
 const getHolidayStatus = (date: Date) => {
   const today = new Date();
@@ -12,6 +13,7 @@ const getHolidayStatus = (date: Date) => {
 };
 
 function Cards({holidays , isLoading} : {holidays: Holidays[] | undefined , isLoading: boolean}) {
+  const { t } = useLanguage();
   const totalHolidays = holidays?.length || 0;
   const upcomingHolidays = holidays?.filter(h => getHolidayStatus(h.date) === "Upcoming").length || 0;
   const passedHolidays = holidays?.filter(h => getHolidayStatus(h.date) === "Passed").length || 0;
@@ -22,10 +24,10 @@ function Cards({holidays , isLoading} : {holidays: Holidays[] | undefined , isLo
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8 ">
-        <div className="bg-white rounded-2xl  shadow-sm p-5 border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
             <div className="flex items-center justify-between">
             <div>
-                <p className="text-sm text-gray-500">Total Holidays</p>
+                <p className="text-sm text-gray-500">{t.adminHolidays?.totalHolidays || 'Total Holidays'}</p>
                 <p className="text-2xl font-bold text-gray-900">{totalHolidays}</p>
             </div>
             <div className="bg-blue-50 text-blue-600 p-3 rounded-xl">
@@ -37,7 +39,7 @@ function Cards({holidays , isLoading} : {holidays: Holidays[] | undefined , isLo
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
             <div className="flex items-center justify-between">
             <div>
-                <p className="text-sm text-gray-500">Upcoming</p>
+                <p className="text-sm text-gray-500">{t.adminHolidays?.upcoming || 'Upcoming'}</p>
                 <p className="text-2xl font-bold text-emerald-600">{upcomingHolidays}</p>
             </div>
             <div className="bg-emerald-50 text-emerald-600 p-3 rounded-xl">
@@ -49,7 +51,7 @@ function Cards({holidays , isLoading} : {holidays: Holidays[] | undefined , isLo
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
             <div className="flex items-center justify-between">
             <div>
-                <p className="text-sm text-gray-500">Passed</p>
+                <p className="text-sm text-gray-500">{t.adminHolidays?.passed || 'Passed'}</p>
                 <p className="text-2xl font-bold text-gray-400">{passedHolidays}</p>
             </div>
             <div className="bg-gray-50 text-gray-400 p-3 rounded-xl">

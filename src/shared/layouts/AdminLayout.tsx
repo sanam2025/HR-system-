@@ -12,8 +12,8 @@ function AdminLayout() {
     { path: '/admin/organization', label: t('organizationStructure'), icon: FolderTree, exact: false },
     { path: '/admin/report', label: t('reports'), icon: BarChart, exact: false },
     { path: '/admin/search', label: t('employeeSearch'), icon: Search, exact: false },
-    { path: '/admin/holidays', label: t('Holidays') || 'Holidays', icon: CalendarDays, exact: false },
-    { path: '/admin/termination', label: t('Termination') || 'Termination', icon: UserX, exact: false },
+    { path: '/admin/holidays', label: t('holidays') || 'Holidays', icon: CalendarDays, exact: false },
+    { path: '/admin/termination', label: t('termination') || 'Terminations', icon: UserX, exact: false },
   ];
 
   const adminPageTitles: Record<string, string> = {
@@ -24,7 +24,7 @@ function AdminLayout() {
     '/admin/report': t('reports'),
     '/admin/search': t('employeeSearch'),
     '/admin/holidays': t('holidays') || 'Holidays',
-    '/admin/termination': t('termination') || 'Termination',
+    '/admin/termination': t('termination') || 'Terminations',
   };
 
   return (

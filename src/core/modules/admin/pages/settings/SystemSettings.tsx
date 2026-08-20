@@ -150,8 +150,8 @@ export default function Settings() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{settingsLang.title}</h1>
           <p className="text-gray-500 mt-0.5 text-sm">
@@ -166,7 +166,7 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all group">
           <div className="flex items-center justify-between mb-4">
             <div className="bg-blue-50 text-blue-600 p-3 rounded-xl">
@@ -175,7 +175,7 @@ export default function Settings() {
             {!editing.workingHours ? (
               <button
                 onClick={() => startEditing("workingHours")}
-                className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer"
               >
                 <Edit className="w-4 h-4" />
               </button>

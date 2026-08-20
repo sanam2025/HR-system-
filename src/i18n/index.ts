@@ -33,6 +33,8 @@ const resources = {
       employeeSearch: 'Employee Search',
       evaluation: 'Evaluation',
       complaints: 'Complaints',
+      holidays: 'Holidays',
+      termination: 'Terminations',
       
       // Dashboard
             systemName: 'HR System',
@@ -445,6 +447,8 @@ const resources = {
       employeeSearch: 'البحث عن الموظفين',
       evaluation: 'التقييم الدوري',
       complaints: 'الشكاوي',
+      holidays: 'العطل الرسمية',
+      termination: 'إنهاء الخدمة',
 
       // Dashboard
             systemName: 'نظام الموارد البشرية',

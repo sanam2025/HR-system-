@@ -309,19 +309,40 @@ export async function submitHourlyLeaveRequest(data: { date: string; start_time:
 // ── 5. تسجيل الحضور والانصراف (Check-in/out) ──
 
 /**
+ * Helper to get current location
+ */
+function getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error("Geolocation is not supported by your browser"));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => resolve({ latitude: position.coords.latitude, longitude: position.coords.longitude }),
+      (err) => reject(new Error(err.message)),
+      { timeout: 5000 }
+    );
+  });
+}
+
+/**
  * تسجيل الحضور
  */
-export async function submitCheckIn(data?: { latitude: number, longitude: number }) {
-  const response = await apiClient.put('check-in', data);
-  return response.data;
+export async function submitCheckIn(coords?: { latitude: number; longitude: number } | { latitude: string; longitude: string }) {
+  if (!coords) {
+    coords = await getCurrentLocation();
+  }
+  return (await apiClient.put('check-in', coords)).data;
 }
 
 /**
  * تسجيل الانصراف
  */
-export async function submitCheckOut(data?: { latitude: number, longitude: number }) {
-  const response = await apiClient.put('check-out', data);
-  return response.data;
+export async function submitCheckOut(coords?: { latitude: number; longitude: number } | { latitude: string; longitude: string }) {
+  if (!coords) {
+    coords = await getCurrentLocation();
+  }
+  return (await apiClient.put('check-out', coords)).data;
 }
 
 // ── 6. الإشعارات (Notifications) ──
@@ -329,17 +350,19 @@ export async function submitCheckOut(data?: { latitude: number, longitude: numbe
 /**
  * جلب جميع إشعارات المستخدم
  */
-export async function getMyNotifications() {
-  const response = await apiClient.get('notifications');
-  return response.data?.data || response.data;
+export async function getMyNotifications(): Promise<any[]> {
+  try {
+    const r = await apiClient.get('notifications');
+    const data = r.data?.data || r.data;
+    return Array.isArray(data) ? data : [];
+  } catch { return []; }
 }
 
 /**
  * تعليم إشعار كمقروء
  */
-export async function markNotificationAsRead(id: number) {
-  const response = await apiClient.post(`notifications/${id}/read`);
-  return response.data;
+export async function markNotificationAsRead(id: number): Promise<void> {
+  try { await apiClient.post('notifications/' + id + '/read'); } catch {}
 }
 
 // ── 7. العطل الرسمية (Holidays) ──

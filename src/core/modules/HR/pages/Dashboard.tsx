@@ -182,9 +182,9 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl font-bold text-gray-900">{t.hrDashboard?.welcomeTitle || 'Welcome to HR Dashboard'}</h1>
         <p className="text-gray-500 mt-1 text-sm">{t.hrDashboard?.welcomeSubtitle || 'Overview of employee performance and statistics.'}</p>
       </div>
@@ -204,7 +204,7 @@ export default function Dashboard() {
         </div>
 
         {!announcementsLoading && announcements.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {announcements.slice(0, 3).map((announcement, index) => (
               <AnnouncementCard key={announcement.id || `announcement-${index}`} announcement={announcement} />
             ))}
@@ -220,7 +220,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 mb-8">
         {STATS_CONFIG.map(({ key, title, icon: Icon, color, path }) => (
           <StatCard
             key={key}
@@ -243,7 +243,7 @@ export default function Dashboard() {
               {departments.length}
             </span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {departments.map((department, deptIndex) => (
               <div
                 key={department.id || `dept-${deptIndex}`}

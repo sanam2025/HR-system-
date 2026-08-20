@@ -9,26 +9,6 @@ import { apiClient } from '../../api/apiClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { NavItem } from './SideBar';
 import { useAuthStore } from '../../store/authStore';
-import { isSameCalendarDay } from '../../lib/date';
-
-const getCurrentLocation = (): Promise<{ latitude: number; longitude: number }> => {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
-      reject(new Error("GEOLOCATION_NOT_SUPPORTED"));
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-      (err) => {
-        if (err.code === 1) reject(new Error("GEOLOCATION_DENIED"));
-        else if (err.code === 2) reject(new Error("POSITION_UNAVAILABLE"));
-        else if (err.code === 3) reject(new Error("TIMEOUT"));
-        else reject(new Error("GEOLOCATION_ERROR"));
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-    );
-  });
-};
 
 interface TopbarProps {
   title: string;
@@ -55,34 +35,84 @@ export default function Topbar({
     const timer = setTimeout(() => setDebouncedQuery(query), 300);
     return () => clearTimeout(timer);
   }, [query]);
-  
+
   // Notifications state
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [activeMobileNotif, setActiveMobileNotif] = useState<any | null>(null);
-  const [dismissedNotifIds, setDismissedNotifIds] = useState<number[]>([]);
+  const [dismissedNotifIds, setDismissedNotifIds] = useState<string[]>([]);
+
+  // Persist viewed notifications to localStorage to ensure they don't repeat
+  const [viewedNotifIds, setViewedNotifIds] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem('viewedNotifIds');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
   const queryClient = useQueryClient();
+
+  const userRoleStr = user?.role?.toLowerCase() || '';
+  const hasNotifications = ['admin', 'manager', 'hr', 'ceo', 'employee'].includes(userRoleStr) || userRoleStr.includes('admin') || userRoleStr.includes('ceo');
 
   const { data: notifications = [] } = useQuery({
     queryKey: ['notifications'],
     queryFn: getMyNotifications,
     refetchInterval: 30000,
-    enabled: !!useAuthStore(state => state.token)
+    enabled: hasNotifications,
   });
 
-  const unreadCount = notifications.filter((n: any) => !n.is_read && !n.read_at).length;
+  const displayNotifications = Array.isArray(notifications)
+    ? notifications.filter((n: any) => n && typeof n === 'object')
+    : [];
+
+  const unreadCount = displayNotifications.filter((n: any) => {
+    const isBackendRead = n.is_read || n.read_at;
+    const isLocalRead = viewedNotifIds.includes(String(n.id));
+    return !isBackendRead && !isLocalRead;
+  }).length;
+
+  // Mark notifications as read when dropdown opens
+  useEffect(() => {
+    if (notificationsOpen) {
+      const idsToMark = displayNotifications
+        .filter((n: any) => !(n.is_read || n.read_at))
+        .map((n: any) => String(n.id))
+        .filter((id: string) => !viewedNotifIds.includes(id));
+
+      if (idsToMark.length > 0) {
+        setViewedNotifIds(prev => {
+          const next = [...prev, ...idsToMark];
+          localStorage.setItem('viewedNotifIds', JSON.stringify(next));
+          return next;
+        });
+        idsToMark.forEach(id => {
+          markNotificationAsRead(id as any).catch(() => { });
+        });
+      }
+    } else {
+      if (viewedNotifIds.length > 0) {
+        queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      }
+    }
+  }, [notificationsOpen, displayNotifications, viewedNotifIds, queryClient]);
 
   // Trigger mobile notification popups when unread notifications exist
   useEffect(() => {
-    const list = Array.isArray(notifications) ? notifications : [];
-    const unreadList = list.filter(
-      (n: any) => !n.is_read && !n.read_at && !dismissedNotifIds.includes(n.id)
-    );
-    if (unreadList.length > 0) {
-      setActiveMobileNotif(unreadList[0]);
+    const unreadLocal = displayNotifications.filter((n: any) => {
+      const isBackendRead = n.is_read || n.read_at;
+      const isLocalRead = viewedNotifIds.includes(String(n.id));
+      return !isBackendRead && !isLocalRead;
+    });
+    
+    if (unreadLocal.length > 0) {
+      // Find the first unread notification that hasn't been dismissed
+      const toShow = unreadLocal.find((n: any) => !dismissedNotifIds.includes(n.id));
+      setActiveMobileNotif(toShow || null);
     } else {
       setActiveMobileNotif(null);
     }
-  }, [notifications, dismissedNotifIds, lang]);
+  }, [displayNotifications, dismissedNotifIds, viewedNotifIds, lang]);
 
   const dismissMobileNotif = (id: number) => {
     setDismissedNotifIds(prev => [...prev, id]);
@@ -98,22 +128,48 @@ export default function Topbar({
 
   const getNotificationRoute = (n: any): string => {
     const text = `${n.type || ''} ${n.title || ''} ${n.message || ''} ${n.data?.type || ''} ${n.data?.message || ''}`.toLowerCase();
-    
-    if (text.includes('leave') || text.includes('إجازة') || text.includes('مغادرة')) return '/manager/leaves';
-    if (text.includes('task') || text.includes('مهمة') || text.includes('مهام')) return '/manager/tasks';
-    if (text.includes('overtime') || text.includes('إضافي')) return '/manager/overtime';
-    if (text.includes('evaluation') || text.includes('تقييم') || text.includes('أداء')) return '/manager/evaluation';
-    if (text.includes('interview') || text.includes('مقابلة')) return '/manager/interviews';
-    if (text.includes('recruitment') || text.includes('job') || text.includes('توظيف') || text.includes('احتياج')) return '/manager/recruitment';
-    if (text.includes('attendance') || text.includes('حضور') || text.includes('انصراف')) return '/manager/attendance';
+    let basePath = window.location.pathname.split('/')[1] || 'manager';
+    // ensure case matching if needed
+    if (basePath.toLowerCase() === 'hr') basePath = 'Hr';
 
-    return '/manager';
+    if (text.includes('leave') || text.includes('إجازة') || text.includes('مغادرة')) {
+      if (basePath === 'employee') return '/employee/attendance';
+      return `/${basePath}/leaves`;
+    }
+    
+    if (text.includes('task') || text.includes('مهمة') || text.includes('مهام')) {
+      return `/${basePath}/tasks`;
+    }
+    
+    if (text.includes('overtime') || text.includes('إضافي')) {
+      if (basePath === 'employee') return '/employee/finance';
+      return `/${basePath}/overtime`;
+    }
+    
+    if (text.includes('evaluation') || text.includes('تقييم') || text.includes('أداء')) return `/${basePath}/evaluation`;
+    if (text.includes('interview') || text.includes('مقابلة')) return `/${basePath}/interviews`;
+    if (text.includes('recruitment') || text.includes('job') || text.includes('توظيف') || text.includes('احتياج')) return `/${basePath}/recruitment`;
+    
+    if (text.includes('attendance') || text.includes('حضور') || text.includes('انصراف')) {
+      return `/${basePath}/attendance`;
+    }
+    
+    if (text.includes('payroll') || text.includes('راتب') || text.includes('رواتب')) {
+      if (basePath === 'admin') return '/admin/report';
+      if (basePath === 'Hr') return '/Hr/payroll';
+      if (basePath === 'employee') return '/employee/finance';
+      return `/${basePath}/report`;
+    }
+    
+    if (text.includes('termination') || text.includes('استقالة') || text.includes('انهاء')) {
+      if (basePath === 'admin') return '/admin/termination';
+      return `/${basePath}/terminations`;
+    }
+
+    return `/${basePath}`;
   };
 
   const handleNotificationClick = (n: any) => {
-    if (!n.is_read && !n.read_at && n.id !== 9991) {
-      markAsReadMutation.mutate(n.id);
-    }
     setNotificationsOpen(false);
     dismissMobileNotif(n.id);
     const targetPath = getNotificationRoute(n);
@@ -141,22 +197,18 @@ export default function Topbar({
     localStorage.setItem('isCheckedIn', status === 'checked_in' ? 'true' : 'false');
   };
 
-  // Initialize from API on mount and when user changes (source of truth)
-  const token = useAuthStore(state => state.token);
-
+  // Initialize from API on mount (source of truth)
   useEffect(() => {
-    if (!token) {
-      updateAttendanceState('not_checked_in');
-      return;
-    }
     getMyMonthlyAttendance().then((data: any[]) => {
       if (!Array.isArray(data)) return;
-      const todayRec = data.find((r: any) => {
-        const dateString = r.date || r.check_date || r.created_at;
-        return dateString ? isSameCalendarDay(dateString) : false;
-      });
+      const todayStr = new Date().toISOString().split('T')[0];
+      const todayRec = data.find((r: any) =>
+        (r.date || r.check_date || r.created_at?.split('T')[0]) === todayStr
+      );
       if (!todayRec) {
-        updateAttendanceState('not_checked_in');
+        // Do not overwrite with 'not_checked_in' if it's missing, because 
+        // localStorage already correctly handles the daily reset.
+        // The API might be cached or missing the record temporarily.
         return;
       }
       if (todayRec.check_in && todayRec.check_out) {
@@ -165,23 +217,28 @@ export default function Topbar({
         updateAttendanceState('checked_in');
       }
     }).catch(() => { /* silent: keep localStorage value */ });
-  }, [token]);
+  }, []);
 
   const handleCheckInOut = async () => {
     setIsLoadingCheck(true);
     try {
-      if (attendanceStatus === 'checked_in') {
+      if (isCheckedIn) {
         await submitCheckOut();
-        updateAttendanceState('completed');
+        setIsCheckedIn(false);
+        localStorage.setItem('isCheckedIn', 'false');
         toast.success(lang === 'ar' ? 'تم تسجيل الانصراف بنجاح' : 'Checked out successfully');
       } else {
         await submitCheckIn();
-        updateAttendanceState('checked_in');
+        setIsCheckedIn(true);
+        localStorage.setItem('isCheckedIn', 'true');
         toast.success(lang === 'ar' ? 'تم تسجيل الحضور بنجاح' : 'Checked in successfully');
       }
     } catch (error: any) {
-      const backendMessage = error.response?.data?.message || error.response?.data?.error;
-      const defaultMessage = lang === 'ar' ? 'حدث خطأ في التسجيل' : 'Error recording attendance';
+      let backendMessage = error.response?.data?.message || error.response?.data?.error;
+      if (error.response?.status === 422 && error.response?.data?.errors) {
+        backendMessage = Object.values(error.response.data.errors).flat().join(', ');
+      }
+      const defaultMessage = lang === 'ar' ? 'خطأ في تسجيل الحضور' : 'Error recording attendance';
       toast.error(backendMessage ? `${defaultMessage}: ${backendMessage}` : defaultMessage);
       console.error("Check-in/out error:", error.response || error);
     } finally {
@@ -259,20 +316,20 @@ export default function Topbar({
 
   return (
     <>
-      <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-6 sticky top-0 z-[60]">
+      <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-[60]">
         {/* Left section: Hamburger & Title */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
           <button
             onClick={onToggleSidebar}
-            className="p-2 rounded-xl hover:bg-gray-50 transition-colors text-dark/60 hover:text-dark"
+            className="p-2 flex-shrink-0 rounded-xl hover:bg-gray-50 transition-colors text-dark/60 hover:text-dark"
           >
             <Menu size={20} />
           </button>
-          <h1 className="text-lg font-bold text-dark">{title}</h1>
+          <h1 className="text-base sm:text-lg font-bold text-dark truncate min-w-0 flex-shrink pr-2">{title}</h1>
         </div>
 
         {/* Right section: Search, Language, Avatar */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1.5 sm:gap-4 flex-shrink-0">
           {/* Search button */}
           <button
             onClick={openSearch}
@@ -288,7 +345,7 @@ export default function Topbar({
             target="_blank"
             rel="noopener noreferrer"
             title={lang === 'ar' ? 'بوابة الوظائف العامة' : 'Public Careers Portal'}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#4A7C59]/10 text-[#4A7C59] text-xs font-bold hover:bg-[#4A7C59]/20 transition-all cursor-pointer"
+            className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#4A7C59]/10 text-[#4A7C59] text-xs font-bold hover:bg-[#4A7C59]/20 transition-all cursor-pointer"
           >
             <Briefcase size={14} />
             <span className="hidden sm:inline">{lang === 'ar' ? 'الوظائف' : 'Careers'}</span>
@@ -301,44 +358,25 @@ export default function Topbar({
                 onClick={async () => {
                   setIsLoadingCheck(true);
                   try {
-                    const coords = await getCurrentLocation();
-                    await submitCheckIn(coords);
+                    await submitCheckIn();
                     updateAttendanceState('checked_in');
                     toast.success(lang === 'ar' ? 'تم تسجيل الحضور بنجاح ✅' : 'Checked in successfully ✅');
                   } catch (error: any) {
-                    const msg: string = error.response?.data?.message || error.response?.data?.error || error.message || '';
-                    if (msg === "GEOLOCATION_NOT_SUPPORTED" || msg === "GEOLOCATION_DENIED") {
-                      toast.error(lang === 'ar' ? 'يجب السماح بالوصول للموقع الجغرافي لتسجيل الحضور' : 'Location access is required to check in');
-                      return;
+                    let msg: string = error.response?.data?.message || error.response?.data?.error || error.message || '';
+                    if (error.response?.status === 422 && error.response?.data?.errors) {
+                      msg = Object.values(error.response.data.errors).flat().join(', ');
                     }
-                    if (msg === "POSITION_UNAVAILABLE") {
-                      toast.error(lang === 'ar' ? 'معلومات الموقع غير متوفرة (تأكد من تفعيل خدمة الموقع في جهازك)' : 'Location information is unavailable');
-                      return;
-                    }
-                    if (msg === "TIMEOUT") {
-                      toast.error(lang === 'ar' ? 'انتهى وقت طلب الموقع الجغرافي، يرجى المحاولة مرة أخرى' : 'Location request timed out');
-                      return;
-                    }
-                    if (msg === "GEOLOCATION_ERROR") {
-                      toast.error(lang === 'ar' ? 'حدث خطأ غير معروف في استخراج الموقع الجغرافي' : 'Unknown geolocation error');
-                      return;
-                    }
-                    
-                    let translatedMsg = msg;
-                    if (msg.toLowerCase().includes('outside the company location')) {
-                      translatedMsg = lang === 'ar' ? 'أنت خارج موقع الشركة المسموح به للتسجيل' : 'You are outside the company location';
-                    }
-
                     if (
                       msg.includes('already checked in') ||
                       msg.includes('check in again') ||
                       msg.includes('hourly leave') ||
-                      msg.includes('already')
+                      msg.includes('already') ||
+                      error.response?.status === 422
                     ) {
                       updateAttendanceState('checked_in');
-                      toast(lang === 'ar' ? 'سجّلت حضورك بالفعل — اضغط لتسجيل الانصراف' : 'Already checked in — click to check out', { icon: 'ℹ️', duration: 5000 });
+                      toast.info(msg, { duration: 5000 });
                     } else {
-                      toast.error(translatedMsg || (lang === 'ar' ? 'خطأ في تسجيل الحضور' : 'Check-in error'));
+                      toast.error(msg || (lang === 'ar' ? 'خطأ في تسجيل الحضور' : 'Check-in error'));
                     }
                   } finally {
                     setIsLoadingCheck(false);
@@ -346,7 +384,7 @@ export default function Topbar({
                 }}
                 disabled={isLoadingCheck}
                 title={lang === 'ar' ? 'تسجيل حضور' : 'Check In'}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer shadow-sm border bg-green/10 text-[#4A7C59] border-green/20 hover:bg-green/20 disabled:opacity-50"
+                className="flex items-center justify-center gap-1.5 w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-1 rounded-full text-xs font-bold transition-all cursor-pointer shadow-sm border bg-green/10 text-[#4A7C59] border-green/20 hover:bg-green/20 disabled:opacity-50"
               >
                 <LogIn size={14} />
                 <span className="hidden sm:inline">{lang === 'ar' ? 'حضور' : 'Check In'}</span>
@@ -358,43 +396,24 @@ export default function Topbar({
                 onClick={async () => {
                   setIsLoadingCheck(true);
                   try {
-                    const coords = await getCurrentLocation();
-                    await submitCheckOut(coords);
+                    await submitCheckOut();
                     updateAttendanceState('completed');
                     toast.success(lang === 'ar' ? 'تم تسجيل الانصراف بنجاح! اكتمل يوم عملك 🎉' : 'Checked out successfully! Work day completed 🎉');
                   } catch (error: any) {
-                    const msg: string = error.response?.data?.message || error.response?.data?.error || error.message || '';
-                    if (msg === "GEOLOCATION_NOT_SUPPORTED" || msg === "GEOLOCATION_DENIED") {
-                      toast.error(lang === 'ar' ? 'يجب السماح بالوصول للموقع الجغرافي لتسجيل الانصراف' : 'Location access is required to check out');
-                      return;
+                    let msg: string = error.response?.data?.message || error.response?.data?.error || error.message || '';
+                    if (error.response?.status === 422 && error.response?.data?.errors) {
+                      msg = Object.values(error.response.data.errors).flat().join(', ');
                     }
-                    if (msg === "POSITION_UNAVAILABLE") {
-                      toast.error(lang === 'ar' ? 'معلومات الموقع غير متوفرة (تأكد من تفعيل خدمة الموقع في جهازك)' : 'Location information is unavailable');
-                      return;
-                    }
-                    if (msg === "TIMEOUT") {
-                      toast.error(lang === 'ar' ? 'انتهى وقت طلب الموقع الجغرافي، يرجى المحاولة مرة أخرى' : 'Location request timed out');
-                      return;
-                    }
-                    if (msg === "GEOLOCATION_ERROR") {
-                      toast.error(lang === 'ar' ? 'حدث خطأ غير معروف في استخراج الموقع الجغرافي' : 'Unknown geolocation error');
-                      return;
-                    }
-                    
-                    let translatedMsg = msg;
-                    if (msg.toLowerCase().includes('outside the company location')) {
-                      translatedMsg = lang === 'ar' ? 'أنت خارج موقع الشركة المسموح به للتسجيل' : 'You are outside the company location';
-                    }
-
                     if (
                       msg.includes('no active check in') ||
                       msg.includes('already checked out') ||
-                      msg.includes('not checked in')
+                      msg.includes('not checked in') ||
+                      error.response?.status === 422
                     ) {
                       updateAttendanceState('completed');
-                      toast(lang === 'ar' ? 'أنت مسجل انصراف بالفعل لهذا اليوم' : 'Already checked out for today', { icon: 'ℹ️', duration: 5000 });
+                      toast.info(msg, { duration: 5000 });
                     } else {
-                      toast.error(translatedMsg ? (lang === 'ar' ? `خطأ انصراف: ${translatedMsg}` : `Check-out error: ${translatedMsg}`) : (lang === 'ar' ? 'خطأ في تسجيل الانصراف' : 'Check-out error'));
+                      toast.error(msg ? (lang === 'ar' ? `خطأ انصراف: ${msg}` : `Check-out error: ${msg}`) : (lang === 'ar' ? 'خطأ في تسجيل الانصراف' : 'Check-out error'));
                       console.error(error);
                     }
                   } finally {
@@ -403,7 +422,7 @@ export default function Topbar({
                 }}
                 disabled={isLoadingCheck}
                 title={lang === 'ar' ? 'تسجيل انصراف' : 'Check Out'}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer shadow-sm border bg-red-50 text-red-600 border-red-200 hover:bg-red-100 disabled:opacity-50"
+                className="flex items-center justify-center gap-1.5 w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-1 rounded-full text-xs font-bold transition-all cursor-pointer shadow-sm border bg-red-50 text-red-600 border-red-200 hover:bg-red-100 disabled:opacity-50"
               >
                 <LogOut size={14} />
                 <span className="hidden sm:inline">{lang === 'ar' ? 'انصراف' : 'Check Out'}</span>
@@ -413,10 +432,10 @@ export default function Topbar({
             {attendanceStatus === 'completed' && (
               <button
                 onClick={() => {
-                  toast(lang === 'ar' ? 'تسجيل الحضور والانصراف مسموح به مرة واحدة فقط في اليوم' : 'Check-in & Check-out allowed only once per day', { icon: 'ℹ️', duration: 4000 });
+                  toast.info(lang === 'ar' ? 'تسجيل الحضور والانصراف مسموح به مرة واحدة فقط في اليوم' : 'Check-in & Check-out allowed only once per day', { duration: 4000 });
                 }}
                 title={lang === 'ar' ? 'اكتمل الحضور والانصراف اليوم' : 'Attendance completed today'}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer shadow-sm border bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200"
+                className="flex items-center justify-center gap-1.5 w-8 h-8 sm:w-auto sm:h-auto sm:px-3 sm:py-1 rounded-full text-xs font-bold transition-all cursor-pointer shadow-sm border bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200"
               >
                 <Clock size={14} className="text-gray-500" />
                 <span className="hidden sm:inline">{lang === 'ar' ? 'اكتمل اليوم' : 'Day Completed'}</span>
@@ -436,90 +455,97 @@ export default function Topbar({
           </button>
 
           {/* Notifications Dropdown */}
-          <div className="relative" ref={notifRef}>
-            <button
-              onClick={() => setNotificationsOpen(p => !p)}
-              className="relative p-2 rounded-full text-gray-500 hover:bg-gray-100 transition-colors focus:outline-none cursor-pointer"
-              title={lang === 'ar' ? 'الإشعارات' : 'Notifications'}
-            >
-              <Bell size={20} />
-            </button>
+          {hasNotifications && (
+            <div className="relative" ref={notifRef}>
+              <button
+                onClick={() => setNotificationsOpen(p => !p)}
+                className="relative p-2 rounded-full text-gray-500 hover:bg-gray-100 transition-colors focus:outline-none cursor-pointer"
+                title={lang === 'ar' ? 'الإشعارات' : 'Notifications'}
+              >
+                <Bell size={20} />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 end-1 min-w-4 h-4 px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse ring-2 ring-white shadow-sm">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </button>
 
-            {notificationsOpen && (
-              <div className="absolute end-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-[300] animate-slide-down flex flex-col max-h-[80vh]">
-                <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center sticky top-0">
-                  <h3 className="font-bold text-dark">{lang === 'ar' ? 'الإشعارات' : 'Notifications'}</h3>
-                  {unreadCount > 0 && (
-                    <span className="bg-green/10 text-green text-xs font-bold px-2 py-0.5 rounded-full">
-                      {unreadCount} {lang === 'ar' ? 'جديد' : 'New'}
-                    </span>
-                  )}
-                </div>
-                <div className="overflow-y-auto flex-1">
-                  {notifications.length === 0 ? (
-                    <div className="p-6 text-center text-gray-400">
-                      <Bell size={24} className="mx-auto mb-2 opacity-20" />
-                      <p className="text-sm">{lang === 'ar' ? 'لا توجد إشعارات' : 'No notifications'}</p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col">
-                      {notifications.map((n: any) => {
-                        const isUnread = !n.read_at;
-                        
-                        // استخراج النص حسب نوع الإشعار
-                        let title = lang === 'ar' ? 'إشعار نظام' : 'System Notification';
-                        let subtitle = '';
-                        let extraInfo = '';
-                        let icon = '🔔';
-                        let targetPath = '';
+              {notificationsOpen && (
+                <div className="absolute end-0 top-full mt-2 w-[calc(100vw-32px)] max-w-sm sm:w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-[300] animate-slide-down flex flex-col max-h-[80vh]">
+                  <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center sticky top-0">
+                    <h3 className="font-bold text-dark">{lang === 'ar' ? 'الإشعارات' : 'Notifications'}</h3>
+                    {unreadCount > 0 && (
+                      <span className="bg-green/10 text-green text-xs font-bold px-2 py-0.5 rounded-full">
+                        {unreadCount} {lang === 'ar' ? 'جديد' : 'New'}
+                      </span>
+                    )}
+                  </div>
+                  <div className="overflow-y-auto flex-1">
+                    {displayNotifications.length === 0 ? (
+                      <div className="p-6 text-center text-gray-400">
+                        <Bell size={24} className="mx-auto mb-2 opacity-20" />
+                        <p className="text-sm">{lang === 'ar' ? 'لا توجد إشعارات' : 'No notifications'}</p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col">
+                        {displayNotifications.map((n: any) => {
+                          const isBackendRead = n.is_read || n.read_at;
+                          const isLocalRead = viewedNotifIds.includes(String(n.id));
+                          const isUnread = !isBackendRead && !isLocalRead;
 
-                        if (n.data?.type === 'interview_assigned') {
-                          icon = '🗓️';
-                          title = lang === 'ar' ? 'تم تعيين مقابلة جديدة لك' : 'New Interview Assigned';
-                          subtitle = lang === 'ar' 
-                            ? `المرشح: ${n.data.candidate || 'غير محدد'}` 
-                            : `Candidate: ${n.data.candidate || 'Unknown'}`;
-                          if (n.data.scheduled_at) {
-                            const d = new Date(n.data.scheduled_at);
-                            extraInfo = lang === 'ar'
-                              ? `الموعد: ${d.toLocaleDateString('ar-SY')} - ${d.toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' })}`
-                              : `Scheduled: ${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                          // استخراج النص حسب نوع الإشعار
+                          let title = n.title || n.message || n.body || n.content || (lang === 'ar' ? 'إشعار نظام' : 'System Notification');
+                          let subtitle = '';
+                          let extraInfo = '';
+                          let icon = '🔔';
+
+                          if (n.data?.type === 'interview_assigned') {
+                            icon = '🗓️';
+                            title = lang === 'ar' ? 'تم تعيين مقابلة جديدة لك' : 'New Interview Assigned';
+                            subtitle = lang === 'ar'
+                              ? `المرشح: ${n.data.candidate || 'غير محدد'}`
+                              : `Candidate: ${n.data.candidate || 'Unknown'}`;
+                            if (n.data.scheduled_at) {
+                              const d = new Date(n.data.scheduled_at);
+                              extraInfo = lang === 'ar'
+                                ? `الموعد: ${d.toLocaleDateString('ar-SY')} - ${d.toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' })}`
+                                : `Scheduled: ${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                            }
+                          } else if (n.data?.message) {
+                            title = n.data.message;
+                          } else if (n.data?.title) {
+                            title = n.data.title;
                           }
-                          targetPath = '/manager/interviews';
-                        } else if (n.data?.message) {
-                          title = n.data.message;
-                        } else if (n.data?.title) {
-                          title = n.data.title;
-                        }
 
-                        return (
-                          <div
-                            key={n.id}
-                            onClick={() => handleNotificationClick(n)}
-                            className={`p-4 border-b border-gray-50 cursor-pointer transition-colors hover:bg-gray-50 flex gap-3 ${isUnread ? 'bg-blue-50/30' : ''}`}
-                          >
-                            {/* أيقونة نوع الإشعار */}
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-base">
-                              {icon}
+                          return (
+                            <div
+                              key={n.id}
+                              onClick={() => handleNotificationClick(n)}
+                              className={`p-4 border-b border-gray-50 cursor-pointer transition-colors hover:bg-gray-50 flex gap-3 ${isUnread ? 'bg-blue-50/30' : ''}`}
+                            >
+                              {/* أيقونة نوع الإشعار */}
+                              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-base">
+                                {icon}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className={`text-sm leading-snug ${isUnread ? 'font-bold text-dark' : 'text-gray-600'}`}>{title}</p>
+                                {subtitle && <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>}
+                                {extraInfo && <p className="text-xs text-green font-semibold mt-0.5">{extraInfo}</p>}
+                                <span className="text-xs text-gray-400 mt-1 block">
+                                  {n.created_at ? new Date(n.created_at).toLocaleString(lang === 'ar' ? 'ar-SA' : 'en-US') : ''}
+                                </span>
+                              </div>
+                              {isUnread && <div className="mt-1.5 flex-shrink-0 w-2 h-2 rounded-full bg-blue-500"></div>}
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <p className={`text-sm leading-snug ${isUnread ? 'font-bold text-dark' : 'text-gray-600'}`}>{title}</p>
-                              {subtitle && <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>}
-                              {extraInfo && <p className="text-xs text-green font-semibold mt-0.5">{extraInfo}</p>}
-                              <span className="text-xs text-gray-400 mt-1 block">
-                                {n.created_at ? new Date(n.created_at).toLocaleString(lang === 'ar' ? 'ar-EG' : 'en-US') : ''}
-                              </span>
-                            </div>
-                            {isUnread && <div className="mt-1.5 flex-shrink-0 w-2 h-2 rounded-full bg-blue-500"></div>}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* User Avatar + Dropdown */}
           <div className="relative" ref={profileRef}>
@@ -550,10 +576,10 @@ export default function Topbar({
                 {/* Menu Items */}
                 <div className="py-1.5">
                   <button
-                    onClick={() => { 
+                    onClick={() => {
                       const basePath = window.location.pathname.split('/')[1] || 'admin';
-                      navigate(`/${basePath}/profile`); 
-                      setProfileOpen(false); 
+                      navigate(`/${basePath}/profile`);
+                      setProfileOpen(false);
                     }}
                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-dark hover:bg-green/5 hover:text-green transition-colors text-start"
                   >
@@ -682,14 +708,14 @@ export default function Topbar({
       {activeMobileNotif && (
         <div className="fixed top-4 start-4 sm:start-auto end-4 z-[9999] max-w-sm w-[92%] sm:w-84 bg-white/95 backdrop-blur-md border border-gray-100/80 rounded-2xl shadow-[0_12px_35px_rgba(0,0,0,0.15)] p-4 transition-all duration-300 animate-slide-down">
           <div className="flex items-start gap-3">
-            <div 
+            <div
               onClick={() => handleNotificationClick(activeMobileNotif)}
               className="w-10 h-10 rounded-xl bg-green/10 text-green flex items-center justify-center font-bold flex-shrink-0 cursor-pointer hover:bg-green/20 transition-colors"
             >
               <Bell size={20} className="animate-bounce text-green" />
             </div>
 
-            <div 
+            <div
               onClick={() => handleNotificationClick(activeMobileNotif)}
               className="flex-1 min-w-0 cursor-pointer"
             >

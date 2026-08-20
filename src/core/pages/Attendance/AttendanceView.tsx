@@ -470,13 +470,15 @@ export default function AttendanceView() {
             ) : todayList.length === 0 ? (
               <p className="text-center py-12 text-gray-400">{t.attendance.noRecords}</p>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto w-full">
                 <table className="w-full">
                   <thead>
-                    <tr className="bg-gray-50 text-xs font-bold text-brown uppercase tracking-wide">
-                      {[t.attendance.employeeCol, t.attendance.columns.status, t.attendance.columns.checkIn, t.attendance.columns.checkOut, t.attendance.columns.delay].map(h => (
-                        <th key={h} className="px-5 py-3 text-start">{h}</th>
-                      ))}
+                    <tr className="bg-gray-50 text-[10px] sm:text-xs font-bold text-brown uppercase tracking-wide">
+                      <th className="px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.employeeCol}</th>
+                      <th className="px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.columns.status}</th>
+                      <th className="px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.columns.checkIn}</th>
+                      <th className="px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.columns.checkOut}</th>
+                      <th className="hidden sm:table-cell px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.columns.delay}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
@@ -498,20 +500,20 @@ export default function AttendanceView() {
 
                       return (
                         <tr key={i} className="hover:bg-gray-50/50 transition-colors">
-                          <td className="px-5 py-3.5 text-start">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-green/20 text-green flex items-center justify-center text-sm font-bold flex-shrink-0">{avatar}</div>
-                              <p className="text-sm font-semibold">{name}</p>
+                          <td className="px-1 sm:px-5 py-2 sm:py-3.5 text-start">
+                            <div className="flex items-center gap-1 sm:gap-3">
+                              <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-green/20 text-green flex items-center justify-center text-[10px] sm:text-sm font-bold flex-shrink-0">{avatar}</div>
+                              <p className="text-[10px] sm:text-sm font-semibold truncate max-w-[60px] sm:max-w-[200px]">{name}</p>
                             </div>
                           </td>
-                          <td className="px-5 py-3.5 text-start">
-                            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${info?.colorClass ?? 'bg-gray-50 text-gray-700'}`}>
+                          <td className="px-1 sm:px-5 py-2 sm:py-3.5 text-start">
+                            <span className={`text-[9px] sm:text-xs font-semibold px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full whitespace-nowrap ${info?.colorClass ?? 'bg-gray-50 text-gray-700'}`}>
                               {lang === 'ar' ? (info?.labelAr ?? rawStatus) : (info?.labelEn ?? rawStatus)}
                             </span>
                           </td>
-                          <td className="px-5 py-3.5 text-sm text-dark text-start">{checkIn}</td>
-                          <td className="px-5 py-3.5 text-sm text-dark text-start">{checkOut}</td>
-                          <td className="px-5 py-3.5 text-sm text-start">
+                          <td className="px-1 sm:px-5 py-2 sm:py-3.5 text-[10px] sm:text-sm text-dark text-start whitespace-nowrap">{checkIn}</td>
+                          <td className="px-1 sm:px-5 py-2 sm:py-3.5 text-[10px] sm:text-sm text-dark text-start whitespace-nowrap">{checkOut}</td>
+                          <td className="hidden sm:table-cell px-1 sm:px-5 py-2 sm:py-3.5 text-[10px] sm:text-sm text-start whitespace-nowrap">
                             {delay > 0
                               ? <span className="text-red-500 font-semibold">{delay} {t.attendance.min}</span>
                               : <span className="text-gray-300">—</span>}
@@ -582,13 +584,16 @@ export default function AttendanceView() {
                 <span className="text-green">{lang === 'en' ? employee?.nameEn ?? employee?.name : employee?.name}</span>
               </h3>
             </div>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto w-full">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-gray-50 text-xs font-bold text-brown uppercase tracking-wide">
-                    {[t.attendance.columns.date, t.attendance.columns.status, t.attendance.columns.checkIn, t.attendance.columns.checkOut, t.attendance.columns.delay, t.attendance.columns.earlyLeave].map(h => (
-                      <th key={h} className="px-5 py-3 text-start">{h}</th>
-                    ))}
+                  <tr className="bg-gray-50 text-[10px] sm:text-xs font-bold text-brown uppercase tracking-wide">
+                    <th className="px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.columns.date}</th>
+                    <th className="px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.columns.status}</th>
+                    <th className="px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.columns.checkIn}</th>
+                    <th className="px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.columns.checkOut}</th>
+                    <th className="hidden sm:table-cell px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.columns.delay}</th>
+                    <th className="hidden lg:table-cell px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.columns.earlyLeave}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -603,20 +608,20 @@ export default function AttendanceView() {
                   ) : (
                     employeeRecords.map((rec, i) => (
                       <tr key={i} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="px-5 py-3.5 text-sm text-brown text-start">{rec.date}</td>
-                        <td className="px-5 py-3.5 text-start">
-                          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${getStatusColor(rec.status)}`}>
+                        <td className="px-1 sm:px-5 py-2 sm:py-3.5 text-[10px] sm:text-sm text-brown text-start whitespace-nowrap">{rec.date}</td>
+                        <td className="px-1 sm:px-5 py-2 sm:py-3.5 text-start">
+                          <span className={`text-[9px] sm:text-xs font-semibold px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full whitespace-nowrap ${getStatusColor(rec.status)}`}>
                             {getStatusLabel(rec.status)}
                           </span>
                         </td>
-                        <td className="px-5 py-3.5 text-sm text-dark text-start">{rec.checkIn ?? '—'}</td>
-                        <td className="px-5 py-3.5 text-sm text-dark text-start">{rec.checkOut ?? '—'}</td>
-                        <td className="px-5 py-3.5 text-sm text-start">
+                        <td className="px-1 sm:px-5 py-2 sm:py-3.5 text-[10px] sm:text-sm text-dark text-start whitespace-nowrap">{rec.checkIn ?? '—'}</td>
+                        <td className="px-1 sm:px-5 py-2 sm:py-3.5 text-[10px] sm:text-sm text-dark text-start whitespace-nowrap">{rec.checkOut ?? '—'}</td>
+                        <td className="hidden sm:table-cell px-1 sm:px-5 py-2 sm:py-3.5 text-[10px] sm:text-sm text-start whitespace-nowrap">
                           {rec.delay > 0
                             ? <span className="text-red-500 font-semibold">{rec.delay} {t.attendance.min}</span>
                             : <span className="text-gray-300">—</span>}
                         </td>
-                        <td className="px-5 py-3.5 text-sm text-start">
+                        <td className="hidden lg:table-cell px-1 sm:px-5 py-2 sm:py-3.5 text-[10px] sm:text-sm text-start whitespace-nowrap">
                           {rec.earlyLeave > 0
                             ? <span className="text-orange-500 font-semibold">{rec.earlyLeave} {t.attendance.min}</span>
                             : <span className="text-gray-300">—</span>}
@@ -638,16 +643,16 @@ export default function AttendanceView() {
               {filteredRecords.length} {lang === 'ar' ? 'سجل' : 'records'}
             </span>
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto w-full">
             <table className="w-full">
               <thead>
-                <tr className="bg-gray-50 text-xs font-bold text-brown uppercase tracking-wide">
-                  <th className="px-5 py-3 text-start">{t.attendance.employeeCol}</th>
-                  <th className="px-5 py-3 text-start">{t.attendance.columns.date}</th>
-                  <th className="px-5 py-3 text-start">{t.attendance.columns.status}</th>
-                  <th className="px-5 py-3 text-start">{t.attendance.columns.checkIn}</th>
-                  <th className="px-5 py-3 text-start">{t.attendance.columns.checkOut}</th>
-                  <th className="px-5 py-3 text-start">{t.attendance.columns.delay}</th>
+                <tr className="bg-gray-50 text-[10px] sm:text-xs font-bold text-brown uppercase tracking-wide">
+                  <th className="px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.employeeCol}</th>
+                  <th className="px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.columns.date}</th>
+                  <th className="px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.columns.status}</th>
+                  <th className="px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.columns.checkIn}</th>
+                  <th className="px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.columns.checkOut}</th>
+                  <th className="hidden sm:table-cell px-1 sm:px-5 py-2 sm:py-3 text-start">{t.attendance.columns.delay}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -662,30 +667,30 @@ export default function AttendanceView() {
                 ) : (
                   filteredRecords.map((rec, i) => (
                     <tr key={i} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-5 py-3.5 text-start">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-green/20 flex items-center justify-center text-green text-sm font-bold flex-shrink-0">
+                      <td className="px-1 sm:px-5 py-2 sm:py-3.5 text-start">
+                        <div className="flex items-center gap-1 sm:gap-3">
+                          <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-green/20 flex items-center justify-center text-green text-[10px] sm:text-sm font-bold flex-shrink-0">
                             {rec.empAvatar}
                           </div>
                           <div className="min-w-0 text-start">
-                            <p className="text-sm font-semibold truncate">
+                            <p className="text-[10px] sm:text-sm font-semibold truncate max-w-[60px] sm:max-w-[200px]">
                               {lang === 'en' ? rec.empNameEn ?? rec.empName : rec.empName}
                             </p>
-                            <p className="text-[10px] text-gray-400 truncate">
+                            <p className="hidden sm:block text-[10px] text-gray-400 truncate">
                               {lang === 'en' ? rec.empTitleEn ?? rec.empTitle : rec.empTitle}
                             </p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-5 py-3.5 text-sm text-brown text-start">{rec.date}</td>
-                      <td className="px-5 py-3.5 text-start">
-                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${getStatusColor(rec.status)}`}>
+                      <td className="px-1 sm:px-5 py-2 sm:py-3.5 text-[10px] sm:text-sm text-brown text-start whitespace-nowrap">{rec.date}</td>
+                      <td className="px-1 sm:px-5 py-2 sm:py-3.5 text-start">
+                        <span className={`text-[9px] sm:text-xs font-semibold px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full whitespace-nowrap ${getStatusColor(rec.status)}`}>
                           {getStatusLabel(rec.status)}
                         </span>
                       </td>
-                      <td className="px-5 py-3.5 text-sm text-dark text-start">{rec.checkIn ?? '—'}</td>
-                      <td className="px-5 py-3.5 text-sm text-dark text-start">{rec.checkOut ?? '—'}</td>
-                      <td className="px-5 py-3.5 text-sm text-start">
+                      <td className="px-1 sm:px-5 py-2 sm:py-3.5 text-[10px] sm:text-sm text-dark text-start whitespace-nowrap">{rec.checkIn ?? '—'}</td>
+                      <td className="px-1 sm:px-5 py-2 sm:py-3.5 text-[10px] sm:text-sm text-dark text-start whitespace-nowrap">{rec.checkOut ?? '—'}</td>
+                      <td className="hidden sm:table-cell px-1 sm:px-5 py-2 sm:py-3.5 text-[10px] sm:text-sm text-start whitespace-nowrap">
                         {rec.delay != null && rec.delay > 0
                           ? <span className="text-red-500 font-semibold">{rec.delay} {t.attendance.min}</span>
                           : <span className="text-gray-300">—</span>}

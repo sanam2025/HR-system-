@@ -51,7 +51,7 @@ export default function NotificationDropdown() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors"
+        className="relative p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors cursor-pointer"
         title={t('notifications')}
       >
         <Bell size={20} />
@@ -69,7 +69,7 @@ export default function NotificationDropdown() {
             {unreadCount > 0 && (
               <button
                 onClick={() => markAllAsRead()}
-                className="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition-colors"
+                className="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition-colors cursor-pointer"
               >
                 <Check size={14} />
                 {t('markAllAsRead')}
@@ -88,7 +88,7 @@ export default function NotificationDropdown() {
                 {notifications.map((notif) => (
                   <div 
                     key={notif.id} 
-                    className={`p-4 flex gap-3 hover:bg-gray-50 transition-colors group ${!notif.isRead ? 'bg-blue-50/30' : ''}`}
+                    className={`p-4 flex gap-3 hover:bg-gray-50 transition-colors group cursor-pointer ${!notif.isRead ? 'bg-blue-50/30' : ''}`}
                     onClick={() => {
                       if (!notif.isRead) markAsRead(notif.id);
                     }}
@@ -114,7 +114,7 @@ export default function NotificationDropdown() {
                         e.stopPropagation();
                         deleteNotification(notif.id);
                       }}
-                      className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                      className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
                       title={t('delete')}
                     >
                       <Trash2 size={14} />
@@ -124,8 +124,6 @@ export default function NotificationDropdown() {
               </div>
             )}
           </div>
-
-
         </div>
       )}
     </div>

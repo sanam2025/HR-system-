@@ -10,7 +10,6 @@ const AdminAnnouncements = React.lazy(() => import('@/core/modules/admin/pages/A
 const OrganizationlStructure = React.lazy(() => import('@/core/modules/admin/pages/Organization/OrganizationlStructure'));
 const EmployeeSearch = React.lazy(() => import('@/core/modules/admin/pages/Employees/EmployeeSearch'));
 const AdminHolidays = React.lazy(() => import('@/core/modules/admin/pages/Holidays/Holidays'));
-const Reports = React.lazy(() => import('@/core/modules/admin/pages/Reports'));
 const Overview = React.lazy(() => import('@/core/modules/admin/pages/Overview/Overview'));
 const AdminTerminations = React.lazy(() => import('@/core/modules/admin/pages/Terminations/Termination'));
 const EmployeeProfile = React.lazy(() => import('@/core/pages/manager/components/EmployeeProfile'));

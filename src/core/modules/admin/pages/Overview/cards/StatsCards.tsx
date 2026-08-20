@@ -1,8 +1,7 @@
 import { UserCheck, UserMinus, Users, UserX } from 'lucide-react';
 import React from 'react'
-import { usePrecentages } from '../../../hooks/Overview/useOverviews';
 import type { AttendancePrecentage, Department } from '../../../types/types';
-
+import { useLanguage } from '../../../../../../i18n/translations/LanguageContext';
 
 type StatsCardsProps = {
     departments: Department[] | undefined;
@@ -13,29 +12,30 @@ function StatsCards({
     departments,
     precentages
 }:StatsCardsProps) {
+    const { t, lang } = useLanguage();
     
     const stats = [
         {
-          title: "Present",
-          value: `${precentages?.present_percentage}%`,
+          title: lang === 'ar' ? 'حاضر' : 'Present',
+          value: `${precentages?.present_percentage || 0}%`,
           icon: UserCheck,
           color: "emerald",
         },
         {
-          title: "Absent",
-          value: `${precentages?.absent_percentage}%`,
+          title: lang === 'ar' ? 'غائب' : 'Absent',
+          value: `${precentages?.absent_percentage || 0}%`,
           icon: UserX,
           color: "red",
         },
         {
-          title: "Late",
-          value: `${precentages?.late_percentage}%`,
+          title: lang === 'ar' ? 'متأخر' : 'Late',
+          value: `${precentages?.late_percentage || 0}%`,
           icon: UserMinus,
           color: "orange",
         },
         {
-          title: "Total Employees",
-          value: departments?.reduce((acc, dept) => acc + dept.users_count, 0),
+          title: t.adminDashboard?.totalEmployees || (lang === 'ar' ? 'إجمالي الموظفين' : 'Total Employees'),
+          value: departments?.reduce((acc, dept) => acc + (dept.users_count || 0), 0) || 0,
           icon: Users,
           color: "blue",
         },

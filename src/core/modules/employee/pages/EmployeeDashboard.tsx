@@ -37,7 +37,7 @@ function SectionCard({
   children: React.ReactNode;
   color?: string;
 }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   return (
     <div 
       className="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col min-h-[160px] relative overflow-hidden group hover:shadow-md transition-all duration-300"
@@ -88,7 +88,7 @@ function ErrorState({ msg }: { msg: string }) {
 
 // ─── Attendance summary ───────────────────────────────────────────────────────
 function AttendanceSummary() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const monthly = useMyMonthlyAttendance();
   const checkIn = useCheckIn();
   const checkOut = useCheckOut();
@@ -123,7 +123,7 @@ function AttendanceSummary() {
 
 // ─── Tasks summary ────────────────────────────────────────────────────────────
 function TasksSummary() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const userId = useAuthStore((s) => s.user?.id);
   const taskQuery = useTasks(userId ? { user_id: userId } : {}, { enabled: Boolean(userId) });
   const startTask = useStartTask();
@@ -179,7 +179,7 @@ function TasksSummary() {
 
 // ─── Announcements summary ────────────────────────────────────────────────────
 function AnnouncementsSummary() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const q = useActiveAnnouncements();
   if (q.isLoading) return <p className="text-sm text-gray-400 animate-pulse">{t.common?.loading || (lang === 'ar' ? 'جاري التحميل...' : 'Loading...')}</p>;
   if (q.isError) return <ErrorState msg={(q.error as ApiError).message} />;
@@ -201,7 +201,7 @@ function AnnouncementsSummary() {
 
 // ─── Finance summary ──────────────────────────────────────────────────────────
 function FinanceSummary() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const payslips = useMyPayslips();
   const deductions = useMyDeductions();
 
@@ -241,7 +241,7 @@ function FinanceSummary() {
 
 // ─── Complaints summary ───────────────────────────────────────────────────────
 function ComplaintsSummary() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const q = useMyComplaints();
   if (q.isLoading) return <p className="text-sm text-gray-400 animate-pulse">{t.common?.loading || (lang === 'ar' ? 'جاري التحميل...' : 'Loading...')}</p>;
   if (q.isError) return <ErrorState msg={(q.error as ApiError).message} />;
@@ -272,7 +272,7 @@ function ComplaintsSummary() {
 
 // ─── Leave summary ────────────────────────────────────────────────────────────
 function LeaveSummary() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const q = useMyLeaveRequests();
   if (q.isLoading) return <p className="text-sm text-gray-400 animate-pulse">{t.common?.loading || (lang === 'ar' ? 'جاري التحميل...' : 'Loading...')}</p>;
   if (q.isError) return <ErrorState msg={(q.error as ApiError).message} />;

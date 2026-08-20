@@ -8,10 +8,9 @@ import {
   Pie,
   Cell,
   PieChart,
-
 } from "recharts";
 import type { Department } from "../../../types/types";
-
+import { useLanguage } from '../../../../../../i18n/translations/LanguageContext';
 
 type DepartmentChartProps = {
     departmentData: Department[] | undefined;
@@ -20,15 +19,18 @@ type DepartmentChartProps = {
 function DepartmentChart({
     departmentData
 }:DepartmentChartProps) {
+    const { lang } = useLanguage();
     const departmentPieData = departmentData?.map((dept) => ({
         name: dept.name,
-        value: dept.users_count,
+        value: dept.users_count || 0,
         color: ["#3b82f6", "#f59e0b", "#8b5cf6", "#10b981", "#ef4444"][dept.id - 1] || "#3b82f6",
     }));
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-gray-800">Department Distribution</h3>
+        <h3 className="font-semibold text-gray-800">
+          {lang === 'ar' ? 'توزيع الأقسام' : 'Department Distribution'}
+        </h3>
         <PieChart className="w-5 h-5 text-gray-400" />
         </div>
         <ResponsiveContainer width="100%" height={300}>

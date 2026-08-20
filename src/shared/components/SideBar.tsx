@@ -88,6 +88,11 @@ export default function Sidebar({
                 key={item.path}
                 to={item.path}
                 end={item.exact ?? false}
+                onClick={() => {
+                  if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                    onToggle();
+                  }
+                }}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-5 py-2.5 text-sm cursor-pointer transition-all duration-200
                   ${isActive

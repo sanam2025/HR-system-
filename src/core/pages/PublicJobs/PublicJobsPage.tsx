@@ -503,7 +503,7 @@ export default function PublicJobsPage() {
             </button>
             {/* Login */}
             <a
-              href="/manager"
+              href="/login"
               className="btn btn-primary text-xs gap-1.5 px-3 sm:px-5"
             >
               <ExternalLink size={12} />
@@ -620,7 +620,7 @@ export default function PublicJobsPage() {
         <div className="mt-10 sm:mt-12 text-center border-t border-gray-200 pt-6 sm:pt-8">
           <p className="text-xs text-[#6B6358]">
             {tx.footerEmployee}{' '}
-            <a href="/manager" className="text-[#4A7C59] font-bold hover:underline">
+            <a href="/login" className="text-[#4A7C59] font-bold hover:underline">
               {tx.footerLogin}
             </a>
           </p>

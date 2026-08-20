@@ -1,4 +1,4 @@
-import { Mail, Lock, LogIn, Eye, EyeOff, ArrowRight } from 'lucide-react'
+import { Mail, Lock, LogIn, Eye, EyeOff, ArrowRight, Briefcase } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
@@ -117,10 +117,10 @@ function Login() {
                     <img src="/logo-login.png" alt="MasarHR Logo" className="w-48 h-auto object-contain mix-blend-multiply relative z-10" />
                 </div>
 
-                <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-6 md:p-8">
-                    <form className="space-y-5" onSubmit={(e) => handleSubmit(e)}>
+                <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-5 sm:p-7 md:p-8">
+                    <form className="space-y-4 sm:space-y-5" onSubmit={(e) => handleSubmit(e)}>
                         <div>
-                            <label htmlFor="email" className="block text-lg font-bold text-white mb-1.5">
+                            <label htmlFor="email" className="block text-sm sm:text-base font-bold text-white mb-1.5">
                                 Email Address <span className="text-red-400">*</span>
                             </label>
                             <div className="relative">
@@ -134,14 +134,14 @@ function Login() {
                                     value={loginData.email}
                                     onChange={(e) => handleChange(e)}
                                     placeholder="you@example.com"
-                                    className="w-full pl-10 pr-4 py-2.5 border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-transparent outline-none transition-all duration-200 bg-white/10 text-white placeholder-white/50 hover:bg-white/20 focus:bg-white/20"
+                                    className="w-full pl-10 pr-4 py-2.5 border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-transparent outline-none transition-all duration-200 bg-white/10 text-white placeholder-white/50 hover:bg-white/20 focus:bg-white/20 text-sm sm:text-base"
                                     required
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label htmlFor="password" className="block text-lg font-bold text-white mb-1.5">
+                            <label htmlFor="password" className="block text-sm sm:text-base font-bold text-white mb-1.5">
                                 Password <span className="text-red-400">*</span>
                             </label>
                             <div className="relative">
@@ -155,7 +155,7 @@ function Login() {
                                     onChange={(e) => handleChange(e)}
                                     placeholder="Enter your password"
                                     name='password'
-                                    className="w-full pl-10 pr-12 py-2.5 border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-transparent outline-none transition-all duration-200 bg-white/10 text-white placeholder-white/50 hover:bg-white/20 focus:bg-white/20"
+                                    className="w-full pl-10 pr-12 py-2.5 border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-transparent outline-none transition-all duration-200 bg-white/10 text-white placeholder-white/50 hover:bg-white/20 focus:bg-white/20 text-sm sm:text-base"
                                     required
                                 />
                                 <button
@@ -168,7 +168,7 @@ function Login() {
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
                             <div className="flex items-center gap-2">
                                 <input
                                     type="checkbox"
@@ -177,7 +177,7 @@ function Login() {
                                     onChange={(e) => setRememberMe(e.target.checked)}
                                     className="w-4 h-4 text-white border-white/30 rounded focus:ring-white/50 bg-white/10"
                                 />
-                                <label htmlFor="remember" className="text-lg font-bold text-white/90 cursor-pointer">
+                                <label htmlFor="remember" className="text-xs sm:text-sm font-semibold text-white/90 cursor-pointer">
                                     Remember me
                                 </label>
                             </div>
@@ -187,7 +187,7 @@ function Login() {
                                     e.preventDefault();
                                     setIsForgotModalOpen(true);
                                 }}
-                                className="text-lg font-bold text-white/90 hover:text-white hover:underline transition-colors"
+                                className="text-xs sm:text-sm font-semibold text-white/90 hover:text-white hover:underline transition-colors"
                             >
                                 Forgot password?
                             </a>
@@ -195,7 +195,7 @@ function Login() {
 
                         <button
                             type="submit"
-                            className="w-full py-2.5 text-lg font-bold text-[#4A7C59] bg-white hover:bg-gray-100 border border-transparent rounded-xl transition-all duration-200 shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+                            className="w-full py-2.5 sm:py-3 text-base font-bold text-[#4A7C59] bg-white hover:bg-gray-100 border border-transparent rounded-xl transition-all duration-200 shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer active:scale-[0.99]"
                             disabled={isLoading}
                         >
                             {isLoading ? 'Sign in...' :
@@ -204,9 +204,21 @@ function Login() {
                                     <ArrowRight className="w-4 h-4" />
                                 </div>
                             }
-
                         </button>
                     </form>
+
+                    {/* Guest / Careers Portal Button */}
+                    <div className="mt-5 pt-4 border-t border-white/15 text-center">
+                        <button
+                            type="button"
+                            onClick={() => navigate('/careers')}
+                            className="w-full py-2.5 px-3 bg-white/10 hover:bg-white/20 text-white border border-white/25 rounded-xl transition-all duration-200 shadow-sm flex items-center justify-center gap-2 font-bold text-xs sm:text-sm backdrop-blur-md group hover:border-white/40 cursor-pointer"
+                        >
+                            <Briefcase className="w-4 h-4 text-white/80 group-hover:text-white transition-colors flex-shrink-0" />
+                            <span>هل أنت ضيف؟ تصفح الوظائف</span>
+                            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1 flex-shrink-0" />
+                        </button>
+                    </div>
 
                 </div>
             </div>

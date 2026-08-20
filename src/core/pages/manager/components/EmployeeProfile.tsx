@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getEmployeeProfile, getEmployeeContract, getEmployeeDocuments, getEmployeeContractDownloadUrl, getEmployeeDocumentDownloadUrl, getEmployeePerformanceSummary, getTasks, getMyProfile } from '../../../../api/manager';
-import { ArrowRight, ArrowLeft, Phone, Mail, Calendar, Star, CheckSquare, Clock, Loader2, MapPin, User, Briefcase, FileText, Download, File, Edit2 } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Phone, Mail, Calendar, Star, CheckSquare, Clock, Loader2, MapPin, User, Briefcase, FileText, Download, File, Edit2, X } from 'lucide-react';
 import { useLanguage } from '../../../../i18n/translations/LanguageContext';
 import { useAuthStore } from '../../../../store/authStore';
 import EditProfileModal from './EditProfileModal';
@@ -41,6 +41,7 @@ export default function EmployeeProfile() {
   const [performance, setPerformance] = useState<any>(null);
   const [attendance, setAttendance] = useState<any[]>([]);
   const [empTasks, setEmpTasks] = useState<any[]>([]);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const currentUser = useAuthStore(state => state.currentUser);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -51,7 +52,23 @@ export default function EmployeeProfile() {
 
       // إذا لا يوجد id في الرابط، نجلب بروفايل المستخدم الحالي
       const data = id ? await getEmployeeProfile(Number(id)) : await getMyProfile();
-      const profile = data?.data || data;
+      let profile = data?.data || data;
+      let isProfileExists = !!profile;
+
+      // Fallback to currentUser if no profile is found in DB for the logged-in user
+      if (!profile && !id && currentUser) {
+        profile = {
+          id: currentUser.id,
+          name: currentUser.name || currentUser.full_name || 'بدون اسم',
+          email: currentUser.email || '',
+          job_title: currentUser.role || 'موظف',
+          department: currentUser.department || 'الإدارة',
+        };
+      }
+
+      if (!profile) {
+        throw new Error("No profile found");
+      }
 
       const deptRaw = profile.department || '';
       const DEPT_MAP: Record<string, string> = {
@@ -91,6 +108,7 @@ export default function EmployeeProfile() {
         todayStatus: 'حاضر',
         avgRating: '0.0',
         leaveBalance: profile.leave_balance || 0,
+        isProfileExists,
       });
 
       const targetUserId = profile.user_id || profile.user?.id || (id ? Number(id) : profile.id);
@@ -209,16 +227,34 @@ export default function EmployeeProfile() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 relative z-10">
           <div className="relative">
             <div className="absolute inset-0 bg-green/20 blur-xl rounded-full"></div>
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-green to-green-dark flex items-center justify-center text-white text-4xl font-extrabold flex-shrink-0 relative overflow-hidden ring-4 ring-white shadow-lg">
-              <span>{employee.avatar}</span>
+            <div
+              onClick={() => {
+                if (employee.picture && !employee.picture.includes('default.jpg')) {
+                  setPreviewImage(employee.picture);
+                }
+              }}
+              className={`w-24 h-24 rounded-full bg-gradient-to-br from-green to-green-dark flex items-center justify-center text-white text-4xl font-extrabold flex-shrink-0 relative overflow-hidden ring-4 ring-white shadow-lg ${
+                employee.picture && !employee.picture.includes('default.jpg')
+                  ? 'cursor-pointer hover:scale-105 hover:ring-green/30 transition-transform active:scale-95'
+                  : ''
+              }`}
+              title={employee.picture && !employee.picture.includes('default.jpg') ? (lang === 'ar' ? 'انقر لعرض الصورة' : 'Click to view photo') : undefined}
+            >
               {employee.picture && !employee.picture.includes('default.jpg') && (
                 <img
-                  src={`${employee.picture}?t=${Date.now()}`}
+                  src={employee.picture}
                   alt={employee.name}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  className="absolute inset-0 w-full h-full object-cover object-center z-10 block"
+                  onError={(e) => { 
+                    e.currentTarget.style.display = 'none';
+                    const fallback = e.currentTarget.parentElement?.querySelector('.avatar-fallback');
+                    if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                  }}
                 />
               )}
+              <span className={`avatar-fallback ${employee.picture && !employee.picture.includes('default.jpg') ? 'hidden' : 'flex'} items-center justify-center w-full h-full z-0`}>
+                {employee.avatar}
+              </span>
             </div>
           </div>
           <div className="flex-1">
@@ -226,14 +262,14 @@ export default function EmployeeProfile() {
 
             <div className="flex gap-1 mt-3 bg-white/50 w-fit px-3 py-1.5 rounded-full border border-white shadow-sm">{renderStars(Number(avgRating))}</div>
           </div>
-          <div className="flex flex-col gap-3 items-end">
+          <div className="flex flex-col sm:flex-row gap-3 items-center sm:items-end w-full sm:w-auto">
             <div className={`px-5 py-2.5 rounded-2xl text-sm font-bold shadow-sm border border-white/50 backdrop-blur-sm ${todayStatusColor}`}>
               {todayLabel} {ep.today}
             </div>
             {(!id || (currentUser && (currentUser.id === employee.id || currentUser.user_id === employee.id))) && (
               <button
                 onClick={() => setIsEditModalOpen(true)}
-                className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-white hover:bg-gray-50 text-green border border-green/20 rounded-xl shadow-sm transition-all font-semibold text-sm"
+                className="flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2 bg-white hover:bg-gray-50 text-green border border-green/20 rounded-xl shadow-sm transition-all font-semibold text-sm cursor-pointer"
               >
                 <Edit2 size={16} />
                 {lang === 'ar' ? 'تعديل البيانات' : 'Edit Profile'}
@@ -242,12 +278,8 @@ export default function EmployeeProfile() {
           </div>
         </div>
 
-        {/* Contact Details */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t border-gray-100/60 relative z-10">
-          <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
-            <div className="p-2 bg-green/10 rounded-lg text-green"><Phone size={16} /></div>
-            <span className="font-medium truncate">{employee.phone}</span>
-          </div>
+        {/* Contact Details (Phone removed as requested) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mt-8 pt-6 border-t border-gray-100/60 relative z-10">
           <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
             <div className="p-2 bg-green/10 rounded-lg text-green"><Mail size={16} /></div>
             <span className="font-medium truncate">{employee.email}</span>
@@ -508,18 +540,49 @@ export default function EmployeeProfile() {
       <EditProfileModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        profileId={employee.id}
+        profileId={employee.isProfileExists ? employee.id : null}
         initialData={{
-          address: employee?.address,
-          picture: employee?.picture,
-          phone_number: employee?.phone,
-          birth_date: employee?.birthDate,
-          gender: employee?.gender,
+          address: employee.address,
+          picture: employee.picture
         }}
         onSuccess={() => {
           fetchProfile(); // Re-fetch data after successful update
         }}
       />
+
+      {/* Image Preview Lightbox Modal */}
+      {previewImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 transition-all duration-300"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div
+            className="relative max-w-2xl max-h-[85vh] bg-white rounded-3xl overflow-hidden shadow-2xl p-3 border border-white/20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setPreviewImage(null)}
+              className="absolute top-5 right-5 z-20 p-2.5 bg-black/60 hover:bg-black/80 text-white rounded-full transition-all shadow-lg hover:scale-110"
+              title={lang === 'ar' ? 'إغلاق' : 'Close'}
+            >
+              <X size={20} />
+            </button>
+            <div className="overflow-hidden rounded-2xl bg-gray-950 flex items-center justify-center min-h-[250px]">
+              <img
+                src={previewImage}
+                alt={employee?.name || "Profile Picture"}
+                className="max-h-[75vh] w-auto max-w-full object-contain rounded-2xl"
+              />
+            </div>
+            {employee?.name && (
+              <div className="pt-3 pb-1 px-3 text-center">
+                <p className="font-bold text-gray-800 text-base">{employee.name}</p>
+                {employee.title && <p className="text-xs text-gray-500 mt-0.5">{employee.title}</p>}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
