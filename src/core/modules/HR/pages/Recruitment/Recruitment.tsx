@@ -49,24 +49,24 @@ export default function Recruitment() {
     if (modal.type === "approve") {
       approveRequisition.mutate(modal.id, {
         onSuccess: () => {
-          toast.success("✅ Job approved successfully");
+          toast.success(" Job approved successfully");
           refetch();
           closeConfirmModal();
         },
         onError: (e) => {
-          toast.error("❌ Failed to approve: " + e);
+          toast.error(" Failed to approve: " + e);
           closeConfirmModal();
         },
       });
     } else {
       rejectRequisition.mutate(modal.id, {
         onSuccess: () => {
-          toast.success("✅ Job rejected successfully");
+          toast.success(" Job rejected successfully");
           refetch();
           closeConfirmModal();
         },
         onError: (e) => {
-          toast.error("❌ Failed to reject: " + e);
+          toast.error(" Failed to reject: " + e);
           closeConfirmModal();
         },
       });
@@ -79,9 +79,9 @@ export default function Recruitment() {
   });
 
   useEffect(() => {
-    console.log("📊 Raw data:", data);
-    console.log("📊 Requests array:", requests);
-    console.log("📊 Requests length:", requests.length);
+    console.log(" Raw data:", data);
+    console.log(" Requests array:", requests);
+    console.log(" Requests length:", requests.length);
   }, [data, requests]);
 
   if (isLoading) {

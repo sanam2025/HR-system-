@@ -28,7 +28,8 @@
 
   body {
     font-family: "Tajawal", "Inter", sans-serif;
-    background-color: #f1f5f9;
+    background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%);
+    background-attachment: fixed;
     color: #1e293b;
   }
 
@@ -235,7 +236,7 @@ button {
   }
 
   .btn-primary {
-    @apply bg-[#4A7C59] text-white hover:bg-[#3a6347] active:scale-[0.98];
+    @apply bg-white text-[#4A7C59] border border-[#4A7C59] hover:bg-[#f1f5f9] active:scale-[0.98];
   }
 
   .btn-gold {

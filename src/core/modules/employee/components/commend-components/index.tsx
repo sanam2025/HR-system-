@@ -100,3 +100,35 @@ export function AlertBanner({ message, onClose }: AlertBannerProps) {
     </div>
   );
 }
+
+/**
+ * Honest empty state for features the backend doesn't support yet (no
+ * fabricated data — see CHANGELOG.md "Known gaps"). Used instead of mock
+ * data wherever a page references a resource with no matching endpoint.
+ */
+export function UnavailableNotice({ title, message }: { title: string; message: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center text-center py-6 px-4 rounded-xl bg-gray-50 border border-dashed border-gray-200">
+      <p className="text-sm font-medium text-gray-500">{title}</p>
+      <p className="text-xs text-gray-400 mt-1 max-w-xs">{message}</p>
+    </div>
+  );
+}
+
+export function QueryErrorNotice({ message }: { message: string }) {
+  return (
+    <div role="alert" className="px-4 py-3 bg-red-50 text-red-600 rounded-xl text-sm">
+      {message}
+    </div>
+  );
+}
+
+export function LoadingSkeleton({ lines = 3 }: { lines?: number }) {
+  return (
+    <div className="animate-pulse space-y-2" aria-label="Loading" role="status">
+      {Array.from({ length: lines }).map((_, i) => (
+        <div key={i} className="h-3 bg-gray-100 rounded w-full" />
+      ))}
+    </div>
+  );
+}

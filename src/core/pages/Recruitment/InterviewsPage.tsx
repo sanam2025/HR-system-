@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Send, Loader2, User, Trophy, ChevronUp, ChevronDown, ClipboardList, Search, AlertCircle, Briefcase, ChevronRight, Star } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
 import { submitInterviewResult, submitCandidatesRanking, getJobRequisitions } from '../../../api/recruitment';
 import apiClient from '../../../api/axios';
@@ -293,7 +293,7 @@ export default function InterviewsPage() {
   // ── Job Picker screen — اعرض فقط إذا لم تكن هناك مقابلات محملة ──
   if (!jobPostingId && pendingInterviews.length === 0) return (
     <div className="space-y-6">
-      <Toaster position="top-center" />
+      
       <div>
         <h2 className="text-xl font-extrabold text-dark flex items-center gap-2">
           <Briefcase size={22} className="text-green" />
@@ -375,7 +375,7 @@ export default function InterviewsPage() {
 
   return (
     <div className="space-y-6">
-      <Toaster position="top-center" />
+      
 
       {/* ── Job indicator + change button — أخفي إذا كان null ── */}
       {!urlJobPostingId && jobPostingId && (
@@ -606,3 +606,4 @@ export default function InterviewsPage() {
     </div>
   );
 }
+

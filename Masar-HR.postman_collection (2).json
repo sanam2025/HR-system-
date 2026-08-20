@@ -3,7 +3,7 @@
     "_postman_id": "5aaeb650-fc00-479e-a3a6-1adbee8a1143",
     "name": "Masar-HR",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "56756970"
+    "_exporter_id": "50775209"
   },
   "item": [
     {
@@ -24,14 +24,14 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}login?email=sososy672005@gmail.com&password=11111111",
+              "raw": "{{base_url}}login?email=omar12@gmail.com&password=11111111",
               "host": [
                 "{{base_url}}login"
               ],
               "query": [
                 {
                   "key": "email",
-                  "value": "sososy672005@gmail.com"
+                  "value": "omar12@gmail.com"
                 },
                 {
                   "key": "password",
@@ -1151,7 +1151,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "1|OtISI9Vt0X4sx9h47BstYCVSKxJJAczV2pYUU3tB333abb79",
+                  "value": "1|4nlXVSzTzZBQu9RnlSIErQrOkaOAGgklOjhtUUYD7d847695",
                   "type": "string"
                 }
               ]
@@ -1709,7 +1709,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "3|9awDJ6lXJVimqOLLSVCHeI3uEfCJSx7FTpNwqyxQba368023",
+                  "value": "4|bvgfNn4jCZ3inhGLzh1oMHAevzsvbqMYAKtHzBX0d09a54ca",
                   "type": "string"
                 }
               ]
@@ -1724,7 +1724,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "",
+              "raw": "{\r\n  \"probation_period_days\": 90,\r\n  \"weekend_days\": [\"friday\", \"monday\"],\r\n  \"jurisdiction\": \"Syrian\",\r\n  \"termination_notice_days\": 30,\r\n  \"expected_check_in\": \"08:30\",\r\n  \"expected_check_out\": \"16:30\",\r\n  \"sick_leave_days\": 12,\r\n  \"annual_leave_days\": 21,\r\n  \"currency\": \"SYP\",\r\n  \"grace_period\": 15,\r\n  \"company_latitude\": 33.5154600,\r\n  \"company_longitude\": 36.2788800,\r\n  \"allowed_radius\": 150,\r\n  \"eval_task_quality_weight\": 0.40,\r\n  \"eval_task_ontime_weight\": 0.30,\r\n  \"eval_attendance_weight\": 0.30,\r\n  \"eval_salary_increase_threshold\": 90.00,\r\n  \"eval_min_tenure_days\": 60,\r\n  \"end_of_service_months_per_year\": 1\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1732,14 +1732,80 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}settings?expected_check_in=09:00",
+              "raw": "{{base_url}}settings",
               "host": [
                 "{{base_url}}settings"
               ],
               "query": [
                 {
                   "key": "expected_check_in",
-                  "value": "09:00"
+                  "value": "09:00",
+                  "disabled": true
+                },
+                {
+                  "key": "expected_check_out",
+                  "value": "15:00",
+                  "disabled": true
+                },
+                {
+                  "key": "weekend_days",
+                  "value": "[\"friday\", \"saturday\"]",
+                  "disabled": true
+                },
+                {
+                  "key": "termination_notice_days",
+                  "value": null,
+                  "disabled": true
+                },
+                {
+                  "key": "sick_leave_days",
+                  "value": null,
+                  "disabled": true
+                },
+                {
+                  "key": "annual_leave_days",
+                  "value": null,
+                  "disabled": true
+                },
+                {
+                  "key": "currency",
+                  "value": null,
+                  "disabled": true
+                },
+                {
+                  "key": "grace_period",
+                  "value": null,
+                  "disabled": true
+                },
+                {
+                  "key": "eval_task_quality_weight",
+                  "value": null,
+                  "disabled": true
+                },
+                {
+                  "key": "eval_task_ontime_weight",
+                  "value": null,
+                  "disabled": true
+                },
+                {
+                  "key": "eval_attendance_weight",
+                  "value": null,
+                  "disabled": true
+                },
+                {
+                  "key": "eval_salary_increase_threshold",
+                  "value": null,
+                  "disabled": true
+                },
+                {
+                  "key": "eval_min_tenure_days",
+                  "value": null,
+                  "disabled": true
+                },
+                {
+                  "key": "end_of_service_months_per_year",
+                  "value": null,
+                  "disabled": true
                 }
               ]
             }
@@ -2185,7 +2251,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "32|ZuEwdGFs3MTgAiQQVhPuopp5VYFXU1ZQX6547nCA541ce8b5",
+                  "value": "22|amxiIc5lJqKlyhprZ7wdlufA0H5KkLe6yGzQDK3j66587a3e",
                   "type": "string"
                 }
               ]
@@ -2229,7 +2295,7 @@
                   "key": "picture",
                   "type": "file",
                   "uuid": "f8d6cb67-78b3-4999-9701-cf6d08a25521",
-                  "src": "/C:/Users/OGY/Pictures/wallpaperflare.com_wallpaper.jpg"
+                  "src": "/C:/Users/OGY/Pictures/pic2.jpg"
                 },
                 {
                   "key": "",
@@ -2260,7 +2326,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "10|DIllwwrdgU44TcOjXLPB4KsQpbVpZeMhNWMfEIEe6425890a",
+                  "value": "22|amxiIc5lJqKlyhprZ7wdlufA0H5KkLe6yGzQDK3j66587a3e",
                   "type": "string"
                 }
               ]
@@ -2316,12 +2382,12 @@
               ]
             },
             "url": {
-              "raw": "{{base_url}}profiles/2",
+              "raw": "{{base_url}}profiles/7",
               "host": [
                 "{{base_url}}profiles"
               ],
               "path": [
-                "2"
+                "7"
               ]
             }
           },
@@ -2335,7 +2401,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "32|ZuEwdGFs3MTgAiQQVhPuopp5VYFXU1ZQX6547nCA541ce8b5",
+                  "value": "22|amxiIc5lJqKlyhprZ7wdlufA0H5KkLe6yGzQDK3j66587a3e",
                   "type": "string"
                 }
               ]
@@ -2349,21 +2415,29 @@
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\r\n   \"address\": \"l,loikk\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "",
+                  "type": "file",
+                  "uuid": "2a2cb33c-abcb-4fcb-a39a-a60355eae967",
+                  "src": "/C:/Users/OGY/Pictures/istockphoto-2233806279-612x612.jpg"
+                },
+                {
+                  "key": "address",
+                  "value": "cdfbgbnynmuyeyyhtbt",
+                  "type": "text",
+                  "uuid": "3cdeea30-4c51-4dbf-932a-509ac0b0b836"
                 }
-              }
+              ]
             },
             "url": {
-              "raw": "{{base_url}}profiles/1",
+              "raw": "{{base_url}}profiles/7",
               "host": [
                 "{{base_url}}profiles"
               ],
               "path": [
-                "1"
+                "7"
               ],
               "query": [
                 {
@@ -2699,6 +2773,30 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "getMyDepartmentMembers for employee",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "8|BTcvrEQo2zJgkhlajDdYj6SSIQAgHR5M76SEgt3m08820af6",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}getMyDepartmentMembers",
+              "host": [
+                "{{base_url}}getMyDepartmentMembers"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -2708,8 +2806,33 @@
         {
           "name": "contracts expiring-soon",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "5|hq0knDjlGBGJ1VIJsW2DmlZ4RVtZROAEgHrgVl7icdd1a7dd",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
-            "header": []
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}contracts/expiring-soon",
+              "host": [
+                "{{base_url}}contracts"
+              ],
+              "path": [
+                "expiring-soon"
+              ]
+            }
           },
           "response": []
         },
@@ -2727,7 +2850,13 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\r\n    \"new_start_date\": \"2026-07-01\",\r\n    \"new_end_date\": \"2027-06-30\",\r\n    \"new_hour_price\": 15.50\r\n}",
@@ -2773,6 +2902,36 @@
               "path": [
                 "2",
                 "non-renewable"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "all contracts",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "3|kjNKy7c1Xr7nzl4MdMlt0DYWLsT2WK2kR4ovutQz4fac26af",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}allcontracts",
+              "host": [
+                "{{base_url}}allcontracts"
               ]
             }
           },
@@ -3002,6 +3161,36 @@
               "raw": "{{base_url}}attendance-percentage",
               "host": [
                 "{{base_url}}attendance-percentage"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "percentage Last 4 month",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "10|AXaEcCzo1DaryfRSy5hfqnlXUAcZmbh9CjtcW9TB439faf5b",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}attendance-percentage-4month",
+              "host": [
+                "{{base_url}}attendance-percentage-4month"
               ]
             }
           },
@@ -3257,24 +3446,30 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{auth_secret_0g7z}}",
+                  "value": "27|XOYSKN8tHV9AJW7iU29X1hVukjZRBVMjkH3qrXUs2ca46ec3",
                   "type": "string"
                 }
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\r\n   \"type\": \"sick\" \r\n}"
             },
             "url": {
-              "raw": "{{base_url}}leave-requests/6/approve",
+              "raw": "{{base_url}}leave-requests/1/approve",
               "host": [
                 "{{base_url}}leave-requests"
               ],
               "path": [
-                "6",
+                "1",
                 "approve"
               ]
             }
@@ -3289,24 +3484,30 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{auth_secret_02sp}}",
+                  "value": "27|XOYSKN8tHV9AJW7iU29X1hVukjZRBVMjkH3qrXUs2ca46ec3",
                   "type": "string"
                 }
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\r\n   \"type\": \"sick\" \r\n}"
             },
             "url": {
-              "raw": "{{base_url}}leave-requests/100/reject",
+              "raw": "{{base_url}}leave-requests/2/reject",
               "host": [
                 "{{base_url}}leave-requests"
               ],
               "path": [
-                "100",
+                "2",
                 "reject"
               ]
             }
@@ -3478,7 +3679,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{auth_secret_0ytm}}",
+                  "value": "10|AXaEcCzo1DaryfRSy5hfqnlXUAcZmbh9CjtcW9TB439faf5b",
                   "type": "string"
                 }
               ]
@@ -3534,12 +3735,12 @@
               ]
             },
             "url": {
-              "raw": "{{base_url}}employee-leave/7/balance",
+              "raw": "{{base_url}}employee-leave/8/balance",
               "host": [
                 "{{base_url}}employee-leave"
               ],
               "path": [
-                "7",
+                "8",
                 "balance"
               ]
             }
@@ -3547,7 +3748,7 @@
           "response": []
         },
         {
-          "name": "All Employees Leave Request",
+          "name": "Filtered Employees Leave Request hr",
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           },
@@ -3557,7 +3758,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{auth_secret_0wha}}",
+                  "value": "10|AXaEcCzo1DaryfRSy5hfqnlXUAcZmbh9CjtcW9TB439faf5b",
                   "type": "string"
                 }
               ]
@@ -3618,9 +3819,9 @@
               ]
             },
             "url": {
-              "raw": "{{base_url}}all-leave-request?from=2026-06-06",
+              "raw": "{{base_url}}filtered-leave-request?from=2026-06-06",
               "host": [
-                "{{base_url}}all-leave-request"
+                "{{base_url}}filtered-leave-request"
               ],
               "query": [
                 {
@@ -3637,8 +3838,7 @@
                 },
                 {
                   "key": "from",
-                  "value": "2026-06-06",
-                  "type": "text"
+                  "value": "2026-06-06"
                 },
                 {
                   "key": "to",
@@ -3669,6 +3869,86 @@
               "raw": "{{base_url}}my-leave-balance",
               "host": [
                 "{{base_url}}my-leave-balance"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "All leave request hr",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "10|AXaEcCzo1DaryfRSy5hfqnlXUAcZmbh9CjtcW9TB439faf5b",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "gender",
+                  "value": "male",
+                  "type": "text",
+                  "uuid": "e6a8a99c-d5b6-431c-b308-0b49692d1739",
+                  "disabled": true
+                },
+                {
+                  "key": "birth_date",
+                  "value": "8-6-2005",
+                  "type": "text",
+                  "uuid": "5f0e825f-ef28-4ef0-9263-1c12b7e8b5d9",
+                  "disabled": true
+                },
+                {
+                  "key": "phone_number",
+                  "value": "0968459869",
+                  "type": "text",
+                  "uuid": "4d52a276-8384-46d8-ae6c-d981c08def13",
+                  "disabled": true
+                },
+                {
+                  "key": "address",
+                  "value": "qawsed",
+                  "type": "text",
+                  "uuid": "7cdd4dd1-b0ea-48b4-82ec-60846c06e10e",
+                  "disabled": true
+                },
+                {
+                  "key": "picture",
+                  "type": "file",
+                  "uuid": "f8d6cb67-78b3-4999-9701-cf6d08a25521",
+                  "src": "/C:/Users/OGY/Pictures/pic2.jpg",
+                  "disabled": true
+                },
+                {
+                  "key": "",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "c0556608-4b0f-4511-ae29-3194ee182147",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}all-leave-request",
+              "host": [
+                "{{base_url}}all-leave-request"
               ]
             }
           },
@@ -3922,7 +4202,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{auth_secret_0elx}}",
+                  "value": "8|eTx30ibnyxaxs3esOqWinhqblpL3O6A5IOKvHmoQcd1be546",
                   "type": "string"
                 }
               ]
@@ -3983,12 +4263,12 @@
               ]
             },
             "url": {
-              "raw": "{{base_url}}hourly-leave-requests/4/approve",
+              "raw": "{{base_url}}hourly-leave-requests/1/approve",
               "host": [
                 "{{base_url}}hourly-leave-requests"
               ],
               "path": [
-                "4",
+                "1",
                 "approve"
               ]
             }
@@ -3996,7 +4276,7 @@
           "response": []
         },
         {
-          "name": "All Hourly Leave Request",
+          "name": "Filtered Hourly Leave Request hr",
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           },
@@ -4006,7 +4286,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{auth_secret_0wha}}",
+                  "value": "10|AXaEcCzo1DaryfRSy5hfqnlXUAcZmbh9CjtcW9TB439faf5b",
                   "type": "string"
                 }
               ]
@@ -4023,41 +4303,6 @@
               "mode": "formdata",
               "formdata": [
                 {
-                  "key": "gender",
-                  "value": "male",
-                  "type": "text",
-                  "uuid": "e6a8a99c-d5b6-431c-b308-0b49692d1739",
-                  "disabled": true
-                },
-                {
-                  "key": "birth_date",
-                  "value": "8-6-2005",
-                  "type": "text",
-                  "uuid": "5f0e825f-ef28-4ef0-9263-1c12b7e8b5d9",
-                  "disabled": true
-                },
-                {
-                  "key": "phone_number",
-                  "value": "0968459869",
-                  "type": "text",
-                  "uuid": "4d52a276-8384-46d8-ae6c-d981c08def13",
-                  "disabled": true
-                },
-                {
-                  "key": "address",
-                  "value": "qawsed",
-                  "type": "text",
-                  "uuid": "7cdd4dd1-b0ea-48b4-82ec-60846c06e10e",
-                  "disabled": true
-                },
-                {
-                  "key": "picture",
-                  "type": "file",
-                  "uuid": "f8d6cb67-78b3-4999-9701-cf6d08a25521",
-                  "src": "/C:/Users/OGY/Pictures/pic2.jpg",
-                  "disabled": true
-                },
-                {
                   "key": "",
                   "value": "",
                   "type": "text",
@@ -4067,21 +4312,20 @@
               ]
             },
             "url": {
-              "raw": "{{base_url}}all-hourly-leave-request?dep_id=4",
+              "raw": "{{base_url}}filtered-hourly-leave-request?status=rejected",
               "host": [
-                "{{base_url}}all-hourly-leave-request"
+                "{{base_url}}filtered-hourly-leave-request"
               ],
               "query": [
                 {
                   "key": "status",
-                  "value": "approved",
-                  "type": "text",
-                  "disabled": true
+                  "value": "rejected",
+                  "type": "text"
                 },
                 {
                   "key": "dep_id",
                   "value": "4",
-                  "type": "text"
+                  "disabled": true
                 },
                 {
                   "key": "from",
@@ -4090,7 +4334,7 @@
                 },
                 {
                   "key": "to",
-                  "value": null,
+                  "value": "",
                   "type": "text",
                   "disabled": true
                 }
@@ -4365,7 +4609,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{auth_secret_0jcq}}",
+                  "value": "8|eTx30ibnyxaxs3esOqWinhqblpL3O6A5IOKvHmoQcd1be546",
                   "type": "string"
                 }
               ]
@@ -4433,6 +4677,59 @@
               "path": [
                 "2",
                 "reject"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "All hourly leave request hr",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "10|AXaEcCzo1DaryfRSy5hfqnlXUAcZmbh9CjtcW9TB439faf5b",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "c0556608-4b0f-4511-ae29-3194ee182147",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}all-hourly-leave-request",
+              "host": [
+                "{{base_url}}all-hourly-leave-request"
+              ],
+              "query": [
+                {
+                  "key": "to",
+                  "value": "",
+                  "type": "text",
+                  "disabled": true
+                }
               ]
             }
           },
@@ -7508,7 +7805,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "1|kfYRhvOGX80htxsOSKYGXNJOuDM1hLft4b19azYr3e1402b4",
+                  "value": "10|AXaEcCzo1DaryfRSy5hfqnlXUAcZmbh9CjtcW9TB439faf5b",
                   "type": "string"
                 }
               ]
@@ -8047,7 +8344,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "2|3esZUn0VUU2SXH2rSakjlwrsoFl0t34LUVNU1xBr72132e2e",
+                  "value": "10|ZU0MDUiGUhCbopUYTuKdBrxWJrG7fwWsEc59rIfG4848c43f",
                   "type": "string"
                 }
               ]
@@ -8061,9 +8358,9 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}resignations/mine",
+              "raw": "{{base_url}}resigna/mine",
               "host": [
-                "{{base_url}}resignations"
+                "{{base_url}}resigna"
               ],
               "path": [
                 "mine"

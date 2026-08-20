@@ -1,75 +1,154 @@
 // src/core/modules/HR/pages/Resignations/Resignations.tsx
-import { useState } from 'react';
+import { useState } from "react";
+import { Eye, Zap, Search, LogOut, Loader2 } from "lucide-react";
+import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Eye } from 'lucide-react';
-import { useResignations } from '../../hooks/useResignations';
-import Loading from '../../../../../shared/components/Loading';
-import type { Resignation } from '../../types/ResignationsService.types';
+import { useResignations } from "../../hooks/useResignations";
+import type { Resignation } from "../../types/ResignationsService.types";
+
+type TabType = "all" | "standard" | "immediate";
 
 export default function Resignations() {
+  const { lang } = useLanguage();
+  const { t } = useTranslation();
   const navigate = useNavigate();
-  const [typeFilter, setTypeFilter] = useState<'all' | 'with_notice' | 'immediate'>('all');
+  const [activeTab, setActiveTab] = useState<TabType>("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  let apiType: "with_notice" | "immediate" | undefined = undefined;
+  if (activeTab === "standard") apiType = "with_notice";
+  if (activeTab === "immediate") apiType = "immediate";
+  
+  const { resignations, isLoading, error } = useResignations(apiType);
 
-  const { resignations, isLoading } = useResignations(typeFilter === 'all' ? undefined : typeFilter);
+  const handleView = (id: number) => {
+    navigate(`/Hr/resignations/${id}`);
+  };
 
-  if (isLoading) return <Loading />;
+  const filteredRequests = (resignations || []).filter(r => {
+    const term = searchTerm.toLowerCase();
+    const name = r.employee?.full_name || 'Unknown';
+    return name.toLowerCase().includes(term);
+  });
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
-      <h1 className="text-2xl font-bold text-gray-900 mb-4">📋 Resignations</h1>
-
-      <div className="flex items-center gap-4 mb-6">
-        <select
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)}
-          className="border rounded-lg px-3 py-2"
-        >
-          <option value="all">All</option>
-          <option value="with_notice">With Notice</option>
-          <option value="immediate">Immediate</option>
-        </select>
+    <div className="space-y-6 p-6" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+      {/* Header */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <LogOut className="text-green" size={28} />
+            {t('resignationRequests') || 'Resignation Requests'}
+          </h1>
+          <p className="text-gray-500 mt-1">{t('manageResignationRequests') || 'Manage standard and immediate resignation requests.'}</p>
+        </div>
       </div>
 
-      {/* ✅ الحل: استخدام optional chaining (?.) للتأكد من أن resignations ليست undefined */}
-      {!resignations || resignations?.length === 0 ? (
-        <p className="text-gray-400">No resignations found.</p>
-      ) : (
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Employee</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Type</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Reason</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Status</th>
-                <th className="px-5 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {resignations?.map((req: Resignation) => (
-                <tr key={req.id} className="hover:bg-gray-50">
-                  <td className="px-5 py-4 font-medium">{req.employee?.full_name}</td>
-                  <td className="px-5 py-4">{req.type}</td>
-                  <td className="px-5 py-4 text-sm text-gray-600">{req.reason}</td>
-                  <td className="px-5 py-4">
-                    <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700">
-                      {req.status}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 text-right">
-                    <button
-                      onClick={() => navigate(`/Hr/resignations/${req.id}`)}
-                      className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Toolbar */}
+      <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex bg-gray-50 p-1 rounded-xl w-full md:w-auto">
+          <button
+            onClick={() => setActiveTab('all')}
+            className={`flex-1 md:flex-none px-6 py-2 text-sm font-medium rounded-lg transition-all ${
+              activeTab === 'all' ? 'bg-white text-green shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {t('all') || 'All'}
+          </button>
+          <button
+            onClick={() => setActiveTab('standard')}
+            className={`flex-1 md:flex-none px-6 py-2 text-sm font-medium rounded-lg transition-all ${
+              activeTab === 'standard' ? 'bg-white text-green shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {t('standard') || 'Standard'}
+          </button>
+          <button
+            onClick={() => setActiveTab('immediate')}
+            className={`flex-1 md:flex-none px-6 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-1 ${
+              activeTab === 'immediate' ? 'bg-white text-green shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <Zap size={16} className={activeTab === 'immediate' ? 'text-green' : 'text-yellow-500'} /> 
+            {t('immediate') || 'Immediate'}
+          </button>
         </div>
-      )}
+        
+        <div className="relative w-full md:w-72">
+          <input
+            type="text"
+            placeholder={lang === 'ar' ? 'بحث عن موظف...' : 'Search employee...'}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={`w-full ${lang === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green/20 focus:border-green outline-none transition-all`}
+          />
+          <Search className={`absolute ${lang === 'ar' ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-gray-400`} size={18} />
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="animate-spin text-green" size={32} />
+          </div>
+        ) : error ? (
+          <div className="p-8 text-center text-red-500">{error}</div>
+        ) : filteredRequests.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+            <LogOut size={48} className="mb-4 opacity-50" />
+            <p className="text-lg">{t('noResignationRequestsFound') || `No ${activeTab} resignation requests found`}</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+              <thead>
+                <tr className="bg-gray-50/50 border-b border-gray-100 text-gray-500 text-sm">
+                  <th className="px-6 py-4 font-medium text-start">{t('employee') || 'Employee'}</th>
+                  <th className="px-6 py-4 font-medium text-start">{t('department') || 'Department'}</th>
+                  <th className="px-6 py-4 font-medium text-start">{t('position') || 'Position'}</th>
+                  <th className="px-6 py-4 font-medium text-start">{t('lastWorkingDay') || 'Last Working Day'}</th>
+                  <th className="px-6 py-4 font-medium text-start">{t('status') || 'Status'}</th>
+                  <th className="px-6 py-4 font-medium text-center">{t('actions') || 'Actions'}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {filteredRequests.map((r: Resignation) => (
+                  <tr key={r.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="font-semibold text-gray-900">{r.employee?.full_name || 'Unknown'}</div>
+                      <div className="text-xs text-gray-400 mt-1">ID: {r.user_id || 'N/A'}</div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{r.employee?.department?.name || 'N/A'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{r.employee?.position?.name || 'N/A'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 font-medium">{r.last_working_day || 'N/A'}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                        r.status === 'approved' ? 'bg-green/10 text-green' :
+                        r.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                        r.status === 'contract_terminated' ? 'bg-blue-100 text-blue-700' :
+                        'bg-yellow-100 text-yellow-700'
+                      }`}>
+                        {t(r.status) || r.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button 
+                        onClick={() => handleView(r.id)} 
+                        className="inline-flex items-center justify-center p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
+                        title={t('viewDetails') || 'View Details'}
+                      >
+                        <Eye size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

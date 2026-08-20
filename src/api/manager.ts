@@ -34,8 +34,19 @@ export async function searchManagerEmployees(searchQuery: string) {
 /**
  * عرض الملف الشخصي لأحد الموظفين التابعين له
  */
-export async function getEmployeeProfile(employeeId: number) {
-  const response = await apiClient.get(`profiles/${employeeId}`);
+export async function getEmployeeProfile(employeeId?: number | string) {
+  const url = employeeId ? `profiles/${employeeId}` : `profiles`;
+  const response = await apiClient.get(url);
+  return response.data;
+}
+
+
+
+export async function updateEmployeeProfile(profileId: number, data: FormData) {
+  data.append('_method', 'PUT');
+  const response = await apiClient.post(`profiles/${profileId}`, data, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
   return response.data;
 }
 
@@ -63,18 +74,26 @@ export async function getEmployeePerformanceSummary(employeeId: number) {
 }
 
 /**
- * عرض الملف الشخصي للمدير الحالي
+ * عرض الملف الشخصي للمدير أو المستخدم الحالي
  */
 export async function getMyProfile() {
   try {
-    const response = await apiClient.get('profiles');
-    if (response.data && response.data.success === false) {
-      return null; // لا يوجد بروفايل بعد
-    }
+    const response = await apiClient.get('my-profile');
+    if (response.data && response.data.success === false) return null;
     return response.data?.data || response.data || null;
   } catch (error: any) {
-    if (error.response?.status === 404) return null;
-    throw error;
+    if (error.response?.status === 404) {
+      try {
+        const fallback = await apiClient.get('profiles');
+        const list = fallback.data?.data || fallback.data;
+        if (Array.isArray(list) && list.length > 0) {
+          return { data: list[0] };
+        }
+      } catch (fallbackError) {
+        return null;
+      }
+    }
+    return null;
   }
 }
 

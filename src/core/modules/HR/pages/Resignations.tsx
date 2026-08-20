@@ -1,124 +1,140 @@
 // core/modules/HR/pages/Resignations.tsx
-import React, { useState } from "react";
-import { Eye, CheckCircle, XCircle, DollarSign, Zap } from "lucide-react";
-import { useTranslation } from 'react-i18next';
-import type { ResignationRequest } from "../types/resignation.types";
-
-// ============= DATA =============
-const ALL_RESIGNATIONS: ResignationRequest[] = [
-  { id: "1", employeeName: "Ahmed Mansour", employeeId: "EMP001", department: "Information Technology", position: "Web Developer", resignationType: "standard", lastWorkingDay: "2026-07-15", submittedDate: "2026-06-01", reason: "Better career opportunity", status: "pending", baseSalary: 1500000, yearsOfService: 3 },
-  { id: "2", employeeName: "Sara Khalil", employeeId: "EMP002", department: "Basic Sciences", position: "Professor", resignationType: "immediate", lastWorkingDay: "2026-06-10", submittedDate: "2026-06-05", reason: "Personal reasons", status: "pending", baseSalary: 2000000, yearsOfService: 5 },
-  { id: "3", employeeName: "Omar Hassan", employeeId: "EMP003", department: "Electrical Engineering", position: "Department Head", resignationType: "standard", lastWorkingDay: "2026-08-01", submittedDate: "2026-05-20", reason: "Retirement", status: "approved", approvedDate: "2026-05-25", baseSalary: 2500000, yearsOfService: 10, compensationAmount: 25000000 },
-  { id: "4", employeeName: "Nadia Ali", employeeId: "EMP004", department: "Administration", position: "HR Manager", resignationType: "immediate", lastWorkingDay: "2026-06-15", submittedDate: "2026-06-07", reason: "Relocation", status: "pending", baseSalary: 1800000, yearsOfService: 4 },
-];
+import { useState } from "react";
+import { Eye, Zap, Search, LogOut, Loader2 } from "lucide-react";
+import { useLanguage } from '../../../../i18n/translations/LanguageContext';
+import { useNavigate } from 'react-router-dom';
+import { useResignations } from "../hooks/useResignations";
 
 type TabType = "standard" | "immediate";
-const COLUMNS_KEYS = [
-  { key: "employee", label: "Employee" },
-  { key: "department", label: "Department" },
-  { key: "position", label: "Position" },
-  { key: "lastWorkingDay", label: "Last Working Day" },
-  { key: "actions", label: "Actions" },
-];
 
-// ============= COMPENSATION MODAL =============
-const CompensationModal: React.FC<{ isOpen: boolean; employeeName: string; onClose: () => void; onSubmit: (compensation: number) => void }> = ({ isOpen, employeeName, onClose, onSubmit }) => {
-  const { t } = useTranslation();
-  const [compensation, setCompensation] = useState("");
-  const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); onSubmit(Number(compensation)); setCompensation(""); onClose(); };
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
-        <div className="px-6 py-4 border-b"><h2 className="text-xl font-semibold">{t('setCompensation') || 'Set Compensation'}</h2><p className="text-sm text-gray-500">{t('employee') || 'Employee'}: {employeeName}</p></div>
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div><label className="block text-sm font-medium mb-1">{t('compensationAmountSYP') || 'Compensation Amount (SYP)'}</label>
-            <div className="relative"><DollarSign className="absolute left-3 top-1/2 w-4 h-4 text-gray-400" />
-              <input type="number" value={compensation} onChange={(e) => setCompensation(e.target.value)} required className="w-full pl-10 pr-4 py-2 border rounded-lg" placeholder="e.g., 5000000" />
-            </div>
-          </div>
-          <div className="flex justify-end gap-3"><button type="button" onClick={onClose} className="px-4 py-2 text-sm bg-gray-100 rounded-lg">{t('cancel') || 'Cancel'}</button>
-            <button type="submit" className="px-4 py-2 text-sm bg-emerald-600 text-white rounded-lg">{t('saveCompensation') || 'Save Compensation'}</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
-
-// ============= MAIN =============
 export default function Resignations() {
-  const { t } = useTranslation();
-  const [requests, setRequests] = useState(ALL_RESIGNATIONS);
+  const { t, lang } = useLanguage();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>("standard");
-  const [selected, setSelected] = useState<ResignationRequest | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  const apiType = activeTab === "standard" ? "with_notice" : "immediate";
+  const { resignations, isLoading, error } = useResignations(apiType);
 
-  const filtered = requests.filter(r => r.resignationType === activeTab);
+  const handleView = (id: number) => {
+    navigate(`/Hr/resignations/${id}`);
+  };
 
-  const handleView = (r: ResignationRequest) => alert(`${r.employeeName}\nReason: ${r.reason}\nLast Day: ${r.lastWorkingDay}`);
-  const handleApprove = (r: ResignationRequest) => {
-    setRequests(prev => prev.map(req => req.id === r.id ? { ...req, status: "approved", approvedDate: new Date().toISOString().split('T')[0] } : req));
-    alert(`${r.employeeName}'s resignation approved`);
-  };
-  const handleOpenModal = (r: ResignationRequest) => { setSelected(r); setIsModalOpen(true); };
-  const handleSaveComp = (comp: number) => {
-    if (selected) {
-      setRequests(prev => prev.map(r => r.id === selected.id ? { ...r, status: "approved", compensationAmount: comp, approvedDate: new Date().toISOString().split('T')[0] } : r));
-      alert(`${selected.employeeName} approved with compensation: ${comp.toLocaleString()} SYP`);
-      setIsModalOpen(false); setSelected(null);
-    }
-  };
-  const handleReject = (r: ResignationRequest) => {
-    setRequests(prev => prev.map(req => req.id === r.id ? { ...req, status: "rejected" } : req));
-    alert(`${r.employeeName}'s resignation rejected`);
-  };
+  const filteredRequests = (resignations || []).filter(r => {
+    const term = searchTerm.toLowerCase();
+    const name = r.employee?.full_name || 'Unknown';
+    return name.toLowerCase().includes(term);
+  });
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <CompensationModal isOpen={isModalOpen} employeeName={selected?.employeeName || ""} onClose={() => setIsModalOpen(false)} onSubmit={handleSaveComp} />
-
-      <div className="mb-8"><h1 className="text-2xl font-bold">{t('resignationRequests') || 'Resignation Requests'}</h1><p className="text-gray-500 text-sm">{t('manageResignationRequests') || 'Manage standard and immediate resignation requests.'}</p></div>
-
-      <div className="flex gap-2 mb-6 border-b">
-        <button onClick={() => setActiveTab("standard")} className={`px-6 py-3 text-sm font-medium border-b-2 ${activeTab === "standard" ? "text-blue-600 border-blue-600" : "text-gray-500 border-transparent"}`}>{t('standard') || 'Standard'} ({requests.filter(r => r.resignationType === "standard").length})</button>
-        <button onClick={() => setActiveTab("immediate")} className={`flex items-center gap-1 px-6 py-3 text-sm font-medium border-b-2 ${activeTab === "immediate" ? "text-blue-600 border-blue-600" : "text-gray-500 border-transparent"}`}><Zap className="w-4 h-4 text-yellow-500" /> {t('immediate') || 'Immediate'} ({requests.filter(r => r.resignationType === "immediate").length})</button>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50"><tr>{COLUMNS_KEYS.map(c => <th key={c.key} className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase">{t(c.key) || c.label}</th>)}</tr></thead>
-            <tbody>
-              {filtered.map(r => (
-                <tr key={r.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-5 py-3.5"><div><div className="text-sm font-medium">{r.employeeName}</div><div className="text-xs text-gray-400">ID: {r.employeeId}</div></div></td>
-                  <td className="px-5 py-3.5 text-sm">{r.department}</td>
-                  <td className="px-5 py-3.5 text-sm">{r.position}</td>
-                  <td className="px-5 py-3.5 text-sm">{r.lastWorkingDay}</td>
-                  <td className="px-5 py-3.5">
-                    <div className="flex gap-2">
-                      <button onClick={() => handleView(r)} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg"><Eye className="w-4 h-4" /></button>
-                      {r.status === "pending" && (
-                        <>
-                          {activeTab === "immediate" ? <button onClick={() => handleOpenModal(r)} className="flex items-center gap-1 px-2 py-1 text-xs bg-emerald-600 text-white rounded-lg"><DollarSign className="w-3 h-3" />{t('addComp') || 'Add Comp.'}</button>
-                            : <button onClick={() => handleApprove(r)} className="flex items-center gap-1 px-2 py-1 text-xs bg-emerald-600 text-white rounded-lg"><CheckCircle className="w-3 h-3" />{t('approve') || 'Approve'}</button>}
-                          <button onClick={() => handleReject(r)} className="flex items-center gap-1 px-2 py-1 text-xs bg-red-600 text-white rounded-lg"><XCircle className="w-3 h-3" />{t('reject') || 'Reject'}</button>
-                        </>
-                      )}
-                      {r.status === "approved" && r.compensationAmount && <span className="flex items-center gap-1 px-2 py-1 text-xs bg-emerald-100 rounded-lg"><DollarSign className="w-3 h-3" />{r.compensationAmount.toLocaleString()} SYP</span>}
-                      {r.status === "approved" && !r.compensationAmount && activeTab === "standard" && <span className="flex items-center gap-1 px-2 py-1 text-xs bg-emerald-100 rounded-lg"><CheckCircle className="w-3 h-3" />{t('approved') || 'Approved'}</span>}
-                      {r.status === "rejected" && <span className="flex items-center gap-1 px-2 py-1 text-xs bg-red-100 rounded-lg"><XCircle className="w-3 h-3" />{t('rejectedStatus') || 'Rejected'}</span>}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="space-y-6 p-6" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+      {/* Header */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <LogOut className="text-green" size={28} />
+            {t('resignationRequests') || 'Resignation Requests'}
+          </h1>
+          <p className="text-gray-500 mt-1">{t('manageResignationRequests') || 'Manage standard and immediate resignation requests.'}</p>
         </div>
       </div>
 
-      {filtered.length === 0 && <div className="text-center py-12 bg-white rounded-xl shadow-sm"><p className="text-gray-500">{t('noResignationRequestsFound') || `No ${activeTab} resignation requests found`}</p></div>}
+      {/* Toolbar */}
+      <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex bg-gray-50 p-1 rounded-xl w-full md:w-auto">
+          <button
+            onClick={() => setActiveTab('standard')}
+            className={`flex-1 md:flex-none px-6 py-2 text-sm font-medium rounded-lg transition-all ${
+              activeTab === 'standard' ? 'bg-white text-green shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {t('standard') || 'Standard'}
+          </button>
+          <button
+            onClick={() => setActiveTab('immediate')}
+            className={`flex-1 md:flex-none px-6 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-1 ${
+              activeTab === 'immediate' ? 'bg-white text-green shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <Zap size={16} className={activeTab === 'immediate' ? 'text-green' : 'text-yellow-500'} /> 
+            {t('immediate') || 'Immediate'}
+          </button>
+        </div>
+        
+        <div className="relative w-full md:w-72">
+          <input
+            type="text"
+            placeholder={lang === 'ar' ? 'بحث عن موظف...' : 'Search employee...'}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={`w-full ${lang === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green/20 focus:border-green outline-none transition-all`}
+          />
+          <Search className={`absolute ${lang === 'ar' ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-gray-400`} size={18} />
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="animate-spin text-green" size={32} />
+          </div>
+        ) : error ? (
+          <div className="p-8 text-center text-red-500">{error}</div>
+        ) : filteredRequests.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+            <LogOut size={48} className="mb-4 opacity-50" />
+            <p className="text-lg">{t('noResignationRequestsFound') || `No ${activeTab} resignation requests found`}</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+              <thead>
+                <tr className="bg-gray-50/50 border-b border-gray-100 text-gray-500 text-sm">
+                  <th className="px-6 py-4 font-medium text-start">{t('employee') || 'Employee'}</th>
+                  <th className="px-6 py-4 font-medium text-start">{t('department') || 'Department'}</th>
+                  <th className="px-6 py-4 font-medium text-start">{t('position') || 'Position'}</th>
+                  <th className="px-6 py-4 font-medium text-start">{t('lastWorkingDay') || 'Last Working Day'}</th>
+                  <th className="px-6 py-4 font-medium text-start">{t('status') || 'Status'}</th>
+                  <th className="px-6 py-4 font-medium text-center">{t('actions') || 'Actions'}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {filteredRequests.map(r => (
+                  <tr key={r.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="font-semibold text-gray-900">{r.employee?.full_name || 'Unknown'}</div>
+                      <div className="text-xs text-gray-400 mt-1">ID: {r.user_id || 'N/A'}</div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{r.employee?.department?.name || 'N/A'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{r.employee?.position?.name || 'N/A'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 font-medium">{r.last_working_day || 'N/A'}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                        r.status === 'approved' ? 'bg-green/10 text-green' :
+                        r.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                        r.status === 'contract_terminated' ? 'bg-blue-100 text-blue-700' :
+                        'bg-yellow-100 text-yellow-700'
+                      }`}>
+                        {t(r.status) || r.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button 
+                        onClick={() => handleView(r.id)} 
+                        className="inline-flex items-center justify-center p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
+                        title={t('viewDetails') || 'View Details'}
+                      >
+                        <Eye size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

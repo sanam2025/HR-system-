@@ -26,7 +26,7 @@ export default function Complaints() {
     <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">📋 Complaints Management</h1>
+          <h1 className="text-2xl font-bold text-gray-900"> Complaints Management</h1>
           <p className="text-gray-500 text-sm">View and manage all complaints from employees and managers</p>
         </div>
         <button
@@ -56,20 +56,22 @@ export default function Complaints() {
                 <tr key={complaint.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3 text-sm text-gray-500">{idx + 1}</td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">{complaint.title}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{complaint.complainant_name}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{complaint.complained_against_name}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{complaint.author?.full_name || 'Unknown'}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{complaint.subject?.full_name || 'Unknown'}</td>
                   <td className="px-4 py-3">{getStatusBadge(complaint.status)}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">
                     {new Date(complaint.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button
-                      onClick={() => navigate(`/Hr/complaints/${complaint.id}`)}
-                      className="p-1 text-blue-500 hover:text-blue-700 transition-colors"
-                      title="View Details"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
+                    {complaint.status === 'pending' && (
+                      <button
+                        onClick={() => navigate(`/Hr/complaints/${complaint.id}`)}
+                        className="p-1 text-blue-500 hover:text-blue-700 transition-colors"
+                        title="View Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

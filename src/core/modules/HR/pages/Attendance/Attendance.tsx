@@ -15,19 +15,19 @@ export const Attendance = () => {
   const [toDate, setToDate] = useState('');
   const [isFiltered, setIsFiltered] = useState(false);
 
-  // ✅ جلب حضور اليوم
+  //  جلب حضور اليوم
   const { records: todayRecords, isLoading: todayLoading, refetch: refetchToday } = useTodayAttendance();
 
-  // ✅ جلب تحليل الحضور
+  //  جلب تحليل الحضور
   const { stats, isLoading: analysisLoading, refetch: refetchAnalysis } = useAttendanceAnalysis();
 
-  // ✅ جلب الحضور المفلتر
+  //  جلب الحضور المفلتر
   const { records: filteredRecords, isLoading: filterLoading, refetch: refetchFiltered } = useFilteredAttendance(
     fromDate,
     toDate
   );
 
-  // ✅ معالج الفلترة
+  //  معالج الفلترة
   const handleFilter = () => {
     if (!fromDate || !toDate) {
       toast.error('Please select both from and to dates');
@@ -37,7 +37,7 @@ export const Attendance = () => {
     refetchFiltered();
   };
 
-  // ✅ معالج التحديث
+  //  معالج التحديث
   const handleRefresh = () => {
     refetchToday();
     refetchAnalysis();
@@ -47,7 +47,7 @@ export const Attendance = () => {
     toast.success('Refreshed');
   };
 
-  // ✅ عرض البيانات
+  //  عرض البيانات
   const records = isFiltered ? filteredRecords : todayRecords;
 
   const isLoading = todayLoading || analysisLoading || filterLoading;

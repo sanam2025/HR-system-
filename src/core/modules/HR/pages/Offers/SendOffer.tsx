@@ -35,18 +35,27 @@ export const SendOffer = () => {
     return "Failed to send offer";
   };
 
-  // ✅ التأكد من وجود candidate_id
+  const [selectedCandidateId, setSelectedCandidateId] = useState<string>(candidateIdFromUrl || "");
+  const [candidates, setCandidates] = useState<any[]>([]);
+
   useEffect(() => {
-    if (!candidateIdFromUrl) {
-      toast.error("No candidate selected");
-      navigate(`/Hr/job-postings/${jobId}/interviews`);
+    if (jobIdNumber) {
+      import('../../../../../api/service/HrService/CandidatesService').then(({ CandidatesService }) => {
+        CandidatesService.getByJobId(jobIdNumber)
+          .then((res) => {
+            setCandidates(res.data?.data || []);
+          })
+          .catch((err) => console.error(err));
+      });
     }
-  }, [candidateIdFromUrl, jobId, navigate]);
+  }, [jobIdNumber]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!candidateIdFromUrl) {
+    const candidateToUse = candidateIdFromUrl || selectedCandidateId;
+
+    if (!candidateToUse) {
       toast.error("No candidate selected");
       return;
     }
@@ -62,26 +71,26 @@ export const SendOffer = () => {
     }
 
     const data = {
-      candidate_id: Number(candidateIdFromUrl),
+      candidate_id: Number(candidateToUse),
       hour_price: Number(form.hour_price),
       start_date: form.start_date,
       weekend_days: form.weekend_days,
       working_hour_per_day: Number(form.working_hour_per_day),
     };
 
-    console.log("📤 Sending offer:", data);
+    console.log(" Sending offer:", data);
 
-    // ✅ 1. أغلق الفورم فوراً (ارجع للصفحة السابقة)
+    //  1. أغلق الفورم فوراً (ارجع للصفحة السابقة)
     navigate(-1);
 
-    // ✅ 2. أرسل الطلب في الخلفية
+    //  2. أرسل الطلب في الخلفية
     sendOffer(data, {
       onSuccess: () => {
-        // ✅ 3. بعد نجاح الطلب، طلع الأليرت فقط
-        toast.success("✅ Offer sent successfully!");
+        //  3. بعد نجاح الطلب، طلع الأليرت فقط
+        toast.success(" Offer sent successfully!");
       },
       onError: (err: unknown) => {
-        console.error("❌ Send offer error:", err);
+        console.error(" Send offer error:", err);
         toast.error(getErrorMessage(err));
       },
     });
@@ -108,7 +117,7 @@ export const SendOffer = () => {
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
           <button
-            onClick={() => navigate(-1)} // ✅ إغلاق الفورم فوراً عند الضغط على الرجوع
+            onClick={() => navigate(-1)} //  إغلاق الفورم فوراً عند الضغط على الرجوع
             className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3"
           >
             <ArrowLeft className="w-4 h-4" /> Back
@@ -118,7 +127,7 @@ export const SendOffer = () => {
             Send a job offer to the candidate
             {candidateIdFromUrl && (
               <span className="text-purple-600 block mt-1">
-                👤 Sending offer to Candidate #{candidateIdFromUrl}
+                 Sending offer to Candidate #{candidateIdFromUrl}
               </span>
             )}
           </p>
@@ -126,15 +135,33 @@ export const SendOffer = () => {
 
         <div className="bg-white rounded-xl shadow-sm p-6">
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* ✅ Candidate ID مخفي (يؤخذ من الـ URL تلقائياً) */}
-            <div className="hidden">
-              <input
-                type="number"
-                name="candidate_id"
-                value={candidateIdFromUrl || ""}
-                readOnly
-              />
-            </div>
+            {!candidateIdFromUrl ? (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Candidate *
+                </label>
+                <select
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  value={selectedCandidateId}
+                  onChange={(e) => setSelectedCandidateId(e.target.value)}
+                  required
+                >
+                  <option value="" disabled>Select Candidate</option>
+                  {candidates.map((c) => (
+                    <option key={c.id} value={c.id}>{c.full_name}</option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div className="hidden">
+                <input
+                  type="number"
+                  name="candidate_id"
+                  value={candidateIdFromUrl}
+                  readOnly
+                />
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -224,7 +251,7 @@ export const SendOffer = () => {
               </button>
               <button
                 type="button"
-                onClick={() => navigate(-1)} // ✅ إغلاق الفورم فوراً عند الضغط على Cancel
+                onClick={() => navigate(-1)} //  إغلاق الفورم فوراً عند الضغط على Cancel
                 className="px-4 py-2 border text-gray-700 rounded-lg hover:bg-gray-50"
               >
                 Cancel

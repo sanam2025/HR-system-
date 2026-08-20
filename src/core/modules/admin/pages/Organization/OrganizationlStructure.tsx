@@ -60,8 +60,8 @@ export default function Organization() {
       <StatusCard departments={departments?.data}/>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {departments?.data?.map((dept) => (
-          <DepartementCard department={dept}/>
+        {departments?.data?.map((dept, index) => (
+          <DepartementCard key={dept.id || index} department={dept}/>
         ))}
       </div>
     </div>

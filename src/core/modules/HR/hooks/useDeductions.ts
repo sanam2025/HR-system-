@@ -9,13 +9,13 @@ export const useDeductions = () => {
     queryKey: ['deductions'],
     queryFn: async () => {
       const res = await DeductionsService.getAll();
-      // ✅ إرجاع البيانات مباشرة بدون استخدام as
+      //  إرجاع البيانات مباشرة بدون استخدام as
       return res.data?.data || [];
     },
   });
 
   return {
-    deductions: data || [], // ✅ TypeScript سيستنتج النوع تلقائياً
+    deductions: data || [], //  TypeScript سيستنتج النوع تلقائياً
     isLoading,
     error: error?.message || null,
     refetch,
@@ -30,7 +30,7 @@ export const useCreateDeduction = () => {
       DeductionsService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['deductions'] });
-      toast.success('✅ Deduction created successfully!');
+      toast.success(' Deduction created successfully!');
     },
     onError: (err) => {
       if (err instanceof AxiosError && err.response?.status === 422) {

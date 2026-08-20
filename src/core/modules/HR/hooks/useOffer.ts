@@ -4,17 +4,17 @@ import { OfferService } from '../../../../api/service/HrService/OfferService';
 import type { CreateOfferData } from '../../../../api/service/HrService/Types/OfferService.types';
 import { AxiosError } from 'axios';
 
-// ✅ دالة استخراج الخطأ بدقة
+//  دالة استخراج الخطأ بدقة
 const getErrorMessage = (err: unknown): string => {
   if (err instanceof AxiosError && err.response) {
     // طباعة تفاصيل الـ 422 للتصحيح (اكتبها في الـ Console)
     if (err.response.status === 422) {
-      console.log('🔴 Validation Errors:', err.response.data);
+      console.log(' Validation Errors:', err.response.data);
       
       const data = err.response.data as Record<string, string[]>;
       const firstKey = Object.keys(data)[0];
       if (firstKey && data[firstKey]?.[0]) {
-        return `❌ ${data[firstKey][0]}`;
+        return ` ${data[firstKey][0]}`;
       }
     }
     // باقي الأخطاء
@@ -25,7 +25,7 @@ const getErrorMessage = (err: unknown): string => {
   return 'Request failed';
 };
 
-// ✅ هوك إرسال العرض
+//  هوك إرسال العرض
 export const useSendOffer = (jobPostingId?: number) => {
   const queryClient = useQueryClient();
 
@@ -39,7 +39,7 @@ export const useSendOffer = (jobPostingId?: number) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviews'] });
       queryClient.invalidateQueries({ queryKey: ['offers'] });
-      toast.success('🎉 Offer sent successfully!');
+      toast.success(' Offer sent successfully!');
     },
     onError: (err) => {
       toast.error(getErrorMessage(err));
@@ -47,7 +47,7 @@ export const useSendOffer = (jobPostingId?: number) => {
   });
 };
 
-// ✅ هوك العروض
+//  هوك العروض
 export const useOffers = (jobPostingId?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['offers', jobPostingId],

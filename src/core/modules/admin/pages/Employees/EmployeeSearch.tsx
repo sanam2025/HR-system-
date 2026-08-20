@@ -18,7 +18,6 @@ export default function EmployeeSearch() {
   const { data: employeesResponse, isLoading } = useEmployees();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: employeeSearch, isLoading: isLoadingSearch } = useEmployeesSearch(searchQuery);
   const { data: topRate, isLoading: isLoadingTopRate } = useTopRateEmplyees();
 
   const mergeEmployees = (data: any): Employee[] => {
@@ -38,27 +37,20 @@ export default function EmployeeSearch() {
     return [];
   };
 
-  const mapSearchData = (data: any[]): Employee[] => {
-    if (!data || data.length === 0) return [];
-    
-    return data.map((item) => ({
-      id: item.id,
-      name: item.full_name || item.name || 'Unknown',
-      email: item.email || '',
-      department: item.dep_id?.toString() || item.department || 'No Department',
-      job_title: item.job_title || 'No Position',
-      status: item.status as UserStatus || 'inactive',
-      profile_id: item.profile_id || 0
-    }));
-  };
+
 
   const employeesData = mergeEmployees(employeesResponse?.data);
   
   const displayData = searchQuery 
-    ? mapSearchData(employeeSearch || []) 
+    ? employeesData.filter(emp => {
+        const q = searchQuery.toLowerCase();
+        const nameMatch = (emp.name || emp.full_name || '').toLowerCase().includes(q);
+        const emailMatch = (emp.email || '').toLowerCase().includes(q);
+        return nameMatch || emailMatch;
+      })
     : employeesData;
 
-  const isDataLoading = isLoading || isLoadingSearch;
+  const isDataLoading = isLoading;
 
   const handleSearch = () => {
     setSearchQuery(searchTerm);
@@ -75,10 +67,7 @@ export default function EmployeeSearch() {
     }
   };
 
-  useEffect(() => {
-    console.log('employeeSearch:', employeeSearch);
-    console.log('topRate:', topRate);
-  }, [employeeSearch, topRate]);
+
 
   if (isLoading) {
     return <EmployeeSkeleton />;

@@ -13,7 +13,7 @@ export const useMandatoryOvertime = () => {
       return res.data?.data || [];
     },
   });
-  // ✅ نضمن أن البيانات دائماً مصفوفة
+  //  نضمن أن البيانات دائماً مصفوفة
   return { requests: data || [], isLoading, error: error?.message, refetch };
 };
 
@@ -25,7 +25,7 @@ export const useVoluntaryOvertime = () => {
       return res.data?.data || [];
     },
   });
-  // ✅ نضمن أن البيانات دائماً مصفوفة
+  //  نضمن أن البيانات دائماً مصفوفة
   return { requests: data || [], isLoading, error: error?.message, refetch };
 };
 
@@ -37,7 +37,7 @@ export const useDepartmentOvertime = () => {
       return res.data?.data || [];
     },
   });
-  // ✅ نضمن أن البيانات دائماً مصفوفة
+  //  نضمن أن البيانات دائماً مصفوفة
   return { requests: data || [], isLoading, error: error?.message, refetch };
 };
 
@@ -60,7 +60,7 @@ export const useApproveMandatoryOvertime = () => {
     mutationFn: (id: number) => OvertimeService.approveMandatory(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mandatory-overtime'] });
-      toast.success('✅ Mandatory overtime approved!');
+      toast.success(' Mandatory overtime approved!');
     },
     onError: (err) => {
       if (err instanceof AxiosError) {
@@ -77,7 +77,7 @@ export const useRejectMandatoryOvertime = () => {
     mutationFn: (id: number) => OvertimeService.rejectMandatory(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mandatory-overtime'] });
-      toast.success('❌ Mandatory overtime rejected!');
+      toast.success(' Mandatory overtime rejected!');
     },
     onError: (err) => {
       if (err instanceof AxiosError) {
@@ -95,7 +95,7 @@ export const useDeleteOvertime = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mandatory-overtime'] });
       queryClient.invalidateQueries({ queryKey: ['voluntary-overtime'] });
-      toast.success('🗑️ Overtime request deleted!');
+      toast.success('️ Overtime request deleted!');
     },
     onError: (err) => {
       if (err instanceof AxiosError) {

@@ -5,7 +5,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { User, Mail, Phone, Building2, Calendar, Edit2, Save, X, Camera, Loader2, BadgeCheck, MapPin, User2 } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
 import { getMyProfile, saveMyProfile } from '../../../api/manager';
 
@@ -144,7 +144,7 @@ export default function ManagerProfile() {
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
-      <Toaster position="top-center" />
+      
 
       {/* ── Header ── */}
       <div className="flex items-center justify-between">
@@ -344,3 +344,4 @@ export default function ManagerProfile() {
     </div>
   );
 }
+

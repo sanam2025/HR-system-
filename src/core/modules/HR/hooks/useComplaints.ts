@@ -7,7 +7,7 @@ import type {
   RespondComplaintData,
 } from '../../../../api/service/HrService/Types/ComplaintsService.types';
 
-// ✅ Get all complaints
+//  Get all complaints
 export const useComplaints = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['complaints'],
@@ -25,7 +25,7 @@ export const useComplaints = () => {
   };
 };
 
-// ✅ Get single complaint
+//  Get single complaint
 export const useComplaint = (id?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['complaint', id],
@@ -45,7 +45,7 @@ export const useComplaint = (id?: number) => {
   };
 };
 
-// ✅ Mark as under review
+//  Mark as under review
 export const useMarkUnderReview = () => {
   const queryClient = useQueryClient();
 
@@ -54,15 +54,16 @@ export const useMarkUnderReview = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['complaints'] });
       queryClient.invalidateQueries({ queryKey: ['complaint'] });
-      toast.success('✅ Review started');
+      toast.success(' Review started');
     },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Failed to start review');
+    onError: (err: any) => {
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'Failed to start review';
+      toast.error(errorMessage);
     },
   });
 };
 
-// ✅ Respond to complaint
+//  Respond to complaint
 export const useRespondComplaint = () => {
   const queryClient = useQueryClient();
 
@@ -72,10 +73,11 @@ export const useRespondComplaint = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['complaints'] });
       queryClient.invalidateQueries({ queryKey: ['complaint'] });
-      toast.success('✅ Response sent successfully');
+      toast.success(' Response sent successfully');
     },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Failed to send response');
+    onError: (err: any) => {
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'Failed to send response';
+      toast.error(errorMessage);
     },
   });
 };

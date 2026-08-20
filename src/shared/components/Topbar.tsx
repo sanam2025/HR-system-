@@ -5,8 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import { mockEmployees } from '../../data/mockData';
 import toast from 'react-hot-toast';
 import { submitCheckIn, submitCheckOut, getMyNotifications, markNotificationAsRead, getMyMonthlyAttendance } from '../../api/manager';
+import { apiClient } from '../../api/apiClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { NavItem } from './SideBar';
+import { useAuthStore } from '../../store/authStore';
 
 interface TopbarProps {
   title: string;
@@ -25,7 +27,14 @@ export default function Topbar({
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [profileOpen, setProfileOpen] = useState(false);
+  const logout = useAuthStore(state => state.logout);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query), 300);
+    return () => clearTimeout(timer);
+  }, [query]);
   
   // Notifications state
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -187,8 +196,8 @@ export default function Topbar({
     if (searchOpen) setTimeout(() => inputRef.current?.focus(), 50);
   }, [searchOpen]);
 
-  const openSearch = () => { setSearchOpen(true); setQuery(''); };
-  const closeSearch = () => { setSearchOpen(false); setQuery(''); };
+  const openSearch = () => { setSearchOpen(true); setQuery(''); setDebouncedQuery(''); };
+  const closeSearch = () => { setSearchOpen(false); setQuery(''); setDebouncedQuery(''); };
 
   const q = query.trim().toLowerCase();
 
@@ -198,22 +207,28 @@ export default function Topbar({
     )
     : navItems;
 
-  const matchedEmployees = q
-    ? mockEmployees.filter(e =>
-      e.name.includes(query) ||
-      (e.nameEn || '').toLowerCase().includes(q) ||
-      (e.title || '').includes(query) ||
-      (e.titleEn || '').toLowerCase().includes(q)
-    )
-    : mockEmployees.slice(0, 4);
+  const { data: matchedEmployees = [], isLoading: isSearchLoading } = useQuery({
+    queryKey: ['globalSearchEmployees', debouncedQuery],
+    queryFn: async () => {
+      if (!debouncedQuery.trim()) return [];
+      try {
+        const res = await apiClient.get('/search-employees', { params: { search: debouncedQuery } });
+        return res.data?.value || (Array.isArray(res.data) ? res.data : []);
+      } catch {
+        return [];
+      }
+    },
+    enabled: debouncedQuery.trim().length > 0
+  });
 
   const handlePageClick = (path: string) => {
     navigate(path);
     closeSearch();
   };
 
-  const handleEmployeeClick = (id: number) => {
-    navigate(`/manager/employees/${id}`);
+  const handleEmployeeClick = (emp: any) => {
+    const basePath = window.location.pathname.split('/')[1] || 'admin';
+    navigate(`/${basePath}/employees/${emp.profile_id || emp.id}`);
     closeSearch();
   };
 
@@ -346,9 +361,9 @@ export default function Topbar({
             title={lang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'}
             className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-gray-200 bg-white text-xs font-semibold text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-all shadow-sm cursor-pointer duration-200"
           >
-            <span className={lang === 'en' ? 'text-green font-bold' : 'text-gray-400'}>EN</span>
+            <span className={lang === 'en' ? 'text-green-700 font-bold' : 'text-gray-400'}>EN</span>
             <span className="text-gray-300 font-normal">|</span>
-            <span className={`font-tajawal text-[13px] leading-none ${lang === 'ar' ? 'text-green font-bold' : 'text-gray-400'}`}>ع</span>
+            <span className={`text-[13px] leading-none ${lang === 'ar' ? 'text-green-700 font-bold' : 'text-gray-400'}`}>ع</span>
           </button>
 
           {/* Notifications Dropdown */}
@@ -458,7 +473,7 @@ export default function Topbar({
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-bold text-dark truncate">{user.name}</p>
-                      <p className="text-[11px] text-gray-400 truncate">{lang === 'ar' ? 'مدير القسم' : 'Department Manager'}</p>
+                      <p className="text-[11px] text-gray-400 truncate">{user.role || (lang === 'ar' ? 'مستخدم' : 'User')}</p>
                     </div>
                   </div>
                 </div>
@@ -466,11 +481,25 @@ export default function Topbar({
                 {/* Menu Items */}
                 <div className="py-1.5">
                   <button
-                    onClick={() => { navigate('/manager/profile'); setProfileOpen(false); }}
+                    onClick={() => { 
+                      const basePath = window.location.pathname.split('/')[1] || 'admin';
+                      navigate(`/${basePath}/profile`); 
+                      setProfileOpen(false); 
+                    }}
                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-dark hover:bg-green/5 hover:text-green transition-colors text-start"
                   >
                     <User size={16} className="text-gray-400" />
                     {lang === 'ar' ? 'الملف الشخصي' : 'Profile'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      logout();
+                      navigate('/login');
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-start"
+                  >
+                    <LogOut size={16} className="text-red-500" />
+                    {lang === 'ar' ? 'تسجيل الخروج' : 'Logout'}
                   </button>
                 </div>
               </div>
@@ -534,32 +563,34 @@ export default function Topbar({
               )}
 
               {/* Employees */}
-              {matchedEmployees.length > 0 && (
+              {isSearchLoading ? (
+                <div className="py-6 flex justify-center"><div className="w-6 h-6 border-2 border-green border-t-transparent rounded-full animate-spin"></div></div>
+              ) : matchedEmployees.length > 0 ? (
                 <div className="mt-1">
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-4 py-2">
                     {lang === 'ar' ? 'الموظفون' : 'Employees'}
                   </p>
-                  {matchedEmployees.map(emp => (
+                  {matchedEmployees.map((emp: any) => (
                     <button
                       key={emp.id}
-                      onClick={() => handleEmployeeClick(emp.id)}
+                      onClick={() => handleEmployeeClick(emp)}
                       className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-green/5 transition-colors text-start"
                     >
                       <div className="w-8 h-8 rounded-full bg-green/20 flex items-center justify-center text-green font-bold text-sm flex-shrink-0">
-                        {emp.avatar}
+                        {emp.avatar || (emp.full_name || emp.name || 'U').charAt(0).toUpperCase()}
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-dark">
-                          {lang === 'en' ? emp.nameEn || emp.name : emp.name}
+                          {emp.full_name || emp.name}
                         </p>
                         <p className="text-[10px] text-gray-400">
-                          {lang === 'en' ? emp.titleEn || emp.title : emp.title}
+                          {emp.job_title || emp.title}
                         </p>
                       </div>
                     </button>
                   ))}
                 </div>
-              )}
+              ) : null}
 
               {/* No results */}
               {matchedPages.length === 0 && matchedEmployees.length === 0 && (

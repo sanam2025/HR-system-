@@ -37,7 +37,7 @@ export const useApproveEvaluation = () => {
       PerformanceService.approveEvaluation(id, { hr_notes }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pending-evaluations'] });
-      toast.success('✅ Evaluation approved successfully!');
+      toast.success(' Evaluation approved successfully!');
     },
     onError: (err) => {
       if (err instanceof AxiosError) {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CheckCircle, XCircle, Clock, AlertTriangle, Plus, Loader2, Calendar, User, Trash2, X } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
@@ -170,7 +170,7 @@ export default function OvertimeRequests() {
 
   return (
     <div className="space-y-6">
-      <Toaster position="top-center" />
+      
 
       {/* Header & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

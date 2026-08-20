@@ -1,140 +1,574 @@
-import { AlertBanner, Badge } from "../commend-components";
-import type { LeaveRequest, AttendanceLogEntry } from "../../types";
+import React, { useState } from "react";
+import type { FormEvent } from "react";
+import { Calendar, Clock, Hourglass, Wallet, X, FileText, CalendarCheck, ClipboardList } from "lucide-react";
+import { Badge, LoadingSkeleton, QueryErrorNotice } from "../commend-components";
+import { humanizeStatus } from "../../../../../lib/text";
+import type {
+  AttendanceRecord,
+  CreateHourlyLeaveRequestPayload,
+  CreateLeaveRequestPayload,
+  HourlyLeaveRequest,
+  LeaveBalance,
+  LeaveRequest,
+  LeaveType,
+} from "../../../../../api/models";
 
-const LEAVE_TYPES = ["Annual Leave", "Sick Leave", "Unpaid Leave", "Emergency Leave"] as const;
+const LEAVE_TYPE_OPTIONS: { value: LeaveType; label: string }[] = [
+  { value: "annual", label: "Annual" },
+  { value: "sick", label: "Sick" },
+  { value: "unpaid", label: "Unpaid" },
+];
 
-export function AlertBannerCard({
-  message,
-  onClose,
+function DashboardCard({
+  icon,
+  title,
+  color,
+  children,
 }: {
-  message: string;
-  onClose?: () => void;
+  icon: React.ReactNode;
+  title: string;
+  color: string;
+  children: React.ReactNode;
 }) {
-  return <div className="animate-slide-up"><AlertBanner message={message} onClose={onClose} /></div>;
-}
-
-export function RequestLeaveCard() {
   return (
-    <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <h3 className="text-sm font-semibold text-dark mb-3 sm:mb-4">Request Leave</h3>
-      <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-        <div>
-          <label htmlFor="leave-type" className="block text-xs text-gray-500 mb-1">
-            Leave Type
-          </label>
-          <select
-            id="leave-type"
-            className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm text-dark bg-white focus:outline-none focus:ring-2 focus:ring-green/30 focus:border-green"
-          >
-            {LEAVE_TYPES.map((type) => (
-              <option key={type}>{type}</option>
-            ))}
-          </select>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="min-w-0">
-            <label htmlFor="start-date" className="block text-xs text-gray-500 mb-1">
-              Start Date
-            </label>
-            <input
-              id="start-date"
-              type="date"
-              className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm text-dark bg-white focus:outline-none focus:ring-2 focus:ring-green/30 focus:border-green"
-            />
-          </div>
-          <div className="min-w-0">
-            <label htmlFor="end-date" className="block text-xs text-gray-500 mb-1">
-              End Date
-            </label>
-            <input
-              id="end-date"
-              type="date"
-              className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm text-dark bg-white focus:outline-none focus:ring-2 focus:ring-green/30 focus:border-green"
-            />
-          </div>
-        </div>
-        <div>
-          <label htmlFor="reason" className="block text-xs text-gray-500 mb-1">
-            Reason (optional)
-          </label>
-          <textarea
-            id="reason"
-            rows={3}
-            className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm text-dark bg-white resize-none focus:outline-none focus:ring-2 focus:ring-green/30 focus:border-green"
-            placeholder="Enter reason..."
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full py-2.5 bg-green text-white rounded-xl text-sm font-medium hover:bg-green-dark transition-colors active:scale-[0.97] transition-transform duration-100"
+    <article
+      className="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col relative overflow-hidden group hover:shadow-md transition-all duration-300"
+      style={{ borderTop: `4px solid ${color}` }}
+    >
+      <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-50">
+        <div
+          className="p-2.5 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105"
+          style={{ backgroundColor: `${color}15`, color: color }}
         >
-          Submit Request
-        </button>
-      </form>
-    </section>
+          {icon}
+        </div>
+        <h2 className="font-bold text-gray-800 text-[15px]">{title}</h2>
+      </div>
+      <div className="px-5 py-4 flex flex-col">{children}</div>
+    </article>
   );
 }
 
-function PendingRequestCard({ request, index }: { request: LeaveRequest; index: number }) {
+export interface RequestLeaveCardProps {
+  onSubmit: (payload: CreateLeaveRequestPayload) => void;
+  isSubmitting: boolean;
+  errorMessage?: string | null;
+}
+
+export function RequestLeaveCard({ onSubmit, isSubmitting, errorMessage }: RequestLeaveCardProps) {
+  const [startDate, setStartDate] = useState("");
+  const [type, setType] = useState<LeaveType>("annual");
+  const [daysCount, setDaysCount] = useState(1);
+  const [reason, setReason] = useState("");
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!startDate || daysCount < 1 || reason.trim().length < 5) return;
+    onSubmit({ start_date: startDate, type, days_count: daysCount, reason });
+    setStartDate("");
+    setDaysCount(1);
+    setType("annual");
+    setReason("");
+  }
+
   return (
-    <div className="p-4 rounded-xl bg-beige animate-slide-up-stagger" style={{ animationDelay: `${index * 0.1}s` }}>
-      <div className="flex items-center justify-between gap-2 mb-1">
-        <span className="text-sm font-medium text-dark truncate">{request.type}</span>
-        <Badge variant="pending">Pending</Badge>
-      </div>
-      <p className="text-xs text-gray-400 mb-2 break-words">
-        {request.from} &mdash; {request.to}
-      </p>
-      <button
-        type="button"
-        className="text-xs text-red-500 hover:text-red-600 font-medium focus:outline-none focus:ring-2 focus:ring-red-200 rounded"
-        aria-label={`Cancel ${request.type} request`}
-      >
-        Cancel Request
-      </button>
+    <DashboardCard icon={<FileText size={18} />} title="Request Leave - تقديم إجازة" color="#C4A66A">
+      <form onSubmit={handleSubmit} className="space-y-3 flex flex-col">
+        {errorMessage && (
+          <p role="alert" className="text-xs text-red-600">
+            {errorMessage}
+          </p>
+        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label htmlFor="leave-start-date" className="block text-xs text-gray-500 mb-1">
+              Start date - تاريخ البدء
+            </label>
+            <input
+              id="leave-start-date"
+              type="date"
+              required
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green/30 focus:border-green text-dark"
+            />
+          </div>
+          <div>
+            <label htmlFor="leave-days" className="block text-xs text-gray-500 mb-1">
+              Days - عدد الأيام
+            </label>
+            <input
+              id="leave-days"
+              type="number"
+              min={1}
+              required
+              value={daysCount}
+              onChange={(e) => setDaysCount(Number(e.target.value))}
+              className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green/30 focus:border-green text-dark"
+            />
+          </div>
+        </div>
+        <div>
+          <label htmlFor="leave-type" className="block text-xs text-gray-500 mb-1">
+            Type - نوع الإجازة
+          </label>
+          <select
+            id="leave-type"
+            value={type}
+            onChange={(e) => setType(e.target.value as LeaveType)}
+            className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green/30 focus:border-green text-dark bg-white"
+          >
+            {LEAVE_TYPE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="mb-2">
+          <label htmlFor="leave-reason" className="block text-xs text-gray-500 mb-1">
+            Reason - السبب
+          </label>
+          <input
+            id="leave-reason"
+            type="text"
+            required
+            minLength={5}
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Brief reason for leave - سبب الإجازة..."
+            className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green/30 focus:border-green text-dark"
+          />
+        </div>
+        <div className="pt-2">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-2.5 bg-[#4A7C59] text-white rounded-xl text-sm font-medium hover:bg-opacity-90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? "Submitting..." : "Submit Request - تقديم الطلب"}
+          </button>
+        </div>
+      </form>
+    </DashboardCard>
+  );
+}
+
+function leaveStatusVariant(status: LeaveRequest["status"]): "success" | "warning" | "danger" {
+  if (status === "approved") return "success";
+  if (status === "rejected") return "danger";
+  return "warning";
+}
+
+export interface LeaveRequestsCardProps {
+  requests: LeaveRequest[] | undefined;
+  isLoading: boolean;
+  errorMessage?: string | null;
+  onCancel: (id: number) => void;
+  cancelingId?: number | null;
+}
+
+export function LeaveRequestsCard({
+  requests,
+  isLoading,
+  errorMessage,
+  onCancel,
+  cancelingId,
+}: LeaveRequestsCardProps) {
+  return (
+    <DashboardCard icon={<ClipboardList size={18} />} title="Leave Requests - طلبات الإجازة" color="#6B6358">
+      {isLoading ? (
+        <LoadingSkeleton />
+      ) : errorMessage ? (
+        <QueryErrorNotice message={errorMessage} />
+      ) : !requests || requests.length === 0 ? (
+        <p className="text-sm text-gray-400 py-2">No leave requests - لا توجد طلبات إجازة.</p>
+      ) : (
+        <div className="space-y-2 flex-1 overflow-y-auto custom-scrollbar">
+          {requests.map((request) => (
+            <div
+              key={request.id}
+              className="flex items-center justify-between gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100/50"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-dark capitalize truncate">
+                  {request.type} Leave - إجازة
+                </p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {request.start_date} • {request.days_count} day(s) - يوم / أيام
+                </p>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <Badge variant={leaveStatusVariant(request.status)}>{humanizeStatus(request.status)}</Badge>
+                {request.status === "pending" && (
+                  <button
+                    type="button"
+                    onClick={() => onCancel(request.id)}
+                    disabled={cancelingId === request.id}
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+                    aria-label="Cancel leave request"
+                    title="Cancel request"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </DashboardCard>
+  );
+}
+
+export interface RecentAttendanceLogCardProps {
+  log: AttendanceRecord[] | undefined;
+  isLoading: boolean;
+  errorMessage?: string | null;
+}
+
+function formatAttendanceDate(dateStr: string): string {
+  const parsed = new Date(dateStr);
+  if (Number.isNaN(parsed.getTime())) return dateStr;
+  return parsed.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+export function RecentAttendanceLogCard({ log, isLoading, errorMessage }: RecentAttendanceLogCardProps) {
+  const entries = (log ?? [])
+    .slice()
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 10);
+
+  return (
+    <DashboardCard icon={<CalendarCheck size={18} />} title="Recent Attendance - الحضور الأخير" color="#4A7C59">
+      {isLoading ? (
+        <LoadingSkeleton />
+      ) : errorMessage ? (
+        <QueryErrorNotice message={errorMessage} />
+      ) : entries.length === 0 ? (
+        <p className="text-sm text-gray-400 py-2">No attendance records found - لا توجد سجلات حضور.</p>
+      ) : (
+        <div className="space-y-2 flex-1 overflow-y-auto custom-scrollbar pr-1">
+          {entries.map((entry) => (
+            <div
+              key={entry.id}
+              className="flex items-center justify-between gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100/50"
+            >
+              <div className="flex flex-col min-w-0">
+                <Badge variant={entry.status === "present" ? "success" : entry.status === "absent" ? "danger" : entry.status === "late" ? "warning" : "default"}>
+                  {humanizeStatus(entry.status)}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
+                <span className="text-dark">{formatAttendanceDate(entry.date)}</span>
+                <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                <span className={entry.check_in ? "text-[#4A7C59]" : "text-gray-400"}>
+                  {entry.check_in ?? "--:--"}
+                </span>
+                <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                <span className={entry.check_out ? "text-[#4A7C59]" : "text-gray-400"}>
+                  {entry.check_out ?? "--:--"}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </DashboardCard>
+  );
+}
+
+export interface LeaveBalanceCardProps {
+  balance: LeaveBalance | undefined;
+  isLoading: boolean;
+  errorMessage?: string | null;
+}
+
+export function LeaveBalanceCard({ balance, isLoading, errorMessage }: LeaveBalanceCardProps) {
+  const entries = balance?.leave_balances ?? [];
+
+  return (
+    <div className="mb-4 sm:mb-6">
+      <DashboardCard icon={<Wallet size={18} />} title="Leave Balance - رصيد الإجازات" color="#4A7C59">
+        {isLoading ? (
+          <LoadingSkeleton lines={2} />
+        ) : errorMessage ? (
+          <QueryErrorNotice message={errorMessage} />
+        ) : entries.length === 0 ? (
+          <p className="text-sm text-gray-400 py-2">No leave balances found - لم يتم العثور على رصيد إجازات.</p>
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-2">
+            {entries.map((b, index) => {
+              const total = b.total_days || 0;
+              const remaining = b.remaining_days ?? total;
+              // Percentage represents how much is remaining (100% = full balance)
+              const fraction = total > 0 ? remaining / total : 0;
+              const percentage = Math.min(100, Math.max(0, fraction * 100));
+              
+              return (
+                <div key={index} className="bg-gray-50 p-4 rounded-xl border border-gray-100/50">
+                  <p className="text-xs text-gray-400 mb-1 uppercase font-semibold tracking-wider">
+                    {b.leave_type} LEAVE - إجازة
+                  </p>
+                  <div className="flex items-baseline gap-1 mb-3" dir="ltr">
+                    <span className="text-2xl font-bold text-gray-800">{remaining}</span>
+                    <span className="text-sm text-gray-400">/ {total}</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden" dir="ltr">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        percentage <= 10 ? "bg-red-500" : percentage <= 25 ? "bg-yellow-400" : "bg-[#4A7C59]"
+                      }`}
+                      style={{ width: `${percentage}%` }}
+                    ></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </DashboardCard>
     </div>
   );
 }
 
-export function PendingRequestsCard({ requests }: { requests: LeaveRequest[] }) {
+export interface RequestHourlyLeaveCardProps {
+  onSubmit: (payload: CreateHourlyLeaveRequestPayload) => void;
+  isSubmitting: boolean;
+  errorMessage?: string | null;
+}
+
+export function RequestHourlyLeaveCard({
+  onSubmit,
+  isSubmitting,
+  errorMessage,
+}: RequestHourlyLeaveCardProps) {
+  const [date, setDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [reason, setReason] = useState("");
+  const [localError, setLocalError] = useState<string | null>(null);
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setLocalError(null);
+
+    if (!date || !startTime || !endTime || reason.trim().length < 5) return;
+
+    if (startTime < "09:00" || startTime > "17:00" || endTime < "09:00" || endTime > "17:00") {
+      setLocalError("Working hours are from 09:00 to 17:00. - لا يمكنك تقديم إجازة خارج أوقات الدوام (09:00 - 17:00).");
+      return;
+    }
+
+    if (startTime >= endTime) {
+      setLocalError("Start time must be before end time. - وقت البداية يجب أن يكون قبل وقت النهاية.");
+      return;
+    }
+
+    onSubmit({ date, start_time: startTime, end_time: endTime, reason });
+    setDate("");
+    setStartTime("");
+    setEndTime("");
+    setReason("");
+  }
+
+  const displayError = localError || errorMessage;
+
   return (
-    <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <h3 className="text-sm font-semibold text-dark mb-3 sm:mb-4">Pending Requests</h3>
-      <div className="space-y-3">
-        {requests.map((req, i) => (
-          <PendingRequestCard key={req.id} request={req} index={i} />
-        ))}
-      </div>
-    </section>
+    <DashboardCard icon={<Hourglass size={18} />} title="Request Hourly Leave - إجازة ساعية" color="#C4A66A">
+      <form onSubmit={handleSubmit} className="space-y-3 flex flex-col">
+        {displayError && (
+          <p role="alert" className="text-xs text-red-600 bg-red-50 p-2 rounded-md border border-red-100">
+            {displayError}
+          </p>
+        )}
+        <div>
+          <label htmlFor="hourly-date" className="block text-xs text-gray-500 mb-1">
+            Date - التاريخ
+          </label>
+          <input
+            id="hourly-date"
+            type="date"
+            required
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green/30 focus:border-green text-dark"
+          />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label htmlFor="hourly-start-time" className="block text-xs text-gray-500 mb-1">
+              Start time - وقت البدء
+            </label>
+            <input
+              id="hourly-start-time"
+              type="time"
+              required
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green/30 focus:border-green text-dark"
+            />
+          </div>
+          <div>
+            <label htmlFor="hourly-end-time" className="block text-xs text-gray-500 mb-1">
+              End time - وقت الانتهاء
+            </label>
+            <input
+              id="hourly-end-time"
+              type="time"
+              required
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green/30 focus:border-green text-dark"
+            />
+          </div>
+        </div>
+        <div className="mb-2">
+          <label htmlFor="hourly-reason" className="block text-xs text-gray-500 mb-1">
+            Reason - السبب
+          </label>
+          <input
+            id="hourly-reason"
+            type="text"
+            required
+            minLength={5}
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Brief reason for hourly leave - سبب الإجازة الساعية..."
+            className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green/30 focus:border-green text-dark"
+          />
+        </div>
+        <div className="pt-2">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-2.5 bg-[#4A7C59] text-white rounded-xl text-sm font-medium hover:bg-opacity-90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? "Submitting..." : "Submit Request - تقديم الطلب"}
+          </button>
+        </div>
+      </form>
+    </DashboardCard>
   );
 }
 
-export function RecentAttendanceLogCard({ log }: { log: AttendanceLogEntry[] }) {
+export interface HourlyLeaveRequestsCardProps {
+  requests: HourlyLeaveRequest[] | undefined;
+  isLoading: boolean;
+  errorMessage?: string | null;
+  onCancel: (id: number) => void;
+  cancelingId?: number | null;
+}
+
+export function HourlyLeaveRequestsCard({
+  requests,
+  isLoading,
+  errorMessage,
+  onCancel,
+  cancelingId,
+}: HourlyLeaveRequestsCardProps) {
   return (
-    <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <h3 className="text-sm font-semibold text-dark mb-3 sm:mb-4">Recent Attendance Log</h3>
-      <div className="overflow-x-auto">
-        <table className="w-full text-xs sm:text-sm">
-          <thead>
-            <tr className="border-b border-gray-100">
-              <th scope="col" className="text-left py-2.5 text-xs text-gray-400 font-medium">Date</th>
-              <th scope="col" className="text-left py-2.5 text-xs text-gray-400 font-medium">Check-in</th>
-              <th scope="col" className="text-left py-2.5 text-xs text-gray-400 font-medium">Check-out</th>
-              <th scope="col" className="text-right py-2.5 text-xs text-gray-400 font-medium">Total Hours</th>
-            </tr>
-          </thead>
-          <tbody>
-            {log.map((entry, i) => (
-              <tr key={i} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition-colors animate-slide-up-stagger" style={{ animationDelay: `${i * 0.05}s` }}>
-                <td className="py-3 text-dark font-medium whitespace-nowrap">{entry.date}</td>
-                <td className="py-3 text-gray-600 whitespace-nowrap">{entry.checkIn}</td>
-                <td className="py-3 text-gray-600 whitespace-nowrap">{entry.checkOut}</td>
-                <td className="py-3 text-green font-semibold text-right whitespace-nowrap">{entry.totalHours}</td>
-              </tr>
+    <DashboardCard icon={<Clock size={18} />} title="Hourly Leave Requests - الإجازات الساعية" color="#6B6358">
+      {isLoading ? (
+        <LoadingSkeleton />
+      ) : errorMessage ? (
+        <QueryErrorNotice message={errorMessage} />
+      ) : !requests || requests.length === 0 ? (
+        <p className="text-sm text-gray-400 py-2">No hourly leave requests - لا توجد طلبات إجازة ساعية.</p>
+      ) : (
+        <div className="space-y-2 flex-1 overflow-y-auto custom-scrollbar">
+          {requests.map((request) => (
+            <div
+              key={request.id}
+              className="flex items-center justify-between gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100/50"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-dark truncate">
+                  {request.date}
+                </p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {request.start_time} - {request.end_time}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <Badge variant={leaveStatusVariant(request.status)}>{humanizeStatus(request.status)}</Badge>
+                {request.status === "pending" && (
+                  <button
+                    type="button"
+                    onClick={() => onCancel(request.id)}
+                    disabled={cancelingId === request.id}
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+                    aria-label="Cancel leave request"
+                    title="Cancel request"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </DashboardCard>
+  );
+}
+
+export interface MonthlyAttendanceCardProps {
+  records: AttendanceRecord[] | undefined;
+  isLoading: boolean;
+  errorMessage?: string | null;
+}
+
+export function MonthlyAttendanceCard({ records, isLoading, errorMessage }: MonthlyAttendanceCardProps) {
+  const entries = (records ?? [])
+    .slice()
+    .sort((a, b) => b.date.localeCompare(a.date));
+
+  return (
+    <div className="mb-4 sm:mb-6">
+      <DashboardCard icon={<CalendarCheck size={18} />} title="Monthly Attendance - الحضور الشهري" color="#4A7C59">
+        {isLoading ? (
+          <LoadingSkeleton lines={3} />
+        ) : errorMessage ? (
+          <QueryErrorNotice message={errorMessage} />
+        ) : entries.length === 0 ? (
+          <p className="text-sm text-gray-400 py-2">No attendance records yet this month - لا توجد سجلات حضور هذا الشهر.</p>
+        ) : (
+          <div className="flex flex-col gap-3 mt-2">
+            {entries.map((entry) => (
+              <div key={entry.id} className="flex flex-col sm:flex-row justify-between sm:items-center p-3 sm:p-4 rounded-xl border border-gray-100 bg-gray-50/50 gap-3">
+                <div className="flex items-center gap-4" dir="ltr">
+                  <span className="text-base font-semibold text-gray-800 whitespace-nowrap">
+                    {formatAttendanceDate(entry.date)}
+                  </span>
+                  <Badge variant={entry.status === "present" ? "success" : entry.status === "absent" ? "danger" : entry.status === "late" ? "warning" : "default"}>
+                    {humanizeStatus(entry.status)}
+                  </Badge>
+                </div>
+                
+                <div className="flex items-center gap-6" dir="ltr">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500 flex items-center gap-1 font-medium">
+                      <Clock size={14} /> Late - تأخير:
+                    </span>
+                    <span className={`text-base font-bold ${entry.late_minutes && entry.late_minutes > 0 ? 'text-red-500' : 'text-gray-800'}`}>
+                      {entry.late_minutes ?? 0} <span className="text-sm text-gray-400 font-normal">m - د</span>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500 flex items-center gap-1 font-medium">
+                      <Hourglass size={14} /> Early Leave - مغادرة مبكرة:
+                    </span>
+                    <span className={`text-base font-bold ${entry.early_leave_minutes && entry.early_leave_minutes > 0 ? 'text-red-500' : 'text-gray-800'}`}>
+                      {entry.early_leave_minutes ?? 0} <span className="text-sm text-gray-400 font-normal">m - د</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
+          </div>
+        )}
+      </DashboardCard>
+    </div>
   );
 }

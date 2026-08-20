@@ -1,7 +1,5 @@
 
 import { useNavigate } from "react-router-dom";
-import { Globe } from "lucide-react";
-import { useLanguage } from "../../../../../i18n/LanguageContext";
 import { useEmployees } from "../../hooks/Employees/useEmployees";
 import { useSettings } from "../../hooks/Settings/useSettings";
 import { useTerminations } from "../../hooks/Terminations/useTerminations";
@@ -15,8 +13,6 @@ import { EmployeeStatusChart } from "./charts/EmployeeStatusChart";
 import { PayrollHistoryChart } from "./charts/PayrollHistoryChart";
 
 export default function Dashboard() {
-  const { lang, toggleLang } = useLanguage();
-
   const { data: employeesResponse, isLoading: isLoadingEmployees } = useEmployees();
   const { data: departmentsResponse, isLoading: isLoadingDepartments } = useDepartments();
   const { data: settingsData } = useSettings();
@@ -117,15 +113,6 @@ export default function Dashboard() {
             Overview of employee statistics and metrics
           </p>
         </div>
-        <button
-          onClick={toggleLang}
-          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
-        >
-          <Globe className="w-4 h-4 text-gray-600" />
-          <span className="text-sm font-medium text-gray-700">
-            {lang === 'en' ? 'العربية' : 'English'}
-          </span>
-        </button>
       </div>
 
       <StatsCards stats={stats} />

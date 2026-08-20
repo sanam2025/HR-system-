@@ -45,6 +45,14 @@ export const TerminationCard = ({ termination }: { termination: Termination }) =
     }
   };
 
+  const displayStatus = (() => {
+    if (termination.approvals && Array.isArray(termination.approvals)) {
+      const roleApproval = termination.approvals.find((a: any) => a.role?.toLowerCase() === 'admin');
+      if (roleApproval) return roleApproval.status;
+    }
+    return termination.status;
+  })();
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
       <div className="p-5">
@@ -66,7 +74,7 @@ export const TerminationCard = ({ termination }: { termination: Termination }) =
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${typeColor}`}>
                     {typeLabels[termination.type as keyof typeof typeLabels] || termination.type}
                   </span>
-                  <StatusBadge status={termination.status} />
+                  <StatusBadge status={displayStatus} />
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-3 mt-1.5">
@@ -102,7 +110,7 @@ export const TerminationCard = ({ termination }: { termination: Termination }) =
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0 self-start lg:self-center">
-            {termination.status === "pending" && (
+            {displayStatus === "pending" && (
               <div className="flex items-center gap-1 bg-gray-50 rounded-lg p-1 border border-gray-100">
                 <button
                   onClick={handleApprove}

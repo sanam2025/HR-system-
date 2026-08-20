@@ -1,113 +1,72 @@
 // src/shared/layouts/HRLayout.tsx
-import { Outlet } from "react-router-dom";
-import Sidebar from "../components/SideBar";
-import LanguageSwitcher from "../components/LanguageSwitcher";
-import { useTranslation } from "react-i18next";
+import AppLayout from './AppLayout';
 import {
   LayoutDashboard,
   Users,
   CalendarDays,
   DollarSign,
   UserPlus,
- 
   LogOut,
   FileText,
   Briefcase,
   Clock,
   Scale,
   Megaphone,
-} from "lucide-react";
-import { useState } from "react";
+  TrendingUp,
+  ClipboardList,
+  UserCheck,
+} from 'lucide-react';
+import type { NavItem } from '../components/SideBar';
 
 export default function HRLayout() {
-  const [open, setOpen] = useState(true);
-  const { t } = useTranslation();
-
-  const hrSideBar = [
-    { path: "/Hr", label: t("dashboard"), icon: LayoutDashboard, exact: true },
-    { path: "employees", label: t("employee"), icon: Users, exact: false },
-    {
-      path: "Recruitment",
-      label: t("recruitment"),
-      icon: UserPlus,
-      exact: false,
-    },
-    {
-  path: "offers", // أو "job-postings/offers" حسب تنسيقك
-  label: t("offers") || "Offers",
-  icon: FileText, // أيقونة مناسبة
-  exact: false,
-},
-    
-    // ✅ إضافة Accepted Candidates في الـ Sidebar
-   
-    { path: "attendance", label: t("attendance"), icon: Clock, exact: false },
-    { path: "Leaves", label: t("leaves"), icon: CalendarDays, exact: false },
-    {
-      path: "hourly-leaves",
-      label: t("hourlyLeaves"),
-      icon: Clock,
-      exact: false,
-    },
-    { path: "Payroll", label: t("payroll"), icon: DollarSign, exact: false },
-    {
-      path: "terminations",
-      label: t("terminations"),
-      icon: Users,
-      exact: false,
-    },
-    {
-      path: "resignations",
-      label: t("resignations"),
-      icon: LogOut,
-      exact: false,
-    },
-    {
-  
-  path: "overtime",
-  label: t("overtime") || "Overtime",
-  icon: Clock,
-  exact: false,
-},
-    { path: "contracts", label: t("contracts"), icon: FileText, exact: false },
-    {
-      path: "job-postings",
-      label: t("jobPostings"),
-      icon: Briefcase,
-      exact: false,
-    },
-    {
-      path: "announcements",
-      label: t("announcements") || "التعميمات",
-      icon: Megaphone,
-      exact: false,
-    },
-    {
-      path: "complaints",
-      label: t("complaints") || "الشكاوي",
-      icon: Scale,
-      exact: false,
-    },
+  const navItems: NavItem[] = [
+    { label: 'لوحة التحكم', icon: LayoutDashboard, path: '/Hr', exact: true },
+    { label: 'التوظيف', icon: UserPlus, path: '/Hr/Recruitment', exact: false },
+    { label: 'العروض', icon: FileText, path: '/Hr/offers', exact: false },
+    { label: 'الحضور', icon: Clock, path: '/Hr/attendance', exact: false },
+    { label: 'الإجازات', icon: CalendarDays, path: '/Hr/Leaves', exact: false },
+    { label: 'الرواتب', icon: DollarSign, path: '/Hr/payroll', exact: false },
+    { label: 'الإنهاءات', icon: UserCheck, path: '/Hr/terminations', exact: false },
+    { label: 'الاستقالات', icon: LogOut, path: '/Hr/resignations', exact: false },
+    { label: 'العمل الإضافي', icon: Clock, path: '/Hr/overtime', exact: false },
+    { label: 'العقود', icon: FileText, path: '/Hr/contracts', exact: false },
+    { label: 'الوظائف', icon: Briefcase, path: '/Hr/job-postings', exact: false },
+    { label: 'الأداء', icon: TrendingUp, path: '/Hr/performance', exact: false },
+    { label: 'المهام', icon: ClipboardList, path: '/Hr/tasks', exact: false },
+    { label: 'التعميمات', icon: Megaphone, path: '/Hr/announcements', exact: false },
+    { label: 'الشكاوي', icon: Scale, path: '/Hr/complaints', exact: false },
   ];
 
+  const pageTitles: Record<string, string> = {
+    '/Hr': 'لوحة التحكم',
+    '/Hr/Recruitment': 'التوظيف',
+    '/Hr/offers': 'العروض',
+    '/Hr/attendance': 'الحضور',
+    '/Hr/Leaves': 'الإجازات',
+    '/Hr/hourly-leaves': 'إجازات بالساعة',
+    '/Hr/payroll': 'الرواتب',
+    '/Hr/terminations': 'الإنهاءات',
+    '/Hr/resignations': 'الاستقالات',
+    '/Hr/overtime': 'العمل الإضافي',
+    '/Hr/contracts': 'العقود',
+    '/Hr/job-postings': 'الوظائف',
+    '/Hr/performance': 'الأداء',
+    '/Hr/tasks': 'المهام',
+    '/Hr/announcements': 'التعميمات',
+    '/Hr/complaints': 'الشكاوي',
+  };
+
   return (
-    <div className="flex overflow-hidden bg-gray-100">
-      <Sidebar
-        navItems={hrSideBar}
-        onToggle={() => setOpen(!open)}
-        open={open}
-      />
-      <main
-        className={`flex-1 transition-all duration-300 ${open ? "ml-64" : "ml-20"}`}
-      >
-        <div className="p-4 border-b bg-white flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-800"></h1>
-          <LanguageSwitcher />
-        </div>
-        <div className="p-6">
-          <Outlet />
-        </div>
-      </main>
-    </div>
+    <AppLayout
+      navItems={navItems}
+      pageTitles={pageTitles}
+      brand={{
+        logo: undefined,
+        title: 'MasarHR',
+        subtitle: 'إدارة الموارد البشرية',
+      }}
+      navSectionLabel="القائمة الرئيسية"
+      defaultTitle="لوحة التحكم"
+    />
   );
 }

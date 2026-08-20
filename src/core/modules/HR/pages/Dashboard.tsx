@@ -1,20 +1,20 @@
 // src/core/modules/HR/pages/Dashboard.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Users, Calendar, TrendingUp, DollarSign, Megaphone, 
+import {
+  Users, Calendar, TrendingUp, DollarSign, Megaphone,
   Building2, ChevronRight, Plus, X
 } from 'lucide-react';
 import StatCard from '../Components/common_Components/StatCard';
 import { useActiveAnnouncements, useCreateAnnouncement } from '../hooks/useAnnouncements';
 import AnnouncementCard from '../Components/Special_Components/AnnouncementCard';
-import { useDepartmentsWithUsers } from '../hooks/useDepartments';
+import { useDepartmentsWithUsers, useDepartments } from '../hooks/useDepartments';
 import Loading from '../../../../shared/components/Loading';
 import toast from 'react-hot-toast';
 import type { CreateAnnouncementData } from '../../../../api/service/HrService/Types/AnnouncementsService.types';
 import { AxiosError } from 'axios';
 
-// ✅ استيراد أنواع الأقسام والموظفين
+//  استيراد أنواع الأقسام والموظفين
 import type { Department, Employee } from '../../../../api/service/HrService/Types/DepartmentsService.types';
 
 const STATS_DATA = {
@@ -36,28 +36,55 @@ const getStatValue = (key: keyof typeof STATS_DATA) => STATS_DATA[key];
 export default function Dashboard() {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
+  const [selectedDepartment, setSelectedDepartment] = useState<(Department & { employees?: Employee[] }) | null>(null);
 
-  const { 
-    announcements, 
-    isLoading: announcementsLoading, 
+  const {
+    announcements,
+    isLoading: announcementsLoading,
     refetch,
-    error: announcementsError 
+    error: announcementsError
   } = useActiveAnnouncements({ status: 'active' });
 
-  // ✅ تعريف نوع المصفوفة بشكل صريح
-  const { 
-    departments, 
+  //  تعريف نوع المصفوفة بشكل صريح
+  const {
+    departments: departmentsWithUsers,
     isLoading: departmentsLoading,
     error: departmentsError
-  } = useDepartmentsWithUsers() as { 
+  } = useDepartmentsWithUsers() as {
     departments: (Department & { employees?: Employee[] })[],
     isLoading: boolean,
     error: string | null
   };
 
+  const { departments: departmentsNames } = useDepartments();
+
+  const departments = departmentsWithUsers.map(dept => {
+    const actualId = (dept as any).department_id || (dept as any).department?.id || dept.id;
+    const nameData = departmentsNames.find((n: any) => String(n.id) === String(actualId));
+    
+    let actualName = nameData?.name || 'Unknown Department';
+    if (typeof (dept as any).department === 'string' && (dept as any).department.trim() !== '') {
+      actualName = (dept as any).department;
+    } else if ((dept as any).department?.name) {
+      actualName = (dept as any).department.name;
+    } else if ((dept as any).department_name) {
+      actualName = (dept as any).department_name;
+    } else if (dept.name) {
+      actualName = dept.name;
+    }
+      
+    return {
+      ...dept,
+      id: actualId,
+      name: actualName,
+      manager_name: (dept as any).department?.manager_name || dept.manager_name,
+      manager_id: (dept as any).department?.manager_id || dept.manager_id
+    };
+  });
+
   const createAnnouncement = useCreateAnnouncement();
 
-  // ✅ استخدام حقول الـ UI فقط، وسنقوم ببناء الـ Payload عند الإرسال
+  //  استخدام حقول الـ UI فقط، وسنقوم ببناء الـ Payload عند الإرسال
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -73,14 +100,14 @@ export default function Dashboard() {
       const firstKey = Object.keys(data)[0];
       const firstMessage = data[firstKey]?.[0];
       if (firstMessage) {
-        toast.error(`❌ ${firstMessage}`);
+        toast.error(` ${firstMessage}`);
       } else {
-        toast.error('❌ Validation error. Please check required fields.');
+        toast.error(' Validation error. Please check required fields.');
       }
     } else if (err instanceof Error) {
-      toast.error(`❌ ${err.message}`);
+      toast.error(` ${err.message}`);
     } else {
-      toast.error('❌ An unexpected error occurred.');
+      toast.error(' An unexpected error occurred.');
     }
   };
 
@@ -94,8 +121,8 @@ export default function Dashboard() {
   }
 
   const hasDepartments = !departmentsLoading && departments.length > 0;
-  
-  // ✅ تصحيح reduce: إزالة <number> لأن النوع سيتم استنتاجه تلقائياً
+
+  //  تصحيح reduce: إزالة <number> لأن النوع سيتم استنتاجه تلقائياً
   const totalEmployees = departments.reduce((acc: number, dept: Department & { employees?: Employee[] }) => {
     return acc + (dept.employees?.length || 0);
   }, 0);
@@ -107,7 +134,7 @@ export default function Dashboard() {
       return;
     }
     try {
-      // ✅ بناء Payload مخصص للباك إند دون تغيير الـ Types
+      //  بناء Payload مخصص للباك إند دون تغيير الـ Types
       const payload = {
         title: formData.title,
         content: formData.content,
@@ -117,9 +144,9 @@ export default function Dashboard() {
         expires_at: formData.expires_at || null,
       };
 
-      // ✅ إرسال الـ payload وتجاوز TypeScript بأمان
+      //  إرسال الـ payload وتجاوز TypeScript بأمان
       await createAnnouncement.mutateAsync(payload as unknown as CreateAnnouncementData);
-      
+
       setShowForm(false);
       setFormData({
         title: '',
@@ -130,7 +157,7 @@ export default function Dashboard() {
         expires_at: '',
       });
       refetch();
-      toast.success('✅ Announcement created successfully!');
+      toast.success(' Announcement created successfully!');
     } catch (err) {
       handleApiError(err);
     }
@@ -165,127 +192,19 @@ export default function Dashboard() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Megaphone className="w-5 h-5 text-blue-500" />
-            <h2 className="text-lg font-semibold text-gray-800">📢 Announcements</h2>
+            <h2 className="text-lg font-semibold text-gray-800"> Announcements</h2>
             {!announcementsLoading && (
               <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
                 {announcements.length}
               </span>
             )}
           </div>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-2 px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Add Announcement
-          </button>
         </div>
-
-        {/* Form Modal */}
-        {showForm && (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">Create New Announcement</h3>
-              <button
-                onClick={() => setShowForm(false)}
-                className="p-1 hover:bg-gray-100 rounded"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-            <form onSubmit={handleCreateAnnouncement} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
-                <textarea
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  rows={3}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-
-              {/* ✅ حقول جديدة من الـ Collection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                <select
-                  value={formData.priority}
-                  onChange={handlePriorityChange}
-                  className="w-full px-3 py-2 border rounded-lg"
-                >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Target Audience</label>
-                <select
-                  value={formData.target_audience}
-                  onChange={handleTargetAudienceChange}
-                  className="w-full px-3 py-2 border rounded-lg"
-                >
-                  <option value="all">All</option>
-                  <option value="employees">Employees</option>
-                  <option value="managers">Managers</option>
-                  <option value="hr">HR</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Starts At *</label>
-                <input
-                  type="datetime-local"
-                  value={formData.starts_at}
-                  onChange={(e) => setFormData({ ...formData, starts_at: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Expires At (optional)</label>
-                <input
-                  type="datetime-local"
-                  value={formData.expires_at}
-                  onChange={(e) => setFormData({ ...formData, expires_at: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
-              </div>
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="submit"
-                  disabled={createAnnouncement.isPending}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
-                >
-                  {createAnnouncement.isPending ? 'Creating...' : 'Create Announcement'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="px-4 py-2 border rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
 
         {!announcementsLoading && announcements.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {announcements.slice(0, 3).map((announcement) => (
-              <AnnouncementCard key={announcement.id} announcement={announcement} />
+            {announcements.slice(0, 3).map((announcement, index) => (
+              <AnnouncementCard key={announcement.id || `announcement-${index}`} announcement={announcement} />
             ))}
           </div>
         ) : (
@@ -317,21 +236,23 @@ export default function Dashboard() {
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
             <Building2 className="w-5 h-5 text-purple-500" />
-            <h2 className="text-lg font-semibold text-gray-800">🏢 Departments</h2>
+            <h2 className="text-lg font-semibold text-gray-800"> Departments</h2>
             <span className="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full">
               {departments.length}
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {departments.map((department) => (
+            {departments.map((department, deptIndex) => (
               <div
-                key={department.id}
+                key={department.id || `dept-${deptIndex}`}
                 className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => navigate(`/Hr/department/${department.id}`)}
+                onClick={() => setSelectedDepartment(department)}
               >
                 <div className="p-4 border-b border-gray-100 flex justify-between items-center">
                   <div>
-                    <h3 className="font-semibold text-gray-800">{department.name}</h3>
+                    <h3 className="font-semibold text-gray-800">
+                      {department.name || (department as any).department_name || 'Unknown Department'}
+                    </h3>
                     {department.manager_name && (
                       <p className="text-xs text-gray-500">Manager: {department.manager_name}</p>
                     )}
@@ -345,9 +266,9 @@ export default function Dashboard() {
                   </div>
                   {department.employees && department.employees.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-1">
-                      {department.employees.slice(0, 3).map((employee: Employee) => (
+                      {department.employees.slice(0, 3).map((employee: Employee, empIndex) => (
                         <div
-                          key={employee.id}
+                          key={employee.id || `emp-${deptIndex}-${empIndex}`}
                           className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium text-xs"
                           title={employee.full_name}
                           onClick={(e) => {
@@ -368,6 +289,63 @@ export default function Dashboard() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Department Employees Modal */}
+      {selectedDepartment && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden">
+            <div className="flex justify-between items-center p-5 border-b border-gray-100">
+              <h3 className="text-xl font-bold text-gray-800">
+                {selectedDepartment.name || (selectedDepartment as any).department_name || 'Unknown Department'} - Employees
+              </h3>
+              <button
+                onClick={() => setSelectedDepartment(null)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="p-5 overflow-y-auto">
+              {(() => {
+                const managerId = selectedDepartment.manager_id;
+                const emps = selectedDepartment.employees || [];
+                // Sort to put manager at the top
+                const sortedEmps = [...emps].sort((a, b) => {
+                  if (a.id === managerId) return -1;
+                  if (b.id === managerId) return 1;
+                  return 0;
+                });
+
+                if (sortedEmps.length === 0) {
+                  return <p className="text-gray-500 text-center py-4">No employees in this department.</p>;
+                }
+
+                return (
+                  <div className="space-y-3">
+                    {sortedEmps.map(emp => (
+                      <div key={emp.id} className={`flex items-center gap-3 p-3 rounded-lg border ${emp.id === managerId ? 'border-purple-200 bg-purple-50' : 'border-gray-100 bg-gray-50'}`}>
+                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                          {emp.full_name?.charAt(0) || '?'}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-800">{emp.full_name}</p>
+                          <p className="text-xs text-gray-500">{emp.email || emp.position || 'Employee'}</p>
+                        </div>
+                        {emp.id === managerId && (
+                          <span className="text-xs font-medium bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
+                            Manager
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
           </div>
         </div>
       )}

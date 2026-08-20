@@ -1,6 +1,7 @@
 import React from 'react';
 import { SuspenseWrapper } from './SuspenseWrapper';
 import AdminLayout from "../shared/layouts/AdminLayout";
+import { ProtectedRoute } from './ProtectedRoute';
 
 // ── Admin pages (new AdminBranch structure) ──
 const DashboardAdmin = React.lazy(() => import('@/core/modules/admin/pages/Dashboard/Dashboard'));
@@ -12,22 +13,25 @@ const AdminHolidays = React.lazy(() => import('@/core/modules/admin/pages/Holida
 const Reports = React.lazy(() => import('@/core/modules/admin/pages/Reports'));
 const Overview = React.lazy(() => import('@/core/modules/admin/pages/Overview/Overview'));
 const AdminTerminations = React.lazy(() => import('@/core/modules/admin/pages/Terminations/Termination'));
-const MyProfile = React.lazy(() => import('@/core/modules/employee/pages/EmployeeProfile'));
+const EmployeeProfile = React.lazy(() => import('@/core/pages/manager/components/EmployeeProfile'));
 
 export const adminRoutes = {
   path: '/admin',
-  element: <AdminLayout />,
+  element: (
+    <ProtectedRoute allowedRoles={['admin', 'ceo']}>
+      <AdminLayout />
+    </ProtectedRoute>
+  ),
   children: [
     { index: true, element: <SuspenseWrapper><DashboardAdmin /></SuspenseWrapper> },
-    { path: 'profile', element: <SuspenseWrapper><MyProfile /></SuspenseWrapper> },
+    { path: 'profile', element: <SuspenseWrapper><EmployeeProfile /></SuspenseWrapper> },
     { path: 'setting', element: <SuspenseWrapper><SystemSettings /></SuspenseWrapper> },
     { path: 'announcement', element: <SuspenseWrapper><AdminAnnouncements /></SuspenseWrapper> },
     { path: 'organization', element: <SuspenseWrapper><OrganizationlStructure /></SuspenseWrapper> },
-    { path: 'report', element: <SuspenseWrapper><Reports /></SuspenseWrapper> },
+    { path: 'report', element: <SuspenseWrapper><Overview /></SuspenseWrapper> },
     { path: 'search', element: <SuspenseWrapper><EmployeeSearch /></SuspenseWrapper> },
+    { path: 'employees/:id', element: <SuspenseWrapper><EmployeeProfile /></SuspenseWrapper> },
     { path: 'holidays', element: <SuspenseWrapper><AdminHolidays /></SuspenseWrapper> },
-    // ── New routes from AdminBranch ──
-    { path: 'Overview', element: <SuspenseWrapper><Overview /></SuspenseWrapper> },
     { path: 'termination', element: <SuspenseWrapper><AdminTerminations /></SuspenseWrapper> },
   ]
 };

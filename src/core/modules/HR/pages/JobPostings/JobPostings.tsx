@@ -61,13 +61,6 @@ export default function JobPostings() {
             <h1 className="text-2xl font-bold text-gray-900">Job Postings (HR)</h1>
             <p className="text-gray-500 text-sm mt-1">Manage all job postings.</p>
           </div>
-          {/* ✅ زر المقابلات يعمل الآن */}
-          <button
-            onClick={() => navigate('/Hr/interviews')}
-            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-          >
-            Manage Interviews
-          </button>
         </div>
       </div>
 

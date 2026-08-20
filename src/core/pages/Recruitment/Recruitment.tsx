@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Send, ClipboardList, Loader2, Briefcase, Calendar, CheckCircle2, Clock, XCircle, Edit, Trash2 } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createJobRequisition, getJobRequisitions, updateJobRequisition, deleteJobRequisition, getSkills, createSkill } from '../../../api/recruitment';
@@ -149,7 +149,7 @@ export default function Recruitment() {
 
   return (
     <div className="space-y-6">
-      <Toaster position="top-center" />
+      
 
       <div>
         <h2 className="text-2xl font-extrabold text-dark">{r.title || 'إدارة التوظيف'}</h2>
@@ -349,3 +349,4 @@ export default function Recruitment() {
     </div>
   );
 }
+

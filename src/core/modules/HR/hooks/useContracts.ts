@@ -50,7 +50,7 @@ export const useRenewContract = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contracts'] });
       queryClient.invalidateQueries({ queryKey: ['contracts-expiring-soon'] });
-      toast.success('✅ Contract renewed successfully!');
+      toast.success(' Contract renewed successfully!');
     },
     onError: (err) => {
       if (err instanceof AxiosError) {
@@ -69,7 +69,7 @@ export const useNonRenewContract = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contracts'] });
       queryClient.invalidateQueries({ queryKey: ['contracts-expiring-soon'] });
-      toast.success('✅ Contract marked as non-renewable');
+      toast.success(' Contract marked as non-renewable');
     },
     onError: (err) => {
       if (err instanceof AxiosError) {
@@ -97,7 +97,7 @@ export const useDownloadContract = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-      toast.success('✅ Contract downloaded successfully!');
+      toast.success(' Contract downloaded successfully!');
     },
     onError: (err) => {
       if (err instanceof AxiosError) {

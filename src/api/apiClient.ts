@@ -12,10 +12,11 @@ export const apiClient = axios.create({
     timeout: 10000
 })
 
+import { getAuthToken } from '../store/authStore';
+
 apiClient.interceptors.request.use(
     (config) =>{
-        const DEV_TOKEN = import.meta.env.VITE_DEV_TOKEN;
-        const token = localStorage.getItem('token') || DEV_TOKEN;
+        const token = getAuthToken();
         if(token){
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -39,10 +40,20 @@ apiClient.interceptors.response.use(
         
         if (response.data?.Token) {
             const token = response.data.Token;
-            localStorage.setItem('token', token);
+            const isRemember = localStorage.getItem('remember_me') === 'true';
 
-            if (response.data.data.user) {
-                localStorage.setItem('user', JSON.stringify(response.data.data.user));
+            if (isRemember) {
+                localStorage.setItem('token', token);
+                if (response.data.data?.user) {
+                    const userWithRole = { ...response.data.data.user, role: response.data.data.role, role_id: response.data.data.role_id };
+                    localStorage.setItem('user', JSON.stringify(userWithRole));
+                }
+            } else {
+                sessionStorage.setItem('token', token);
+                if (response.data.data?.user) {
+                    const userWithRole = { ...response.data.data.user, role: response.data.data.role, role_id: response.data.data.role_id };
+                    sessionStorage.setItem('user', JSON.stringify(userWithRole));
+                }
             }
         }
         
@@ -55,6 +66,8 @@ apiClient.interceptors.response.use(
             if (response.status === 401) {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('user');
             }
         }
 

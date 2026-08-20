@@ -179,7 +179,7 @@ export const TerminationFormModal: React.FC<TerminationFormModalProps> = ({ isOp
             {uploads.length > 0 && (
               <div className="mt-2">
                 {uploads.map((file, idx) => (
-                  <div key={idx} className="text-xs text-gray-500">📄 {file.name}</div>
+                  <div key={idx} className="text-xs text-gray-500"> {file.name}</div>
                 ))}
               </div>
             )}

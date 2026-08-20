@@ -1,15 +1,16 @@
 import { Mail } from 'lucide-react'
-
+import { useNavigate } from 'react-router-dom'
 import type { Employee } from '../../../../../../api/Types/types.types'
 
 function EmployeeCard({
     employee
 }: {employee: Employee}) {
+  const navigate = useNavigate()
   return (
         <div 
             key={employee.id} 
             className="px-6 py-4 hover:bg-gray-50 transition-colors cursor-pointer"
-        //   onClick={() => navigate(`/admin/employees/${employee.id}`)}
+            onClick={() => navigate(`/admin/employees/${employee.profile_id || employee.id}`)}
         >
             <div className="flex items-center gap-3 mb-1">
             <h4 className="font-medium text-gray-900">{employee.name || 'Unknown'}</h4>

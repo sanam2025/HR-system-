@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { InterviewsService } from '../../../../api/service/HrService/InterviewsService';
 
-// ✅ بدون interviewed_by (يتم تعيينه تلقائياً من السيرفر)
+//  بدون interviewed_by (يتم تعيينه تلقائياً من السيرفر)
 interface ScheduleData {
   candidate_id: number;
   scheduled_at: string;
@@ -29,7 +29,7 @@ export const useInterviews = (jobId?: number) => {
       if (!jobId) return [];
       
       try {
-        const res = await InterviewsService.getByJobId(jobId);
+        const res = await InterviewsService.getAll(jobId);
         return res.data?.data || [];
       } catch {
         return [];
@@ -43,11 +43,11 @@ export const useInterviews = (jobId?: number) => {
   const schedule = useMutation({
     mutationFn: (data: ScheduleData) => {
       if (!jobId) throw new Error('Job ID required');
-      return InterviewsService.schedule(jobId, data);
+      return InterviewsService.create(jobId, data as any);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviews', jobId] });
-      toast.success('✅ Interview scheduled successfully!');
+      toast.success(' Interview scheduled successfully!');
     },
     onError: (err: Error) => toast.error(err.message || 'Schedule failed'),
   });
@@ -75,7 +75,7 @@ export const useInterviews = (jobId?: number) => {
     queryKey: ['interviews-ranking', jobId],
     queryFn: async () => {
       if (!jobId) return [];
-      const res = await InterviewsService.getRanking(jobId);
+      const res = await InterviewsService.getRankedByRate(jobId);
       return res.data?.data || [];
     },
     enabled: !!jobId,

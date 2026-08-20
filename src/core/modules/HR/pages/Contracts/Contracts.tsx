@@ -106,7 +106,7 @@ export default function Contracts() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {currentContracts.map((contract: Contract) => ( // ✅ إضافة النوع
+              {currentContracts.map((contract: Contract) => ( //  إضافة النوع
                 <tr key={contract.id} className="hover:bg-gray-50">
                   <td className="px-5 py-4 text-sm font-medium text-gray-900">{contract.contract_number}</td>
                   <td className="px-5 py-4">

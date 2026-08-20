@@ -9,13 +9,13 @@ export const useIncentives = () => {
     queryKey: ['incentives'],
     queryFn: async () => {
       const res = await IncentivesService.getAll();
-      // ✅ إرجاع البيانات مباشرة بدون استخدام as
+      //  إرجاع البيانات مباشرة بدون استخدام as
       return res.data?.data || [];
     },
   });
 
   return {
-    incentives: data || [], // ✅ TypeScript سيستنتج النوع تلقائياً
+    incentives: data || [], //  TypeScript سيستنتج النوع تلقائياً
     isLoading,
     error: error?.message || null,
     refetch,
@@ -30,7 +30,7 @@ export const useCreateIncentive = () => {
       IncentivesService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['incentives'] });
-      toast.success('✅ Incentive created successfully!');
+      toast.success(' Incentive created successfully!');
     },
     onError: (err) => {
       if (err instanceof AxiosError && err.response?.status === 422) {

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getAuthToken } from '../store/authStore';
 
 // ── Base URL ─
 const BASE_URL = 'https://masarhr.alwaysdata.net/api/';
@@ -13,7 +14,6 @@ const apiClient = axios.create({
     (data) => {
       if (typeof data === 'string') {
         try {
-          // Clean up any prepended HTML warnings (like PHP deprecation notices)
           const firstBrace = data.indexOf('{');
           const firstBracket = data.indexOf('[');
           let startIdx = -1;
@@ -41,12 +41,12 @@ const apiClient = axios.create({
 });
 
 // ── Request Interceptor: أضف Bearer Token تلقائياً ───
-const DEV_TOKEN = import.meta.env.VITE_DEV_TOKEN || '31|IQQZQbyUyE62wyoVbb9Dg87KLfOK9IreOau1Faz9fbb1fd15';
-
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('auth_token') || DEV_TOKEN;
-    config.headers['Authorization'] = `Bearer ${token}`;
+    const token = getAuthToken();
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => Promise.reject(error),
@@ -60,6 +60,8 @@ apiClient.interceptors.response.use(
       // Token منتهي أو غير صالح — امسح التوكن وأعد للـ Login
       localStorage.removeItem('auth_token');
       localStorage.removeItem('auth_user');
+      sessionStorage.removeItem('auth_token');
+      sessionStorage.removeItem('auth_user');
       // يمكن إضافة redirect لاحقاً
       console.warn('[API] Unauthorized — token cleared.');
     }

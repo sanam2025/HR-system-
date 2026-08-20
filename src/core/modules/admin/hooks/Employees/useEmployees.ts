@@ -36,7 +36,7 @@ export const useTopRateEmplyees = () =>{
     queryKey: USER_KEYS.top_rate,
     queryFn: async () => {
       const response = await EmployeesService.getTopRate();
-      return response.data || [];
+      return response.data?.data || null;
     },
         staleTime: 10 * 60 * 1000,
         gcTime: 20 * 60 * 1000,

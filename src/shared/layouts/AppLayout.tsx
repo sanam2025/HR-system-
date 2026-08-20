@@ -4,6 +4,7 @@ import type { NavItem } from '../components/SideBar';
 import Sidebar from '../components/SideBar';
 import Topbar from '../components/Topbar';
 import { useLanguage } from '../../i18n/translations/LanguageContext';
+import { useAuthStore } from '../../store/authStore';
 
 interface AppLayoutProps {
   navItems: NavItem[];
@@ -24,7 +25,15 @@ export default function AppLayout({
 }: AppLayoutProps) {
   const location = useLocation();
   const { dir } = useLanguage();
+  const currentUser = useAuthStore(state => state.currentUser);
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
+
+  const userName = currentUser?.name || currentUser?.full_name || currentUser?.user_name || 'User';
+  const activeUser = currentUser ? {
+    avatar: userName.charAt(0).toUpperCase(),
+    name: userName,
+    role: currentUser.role || currentUser.job_title || ''
+  } : user;
 
   const toggleSidebar = useCallback(() => setSidebarOpen(open => !open), []);
 
@@ -35,17 +44,17 @@ export default function AppLayout({
     defaultTitle;
 
   return (
-    <div className="flex min-h-screen bg-surface" dir={dir}>
+    <div className="flex min-h-screen bg-transparent" dir={dir}>
       <Sidebar
         open={sidebarOpen}
         onToggle={toggleSidebar}
         navItems={navItems}
         brand={brand}
-        user={user}
+        user={activeUser}
         navSectionLabel={navSectionLabel}
       />
       <div className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${sidebarOpen ? 'md:ms-64' : 'md:ms-16'}`}>
-        <Topbar title={title} onToggleSidebar={toggleSidebar} user={user} navItems={navItems} />
+        <Topbar title={title} onToggleSidebar={toggleSidebar} user={activeUser} navItems={navItems} />
         <main className="flex-1 p-6 pb-16 overflow-x-hidden overflow-y-auto">
           <Outlet />
         </main>

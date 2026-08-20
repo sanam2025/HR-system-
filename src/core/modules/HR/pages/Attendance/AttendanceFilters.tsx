@@ -2,7 +2,7 @@
 import React from 'react';
 import { Calendar } from 'lucide-react';
 
-// ✅ تعديل الـ Props: حذف searchTerm و setSearchTerm
+//  تعديل الـ Props: حذف searchTerm و setSearchTerm
 interface AttendanceFiltersProps {
   fromDate: string;
   setFromDate: (value: string) => void;

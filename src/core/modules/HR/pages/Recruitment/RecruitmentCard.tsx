@@ -22,10 +22,10 @@ export default function RecruitmentCard({
 }: RecruitmentCardProps) {
   const navigate = useNavigate();
   
-  // ✅ جلب جميع الوظائف المنشورة
+  //  جلب جميع الوظائف المنشورة
   const { postings } = useJobPostings();
 
-  // ✅ البحث عن الوظيفة المنشورة التي تطابق job_title
+  //  البحث عن الوظيفة المنشورة التي تطابق job_title
   const getJobPostingId = (): number | undefined => {
     if (!postings || postings.length === 0) return undefined;
     const match = postings.find((p: JobPosting) => p.job_title === req.job_title);
@@ -68,7 +68,7 @@ export default function RecruitmentCard({
   const goToApplicants = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (req?.id) {
-      console.log(`🔍 req.id: ${req.id} → job_title: "${req.job_title}" → jobPostingId: ${jobPostingId} → final: ${finalJobId}`);
+      console.log(` req.id: ${req.id} → job_title: "${req.job_title}" → jobPostingId: ${jobPostingId} → final: ${finalJobId}`);
       navigate(`/Hr/all-applicants?jobId=${finalJobId}`);
     }
   };

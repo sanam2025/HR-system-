@@ -4,14 +4,14 @@ import toast from 'react-hot-toast';
 import { ResignationsService } from '../../../../api/service/HrService/ResignationsService';
 import { AxiosError } from 'axios';
 import type { Resignation } from '../types/ResignationsService.types';
-// ✅ إضافة استيراد النوع
+//  إضافة استيراد النوع
 
 export const useResignations = (type?: 'with_notice' | 'immediate') => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['resignations', type],
     queryFn: async () => {
       const res = await ResignationsService.getAll(type);
-      return res.data?.data || [];
+      return res.data?.data || res.data || [];
     },
   });
   return { resignations: data as Resignation[], isLoading, error: error?.message, refetch };
@@ -22,7 +22,7 @@ export const useResignationDetails = (id: number) => {
     queryKey: ['resignation', id],
     queryFn: async () => {
       const res = await ResignationsService.getById(id);
-      return res.data?.data || null;
+      return res.data?.data || res.data || null;
     },
     enabled: !!id,
   });
@@ -36,7 +36,7 @@ export const useClassifyResignation = () => {
       ResignationsService.classify(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['resignations'] });
-      toast.success('✅ Resignation classified successfully!');
+      toast.success(' Resignation classified successfully!');
     },
     onError: (err) => {
       if (err instanceof AxiosError) {
@@ -62,7 +62,7 @@ export const useDownloadResignationDocument = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-      toast.success('✅ Document downloaded successfully!');
+      toast.success(' Document downloaded successfully!');
     },
     onError: (err) => {
       if (err instanceof AxiosError) {

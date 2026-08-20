@@ -1,6 +1,7 @@
 import React from 'react';
 import { SuspenseWrapper } from './SuspenseWrapper';
 import ManagerLayout from "../shared/layouts/ManagerLayout";
+import { ProtectedRoute } from './ProtectedRoute';
 
 const Dashboard = React.lazy(() => import('@/core/pages/manager/Dashboard'));
 const EmployeesList = React.lazy(() => import('@/core/pages/manager/components/EmployeesList'));
@@ -11,17 +12,20 @@ const OvertimeRequests = React.lazy(() => import('@/core/pages/Leaves/OvertimeRe
 const AttendanceView = React.lazy(() => import('@/core/pages/Attendance/AttendanceView'));
 const PeriodicEvaluation = React.lazy(() => import('@/core/pages/Evaluation/PeriodicEvaluation'));
 const Recruitment = React.lazy(() => import('@/core/pages/Recruitment/Recruitment'));
-const ManagerProfile = React.lazy(() => import('@/core/pages/Profile/ManagerProfile'));
 const Interviews = React.lazy(() => import('@/core/pages/Recruitment/InterviewsPage'));
 const ManagerAnnouncements = React.lazy(() => import('@/core/pages/Announcements/ManagerAnnouncements'));
 const TerminationRequests = React.lazy(() => import('@/core/pages/Termination/TerminationRequests'));
 
 export const managerRoutes = {
   path: '/manager',
-  element: <ManagerLayout />,
+  element: (
+    <ProtectedRoute allowedRoles={['manager']}>
+      <ManagerLayout />
+    </ProtectedRoute>
+  ),
   children: [
     { index: true, element: <SuspenseWrapper><Dashboard /></SuspenseWrapper> },
-    { path: 'profile', element: <SuspenseWrapper><ManagerProfile /></SuspenseWrapper> },
+    { path: 'profile', element: <SuspenseWrapper><EmployeeProfile /></SuspenseWrapper> },
     { path: 'employees', element: <SuspenseWrapper><EmployeesList /></SuspenseWrapper> },
     { path: 'employees/:id', element: <SuspenseWrapper><EmployeeProfile /></SuspenseWrapper> },
     { path: 'tasks', element: <SuspenseWrapper><TasksBoard /></SuspenseWrapper> },

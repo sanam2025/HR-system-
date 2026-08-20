@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { apiClient } from '../../../../api/client';
 import Loading from '../../../../shared/components/Loading';
 
-// ✅ تعريف الأنواع الخاصة بالمتقدم
+//  تعريف الأنواع الخاصة بالمتقدم
 interface Skill {
   id: number;
   name: string;

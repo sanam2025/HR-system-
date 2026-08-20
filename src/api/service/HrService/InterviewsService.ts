@@ -33,4 +33,7 @@ export const InterviewsService = {
 
   // تحديث نتيجة المقابلة
   updateResult: (id: number, data: UpdateInterviewResultData) => apiClient.patch(`/interviews/${id}/result`, data),
+
+  // تقديم التقييم (Ranking)
+  submitRanking: (jobId: number, data: any) => apiClient.post(`/job-postings/${jobId}/interviews/ranking`, data),
 };

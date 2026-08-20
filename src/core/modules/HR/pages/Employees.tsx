@@ -20,7 +20,7 @@ export default function Employees() {
   return (
     <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">🏢 Employees & Departments</h1>
+        <h1 className="text-2xl font-bold text-gray-900"> Employees & Departments</h1>
         <p className="text-gray-500 text-sm">Manage employees and browse departments.</p>
       </div>
 
@@ -52,7 +52,7 @@ export default function Employees() {
                 <div className="mt-3 flex flex-wrap gap-1">
                   {department.employees.slice(0, 3).map((employee: Employee) => (
                     <div
-                      key={employee.id} // ✅ تم إضافة المفتاح هنا
+                      key={employee.id} //  تم إضافة المفتاح هنا
                       className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium text-xs"
                       title={employee.full_name}
                       onClick={(e) => {

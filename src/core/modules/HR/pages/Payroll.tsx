@@ -1,5 +1,5 @@
 // src/core/modules/HR/pages/Payroll/Payroll.tsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   DollarSign,
   Wallet,
@@ -9,6 +9,8 @@ import {
   Plus,
   List,
   X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useCreateDeduction, useDeductions } from "../hooks/useDeductions";
 import { useCreateIncentive, useIncentives } from "../hooks/useIncentives";
@@ -16,6 +18,7 @@ import { PayrollsService } from "../../../../api/service/HrService/PayrollsServi
 import { apiClient } from "../../../../api/client";
 import type { PayrollRecord } from "../types/payroll.types";
 import toast from "react-hot-toast";
+import { useAuthStore } from "../../../../store/authStore";
 
 const formatSalary = (amount: number) => {
   return new Intl.NumberFormat("en-US", {
@@ -44,15 +47,17 @@ export default function Payroll() {
   const { deductions } = useDeductions();
   const createIncentive = useCreateIncentive();
   const createDeduction = useCreateDeduction();
+  const { currentUser } = useAuthStore();
 
   // ------------------- Local States -------------------
   const [records, setRecords] = useState<PayrollRecord[]>([]);
-  // ✅ إعادة تفعيل employees وتعريفه بنوع صحيح
-  const [employees, setEmployees] = useState<{ id: number; full_name: string }[]>([]);
+  //  إعادة تفعيل employees وتعريفه بنوع صحيح
+  const [employees, setEmployees] = useState<{ id: number; full_name?: string; name?: string }[]>([]);
   
   const [showIncentiveModal, setShowIncentiveModal] = useState(false);
   const [showDeductionModal, setShowDeductionModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [historyPage, setHistoryPage] = useState(1);
 
   const [newIncentive, setNewIncentive] = useState({
     user_id: 0,
@@ -72,19 +77,52 @@ export default function Payroll() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // ✅ جلب الموظفين (للاستخدام في الـ Dropdown)
+        //  جلب الموظفين (للاستخدام في الـ Dropdown)
         const empRes = await apiClient.get("/users/employees");
         if (empRes.data?.data) setEmployees(empRes.data.data);
 
-        // جلب كشف الرواتب الحالي
-        const payrollRes = await PayrollsService.getCurrentPayroll();
-        if (payrollRes.data?.data) setRecords(payrollRes.data.data);
-      } catch {
-        toast.error("Failed to load payroll data");
+        // جلب كشف الرواتب الحالي — مع التمييز بين HR وغيرها
+        try {
+          const userRole = currentUser?.role?.toLowerCase() || '';
+          const isHr = userRole.includes('hr');
+
+          let payslips: any[] = [];
+          if (isHr) {
+            const payslipsRes = await PayrollsService.getCurrentMonthPayslips();
+            payslips = payslipsRes.data?.data || payslipsRes.data || [];
+          } else {
+            const payrollRes = await PayrollsService.getCurrentPayroll();
+            payslips = payrollRes.data?.data || [];
+          }
+          
+          if (payslips.length > 0) {
+            // تحويل بيانات payslips إلى تنسيق PayrollRecord
+              const mapped = Array.isArray(payslips) ? payslips.map((p: any) => ({
+                id: p.id || p.user_id || p.employee_id || Math.random(),
+                employeeName: p.employeeName || p.employee?.full_name || p.employee?.name || p.user?.full_name || p.user?.name || p.full_name || p.name || 'Unknown',
+                department: p.department?.name || p.department || p.user?.department?.name || p.user?.department || p.department_name || 'Unknown',
+                baseSalary: Number(p.base_salary || p.gross_salary || p.baseSalary || p.basic_salary || p.salary || p.gross_amount || 0),
+                bonuses: Number(p.incentives_total || p.incentives || p.bonuses || p.total_incentives || p.total_bonuses || p.incentive_amount || 0),
+                deductions: Number(p.deductions_total || p.deductions || p.total_deductions || p.deduction_amount || 0),
+                netSalary: Number(p.net_salary || p.netSalary || p.net_total || p.net_amount || p.net || 0),
+                month: p.month || String(new Date().getMonth() + 1),
+                year: p.year || new Date().getFullYear(),
+                status: p.status || 'generated',
+              })) : [];
+              setRecords(mapped);
+          }
+        } catch (error: any) {
+          if (error?.response?.status !== 403) {
+            toast.error("Failed to load payroll data");
+          }
+        }
+      } catch (error: any) {
+        // Handle generic fetch errors
       }
     };
     fetchData();
-  }, []);
+  }, [currentUser]);
+
 
   // ------------------- Handlers -------------------
   const handleCreateIncentive = () => {
@@ -114,10 +152,26 @@ export default function Payroll() {
   };
 
   // ------------------- Calculations -------------------
-  const totalBaseSalary = records.reduce((acc, r) => acc + r.baseSalary, 0);
-  const totalIncentives = incentives.reduce((acc, r) => acc + r.amount, 0);
-  const totalDeductions = deductions.reduce((acc, r) => acc + r.amount, 0);
-  const totalNetSalary = records.reduce((acc, r) => acc + r.netSalary, 0);
+  const totalBaseSalary = records.reduce((acc, r) => acc + (Number(r.baseSalary) || 0), 0);
+  const totalIncentives = incentives.reduce((acc, r) => acc + (Number(r.amount) || 0), 0);
+  const totalDeductions = deductions.reduce((acc, r) => acc + (Number(r.amount) || 0), 0);
+  const totalNetSalary = records.reduce((acc, r) => acc + (Number(r.netSalary) || 0), 0);
+
+  // ------------------- History Pagination -------------------
+  const historyItems = useMemo(() => {
+    const combined = [
+      ...incentives.map(item => ({ ...item, type: 'incentive' as const })),
+      ...deductions.map(item => ({ ...item, type: 'deduction' as const }))
+    ];
+    return combined.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [incentives, deductions]);
+
+  const itemsPerPage = 5;
+  const totalHistoryPages = Math.max(1, Math.ceil(historyItems.length / itemsPerPage));
+  const currentHistoryItems = historyItems.slice(
+    (historyPage - 1) * itemsPerPage,
+    historyPage * itemsPerPage
+  );
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
@@ -237,9 +291,9 @@ export default function Payroll() {
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">
-                        {record.employeeName.charAt(0)}
+                        {String(record.employeeName || 'Unknown').charAt(0)}
                       </div>
-                      <span className="text-sm font-medium text-gray-800">{record.employeeName}</span>
+                      <span className="text-sm font-medium text-gray-800">{typeof record.employeeName === 'string' ? record.employeeName : 'Unknown'}</span>
                     </div>
                   </td>
                   <td className="px-5 py-4 text-sm text-gray-600">{record.department}</td>
@@ -258,51 +312,74 @@ export default function Payroll() {
       {showHistory && (
         <div className="mt-12 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden p-6">
           <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
-            <h3 className="text-lg font-bold text-gray-800">📜 Incentives & Deductions History</h3>
+            <h3 className="text-lg font-bold text-gray-800"> Incentives & Deductions History</h3>
             <button onClick={() => setShowHistory(false)} className="text-sm text-blue-600 hover:text-blue-800 font-medium">
               Hide History
             </button>
           </div>
 
-          {incentives.length === 0 && deductions.length === 0 ? (
+          {historyItems.length === 0 ? (
             <p className="text-gray-400 text-center py-8">No history found</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Employee</th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Type</th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Amount</th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Reason</th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Date</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {incentives.map((item) => (
-                    <tr key={`inc-${item.id}`}>
-                      <td className="px-5 py-3 text-sm text-gray-800">{item.user?.full_name || `User #${item.user_id}`}</td>
-                      <td className="px-5 py-3 text-sm">
-                        <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">Incentive</span>
-                      </td>
-                      <td className="px-5 py-3 text-sm font-semibold text-emerald-600">+ {formatSalary(item.amount)}</td>
-                      <td className="px-5 py-3 text-sm text-gray-600">{item.reason || '-'}</td>
-                      <td className="px-5 py-3 text-sm text-gray-600">{new Date(item.date).toLocaleDateString()}</td>
+            <div className="flex flex-col">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Employee</th>
+                      <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Type</th>
+                      <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Amount</th>
+                      <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Reason</th>
+                      <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Date</th>
                     </tr>
-                  ))}
-                  {deductions.map((item) => (
-                    <tr key={`ded-${item.id}`}>
-                      <td className="px-5 py-3 text-sm text-gray-800">{item.user?.full_name || `User #${item.user_id}`}</td>
-                      <td className="px-5 py-3 text-sm">
-                        <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">Deduction</span>
-                      </td>
-                      <td className="px-5 py-3 text-sm font-semibold text-red-600">- {formatSalary(item.amount)}</td>
-                      <td className="px-5 py-3 text-sm text-gray-600">{item.reason || '-'}</td>
-                      <td className="px-5 py-3 text-sm text-gray-600">{new Date(item.date).toLocaleDateString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {currentHistoryItems.map((item) => (
+                      <tr key={`${item.type}-${item.id}`}>
+                        <td className="px-5 py-3 text-sm text-gray-800">{item.name || item.user?.full_name || `User #${item.user_id || 'Unknown'}`}</td>
+                        <td className="px-5 py-3 text-sm">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            item.type === 'incentive' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+                          }`}>
+                            {item.type === 'incentive' ? 'Incentive' : 'Deduction'}
+                          </span>
+                        </td>
+                        <td className={`px-5 py-3 text-sm font-semibold ${
+                          item.type === 'incentive' ? 'text-emerald-600' : 'text-red-600'
+                        }`}>
+                          {item.type === 'incentive' ? '+' : '-'} {formatSalary(item.amount)}
+                        </td>
+                        <td className="px-5 py-3 text-sm text-gray-600">{item.reason || '-'}</td>
+                        <td className="px-5 py-3 text-sm text-gray-600">{new Date(item.date).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="flex items-center justify-between border-t border-gray-100 px-5 py-3 mt-4">
+                <span className="text-sm text-gray-500">
+                  Showing {(historyPage - 1) * itemsPerPage + 1} to {Math.min(historyPage * itemsPerPage, historyItems.length)} of {historyItems.length} entries
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setHistoryPage(p => Math.max(1, p - 1))}
+                    disabled={historyPage === 1}
+                    className="p-1 rounded-md text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <span className="text-sm font-medium text-gray-700">
+                    Page {historyPage} of {totalHistoryPages}
+                  </span>
+                  <button
+                    onClick={() => setHistoryPage(p => Math.min(totalHistoryPages, p + 1))}
+                    disabled={historyPage === totalHistoryPages}
+                    className="p-1 rounded-md text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -332,10 +409,10 @@ export default function Payroll() {
                   className="w-full border rounded-lg px-3 py-2 bg-white"
                 >
                   <option value={0}>Select Employee</option>
-                  {/* ✅ تصحيح: employees معرفة الآن، وتم إزالة any بوضع النوع مباشرة */}
-                  {employees.map((emp: { id: number; full_name: string }) => (
+                  {/*  تصحيح: employees معرفة الآن، وتم إزالة any بوضع النوع مباشرة */}
+                  {employees.map((emp: { id: number; full_name?: string; name?: string }) => (
                     <option key={emp.id} value={emp.id}>
-                      {emp.full_name}
+                      {emp.name || emp.full_name}
                     </option>
                   ))}
                 </select>
@@ -425,10 +502,10 @@ export default function Payroll() {
                   className="w-full border rounded-lg px-3 py-2 bg-white"
                 >
                   <option value={0}>Select Employee</option>
-                  {/* ✅ تصحيح: employees معرفة الآن، وتم إزالة any بوضع النوع مباشرة */}
-                  {employees.map((emp: { id: number; full_name: string }) => (
+                  {/*  تصحيح: employees معرفة الآن، وتم إزالة any بوضع النوع مباشرة */}
+                  {employees.map((emp: { id: number; full_name?: string; name?: string }) => (
                     <option key={emp.id} value={emp.id}>
-                      {emp.full_name}
+                      {emp.name || emp.full_name}
                     </option>
                   ))}
                 </select>

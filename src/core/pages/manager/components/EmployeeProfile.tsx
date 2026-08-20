@@ -1,16 +1,19 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { getEmployeeProfile, getEmployeeContract, getEmployeeDocuments, getEmployeeContractDownloadUrl, getEmployeeDocumentDownloadUrl, getEmployeePerformanceSummary, getTasks } from '../../../../api/manager';
-import { ArrowRight, ArrowLeft, Phone, Mail, Calendar, Star, CheckSquare, Clock, Loader2, MapPin, User, Briefcase, FileText, Download, File } from 'lucide-react';
+import { getEmployeeProfile, getEmployeeContract, getEmployeeDocuments, getEmployeeContractDownloadUrl, getEmployeeDocumentDownloadUrl, getEmployeePerformanceSummary, getTasks, getMyProfile } from '../../../../api/manager';
+import { ArrowRight, ArrowLeft, Phone, Mail, Calendar, Star, CheckSquare, Clock, Loader2, MapPin, User, Briefcase, FileText, Download, File, Edit2 } from 'lucide-react';
 import { useLanguage } from '../../../../i18n/translations/LanguageContext';
+import { useAuthStore } from '../../../../store/authStore';
+import EditProfileModal from './EditProfileModal';
 
 import { TASK_STATUS_COLORS, TASK_STATUS_EN, CHART_MONTHS_EN, ATTENDANCE_STATUS_INFO } from '../../../constants';
 
 // ── Helpers ──
 
 function renderStars(rating: number) {
+  const normalizedRating = rating > 5 ? (rating / 20) : rating;
   return Array.from({ length: 5 }, (_, i) => (
-    <span key={i} className={`text-lg ${i < Math.round(rating) ? 'text-gold' : 'text-gray-200'}`}>★</span>
+    <span key={i} className={`text-lg ${i < Math.round(normalizedRating) ? 'text-gold' : 'text-gray-200'}`}>★</span>
   ));
 }
 
@@ -39,106 +42,112 @@ export default function EmployeeProfile() {
   const [attendance, setAttendance] = useState<any[]>([]);
   const [empTasks, setEmpTasks] = useState<any[]>([]);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
+  const currentUser = useAuthStore(state => state.currentUser);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+
+      // إذا لا يوجد id في الرابط، نجلب بروفايل المستخدم الحالي
+      const data = id ? await getEmployeeProfile(Number(id)) : await getMyProfile();
+      const profile = data?.data || data;
+
+      const deptRaw = profile.department || '';
+      const DEPT_MAP: Record<string, string> = {
+        'marketing': 'التسويق',
+        'hr': 'الموارد البشرية',
+        'human resources': 'الموارد البشرية',
+        'it': 'تقنية المعلومات',
+        'engineering': 'الهندسة',
+        'finance': 'المالية',
+        'sales': 'المبيعات',
+        'operations': 'العمليات',
+        'support': 'الدعم الفني',
+        'design': 'التصميم',
+        'management': 'الإدارة',
+        'accounting': 'المحاسبة',
+      };
+      const deptLower = deptRaw.toLowerCase();
+      const deptAr = DEPT_MAP[deptLower] || deptRaw;
+      const deptEn = deptRaw.charAt(0).toUpperCase() + deptRaw.slice(1);
+
+      setEmployee({
+        id: profile.id || (id ? Number(id) : 0),
+        name: profile.user_name || profile.name || profile.user?.name || 'بدون اسم',
+        title: profile.job_title || profile.title || 'موظف',
+        department: deptRaw,
+        departmentAr: deptAr,
+        departmentEn: deptEn,
+        email: profile.user_email || profile.email || profile.user?.email || 'غير متوفر',
+        phone: profile.phone_number || 'غير متوفر',
+        joinDate: profile.hiring_date || profile.join_date || 'غير متوفر',
+        gender: profile.gender || '',
+        address: profile.address || '',
+        birthDate: profile.birth_date || '',
+        manager: profile.manager || '',
+        avatar: profile.user_name ? profile.user_name.charAt(0).toUpperCase() : (profile.name ? profile.name.charAt(0).toUpperCase() : 'م'),
+        picture: profile.picture,
+        todayStatus: 'حاضر',
+        avgRating: '0.0',
+        leaveBalance: profile.leave_balance || 0,
+      });
+
+      const targetUserId = profile.user_id || profile.user?.id || (id ? Number(id) : profile.id);
+
       try {
-        setLoading(true);
-        const data = await getEmployeeProfile(Number(id));
-        const profile = data?.data || data;
-
-        const deptRaw = profile.department || '';
-        const DEPT_MAP: Record<string, string> = {
-          'marketing': 'التسويق',
-          'hr': 'الموارد البشرية',
-          'human resources': 'الموارد البشرية',
-          'it': 'تقنية المعلومات',
-          'engineering': 'الهندسة',
-          'finance': 'المالية',
-          'sales': 'المبيعات',
-          'operations': 'العمليات',
-          'support': 'الدعم الفني',
-          'design': 'التصميم',
-          'management': 'الإدارة',
-          'accounting': 'المحاسبة',
-        };
-        const deptLower = deptRaw.toLowerCase();
-        const deptAr = DEPT_MAP[deptLower] || deptRaw;
-        const deptEn = deptRaw.charAt(0).toUpperCase() + deptRaw.slice(1);
-
-        setEmployee({
-          id: profile.id || Number(id),
-          name: profile.user_name || profile.name || profile.user?.name || 'بدون اسم',
-          title: profile.job_title || profile.title || 'موظف',
-          department: deptRaw,
-          departmentAr: deptAr,
-          departmentEn: deptEn,
-          email: profile.user_email || profile.email || profile.user?.email || 'غير متوفر',
-          phone: profile.phone_number || 'غير متوفر',
-          joinDate: profile.hiring_date || profile.join_date || 'غير متوفر',
-          gender: profile.gender || '',
-          address: profile.address || '',
-          birthDate: profile.birth_date || '',
-          manager: profile.manager || '',
-          avatar: profile.user_name ? profile.user_name.charAt(0).toUpperCase() : (profile.name ? profile.name.charAt(0).toUpperCase() : 'م'),
-          picture: profile.picture,
-          todayStatus: 'حاضر',
-          avgRating: '0.0',
-          leaveBalance: profile.leave_balance || 0,
-        });
-
-        try {
-          const contractRes = await getEmployeeContract(Number(id));
-          setContract(contractRes?.data || contractRes);
-        } catch (e) {
-          console.error("Contract fetch error:", e);
-        }
-
-        try {
-          const docsRes = await getEmployeeDocuments(Number(id));
-          const docs = Array.isArray(docsRes?.data) ? docsRes.data : Array.isArray(docsRes) ? docsRes : [];
-          setDocuments(docs);
-        } catch (e) {
-          console.error("Docs fetch error:", e);
-        }
-
-        try {
-          const perfRes = await getEmployeePerformanceSummary(Number(id));
-          setPerformance(perfRes);
-        } catch (e) {
-          console.error("Performance fetch error:", e);
-        }
-
-        try {
-          const { getMyMonthlyAttendance } = await import('../../../../api/manager');
-          const { default: apiClient } = await import('../../../../api/axios');
-          const attRes = await apiClient.get(`my-monthly-attendance?user_id=${id}`);
-          const attData = attRes.data?.data || attRes.data;
-          setAttendance(Array.isArray(attData) ? attData : []);
-        } catch (e) {
-          console.error("Attendance fetch error:", e);
-        }
-
-        try {
-          const allTasks = await getTasks();
-          const targetUserId = profile?.user_id || profile?.user?.id || Number(id);
-          const empName = profile?.user_name || profile?.name || profile?.user?.name;
-          const employeeTasks = allTasks.filter((t: any) => 
-            t.assignee?.id === targetUserId || 
-            t.assignee?.id === Number(id) ||
-            (empName && t.assignee?.name && t.assignee.name.toLowerCase() === empName.toLowerCase())
-          );
-          setEmpTasks(employeeTasks);
-        } catch (e) {
-          console.error("Tasks fetch error:", e);
-        }
-
-      } catch (err) {
-        setError('تعذر جلب ملف الموظف (قد لا يوجد ملف شخصي لهذا الموظف بعد في قاعدة البيانات).');
-      } finally {
-        setLoading(false);
+        const contractRes = await getEmployeeContract(targetUserId);
+        setContract(contractRes?.data || contractRes);
+      } catch (e) {
+        console.error("Contract fetch error:", e);
       }
-    };
-    if (id) fetchProfile();
+
+      try {
+        const docsRes = await getEmployeeDocuments(targetUserId);
+        const docs = Array.isArray(docsRes?.data) ? docsRes.data : Array.isArray(docsRes) ? docsRes : [];
+        setDocuments(docs);
+      } catch (e) {
+        console.error("Docs fetch error:", e);
+      }
+
+      try {
+        const perfRes = await getEmployeePerformanceSummary(targetUserId);
+        setPerformance(perfRes);
+      } catch (e) {
+        console.error("Performance fetch error:", e);
+      }
+
+      try {
+        const { getMyMonthlyAttendance } = await import('../../../../api/manager');
+        const { default: apiClient } = await import('../../../../api/axios');
+        const attRes = await apiClient.get(`my-monthly-attendance?user_id=${targetUserId}`);
+        const attData = attRes.data?.data || attRes.data;
+        setAttendance(Array.isArray(attData) ? attData : []);
+      } catch (e) {
+        console.error("Attendance fetch error:", e);
+      }
+
+      try {
+        const allTasks = await getTasks();
+        const empName = profile?.user_name || profile?.name || profile?.user?.name;
+        const employeeTasks = allTasks.filter((t: any) =>
+          t.assignee?.id === targetUserId ||
+          (empName && t.assignee?.name && t.assignee.name.toLowerCase() === empName.toLowerCase())
+        );
+        setEmpTasks(employeeTasks);
+      } catch (e) {
+        console.error("Tasks fetch error:", e);
+      }
+
+    } catch (err) {
+      setError('تعذر جلب ملف الموظف (قد لا يوجد ملف شخصي لهذا الموظف بعد في قاعدة البيانات).');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
   }, [id]);
 
   const tasksCount = performance?.tasks_assigned_count || 0;
@@ -161,7 +170,7 @@ export default function EmployeeProfile() {
     return (
       <div className="flex flex-col items-center justify-center py-16 bg-white rounded-3xl border border-gray-100 shadow-sm mt-6">
         <h3 className="text-xl font-bold text-dark">{error || ep.notFound}</h3>
-        <button onClick={() => navigate('/manager/employees')} className="btn-primary btn mt-4">
+        <button onClick={() => navigate(-1)} className="btn-primary btn mt-4">
           {ep.backToList}
         </button>
       </div>
@@ -183,7 +192,7 @@ export default function EmployeeProfile() {
     <div className="space-y-6">
       {/* Back */}
       <button
-        onClick={() => navigate('/manager/employees')}
+        onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-sm text-brown hover:text-green transition-colors font-semibold"
       >
         <BackIcon size={16} /> {ep.backToList}
@@ -191,6 +200,8 @@ export default function EmployeeProfile() {
 
       {/* Profile Header */}
       <div className="bg-gradient-to-br from-white to-slate-50 rounded-3xl border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 relative overflow-hidden">
+
+
         {/* Decorative background element */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-green/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-40 h-40 bg-gold/5 rounded-full blur-2xl -ml-20 -mb-20 pointer-events-none"></div>
@@ -202,7 +213,7 @@ export default function EmployeeProfile() {
               <span>{employee.avatar}</span>
               {employee.picture && !employee.picture.includes('default.jpg') && (
                 <img
-                  src={employee.picture}
+                  src={`${employee.picture}?t=${Date.now()}`}
                   alt={employee.name}
                   className="absolute inset-0 w-full h-full object-cover"
                   onError={(e) => { e.currentTarget.style.display = 'none'; }}
@@ -215,8 +226,19 @@ export default function EmployeeProfile() {
 
             <div className="flex gap-1 mt-3 bg-white/50 w-fit px-3 py-1.5 rounded-full border border-white shadow-sm">{renderStars(Number(avgRating))}</div>
           </div>
-          <div className={`px-5 py-2.5 rounded-2xl text-sm font-bold shadow-sm border border-white/50 backdrop-blur-sm ${todayStatusColor}`}>
-            {todayLabel} {ep.today}
+          <div className="flex flex-col gap-3 items-end">
+            <div className={`px-5 py-2.5 rounded-2xl text-sm font-bold shadow-sm border border-white/50 backdrop-blur-sm ${todayStatusColor}`}>
+              {todayLabel} {ep.today}
+            </div>
+            {(!id || (currentUser && (currentUser.id === employee.id || currentUser.user_id === employee.id))) && (
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-white hover:bg-gray-50 text-green border border-green/20 rounded-xl shadow-sm transition-all font-semibold text-sm"
+              >
+                <Edit2 size={16} />
+                {lang === 'ar' ? 'تعديل البيانات' : 'Edit Profile'}
+              </button>
+            )}
           </div>
         </div>
 
@@ -319,8 +341,7 @@ export default function EmployeeProfile() {
                 </div>
                 <div className="flex items-center gap-3">
                   {(task.score || task.rating) && <span className="bg-gold/10 text-yellow-700 text-sm font-bold px-2 py-1 rounded-lg">{task.score || task.rating}</span>}
-                  <span className={`text-xs font-bold px-3 py-1.5 rounded-xl ${
-                    {
+                  <span className={`text-xs font-bold px-3 py-1.5 rounded-xl ${{
                       'pending': 'bg-blue-50 text-blue-700',
                       'in_progress': 'bg-yellow-50 text-yellow-700',
                       'completed': 'bg-green-50 text-green-700',
@@ -328,24 +349,24 @@ export default function EmployeeProfile() {
                       'approved': 'bg-green-50 text-green-700',
                       'rejected': 'bg-red-50 text-red-600'
                     }[task.status as string] || TASK_STATUS_COLORS[task.status] || 'bg-gray-50 text-gray-700'
-                  }`}>
-                    {lang === 'ar' 
+                    }`}>
+                    {lang === 'ar'
                       ? ({
-                          'pending': 'قيد الانتظار',
-                          'in_progress': 'قيد التنفيذ',
-                          'completed': 'مكتملة',
-                          'overdue': 'متأخرة',
-                          'approved': 'معتمدة',
-                          'rejected': 'مرفوضة'
-                        }[task.status as string] || task.status)
+                        'pending': 'قيد الانتظار',
+                        'in_progress': 'قيد التنفيذ',
+                        'completed': 'مكتملة',
+                        'overdue': 'متأخرة',
+                        'approved': 'معتمدة',
+                        'rejected': 'مرفوضة'
+                      }[task.status as string] || task.status)
                       : ({
-                          'pending': 'Pending',
-                          'in_progress': 'In Progress',
-                          'completed': 'Completed',
-                          'overdue': 'Overdue',
-                          'approved': 'Approved',
-                          'rejected': 'Rejected'
-                        }[task.status as string] || TASK_STATUS_EN[task.status] || task.status)
+                        'pending': 'Pending',
+                        'in_progress': 'In Progress',
+                        'completed': 'Completed',
+                        'overdue': 'Overdue',
+                        'approved': 'Approved',
+                        'rejected': 'Rejected'
+                      }[task.status as string] || TASK_STATUS_EN[task.status] || task.status)
                     }
                   </span>
                 </div>
@@ -483,6 +504,19 @@ export default function EmployeeProfile() {
           </div>
         )}
       </div>
+
+      <EditProfileModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        profileId={employee.id}
+        initialData={{
+          address: employee.address,
+          picture: employee.picture
+        }}
+        onSuccess={() => {
+          fetchProfile(); // Re-fetch data after successful update
+        }}
+      />
     </div>
   );
 }

@@ -13,14 +13,14 @@ export const Leaves = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
 
-  // ✅ جلب طلبات الإجازات
+  //  جلب طلبات الإجازات
   const { requests, isLoading, refetch } = useLeaveRequests();
   
-  // ✅ هوك الموافقة والرفض
+  //  هوك الموافقة والرفض
   const approveMutation = useApproveLeave();
   const rejectMutation = useRejectLeave();
 
-  // ✅ حساب الإحصائيات
+  //  حساب الإحصائيات
   const stats = {
     total: requests.length,
     pending: requests.filter((r) => r.status === 'pending').length,
@@ -28,7 +28,7 @@ export const Leaves = () => {
     rejected: requests.filter((r) => r.status === 'rejected').length,
   };
 
-  // ✅ فلترة الطلبات (حذف البحث بالاسم واعتماد الفلترة بالحالة والنوع فقط)
+  //  فلترة الطلبات (حذف البحث بالاسم واعتماد الفلترة بالحالة والنوع فقط)
   const filtered = requests.filter((request) => {
     const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
     const matchesType = typeFilter === 'all' || request.type === typeFilter;

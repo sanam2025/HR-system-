@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Send, Loader2, Star, Calendar, BarChart3, Clock, HeartHandshake, Users, Lightbulb, CheckCircle, XCircle, ListTodo, TrendingUp, AlertCircle, Target, FileText } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { getEvaluations, getEvaluationDetails, submitAssessment, type Evaluation, type SubmitAssessmentPayload } from '../../../api/evaluation';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
@@ -87,7 +87,7 @@ export default function PeriodicEvaluation() {
 
   return (
     <div className="w-full max-w-5xl mx-auto pb-12 pt-2 space-y-6">
-      <Toaster position="top-center" />
+      
       
       {/* Premium Header */}
       <div className={`bg-gradient-to-br from-green/5 via-emerald-50/30 to-transparent p-6 sm:p-8 rounded-3xl border border-green/10 shadow-sm flex flex-col sm:flex-row items-center sm:justify-between gap-4 relative overflow-hidden`}>

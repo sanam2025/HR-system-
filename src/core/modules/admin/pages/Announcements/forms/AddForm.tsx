@@ -50,7 +50,22 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
                 return;
             }
     
-            await AddAnnouncement(data);
+            const formatForApi = (dateString: string) => {
+                if (!dateString) return '';
+                if (dateString.includes('T')) {
+                    const withSeconds = dateString.length === 16 ? `${dateString}:00` : dateString;
+                    return withSeconds.replace('T', ' ');
+                }
+                return dateString;
+            };
+
+            const formattedData = {
+                ...data,
+                starts_at: formatForApi(data.starts_at),
+                expires_at: formatForApi(data.expires_at),
+            };
+
+            await AddAnnouncement(formattedData);
             toast.success('Announcemet Added successfully');
             setIsModalOpen(false);
         }catch (e: any) {

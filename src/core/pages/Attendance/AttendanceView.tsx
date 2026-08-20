@@ -4,7 +4,9 @@ import { useLanguage } from '../../../i18n/translations/LanguageContext';
 import { ATTENDANCE_STATUS_INFO } from '../../constants';
 import { getManagerEmployees, getAttendanceFilter, getAttendanceTodayAnalysis, getAttendanceToday, getMyMonthlyAttendance, submitCheckIn, submitCheckOut } from '../../../api/manager';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
+import { useAuthStore } from '../../../store/authStore';
+import { EmployeesService } from '../../../api/service/HrService/EmployeesService';
 
 // ── Types ──
 type AttendanceRecord = {
@@ -90,6 +92,7 @@ const formatDate = (dateVal: any): string => {
 
 export default function AttendanceView() {
   const { t, lang } = useLanguage();
+  const { currentUser } = useAuthStore();
 
   const [activeTab, setActiveTab]       = useState<'byEmployee' | 'generalReport' | 'todayLive'>('byEmployee');
   const qc = useQueryClient();
@@ -112,11 +115,18 @@ export default function AttendanceView() {
   useEffect(() => {
     const initFetch = async () => {
       try {
+        const userRole = currentUser?.role?.toLowerCase() || '';
+        const isHrOrAdmin = userRole.includes('hr') || userRole.includes('admin') || userRole.includes('ceo');
+
         const [empRes, statsRes] = await Promise.all([
-          getManagerEmployees(),
+          isHrOrAdmin ? EmployeesService.getEmployees() : getManagerEmployees(),
           getAttendanceTodayAnalysis()
         ]);
-        const emps = Array.isArray(empRes) ? empRes : (empRes?.data || []);
+        let rawEmps = empRes;
+        if (rawEmps && !Array.isArray(rawEmps)) {
+          rawEmps = rawEmps.data?.data || rawEmps.data?.employees || rawEmps.data || [];
+        }
+        const emps = Array.isArray(rawEmps) ? rawEmps : [];
         
         const mappedEmps = emps.map((e: any) => ({
           ...e,
@@ -356,7 +366,7 @@ export default function AttendanceView() {
 
   return (
     <div className="space-y-6">
-      <Toaster position="top-center" />
+      
       {/* Header */}
       <div className="text-start">
         <h2 className="text-xl font-extrabold text-dark">{t.attendance.title}</h2>

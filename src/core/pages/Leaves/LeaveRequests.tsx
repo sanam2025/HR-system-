@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CheckCircle, XCircle, Calendar, User, Clock, AlertTriangle, Plus, Loader2, Wallet } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
@@ -31,7 +31,7 @@ export default function LeaveRequests() {
 
   return (
     <div className="space-y-6">
-      <Toaster position="top-center" />
+      
 
       {/* Main Header & Tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -534,3 +534,4 @@ function MyLeavesView({ myLv, lv, lang, subType }: { myLv: any; lv: any; lang: s
     </div>
   );
 }
+

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Plus, X, Loader2, CheckCircle2, XCircle, ClipboardList, AlertCircle, Clock, Paperclip } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getTasks,
@@ -231,7 +231,7 @@ export default function TasksBoard() {
 
   return (
     <div dir={dir}>
-      <Toaster position="top-center" />
+      
 
       {/* Header */}
       <div className="flex items-center justify-between mb-6">

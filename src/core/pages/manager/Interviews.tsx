@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CalendarClock, Star, Clock, XCircle, CheckCircle, Video, User, Loader2 } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMyInterviews, submitInterviewResult, cancelInterview } from '../../../api/recruitment';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
@@ -70,7 +70,7 @@ export default function Interviews() {
 
   return (
     <div className="space-y-6">
-      <Toaster position="top-center" />
+      
       <div>
         <h2 className="text-xl font-extrabold text-dark flex items-center gap-2">
           <CalendarClock className="text-green" />
@@ -203,3 +203,4 @@ export default function Interviews() {
     </div>
   );
 }
+

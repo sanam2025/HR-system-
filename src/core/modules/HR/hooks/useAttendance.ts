@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { AttendanceService } from '../../../../api/service/HrService/AttendanceService';
 
-// ✅ جلب حضور اليوم
+//  جلب حضور اليوم
 export const useTodayAttendance = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['attendance-today'],
@@ -20,7 +20,7 @@ export const useTodayAttendance = () => {
   };
 };
 
-// ✅ جلب تحليل الحضور
+//  جلب تحليل الحضور
 export const useAttendanceAnalysis = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['attendance-analysis'],
@@ -38,7 +38,7 @@ export const useAttendanceAnalysis = () => {
   };
 };
 
-// ✅ جلب الحضور المفلتر
+//  جلب الحضور المفلتر
 export const useFilteredAttendance = (from: string, to: string) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['attendance-filter', from, to],

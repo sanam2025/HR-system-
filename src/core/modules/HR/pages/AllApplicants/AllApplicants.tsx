@@ -53,7 +53,7 @@ export const AllApplicants = () => {
       },
       {
         onSuccess: () => {
-          toast.success('🎉 Offer sent successfully!');
+          toast.success(' Offer sent successfully!');
           setSelectedCandidateId(null);
           refetch();
         },
@@ -190,7 +190,7 @@ export const AllApplicants = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filteredCandidates.map((candidate: Candidate) => {
-                // ✅ 7. المنطق الصحيح حسب الـ Type الخاص بك:
+                //  7. المنطق الصحيح حسب الـ Type الخاص بك:
                 // المتقدم الذي اجتاز المقابلة يصبح حالته 'accepted'
                 // ملاحظة: 'accepted' هي القيمة الوحيدة التي تدل على النجاح في الـ Type
                 const hasPassed = candidate.status === 'accepted';
@@ -215,14 +215,14 @@ export const AllApplicants = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700">
-                      {/* ✅ التصحيح: استخدام applied_date بدلاً من applied_at كما في Typesك */}
+                      {/*  التصحيح: استخدام applied_date بدلاً من applied_at كما في Typesك */}
                       {candidate.applied_date ? new Date(candidate.applied_date).toLocaleDateString() : '-'}
                     </td>
                     
                     {/* 8. خانة الأزرار */}
                     <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
                       {hasPassed ? (
-                        // ✅ إذا اجتاز المقابلة، نعرض زر إرسال العرض
+                        //  إذا اجتاز المقابلة، نعرض زر إرسال العرض
                         <button
                           onClick={() => setSelectedCandidateId(candidate.id)}
                           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm"
@@ -230,7 +230,7 @@ export const AllApplicants = () => {
                           <FileText className="w-4 h-4" /> Send Offer
                         </button>
                       ) : (
-                        // ❌ إذا لم يجتز، نعرض زر المقابلة العادي
+                        //  إذا لم يجتز، نعرض زر المقابلة العادي
                         <button
                           onClick={() => {
                             if (!jobId) {

@@ -8,21 +8,22 @@
 // ==============================================================
 
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Send, Loader2, Megaphone, ClipboardList, CalendarDays } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import { Plus, Edit2, Trash2, Send, Loader2, Megaphone, ClipboardList } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
 import { useQuery } from '@tanstack/react-query';
-import { getHolidays } from '../../../api/manager';
 import { AnnouncementsService } from '../../../api/service/HrService/AnnouncementsService';
 import type { Announcement, Priority, AnnouncementStatus } from '../../../api/service/HrService/Types/AnnouncementsService.types';
+import { useAuthStore } from '../../../store/authStore';
+import { useDepartments } from '../../modules/HR/hooks/useDepartments';
 
 // ── Helpers ─────────────────────────────────────────────────
 
 const STATUS_STYLE: Record<AnnouncementStatus, string> = {
-  draft:     'bg-gray-100    text-gray-500',
+  draft: 'bg-gray-100    text-gray-500',
   scheduled: 'bg-purple-50   text-purple-600',
-  active:    'bg-green-50    text-green-600',
-  expired:   'bg-orange-50   text-orange-500',
+  active: 'bg-green-50    text-green-600',
+  expired: 'bg-orange-50   text-orange-500',
 };
 
 
@@ -42,39 +43,45 @@ const fromInput = (v: string) => new Date(v).toISOString();
 // ── Form component ───────────────────────────────────────────
 
 interface FormValues {
-  title:    string;
-  content:  string;
+  title: string;
+  content: string;
   priority: Priority;
   startsAt: string;
   expiresAt: string;
+  target_audience: string;
+  department_id: number | '';
 }
 
 function defaultForm(): FormValues {
-  return { title: '', content: '', priority: 'medium', startsAt: nowInput(), expiresAt: '' };
+  return { title: '', content: '', priority: 'medium', startsAt: nowInput(), expiresAt: '', target_audience: 'all', department_id: '' };
 }
 
-function annToForm(a: Announcement): FormValues {
+function annToForm(a: any): FormValues {
   return {
-    title:     a.title,
-    content:   a.content,
-    priority:  a.priority,
-    startsAt:  toInput(a.starts_at),
+    title: a.title,
+    content: a.content,
+    priority: a.priority,
+    startsAt: toInput(a.starts_at),
     expiresAt: toInput(a.expires_at),
+    target_audience: a.target_audience || a.audience_type || 'all',
+    department_id: a.department_id || '',
   };
 }
 
 interface AnnouncementFormProps {
   initial?: Announcement;
-  onSave:   (f: FormValues) => Promise<void>;
+  onSave: (f: FormValues) => Promise<void>;
   onCancel: () => void;
 }
 
 function AnnouncementForm({ initial, onSave, onCancel }: AnnouncementFormProps) {
-  const { t } = useLanguage();
-  const [form,   setForm]   = useState<FormValues>(initial ? annToForm(initial) : defaultForm());
+  const { t, lang } = useLanguage();
+  const { currentUser } = useAuthStore();
+  const [form, setForm] = useState<FormValues>(initial ? annToForm(initial) : defaultForm());
   const [saving, setSaving] = useState(false);
+  const { departments } = useDepartments();
 
-  const set = (k: keyof FormValues, v: string) => setForm(p => ({ ...p, [k]: v }));
+  const set = (k: keyof FormValues, v: any) => setForm(p => ({ ...p, [k]: v }));
   // minimum datetime = now + 1 minute
   const minDatetime = toInput(addMinutes(new Date(), 1).toISOString());
 
@@ -159,10 +166,39 @@ function AnnouncementForm({ initial, onSave, onCancel }: AnnouncementFormProps) 
         </div>
       </div>
 
-      {/* ملاحظة الجمهور — مخفية للمدير (تلقائي = قسمه) */}
-      <p className="text-xs text-green bg-green/5 border border-green/10 rounded-xl px-4 py-2">
-        {t.announcements.form.audienceNote}
-      </p>
+      {/* الجمهور */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="form-label">{lang === 'ar' ? 'الجمهور المستهدف' : 'Target Audience'} <span className="text-red-500">*</span></label>
+          <select
+            className="form-input"
+            value={form.target_audience}
+            onChange={e => set('target_audience', e.target.value)}
+          >
+            <option value="all">{lang === 'ar' ? 'الكل' : 'All'}</option>
+            <option value="employees">{lang === 'ar' ? 'الموظفون' : 'Employees'}</option>
+            <option value="managers">{lang === 'ar' ? 'المدراء' : 'Managers'}</option>
+            <option value="department">{lang === 'ar' ? 'قسم محدد' : 'Specific Department'}</option>
+          </select>
+        </div>
+
+        {form.target_audience === 'department' && (
+          <div>
+            <label className="form-label">{lang === 'ar' ? 'اختر القسم' : 'Select Department'} <span className="text-red-500">*</span></label>
+            <select
+              className="form-input"
+              value={form.department_id}
+              onChange={e => set('department_id', e.target.value ? Number(e.target.value) : '')}
+              required
+            >
+              <option value="">{lang === 'ar' ? 'اختر...' : 'Select...'}</option>
+              {departments.map((dep: any) => (
+                <option key={dep.id} value={dep.id}>{dep.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
 
       {/* أزرار */}
       <div className="flex items-center gap-3 pt-1">
@@ -190,8 +226,10 @@ function AnnouncementForm({ initial, onSave, onCancel }: AnnouncementFormProps) 
 
 export default function ManagerAnnouncements() {
   const { t, lang } = useLanguage();
+  const { currentUser } = useAuthStore();
+  const isHR = currentUser?.role === 'hr';
 
-  const [list,    setList]    = useState<Announcement[]>([]);
+  const [list, setList] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNew, setShowNew] = useState(false);
   const [editing, setEditing] = useState<Announcement | null>(null);
@@ -200,13 +238,13 @@ export default function ManagerAnnouncements() {
   // ── data ──
   const fetchAll = async () => {
     setLoading(true);
-    try   { 
+    try {
       const res = await AnnouncementsService.getAll();
       const raw = res.data;
       const arr = Array.isArray(raw) ? raw : Array.isArray((raw as any)?.data) ? (raw as any).data : [];
-      setList(arr); 
+      setList(arr);
     }
-    catch  { /* silent */ }
+    catch { /* silent */ }
     finally { setLoading(false); }
   };
 
@@ -214,41 +252,53 @@ export default function ManagerAnnouncements() {
 
   // ── handlers ──
   const handleCreate = async (f: FormValues) => {
-    const starts  = fromInput(f.startsAt);
-    // التحقق من أن تاريخ البدء في المستقبل
-    if (new Date(starts) <= new Date()) {
-      toast.error('يجب أن يكون تاريخ النشر في المستقبل');
-      return;
+    const starts = fromInput(f.startsAt);
+    // Remove the validation that it must be in the future, as it will be a draft
+    const status: AnnouncementStatus = 'draft';
+    try {
+      await AnnouncementsService.create({
+        title: f.title,
+        content: f.content,
+        priority: f.priority,
+        starts_at: starts,
+        expires_at: fromInput(f.expiresAt),
+        status,
+        audience: f.target_audience,
+        target_audience: f.target_audience,
+        department_id: f.target_audience === 'department' ? (f.department_id || undefined) : undefined,
+      } as any);
+      toast.success(t.announcements.form.createdSuccess);
+      setShowNew(false);
+      fetchAll();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Failed to create announcement');
+      throw err;
     }
-    const status: AnnouncementStatus = 'scheduled';
-    await AnnouncementsService.create({
-      title:     f.title,
-      content:   f.content,
-      priority:  f.priority,
-      starts_at: starts,
-      expires_at: fromInput(f.expiresAt),
-      status,
-    });
-    toast.success(t.announcements.form.createdSuccess);
-    setShowNew(false);
-    fetchAll();
   };
 
   const handleUpdate = async (f: FormValues) => {
     if (!editing) return;
-    const starts  = fromInput(f.startsAt);
-    const status: AnnouncementStatus = new Date(starts) > new Date() ? 'scheduled' : 'active';
-    await AnnouncementsService.update(editing.id, {
-      title:     f.title,
-      content:   f.content,
-      priority:  f.priority,
-      starts_at: starts,
-      expires_at: fromInput(f.expiresAt),
-      status,
-    });
-    toast.success(t.announcements.form.updatedSuccess);
-    setEditing(null);
-    fetchAll();
+    const starts = fromInput(f.startsAt);
+    const status: AnnouncementStatus = editing.status === 'active' ? 'active' : 'draft';
+    try {
+      await AnnouncementsService.update(editing.id, {
+        title: f.title,
+        content: f.content,
+        priority: f.priority,
+        starts_at: starts,
+        expires_at: fromInput(f.expiresAt),
+        status,
+        audience: f.target_audience,
+        target_audience: f.target_audience,
+        department_id: f.target_audience === 'department' ? (f.department_id || undefined) : undefined,
+      } as any);
+      toast.success(t.announcements.form.updatedSuccess);
+      setEditing(null);
+      fetchAll();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Failed to update announcement');
+      throw err;
+    }
   };
 
   const handleDelete = async (ann: Announcement) => {
@@ -257,10 +307,14 @@ export default function ManagerAnnouncements() {
 
   const confirmDelete = async () => {
     if (!deleting) return;
-    await AnnouncementsService.delete(deleting.id);
-    toast.success(t.announcements.deleteConfirm.success);
-    setDeleting(null);
-    fetchAll();
+    try {
+      await AnnouncementsService.delete(deleting.id);
+      toast.success(t.announcements.deleteConfirm.success);
+      setDeleting(null);
+      fetchAll();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Failed to delete announcement');
+    }
   };
 
   const [publishing, setPublishing] = useState<number | null>(null);
@@ -286,18 +340,8 @@ export default function ManagerAnnouncements() {
     });
   };
 
-  // ── Holidays Query ──
-  const { data: holidays = [], isLoading: holidaysLoading } = useQuery({
-    queryKey: ['holidays'],
-    queryFn: getHolidays,
-    retry: false,
-  });
-
-  // ── render ──
   return (
     <div className="space-y-6">
-      <Toaster position="top-center" />
-
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -312,77 +356,6 @@ export default function ManagerAnnouncements() {
             <Plus size={18} />
             {t.announcements.createNew}
           </button>
-        )}
-      </div>
-
-      {/* ── قسم العطل الرسمية ── */}
-      <div className="bg-white rounded-2xl border border-amber-100 shadow-card overflow-hidden">
-        <div className="flex items-center gap-2 px-6 py-4 border-b border-amber-100 bg-amber-50/40">
-          <CalendarDays size={18} className="text-amber-600" />
-          <span className="font-bold text-dark">{lang === 'ar' ? 'العطل الرسمية' : 'Official Holidays'}</span>
-          {!holidaysLoading && (
-            <span className="text-xs bg-amber-100 text-amber-700 rounded-full px-2 py-0.5 font-semibold ms-1">
-              {holidays.length}
-            </span>
-          )}
-        </div>
-
-        {holidaysLoading ? (
-          <div className="flex items-center justify-center py-8 text-gray-400 gap-3">
-            <Loader2 size={20} className="animate-spin" />
-          </div>
-        ) : holidays.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 text-gray-400 gap-2">
-            <CalendarDays size={32} className="opacity-20" />
-            <p className="text-sm">{lang === 'ar' ? 'لا توجد عطل مسجلة' : 'No holidays found'}</p>
-          </div>
-        ) : (
-          <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {holidays.map((h: any) => {
-              const start = new Date(h.start_date || h.date || h.starts_at || h.from);
-              const end   = h.end_date || h.ends_at || h.to ? new Date(h.end_date || h.ends_at || h.to) : null;
-              const isUpcoming = start > new Date();
-              const isToday = start.toDateString() === new Date().toDateString();
-              return (
-                <div
-                  key={h.id}
-                  className={`flex items-start gap-3 p-4 rounded-xl border transition-all ${
-                    isToday
-                      ? 'bg-green/5 border-green/20'
-                      : isUpcoming
-                        ? 'bg-amber-50/50 border-amber-100'
-                        : 'bg-gray-50 border-gray-100 opacity-70'
-                  }`}
-                >
-                  <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex flex-col items-center justify-center text-center ${
-                    isToday ? 'bg-green text-white' : isUpcoming ? 'bg-amber-100 text-amber-700' : 'bg-gray-200 text-gray-500'
-                  }`}>
-                    <span className="text-[10px] font-bold uppercase leading-none">
-                      {start.toLocaleString(lang === 'ar' ? 'ar-SY' : 'en', { month: 'short' })}
-                    </span>
-                    <span className="text-lg font-extrabold leading-none">{start.getDate()}</span>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-dark text-sm leading-snug">{h.name || h.title || (lang === 'ar' ? 'عطلة رسمية' : 'Holiday')}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {start.toLocaleDateString(lang === 'ar' ? 'ar-SY' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                      {end && ` → ${end.toLocaleDateString(lang === 'ar' ? 'ar-SY' : 'en-US', { month: 'short', day: 'numeric' })}`}
-                    </p>
-                    {isToday && (
-                      <span className="inline-block mt-1 text-[10px] bg-green text-white px-2 py-0.5 rounded-full font-bold">
-                        {lang === 'ar' ? 'اليوم' : 'Today'}
-                      </span>
-                    )}
-                    {isUpcoming && !isToday && (
-                      <span className="inline-block mt-1 text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold">
-                        {lang === 'ar' ? 'قادم' : 'Upcoming'}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         )}
       </div>
 
@@ -464,7 +437,7 @@ export default function ManagerAnnouncements() {
                   <th className="px-5 py-3 text-start font-semibold">{t.announcements.list.columns.priority}</th>
                   <th className="px-5 py-3 text-start font-semibold">{t.announcements.list.columns.status}</th>
                   <th className="px-5 py-3 text-start font-semibold">{t.announcements.list.columns.date}</th>
-                  <th className="px-5 py-3 text-center font-semibold">{t.announcements.list.columns.actions}</th>
+                  <th className="px-5 py-3 text-center font-semibold w-[1%] whitespace-nowrap">{t.announcements.list.columns.actions}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -473,9 +446,11 @@ export default function ManagerAnnouncements() {
                     <td className="px-5 py-3.5 text-gray-400 font-medium">{idx + 1}</td>
 
                     {/* العنوان + النص المختصر */}
-                    <td className="px-5 py-3.5">
-                      <p className="font-semibold text-dark leading-snug">{ann.title}</p>
-                      <p className="text-xs text-brown truncate max-w-xs mt-0.5">{ann.content}</p>
+                    <td className="px-5 py-3.5 max-w-[200px]">
+                      <p className="font-semibold text-dark leading-snug truncate" title={ann.title}>
+                        {ann.title.length > 20 ? ann.title.substring(0, 20) + '...' : ann.title}
+                      </p>
+                      <p className="text-xs text-brown truncate mt-0.5" title={ann.content}>{ann.content}</p>
                     </td>
 
                     {/* الجمهور */}
@@ -503,10 +478,10 @@ export default function ManagerAnnouncements() {
                     </td>
 
                     {/* الإجراءات */}
-                    <td className="px-5 py-3.5">
+                    <td className="px-5 py-3.5 w-[1%] whitespace-nowrap">
                       <div className="flex items-center justify-center gap-1">
-                        {/* نشر فوري — يظهر للمجدول فقط */}
-                        {ann.status === 'scheduled' && (
+                        {/* نشر فوري — يظهر للمسودة والمجدول */}
+                        {((ann as any).author?.id !== 1 || currentUser?.id === 1) && (ann.status?.toLowerCase() === 'scheduled' || ann.status?.toLowerCase() === 'draft') && (
                           <button
                             onClick={() => handlePublish(ann.id)}
                             disabled={publishing === ann.id}
@@ -519,24 +494,31 @@ export default function ManagerAnnouncements() {
                             }
                           </button>
                         )}
-                        {/* تعديل */}
-                        <button
-                          onClick={() => { setEditing(ann); setShowNew(false); }}
-                          disabled={ann.target_audience === 'all' || ann.audience_type === 'all'}
-                          title={ann.target_audience === 'all' || ann.audience_type === 'all' ? t.announcements.list.hrNote : t.announcements.list.edit}
-                          className={`p-2 rounded-xl transition-colors ${ann.target_audience === 'all' || ann.audience_type === 'all' ? 'text-gray-300 cursor-not-allowed' : 'text-[#6B6358] hover:bg-gray-100'}`}
-                        >
-                          <Edit2 size={16} />
-                        </button>
-                        {/* حذف */}
-                        <button
-                          onClick={() => handleDelete(ann)}
-                          disabled={ann.target_audience === 'all' || ann.audience_type === 'all'}
-                          title={ann.target_audience === 'all' || ann.audience_type === 'all' ? t.announcements.list.hrNote : t.announcements.list.delete}
-                          className={`p-2 rounded-xl transition-colors ${ann.target_audience === 'all' || ann.audience_type === 'all' ? 'text-gray-300 cursor-not-allowed' : 'text-red-500 hover:bg-red-50'}`}
-                        >
-                          <Trash2 size={16} />
-                        </button>
+
+                        {/* 
+                          يمكنه التعديل/الحذف إذا لم يكن المنشئ هو المدير صاحب ال id 1 
+                          والحالة ليست active
+                        */}
+                        {((ann as any).author?.id !== 1 || currentUser?.id === 1) && ann.status?.toLowerCase() !== 'active' && (
+                          <>
+                            {/* تعديل */}
+                            <button
+                              onClick={() => { setEditing(ann); setShowNew(false); }}
+                              title={t.announcements.list.edit}
+                              className="p-2 rounded-xl transition-colors text-[#6B6358] hover:bg-gray-100"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                            {/* حذف */}
+                            <button
+                              onClick={() => handleDelete(ann)}
+                              title={t.announcements.list.delete}
+                              className="p-2 rounded-xl transition-colors text-red-500 hover:bg-red-50"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -549,3 +531,4 @@ export default function ManagerAnnouncements() {
     </div>
   );
 }
+

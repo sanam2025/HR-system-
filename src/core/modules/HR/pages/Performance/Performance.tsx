@@ -4,7 +4,7 @@ import { ChevronRight } from 'lucide-react';
 import { usePendingEvaluations } from '../../hooks/usePerformance';
 import Loading from '../../../../../shared/components/Loading';
 import type { PerformanceEvaluation } from '../../types/PerformanceService.types';
-// ✅ إضافة استيراد النوع
+//  إضافة استيراد النوع
 
 export default function Performance() {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ export default function Performance() {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
-      <h1 className="text-2xl font-bold text-gray-900 mb-4">📊 Pending Evaluations</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-4"> Pending Evaluations</h1>
       <p className="text-gray-500 text-sm mb-6">Review and approve employee performance evaluations.</p>
 
       {evaluations.length === 0 ? (

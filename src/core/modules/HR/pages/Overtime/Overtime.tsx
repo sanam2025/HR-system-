@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useMandatoryOvertime, useVoluntaryOvertime, useApproveMandatoryOvertime, useRejectMandatoryOvertime } from '../../hooks/useOvertime';
 import Loading from '../../../../../shared/components/Loading';
-// ✅ استيراد نوع الطلب
+//  استيراد نوع الطلب
 import type { OvertimeRequest } from '../../types/overtime.types';
 
 export default function Overtime() {
@@ -79,7 +79,7 @@ export default function Overtime() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {/* ✅ تصحيح النوع: إضافة (req: OvertimeRequest) */}
+              {/*  تصحيح النوع: إضافة (req: OvertimeRequest) */}
               {(tab === 'mandatory' ? mandatory : voluntary).map((req: OvertimeRequest) => (
                 <tr key={req.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">

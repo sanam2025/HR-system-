@@ -9,9 +9,10 @@ interface CreateTerminationModalProps {
   onClose: () => void;
   onSubmit: (formData: FormData) => void;
   isSubmitting: boolean;
+  employees?: any[];
 }
 
-export default function CreateTerminationModal({ isOpen, onClose, onSubmit, isSubmitting }: CreateTerminationModalProps) {
+export default function CreateTerminationModal({ isOpen, onClose, onSubmit, isSubmitting, employees: propEmployees }: CreateTerminationModalProps) {
   const { t, lang } = useLanguage();
   const tr = t.terminations;
 
@@ -23,11 +24,14 @@ export default function CreateTerminationModal({ isOpen, onClose, onSubmit, isSu
   const [compensationAmount, setCompensationAmount] = useState('');
   const [document, setDocument] = useState<File | null>(null);
 
-  // Fetch employees to select
-  const { data: employees = [] } = useQuery({
+  // Fetch employees to select (only if propEmployees is not provided)
+  const { data: fetchedEmployees = [] } = useQuery({
     queryKey: ['managerEmployees'],
-    queryFn: getManagerEmployees
+    queryFn: getManagerEmployees,
+    enabled: !propEmployees
   });
+
+  const employees = propEmployees || fetchedEmployees;
 
   if (!isOpen) return null;
 
@@ -84,7 +88,7 @@ export default function CreateTerminationModal({ isOpen, onClose, onSubmit, isSu
                 <option value="">{tr.form.selectEmployee}</option>
                 {employees.map((emp: any) => (
                   <option key={emp.id} value={emp.user_id || emp.id}>
-                    {emp.user_name || emp.name || emp.first_name + ' ' + emp.last_name}
+                    {emp.user_name || emp.name || emp.full_name || emp.first_name + ' ' + emp.last_name}
                   </option>
                 ))}
               </select>

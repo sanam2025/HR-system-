@@ -73,13 +73,22 @@ function UpdateAnnouncementForm({
                 return;
             }
 
+            const formatForApi = (dateString: string) => {
+                if (!dateString) return '';
+                if (dateString.includes('T')) {
+                    const withSeconds = dateString.length === 16 ? `${dateString}:00` : dateString;
+                    return withSeconds.replace('T', ' ');
+                }
+                return dateString;
+            };
+
             const formattedData = {
                 title: editData.title.trim(),
                 content: editData.content.trim(),
                 priority: editData.priority,
                 target_audience: editData.target_audience,
-                starts_at: editData.starts_at,
-                expires_at: editData.expires_at,
+                starts_at: formatForApi(editData.starts_at),
+                expires_at: formatForApi(editData.expires_at),
             };
 
             await updateAnnouncemet({id:announcementData?.id ,announcementData:formattedData});

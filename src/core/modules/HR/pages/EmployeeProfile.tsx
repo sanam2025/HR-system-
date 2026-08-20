@@ -11,13 +11,13 @@ export default function EmployeeProfile() {
   useParams<{ id: string; }>();
   const [editMode, setEditMode] = useState(false);
 
-  // ✅ استخدام هوك الـ Profile (سيجلب بيانات الموظف حسب الـ ID أو الحالي)
+  //  استخدام هوك الـ Profile (سيجلب بيانات الموظف حسب الـ ID أو الحالي)
   const { profile, isLoading, error, refetch } = useProfile();
 
   // إذا كان لديك ID في الرابط، استخدم useEmployeeProfile بدلاً من ذلك
   // const { profile, isLoading, error, refetch } = useEmployeeProfile(Number(id));
 
-  // ✅ نموذج التعديل (افتراضي)
+  //  نموذج التعديل (افتراضي)
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
     email: profile?.email || '',

@@ -60,7 +60,7 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
     }
   };
 
-  // ✅ دالة لعرض أيقونة الترتيب
+  //  دالة لعرض أيقونة الترتيب
   const getRankIcon = (rank?: number) => {
     if (!rank) return null;
     switch (rank) {
@@ -94,7 +94,7 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
           <div className="ml-3">
             <p className="text-sm font-medium text-gray-900">{candidateName}</p>
             <p className="text-xs text-gray-500">{candidateEmail}</p>
-            {/* ✅ عرض الرتبة بجانب الاسم */}
+            {/*  عرض الرتبة بجانب الاسم */}
             {interview.rank && (
               <div className="flex items-center gap-1 mt-0.5">
                 {getRankIcon(interview.rank)}
@@ -140,16 +140,16 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
           <span
             className={`px-2 py-1 text-xs rounded-full inline-flex items-center gap-1 w-fit ${getStatusColor(interview.status)}`}
           >
-            {interview.status === 'done' && <span>✅</span>}
+            {interview.status === 'done' && <span></span>}
             {interview.status || "N/A"}
           </span>
           {interview.rate && (
             <div className="text-xs text-gray-500 flex items-center gap-1">
-              <span className="text-yellow-500">⭐</span>
+              <span className="text-yellow-500"></span>
               Rate: {interview.rate}/10
             </div>
           )}
-          {/* ✅ عرض الرتبة هنا أيضاً */}
+          {/*  عرض الرتبة هنا أيضاً */}
           {interview.rank && (
             <div className="text-xs text-gray-500 flex items-center gap-1">
               {getRankIcon(interview.rank)}

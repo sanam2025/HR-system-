@@ -95,10 +95,10 @@ export default function Announcements() {
     <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">📢 Manage Announcements</h1>
+          <h1 className="text-2xl font-bold text-gray-900"> Manage Announcements</h1>
           <p className="text-gray-500 text-sm">Create and manage announcements for employees</p>
         </div>
-        {/* ❌ تم حذف زر Add Announcement من هنا */}
+        {/*  تم حذف زر Add Announcement من هنا */}
         {/* <button
           onClick={() => { setShowForm(true); setEditingId(null); setFormData({ title: '', content: '', audience: 'all', status: 'draft', starts_at: '', ends_at: '' }); }}
           className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"

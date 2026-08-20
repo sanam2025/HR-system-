@@ -18,15 +18,19 @@ export type TopRate = {
 };
 
 type TopEmployeesSectionProps = {
-  topRate?: {
-    data: TopRate;
-  };
+  topRate?: TopRate;
   isLoadingTopRate: boolean;
 };
 
 
 const TopEmployeeCard = ({ employee }: { employee: Employee & { rating?: number; projects_completed?: number; attendance_rate?: number } }) => {
   const getRatingColor = (rating: number) => {
+    if (rating > 5) {
+      if (rating >= 90) return "text-emerald-500";
+      if (rating >= 80) return "text-blue-500";
+      if (rating >= 60) return "text-amber-500";
+      return "text-red-500";
+    }
     if (rating >= 4.8) return "text-emerald-500";
     if (rating >= 4.5) return "text-blue-500";
     if (rating >= 4.0) return "text-amber-500";
@@ -74,9 +78,9 @@ const TopEmployeeCard = ({ employee }: { employee: Employee & { rating?: number;
         
         <div className="text-right">
           <div className={`text-lg font-bold ${getRatingColor(employee.rating || 0)}`}>
-            {(employee.rating || 0).toFixed(1)}
+            {employee.rating ? (employee.rating > 5 ? employee.rating : employee.rating.toFixed(1)) : 0}
           </div>
-          <div className="text-xs text-gray-400">Rating</div>
+          <div className="text-xs text-gray-400">{employee.rating_label || 'Rating'}</div>
         </div>
       </div>
       
@@ -100,7 +104,7 @@ function TopEmployeesSection({ topRate, isLoadingTopRate }: TopEmployeesSectionP
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const employees = topRate?.data?.employees || [];
+  const employees = topRate?.employees || [];
   const hasEmployees = employees.length > 0;
 
   const totalPages = Math.ceil(employees.length / itemsPerPage);
@@ -154,9 +158,9 @@ function TopEmployeesSection({ topRate, isLoadingTopRate }: TopEmployeesSectionP
         <Award className="w-5 h-5 text-yellow-500" />
         <h2 className="text-lg font-semibold text-gray-800">Top Rated Employees</h2>
         <span className="text-xs text-gray-400">({employees.length})</span>
-        {topRate?.data?.year && (
+        {topRate?.year && (
           <span className="text-xs text-gray-400">
-            • Q{topRate.data.quarter} {topRate.data.year}
+            • Q{topRate.quarter} {topRate.year}
           </span>
         )}
       </div>
@@ -189,9 +193,15 @@ function TopEmployeesSection({ topRate, isLoadingTopRate }: TopEmployeesSectionP
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {currentEmployees.map((employee: any) => (
-              <TopEmployeeCard key={employee.id} employee={employee} />
-            ))}
+            {currentEmployees.map((employee: any) => {
+              const mappedEmployee = {
+                ...employee,
+                id: employee.employee_id || employee.id,
+                name: employee.full_name || employee.name || 'Unknown',
+                rating: employee.final_score !== undefined ? employee.final_score : employee.rating,
+              };
+              return <TopEmployeeCard key={mappedEmployee.id} employee={mappedEmployee} />;
+            })}
           </div>
 
           {totalPages > 1 && (
