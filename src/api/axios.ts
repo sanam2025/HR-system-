@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getAuthToken } from '../store/authStore';
+import { getAuthToken, useAuthStore } from '../store/authStore';
 
 // ── Base URL ─
 const BASE_URL = 'https://masarhr.alwaysdata.net/api/';
@@ -58,12 +58,9 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Token منتهي أو غير صالح — امسح التوكن وأعد للـ Login
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_user');
-      sessionStorage.removeItem('auth_token');
-      sessionStorage.removeItem('auth_user');
-      // يمكن إضافة redirect لاحقاً
-      console.warn('[API] Unauthorized — token cleared.');
+      // Token منتهي أو غير صالح — استخدم Zustand store للمسح
+      useAuthStore.getState().logout();
+      console.warn('[API] Unauthorized — token cleared via authStore.');
     }
     return Promise.reject(error);
   },

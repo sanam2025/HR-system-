@@ -10,6 +10,19 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { NavItem } from './SideBar';
 import { useAuthStore } from '../../store/authStore';
 
+const getCurrentLocation = (): Promise<{ latitude: number; longitude: number }> => {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error("GEOLOCATION_NOT_SUPPORTED"));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+      (err) => reject(new Error("GEOLOCATION_DENIED"))
+    );
+  });
+};
+
 interface TopbarProps {
   title: string;
   onToggleSidebar: () => void;
@@ -46,6 +59,7 @@ export default function Topbar({
     queryKey: ['notifications'],
     queryFn: getMyNotifications,
     refetchInterval: 30000,
+    enabled: !!useAuthStore(state => state.token)
   });
 
   const unreadCount = notifications.filter((n: any) => !n.is_read && !n.read_at).length;
@@ -276,12 +290,16 @@ export default function Topbar({
                 onClick={async () => {
                   setIsLoadingCheck(true);
                   try {
-                    const coords = { latitude: 33.51548003, longitude: 36.2788800 };
+                    const coords = await getCurrentLocation();
                     await submitCheckIn(coords);
                     updateAttendanceState('checked_in');
                     toast.success(lang === 'ar' ? 'تم تسجيل الحضور بنجاح ✅' : 'Checked in successfully ✅');
                   } catch (error: any) {
                     const msg: string = error.response?.data?.message || error.response?.data?.error || error.message || '';
+                    if (msg === "GEOLOCATION_NOT_SUPPORTED" || msg === "GEOLOCATION_DENIED") {
+                      toast.error(lang === 'ar' ? 'يجب السماح بالوصول للموقع الجغرافي لتسجيل الحضور' : 'Location access is required to check in');
+                      return;
+                    }
                     if (
                       msg.includes('already checked in') ||
                       msg.includes('check in again') ||
@@ -311,12 +329,16 @@ export default function Topbar({
                 onClick={async () => {
                   setIsLoadingCheck(true);
                   try {
-                    const coords = { latitude: 33.51548003, longitude: 36.2788800 };
+                    const coords = await getCurrentLocation();
                     await submitCheckOut(coords);
                     updateAttendanceState('completed');
                     toast.success(lang === 'ar' ? 'تم تسجيل الانصراف بنجاح! اكتمل يوم عملك 🎉' : 'Checked out successfully! Work day completed 🎉');
                   } catch (error: any) {
                     const msg: string = error.response?.data?.message || error.response?.data?.error || error.message || '';
+                    if (msg === "GEOLOCATION_NOT_SUPPORTED" || msg === "GEOLOCATION_DENIED") {
+                      toast.error(lang === 'ar' ? 'يجب السماح بالوصول للموقع الجغرافي لتسجيل الانصراف' : 'Location access is required to check out');
+                      return;
+                    }
                     if (
                       msg.includes('no active check in') ||
                       msg.includes('already checked out') ||

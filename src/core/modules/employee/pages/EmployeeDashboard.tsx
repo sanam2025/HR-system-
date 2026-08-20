@@ -184,9 +184,9 @@ function AnnouncementsSummary() {
     <ul className="space-y-2">
       {q.data.map((a) => (
         <li key={a.id} className="rounded-xl bg-gray-50 p-3">
-          <p className="text-sm font-medium text-dark truncate">{a.title}</p>
+          <p className="text-sm font-medium text-dark break-words whitespace-normal">{a.title}</p>
           {a.content && (
-            <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{a.content}</p>
+            <p className="text-xs text-gray-500 mt-0.5 break-words whitespace-normal">{a.content}</p>
           )}
         </li>
       ))}

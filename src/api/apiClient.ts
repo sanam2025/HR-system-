@@ -64,10 +64,8 @@ apiClient.interceptors.response.use(
 
         if (response) {
             if (response.status === 401) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                sessionStorage.removeItem('token');
-                sessionStorage.removeItem('user');
+                useAuthStore.getState().logout();
+                console.warn('[API] Unauthorized — token cleared via authStore.');
             }
         }
 
