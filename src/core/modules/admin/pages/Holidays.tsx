@@ -1,6 +1,6 @@
 // core/modules/Admin/pages/Holidays.tsx
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useLanguage } from "../../../../i18n/translations/LanguageContext";
 import {
   Calendar,
   Plus,
@@ -47,8 +47,7 @@ interface ModalProps {
 }
 
 function HolidayModal({ onClose, onSave, initial }: ModalProps) {
-  const { i18n } = useTranslation();
-  const isRtl = i18n.language === "ar";
+  const { t, lang } = useLanguage();
   const [name, setName] = useState(initial?.name ?? "");
   const [date, setDate] = useState(
     initial ? new Date(initial.date).toISOString().split("T")[0] : ""
@@ -71,8 +70,8 @@ function HolidayModal({ onClose, onSave, initial }: ModalProps) {
         <div className="flex justify-between items-center mb-5">
           <h3 className="text-lg font-bold text-gray-900">
             {initial
-              ? (isRtl ? "تعديل العطلة" : "Edit Holiday")
-              : (isRtl ? "إضافة عطلة جديدة" : "Add Holiday")}
+              ? (t.adminHolidays?.editHoliday || "Edit Holiday")
+              : (t.adminHolidays?.addHoliday || "Add Holiday")}
           </h3>
           <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500">
             <X className="w-5 h-5" />
@@ -81,19 +80,19 @@ function HolidayModal({ onClose, onSave, initial }: ModalProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {isRtl ? "اسم العطلة" : "Holiday Name"}
+              {t.adminHolidays?.holidayName || "Holiday Name"}
             </label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
               className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green/40 focus:border-green"
-              placeholder={isRtl ? "أدخل اسم العطلة" : "Enter holiday name"}
+              placeholder={t.adminHolidays?.holidayNamePlaceholder || "Enter holiday name"}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {isRtl ? "التاريخ" : "Date"}
+              {t.adminHolidays?.date || "Date"}
             </label>
             <input
               type="date"
@@ -105,15 +104,15 @@ function HolidayModal({ onClose, onSave, initial }: ModalProps) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {isRtl ? "النوع" : "Type"}
+              {t.adminHolidays?.type || "Type"}
             </label>
             <select
               value={type}
               onChange={(e) => setType(e.target.value as "official" | "company")}
               className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green/40 focus:border-green bg-white"
             >
-              <option value="official">{isRtl ? "رسمية" : "Official"}</option>
-              <option value="company">{isRtl ? "شركة" : "Company"}</option>
+              <option value="official">{t.adminHolidays?.official || "Official"}</option>
+              <option value="company">{t.adminHolidays?.company || "Company"}</option>
             </select>
           </div>
           <div className="flex gap-3 pt-2">
@@ -121,13 +120,13 @@ function HolidayModal({ onClose, onSave, initial }: ModalProps) {
               type="button" onClick={onClose}
               className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors"
             >
-              {isRtl ? "إلغاء" : "Cancel"}
+              {t.adminHolidays?.cancel || "Cancel"}
             </button>
             <button
               type="submit"
               className="flex-1 px-4 py-2.5 bg-green text-white rounded-xl text-sm font-medium hover:bg-green-dark transition-colors"
             >
-              {initial ? (isRtl ? "حفظ" : "Save") : (isRtl ? "إضافة" : "Add")}
+              {initial ? (t.adminHolidays?.save || "Save") : (t.adminHolidays?.add || "Add")}
             </button>
           </div>
         </form>
@@ -138,8 +137,7 @@ function HolidayModal({ onClose, onSave, initial }: ModalProps) {
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 export default function Holidays() {
-  const { i18n } = useTranslation();
-  const isRtl = i18n.language === "ar";
+  const { t, lang } = useLanguage();
 
   const [holidays, setHolidays] = useState<Holiday[]>(initialHolidays);
   const [showModal, setShowModal] = useState(false);
@@ -166,15 +164,15 @@ export default function Holidays() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir={isRtl ? "rtl" : "ltr"}>
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       {/* ── Header ── */}
       <div className="flex justify-between items-start mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            {isRtl ? "العطل الرسمية" : "Holidays"}
+            {t.adminHolidays?.title || "Holidays"}
           </h1>
           <p className="text-gray-500 mt-1 text-sm">
-            {isRtl ? "إدارة عطل الشركة والأيام الرسمية" : "Manage company holidays and official days off"}
+            {t.adminHolidays?.subtitle || "Manage company holidays and official days off"}
           </p>
         </div>
         <button
@@ -182,7 +180,7 @@ export default function Holidays() {
           className="flex items-center gap-2 bg-green text-white px-4 py-2.5 rounded-xl hover:bg-green-dark transition-all shadow-[0_4px_14px_rgba(74,124,89,.3)] text-sm font-semibold"
         >
           <Plus className="w-4 h-4" />
-          {isRtl ? "+ إضافة عطلة" : "+ Add Holiday"}
+          {t.adminHolidays?.addHoliday || "Add Holiday"}
         </button>
       </div>
 
@@ -190,7 +188,7 @@ export default function Holidays() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-500">{isRtl ? "إجمالي العطل" : "Total Holidays"}</p>
+            <p className="text-sm text-gray-500">{t.adminHolidays?.totalHolidays || "Total Holidays"}</p>
             <p className="text-3xl font-bold text-gray-900 mt-1">{total}</p>
           </div>
           <div className="w-11 h-11 rounded-xl bg-green/10 flex items-center justify-center text-green">
@@ -200,7 +198,7 @@ export default function Holidays() {
 
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-500">{isRtl ? "القادمة" : "Upcoming"}</p>
+            <p className="text-sm text-gray-500">{t.adminHolidays?.upcoming || "Upcoming"}</p>
             <p className="text-3xl font-bold text-green mt-1">{upcoming}</p>
           </div>
           <div className="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500">
@@ -210,7 +208,7 @@ export default function Holidays() {
 
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-500">{isRtl ? "المنتهية" : "Passed"}</p>
+            <p className="text-sm text-gray-500">{t.adminHolidays?.passed || "Passed"}</p>
             <p className="text-3xl font-bold text-gray-400 mt-1">{passed}</p>
           </div>
           <div className="w-11 h-11 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400">
@@ -223,17 +221,17 @@ export default function Holidays() {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100">
           <h3 className="text-lg font-semibold text-gray-800">
-            {isRtl ? "جميع العطل" : "All Holidays"}
+            {t.adminHolidays?.allHolidays || "All Holidays"}
           </h3>
           <p className="text-sm text-gray-400 mt-0.5">
-            {holidays.length} {isRtl ? "عطلة مجدولة" : "holidays scheduled"}
+            {holidays.length} {t.adminHolidays?.holidaysScheduled || "holidays scheduled"}
           </p>
         </div>
 
         <div className="divide-y divide-gray-50">
           {holidays.length === 0 && (
             <div className="px-6 py-12 text-center text-gray-400 text-sm">
-              {isRtl ? "لا توجد عطل مضافة بعد" : "No holidays added yet"}
+              {t.adminHolidays?.noHolidaysFound || "No holidays added yet"}
             </div>
           )}
           {holidays.map((holiday) => (
@@ -249,8 +247,8 @@ export default function Holidays() {
                       : "bg-purple-50 text-purple-600"
                     }`}>
                     {holiday.type === "official"
-                      ? (isRtl ? "رسمية" : "official")
-                      : (isRtl ? "شركة" : "company")}
+                      ? (t.adminHolidays?.official || "Official")
+                      : (t.adminHolidays?.company || "Company")}
                   </span>
                 </div>
                 <div className="flex items-center gap-4 mt-1.5 text-xs text-gray-400">
@@ -260,7 +258,7 @@ export default function Holidays() {
                   </span>
                   <span className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    {isRtl ? "تحديث:" : "Updated:"} {holiday.updatedAt}
+                    {t.adminHolidays?.updated || "Updated:"} {holiday.updatedAt}
                   </span>
                 </div>
               </div>
@@ -268,14 +266,14 @@ export default function Holidays() {
                 <button
                   onClick={() => { setEditing(holiday); setShowModal(true); }}
                   className="p-2 text-amber-500 hover:bg-amber-50 rounded-lg transition-colors"
-                  title={isRtl ? "تعديل" : "Edit"}
+                  title={t.adminHolidays?.edit || "Edit"}
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => handleDelete(holiday.id)}
                   className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                  title={isRtl ? "حذف" : "Delete"}
+                  title={t.adminHolidays?.delete || "Delete"}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>

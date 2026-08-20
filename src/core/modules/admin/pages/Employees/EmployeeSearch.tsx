@@ -13,8 +13,10 @@ import EmployeeList from "./list/EmployeeList";
 import TopEmployeesSection from "./TopEmployeesSection";
 import type { UserStatus } from "../../../auth/Types/types";
 import type { Employee } from "../../../../../api/Types/types.types";
+import { useLanguage } from "../../../../../i18n/translations/LanguageContext";
 
 export default function EmployeeSearch() {
+  const { t, lang } = useLanguage();
   const { data: employeesResponse, isLoading } = useEmployees();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -74,11 +76,11 @@ export default function EmployeeSearch() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Employee Search</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t.adminEmployeeSearch?.title || 'Employee Search'}</h1>
         <p className="text-gray-500 mt-1 text-sm">
-          Search and filter employees
+          {t.adminEmployeeSearch?.subtitle || 'Search and filter employees'}
         </p>
       </div>
 
@@ -88,7 +90,7 @@ export default function EmployeeSearch() {
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
             <input 
               type="text" 
-              placeholder="Search by name, department, or position..."
+              placeholder={t.adminEmployeeSearch?.searchPlaceholder || 'Search by name, department, or position...'}
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -108,7 +110,7 @@ export default function EmployeeSearch() {
             className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2"
           >
             <Search className="w-4 h-4" />
-            Search
+            {t.adminEmployeeSearch?.filter || 'Search'}
           </button>
         </div>
         {searchQuery && (

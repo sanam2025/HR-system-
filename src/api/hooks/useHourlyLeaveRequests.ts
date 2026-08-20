@@ -7,8 +7,8 @@ import type {
   UpdateHourlyLeaveRequestPayload,
 } from "../models";
 
-export function useMyHourlyLeaveRequests(status?: LeaveRequestStatus) {
-  const params = status ? { status } : {};
+export function useMyHourlyLeaveRequests(status?: LeaveRequestStatus, page: number = 1) {
+  const params = status ? { status, page } : { page };
   return useQuery({
     queryKey: queryKeys.hourlyLeaveRequests.mine(params),
     queryFn: () => api.listMyHourlyLeaveRequests(params),

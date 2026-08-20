@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import type { Employee } from "../../../../../api/Types/types.types";
+import { useLanguage } from "../../../../../i18n/translations/LanguageContext";
 
 export type TopRate = {
   year: number;
@@ -24,6 +25,7 @@ type TopEmployeesSectionProps = {
 
 
 const TopEmployeeCard = ({ employee }: { employee: Employee & { rating?: number; projects_completed?: number; attendance_rate?: number } }) => {
+  const { t } = useLanguage();
   const getRatingColor = (rating: number) => {
     if (rating > 5) {
       if (rating >= 90) return "text-emerald-500";
@@ -72,7 +74,7 @@ const TopEmployeeCard = ({ employee }: { employee: Employee & { rating?: number;
         
         <div className="flex-1 min-w-0">
           <h4 className="font-semibold text-gray-800 text-sm truncate">{employee.name}</h4>
-          <p className="text-xs text-gray-500">{employee.job_title || 'No Position'}</p>
+          <p className="text-xs text-gray-500">{employee.job_title || t.adminEmployeeSearch?.noPosition || 'No Position'}</p>
           <p className="text-xs text-gray-400">{employee.department}</p>
         </div>
         
@@ -80,7 +82,7 @@ const TopEmployeeCard = ({ employee }: { employee: Employee & { rating?: number;
           <div className={`text-lg font-bold ${getRatingColor(employee.rating || 0)}`}>
             {employee.rating ? (employee.rating > 5 ? employee.rating : employee.rating.toFixed(1)) : 0}
           </div>
-          <div className="text-xs text-gray-400">{employee.rating_label || 'Rating'}</div>
+          <div className="text-xs text-gray-400">{employee.rating_label || t.adminEmployeeSearch?.rating || 'Rating'}</div>
         </div>
       </div>
       
@@ -88,11 +90,11 @@ const TopEmployeeCard = ({ employee }: { employee: Employee & { rating?: number;
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-1 text-gray-500">
             <TrendingUp className="w-3.5 h-3.5" />
-            <span>{employee.projects_completed || 0} projects</span>
+            <span>{employee.projects_completed || 0} {t.adminEmployeeSearch?.projects || 'projects'}</span>
           </div>
           <div className="flex items-center gap-1 text-gray-500">
             <User className="w-3.5 h-3.5" />
-            <span>{employee.attendance_rate || 0}% attendance</span>
+            <span>{employee.attendance_rate || 0}% {t.adminEmployeeSearch?.attendance || 'attendance'}</span>
           </div>
         </div>
       </div>
@@ -101,6 +103,7 @@ const TopEmployeeCard = ({ employee }: { employee: Employee & { rating?: number;
 };
 
 function TopEmployeesSection({ topRate, isLoadingTopRate }: TopEmployeesSectionProps) {
+  const { t } = useLanguage();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
@@ -134,17 +137,17 @@ function TopEmployeesSection({ topRate, isLoadingTopRate }: TopEmployeesSectionP
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-4">
           <Award className="w-5 h-5 text-yellow-500" />
-          <h2 className="text-lg font-semibold text-gray-800">Top Rated Employees</h2>
+          <h2 className="text-lg font-semibold text-gray-800">{t.adminEmployeeSearch?.topRated || 'Top Rated Employees'}</h2>
           <span className="text-xs text-gray-400">(0)</span>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
           <div className="flex flex-col items-center justify-center space-y-3">
             <div className="bg-gray-50 rounded-full p-4">
-              <Users className="w-12 h-12 text-gray-300" />
+               <Users className="w-12 h-12 text-gray-300" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-800">No Top Rated Employees</h3>
+            <h3 className="text-lg font-semibold text-gray-800">{t.adminEmployeeSearch?.noTopRated || 'No Top Rated Employees'}</h3>
             <p className="text-sm text-gray-500 max-w-md">
-              No employees have been rated yet. Ratings will appear here once employees receive their performance reviews.
+              {t.adminEmployeeSearch?.noTopRatedDesc || 'No employees have been rated yet. Ratings will appear here once employees receive their performance reviews.'}
             </p>
           </div>
         </div>
@@ -156,7 +159,7 @@ function TopEmployeesSection({ topRate, isLoadingTopRate }: TopEmployeesSectionP
     <div className="mb-6">
       <div className="flex items-center gap-2 mb-4">
         <Award className="w-5 h-5 text-yellow-500" />
-        <h2 className="text-lg font-semibold text-gray-800">Top Rated Employees</h2>
+        <h2 className="text-lg font-semibold text-gray-800">{t.adminEmployeeSearch?.topRated || 'Top Rated Employees'}</h2>
         <span className="text-xs text-gray-400">({employees.length})</span>
         {topRate?.year && (
           <span className="text-xs text-gray-400">

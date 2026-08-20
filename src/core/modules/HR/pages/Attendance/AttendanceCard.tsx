@@ -1,11 +1,12 @@
-// src/core/modules/HR/pages/Attendance/AttendanceCard.tsx
 import type { AttendanceRecord } from '../../../../../api/service/HrService/AttendanceService';
+import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
 
 interface AttendanceCardProps {
   record: AttendanceRecord;
 }
 
 const AttendanceCard = ({ record }: AttendanceCardProps) => {
+  const { t, lang } = useLanguage();
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'present': return 'bg-green-100 text-green-800';
@@ -18,10 +19,10 @@ const AttendanceCard = ({ record }: AttendanceCardProps) => {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'present': return ' Present';
-      case 'absent': return ' Absent';
-      case 'late': return ' Late';
-      case 'leave': return ' Leave';
+      case 'present': return t.attendance?.filter?.present || 'Present';
+      case 'absent': return t.attendance?.filter?.absent || 'Absent';
+      case 'late': return t.attendance?.filter?.late || 'Late';
+      case 'leave': return t.attendance?.filter?.leave || 'Leave';
       default: return status;
     }
   };
@@ -33,7 +34,7 @@ const AttendanceCard = ({ record }: AttendanceCardProps) => {
           <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium text-sm">
             {record.employee_name?.charAt(0) || '?'}
           </div>
-          <span className="ml-3 text-sm font-medium text-gray-900">
+          <span className={`text-sm font-medium text-gray-900 ${lang === 'ar' ? 'mr-3' : 'ml-3'}`}>
             {record.employee_name}
           </span>
         </div>

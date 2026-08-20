@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { JobPostingsService } from "../../../../../api/service/HrService/JobPostingsService";
 import Loading from "../../../../../shared/components/Loading";
+import { useLanguage } from "../../../../../i18n/translations/LanguageContext";
 
 // تعريف نوع الخطأ
 interface ApiError {
@@ -29,6 +30,9 @@ const getErrorMessage = (err: unknown): string => {
 };
 
 export default function JobPostingForm() {
+  const { lang, t } = useLanguage();
+  const formLang = t.hrJobPostings?.form;
+  
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditMode = !!id;
@@ -66,11 +70,11 @@ export default function JobPostingForm() {
     try {
       if (isEditMode && id) {
         await JobPostingsService.update(Number(id), formData);
-        toast.success("Job posting updated successfully!");
+        toast.success(formLang?.updateSuccess || "Job posting updated successfully!");
       }
       navigate("/Hr/job-postings");
     } catch (err) {
-      toast.error(getErrorMessage(err));
+      toast.error(getErrorMessage(err) || formLang?.error || "An error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -85,16 +89,19 @@ export default function JobPostingForm() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div className="mb-6">
         <button
           onClick={() => navigate("/Hr/job-postings")}
           className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-4"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Job Postings
+          <ArrowLeft className={`w-4 h-4 ${lang === 'ar' ? 'rotate-180' : ''}`} /> 
+          {formLang?.back || "Back to Job Postings"}
         </button>
         <h1 className="text-2xl font-bold">
-          {isEditMode ? "Edit Job Posting" : "Create Job Posting"}
+          {isEditMode 
+            ? formLang?.editTitle || "Edit Job Posting" 
+            : formLang?.createTitle || "Create Job Posting"}
         </h1>
       </div>
 
@@ -103,7 +110,9 @@ export default function JobPostingForm() {
         className="bg-white rounded-xl shadow-sm p-6 max-w-2xl space-y-5"
       >
         <div>
-          <label className="block text-sm font-medium mb-1">Job Title *</label>
+          <label className="block text-sm font-medium mb-1">
+            {formLang?.jobTitleLabel || "Job Title *"}
+          </label>
           <input
             type="text"
             value={formData.job_title}
@@ -116,7 +125,9 @@ export default function JobPostingForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Description</label>
+          <label className="block text-sm font-medium mb-1">
+            {formLang?.descriptionLabel || "Description"}
+          </label>
           <textarea
             value={formData.description}
             onChange={(e) =>
@@ -129,7 +140,7 @@ export default function JobPostingForm() {
 
         <div>
           <label className="block text-sm font-medium mb-1">
-            Experience (years) *
+            {formLang?.experienceLabel || "Experience (years) *"}
           </label>
           <input
             type="number"
@@ -149,15 +160,19 @@ export default function JobPostingForm() {
             onClick={() => navigate("/Hr/job-postings")}
             className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
           >
-            Cancel
+            {formLang?.cancel || "Cancel"}
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
             className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50"
           >
-            <Save className="w-4 h-4" />{" "}
-            {isSubmitting ? "Saving..." : isEditMode ? "Update" : "Create"}
+            <Save className="w-4 h-4" />
+            {isSubmitting 
+              ? (formLang?.saving || "Saving...") 
+              : (isEditMode 
+                  ? formLang?.update || "Update" 
+                  : formLang?.create || "Create")}
           </button>
         </div>
       </form>

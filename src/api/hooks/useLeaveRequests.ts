@@ -7,8 +7,8 @@ import type {
   UpdateLeaveRequestPayload,
 } from "../models";
 
-export function useMyLeaveRequests(status?: LeaveRequestStatus) {
-  const params = status ? { status } : {};
+export function useMyLeaveRequests(status?: LeaveRequestStatus, page: number = 1) {
+  const params = status ? { status, page } : { page };
   return useQuery({
     queryKey: queryKeys.leaveRequests.mine(params),
     queryFn: () => api.listMyLeaveRequests(params),

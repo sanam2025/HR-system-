@@ -1,4 +1,5 @@
-import { getListOrEmpty, httpClient, unwrap } from "../lib/http/client";
+import { getListOrEmpty, getPaginatedListOrEmpty, httpClient, unwrap } from "../lib/http/client";
+import type { Paginated } from "../lib/http/client";
 import { endpoints } from "./endpoints";
 import type { RequestOptions } from "../lib/http/client";
 import type { MessageResponse } from "../lib/http/types";
@@ -44,10 +45,10 @@ export async function deleteHourlyLeaveRequest(
 
 /** The signed-in employee's own hourly leave requests, optionally filtered by status. */
 export async function listMyHourlyLeaveRequests(
-  params: { status?: LeaveRequestStatus } = {},
+  params: { status?: LeaveRequestStatus; page?: number } = {},
   options?: RequestOptions
-): Promise<HourlyLeaveRequest[]> {
-  return getListOrEmpty<HourlyLeaveRequest>(endpoints.hourlyLeaveRequests.list, {
+): Promise<Paginated<HourlyLeaveRequest>> {
+  return getPaginatedListOrEmpty<HourlyLeaveRequest>(endpoints.hourlyLeaveRequests.list, {
     ...options,
     params: { ...params, ...options?.params },
   });

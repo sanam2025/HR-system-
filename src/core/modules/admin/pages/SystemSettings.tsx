@@ -1,7 +1,7 @@
 // core/modules/Admin/pages/Settings.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useLanguage } from "../../../../i18n/translations/LanguageContext";
 import { 
   Clock, 
   Calendar, 
@@ -16,16 +16,16 @@ import {
 } from "lucide-react";
 
 export default function Settings() {
-  const { t, i18n } = useTranslation();
+  const { t, lang } = useLanguage();
   const navigate = useNavigate();
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">{t('systemSettings')}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t.adminSettings?.systemSettings || 'System Settings'}</h1>
         <p className="text-gray-500 mt-1 text-sm">
-          {t('configureSettings')}
+          {t.adminSettings?.configureSettings || 'Configure and manage system settings'}
         </p>
       </div>
 
@@ -38,10 +38,10 @@ export default function Settings() {
               <Clock className="w-6 h-6" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('workingHours')}</h3>
-          <p className="text-sm text-gray-500">Check-in: 9:00 AM | Check-out: 6:00 PM</p>
-          <p className="text-sm text-gray-500 mt-1">Grace Period: 15 minutes</p>
-          <p className="text-xs text-blue-600 mt-3">{t('clickToEdit')}</p>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t.adminSettings?.workingHours || 'Working Hours'}</h3>
+          <p className="text-sm text-gray-500">{t.adminSettings?.checkInOut || 'Check-in: 9:00 AM | Check-out: 6:00 PM'}</p>
+          <p className="text-sm text-gray-500 mt-1">{t.adminSettings?.gracePeriod || 'Grace Period: 15 minutes'}</p>
+          <p className="text-xs text-blue-600 mt-3">{t.adminSettings?.clickToEdit || 'Click to edit'}</p>
         </div>
 
         {/* {t('noticePeriod')} - Orange */}
@@ -51,10 +51,10 @@ export default function Settings() {
               <Bell className="w-6 h-6" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('noticePeriod')}</h3>
-          <p className="text-sm text-gray-500">Resignation Notice: 30 days</p>
-          <p className="text-sm text-gray-500 mt-1">Termination Notice: 60 days</p>
-          <p className="text-xs text-orange-600 mt-3">{t('clickToEdit')}</p>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t.adminSettings?.noticePeriod || 'Notice Period'}</h3>
+          <p className="text-sm text-gray-500">{t.adminSettings?.resignationNotice || 'Resignation Notice: 30 days'}</p>
+          <p className="text-sm text-gray-500 mt-1">{t.adminSettings?.terminationNotice || 'Termination Notice: 60 days'}</p>
+          <p className="text-xs text-orange-600 mt-3">{t.adminSettings?.clickToEdit || 'Click to edit'}</p>
         </div>
 
         {/* {t('officialHolidays')} - Green */}
@@ -64,10 +64,10 @@ export default function Settings() {
               <Calendar className="w-6 h-6" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('officialHolidays')}</h3>
-          <p className="text-sm text-gray-500">Weekend: Friday & Saturday</p>
-          <p className="text-sm text-gray-500 mt-1">National Day: Sep 23</p>
-          <p className="text-xs text-emerald-600 mt-3">{t('clickToEdit')}</p>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t.adminSettings?.officialHolidays || 'Official Holidays'}</h3>
+          <p className="text-sm text-gray-500">{t.adminSettings?.weekend || 'Weekend: Friday & Saturday'}</p>
+          <p className="text-sm text-gray-500 mt-1">{t.adminSettings?.nationalDay || 'National Day: Sep 23'}</p>
+          <p className="text-xs text-emerald-600 mt-3">{t.adminSettings?.clickToEdit || 'Click to edit'}</p>
         </div>
 
         {/* {t('currencySettings')} - Purple */}
@@ -77,10 +77,10 @@ export default function Settings() {
               <DollarSign className="w-6 h-6" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('currencySettings')}</h3>
-          <p className="text-sm text-gray-500">Base Currency: SAR</p>
-          <p className="text-sm text-gray-500 mt-1">Salary Month: March 2026</p>
-          <p className="text-xs text-purple-600 mt-3">{t('clickToEdit')}</p>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t.adminSettings?.currencySettings || 'Currency Settings'}</h3>
+          <p className="text-sm text-gray-500">{t.adminSettings?.baseCurrency || 'Base Currency: SAR'}</p>
+          <p className="text-sm text-gray-500 mt-1">{t.adminSettings?.salaryMonth || 'Salary Month: March 2026'}</p>
+          <p className="text-xs text-purple-600 mt-3">{t.adminSettings?.clickToEdit || 'Click to edit'}</p>
         </div>
 
         {/* Email Settings - Cyan */}
@@ -90,10 +90,10 @@ export default function Settings() {
               <Mail className="w-6 h-6" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('emailNotifications')}</h3>
-          <p className="text-sm text-gray-500">SMTP Server: smtp.company.com</p>
-          <p className="text-sm text-gray-500 mt-1">Notifications: Enabled</p>
-          <p className="text-xs text-cyan-600 mt-3">{t('clickToEdit')}</p>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t.adminSettings?.emailNotifications || 'Email Notifications'}</h3>
+          <p className="text-sm text-gray-500">{t.adminSettings?.smtpServer || 'SMTP Server: smtp.company.com'}</p>
+          <p className="text-sm text-gray-500 mt-1">{t.adminSettings?.notificationsEnabled || 'Notifications: Enabled'}</p>
+          <p className="text-xs text-cyan-600 mt-3">{t.adminSettings?.clickToEdit || 'Click to edit'}</p>
         </div>
 
         {/* Security Settings - Red */}
@@ -103,10 +103,10 @@ export default function Settings() {
               <Lock className="w-6 h-6" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('security')}</h3>
-          <p className="text-sm text-gray-500">2FA: Enabled</p>
-          <p className="text-sm text-gray-500 mt-1">Session Timeout: 30 min</p>
-          <p className="text-xs text-red-600 mt-3">{t('clickToEdit')}</p>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t.adminSettings?.security || 'Security'}</h3>
+          <p className="text-sm text-gray-500">{t.adminSettings?.twoFA || '2FA: Enabled'}</p>
+          <p className="text-sm text-gray-500 mt-1">{t.adminSettings?.sessionTimeout || 'Session Timeout: 30 min'}</p>
+          <p className="text-xs text-red-600 mt-3">{t.adminSettings?.clickToEdit || 'Click to edit'}</p>
         </div>
 
         {/* {t('roleManagement')} - Indigo */}
@@ -116,10 +116,10 @@ export default function Settings() {
               <UserCog className="w-6 h-6" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('roleManagement')}</h3>
-          <p className="text-sm text-gray-500">Admin Roles: 3</p>
-          <p className="text-sm text-gray-500 mt-1">User Roles: 5</p>
-          <p className="text-xs text-indigo-600 mt-3">{t('clickToEdit')}</p>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t.adminSettings?.roleManagement || 'Role Management'}</h3>
+          <p className="text-sm text-gray-500">{t.adminSettings?.adminRoles || 'Admin Roles: 3'}</p>
+          <p className="text-sm text-gray-500 mt-1">{t.adminSettings?.userRoles || 'User Roles: 5'}</p>
+          <p className="text-xs text-indigo-600 mt-3">{t.adminSettings?.clickToEdit || 'Click to edit'}</p>
         </div>
 
         {/* {t('backupSettings')} - Teal */}
@@ -129,10 +129,10 @@ export default function Settings() {
               <Database className="w-6 h-6" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('backupSettings')}</h3>
-          <p className="text-sm text-gray-500">Auto Backup: Daily</p>
-          <p className="text-sm text-gray-500 mt-1">Retention: 30 days</p>
-          <p className="text-xs text-teal-600 mt-3">{t('clickToEdit')}</p>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t.adminSettings?.backupSettings || 'Backup Settings'}</h3>
+          <p className="text-sm text-gray-500">{t.adminSettings?.autoBackup || 'Auto Backup: Daily'}</p>
+          <p className="text-sm text-gray-500 mt-1">{t.adminSettings?.retention || 'Retention: 30 days'}</p>
+          <p className="text-xs text-teal-600 mt-3">{t.adminSettings?.clickToEdit || 'Click to edit'}</p>
         </div>
 
         {/* Language - Yellow */}
@@ -142,10 +142,10 @@ export default function Settings() {
               <Globe className="w-6 h-6" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('language')}</h3>
-          <p className="text-sm text-gray-500">Default Language: English</p>
-          <p className="text-sm text-gray-500 mt-1">RTL Support: Yes</p>
-          <p className="text-xs text-yellow-600 mt-3">{t('clickToEdit')}</p>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{t.adminSettings?.language || 'Language'}</h3>
+          <p className="text-sm text-gray-500">{t.adminSettings?.defaultLanguage || 'Default Language: English'}</p>
+          <p className="text-sm text-gray-500 mt-1">{t.adminSettings?.rtlSupport || 'RTL Support: Yes'}</p>
+          <p className="text-xs text-yellow-600 mt-3">{t.adminSettings?.clickToEdit || 'Click to edit'}</p>
         </div>
       </div>
     </div>

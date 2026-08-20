@@ -1,5 +1,5 @@
-// src/core/modules/HR/pages/HourlyLeaves/HourlyLeaveFilters.tsx
 import { Search } from 'lucide-react';
+import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
 
 interface HourlyLeaveFiltersProps {
   searchTerm: string;
@@ -18,17 +18,18 @@ const HourlyLeaveFilters = ({
   depId,
   setDepId,
 }: HourlyLeaveFiltersProps) => {
+  const { t, lang } = useLanguage();
   return (
     <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className={`absolute top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 ${lang === 'ar' ? 'right-3' : 'left-3'}`} />
           <input
             type="text"
-            placeholder="Search by name..."
+            placeholder={t.hrEmployees?.search || 'Search by name...'}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`w-full py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${lang === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'}`}
           />
         </div>
 
@@ -37,10 +38,10 @@ const HourlyLeaveFilters = ({
           onChange={(e) => setStatusFilter(e.target.value)}
           className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
-          <option value="all">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
+          <option value="all">{t.hrLeaves?.statusAll || 'All Status'}</option>
+          <option value="pending">{t.hrLeaves?.statusPending || 'Pending'}</option>
+          <option value="approved">{t.hrLeaves?.statusApproved || 'Approved'}</option>
+          <option value="rejected">{t.hrLeaves?.statusRejected || 'Rejected'}</option>
         </select>
 
         {setDepId && (

@@ -2,6 +2,7 @@
 import type { Employee } from '../../../../../../api/Types/types.types'
 import EmployeeCard from '../cards/EmployeeCard'
 import { Users } from 'lucide-react'
+import { useLanguage } from '../../../../../../i18n/translations/LanguageContext'
 
 type EmployeeListProps = {
     employees: Employee[] | undefined,
@@ -12,14 +13,15 @@ function EmployeeList({
     employees,
     isLoading
 }: EmployeeListProps) {
+    const { t } = useLanguage();
 
     if (isLoading) {
         return (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-800">
-                        All Employees
-                        <span className="ml-2 text-sm font-normal text-gray-500">Loading...</span>
+                        {t.adminEmployeeSearch?.allEmployees || 'All Employees'}
+                        <span className="ml-2 text-sm font-normal text-gray-500">{t.adminEmployeeSearch?.loading || 'Loading...'}</span>
                     </h3>
                 </div>
                 <div className="divide-y divide-gray-50">
@@ -43,14 +45,14 @@ function EmployeeList({
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-800">
-                        All Employees
+                        {t.adminEmployeeSearch?.allEmployees || 'All Employees'}
                         <span className="ml-2 text-sm font-normal text-gray-500">(0)</span>
                     </h3>
                 </div>
                 <div className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center justify-center space-y-3">
                         <Users className="w-12 h-12 text-gray-300" />
-                        <p className="text-gray-500">No employees found</p>
+                        <p className="text-gray-500">{t.adminEmployeeSearch?.noEmployeesFound || 'No employees found'}</p>
                     </div>
                 </div>
             </div>
@@ -61,7 +63,7 @@ function EmployeeList({
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100">
                 <h3 className="text-lg font-semibold text-gray-800">
-                    All Employees
+                    {t.adminEmployeeSearch?.allEmployees || 'All Employees'}
                     <span className="ml-2 text-sm font-normal text-gray-500">({employees.length})</span>
                 </h3>
             </div>

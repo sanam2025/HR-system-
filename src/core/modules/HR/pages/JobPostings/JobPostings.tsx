@@ -10,9 +10,11 @@ import {
   useCloseJobPosting, 
   useDeleteJobPosting 
 } from '../../hooks/useJobPostings';
+import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
 
 export default function JobPostings() {
   const navigate = useNavigate();
+  const { t, lang } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
 
   const { postings, isLoading, error, refetch } = useJobPostings();
@@ -36,7 +38,7 @@ export default function JobPostings() {
       <div className="p-6 bg-gray-50 min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <Loading />
-          <p className="text-gray-500">Loading job postings...</p>
+          <p className="text-gray-500">{t.hrJobPostings?.loading || 'Loading job postings...'}</p>
         </div>
       </div>
     );
@@ -46,20 +48,20 @@ export default function JobPostings() {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-          <p className="text-red-600 mb-4">Error: {error}</p>
-          <button onClick={() => refetch()} className="px-4 py-2 bg-red-600 text-white rounded-lg">Retry</button>
+          <p className="text-red-600 mb-4">{t.hrJobPostings?.error || 'Error:'} {error}</p>
+          <button onClick={() => refetch()} className="px-4 py-2 bg-red-600 text-white rounded-lg">{t.hrJobPostings?.retry || 'Retry'}</button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Job Postings (HR)</h1>
-            <p className="text-gray-500 text-sm mt-1">Manage all job postings.</p>
+            <h1 className="text-2xl font-bold text-gray-900">{t.hrJobPostings?.title || 'Job Postings (HR)'}</h1>
+            <p className="text-gray-500 text-sm mt-1">{t.hrJobPostings?.subtitle || 'Manage all job postings.'}</p>
           </div>
         </div>
       </div>
@@ -72,11 +74,11 @@ export default function JobPostings() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Job Title</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Description</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Experience</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-4 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.hrJobPostings?.table?.jobTitle || 'Job Title'}</th>
+                <th className="px-4 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.hrJobPostings?.table?.description || 'Description'}</th>
+                <th className="px-4 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.hrJobPostings?.table?.experience || 'Experience'}</th>
+                <th className="px-4 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.hrJobPostings?.table?.status || 'Status'}</th>
+                <th className="px-4 py-3 text-start text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.hrJobPostings?.table?.actions || 'Actions'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -95,7 +97,7 @@ export default function JobPostings() {
         </div>
         {filteredPostings.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-400">No job postings found</p>
+            <p className="text-gray-400">{t.hrJobPostings?.noPostings || 'No job postings found'}</p>
           </div>
         )}
       </div>

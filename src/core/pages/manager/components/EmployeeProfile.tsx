@@ -510,8 +510,11 @@ export default function EmployeeProfile() {
         onClose={() => setIsEditModalOpen(false)}
         profileId={employee.id}
         initialData={{
-          address: employee.address,
-          picture: employee.picture
+          address: employee?.address,
+          picture: employee?.picture,
+          phone_number: employee?.phone,
+          birth_date: employee?.birthDate,
+          gender: employee?.gender,
         }}
         onSuccess={() => {
           fetchProfile(); // Re-fetch data after successful update

@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, Briefcase, Calendar, DollarSign } from 'lucide-react';
 import { useOffers } from '../../hooks/useOffer';
 import { useJobPostings } from '../../hooks/useJobPostings';
 import Loading from '../../../../../shared/components/Loading';
+import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
 
 export const Offers = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ export const Offers = () => {
 
   const { postings, isLoading: isLoadingPostings } = useJobPostings();
   const { offers, isLoading: isLoadingOffers, error } = useOffers(selectedJobId);
+  const { t, lang } = useLanguage();
 
   const isLoading = isLoadingPostings || (selectedJobId && isLoadingOffers);
 
@@ -32,23 +34,23 @@ export const Offers = () => {
 
   if (error) {
     return (
-      <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
         <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-          <p className="text-red-500">Error loading offers: {error}</p>
+          <p className="text-red-500">{t.hrOffers?.errorLoading || 'Error loading offers:'} {error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div className="mb-8">
 
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Offers</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t.hrOffers?.title || 'Offers'}</h1>
             <p className="text-gray-500 text-sm mt-1">
-              Manage offers for this job posting
+              {t.hrOffers?.subtitle || 'Manage offers for this job posting'}
             </p>
           </div>
           {selectedJobId && (
@@ -57,20 +59,20 @@ export const Offers = () => {
               className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
             >
               <Plus className="w-4 h-4" />
-              New Offer
+              {t.hrOffers?.newOffer || 'New Offer'}
             </button>
           )}
         </div>
 
         {!jobId && (
           <div className="mt-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Select Job Posting</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t.hrOffers?.selectJobPosting || 'Select Job Posting'}</label>
             <select
               className="w-full md:w-1/3 border-gray-300 rounded-lg shadow-sm focus:border-orange-500 focus:ring-orange-500 p-2 border"
               value={selectedJobId || ""}
               onChange={(e) => setSelectedJobId(Number(e.target.value))}
             >
-              <option value="" disabled>Select a job posting...</option>
+              <option value="" disabled>{t.hrOffers?.selectJobPostingPlaceholder || 'Select a job posting...'}</option>
               {postings.map(post => (
                 <option key={post.id} value={post.id}>{post.job_title}</option>
               ))}
@@ -82,17 +84,17 @@ export const Offers = () => {
       {!selectedJobId ? (
         <div className="bg-white rounded-xl shadow-sm p-12 text-center">
           <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">Please select a job posting to view its offers</p>
+          <p className="text-gray-500">{t.hrOffers?.pleaseSelectJob || 'Please select a job posting to view its offers'}</p>
         </div>
       ) : offers.length === 0 ? (
         <div className="bg-white rounded-xl shadow-sm p-12 text-center">
           <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">No offers sent yet</p>
+          <p className="text-gray-500">{t.hrOffers?.noOffersSent || 'No offers sent yet'}</p>
           <button
             onClick={() => navigate(`/Hr/job-postings/${selectedJobId}/offers/send`)}
             className="mt-4 text-orange-500 hover:text-orange-700 font-medium"
           >
-            Send your first offer →
+            {t.hrOffers?.sendFirstOffer || 'Send your first offer \u2192'}
           </button>
         </div>
       ) : (
@@ -101,11 +103,11 @@ export const Offers = () => {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Candidate</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hour Price</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Start Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.hrOffers?.table?.candidate || 'Candidate'}</th>
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.hrOffers?.table?.hourPrice || 'Hour Price'}</th>
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.hrOffers?.table?.startDate || 'Start Date'}</th>
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.hrOffers?.table?.status || 'Status'}</th>
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.hrOffers?.table?.actions || 'Actions'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -138,7 +140,7 @@ export const Offers = () => {
                               ? "bg-red-100 text-red-700"
                               : "bg-gray-100 text-gray-500"
                       }`}>
-                        {offer.status}
+                        {t.hrOffers?.statuses?.[offer.status as keyof typeof t.hrOffers.statuses] || offer.status}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -146,7 +148,7 @@ export const Offers = () => {
                         onClick={() => navigate(`/Hr/offers/${offer.id}`)}
                         className="text-blue-500 hover:text-blue-700 text-sm"
                       >
-                        View
+                        {t.hrOffers?.table?.view || 'View'}
                       </button>
                     </td>
                   </tr>

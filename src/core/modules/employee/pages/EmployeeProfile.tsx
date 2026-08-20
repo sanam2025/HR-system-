@@ -18,8 +18,10 @@ import useAuthStore from "../../../../store/authStore";
 import { ApiError } from "../../../../lib/http/ApiError";
 import type { CreateProfilePayload, UpdateProfilePayload, Contract } from "../../../../api/models";
 import { FileText, Download, X } from "lucide-react";
+import { useLanguage } from "../../../../i18n/translations/LanguageContext";
 
 function ContractCard({ contract }: { contract: Contract | null | undefined }) {
+  const { t } = useLanguage();
   const downloadMutation = useDownloadMyContract();
 
   if (!contract) return null;
@@ -28,7 +30,7 @@ function ContractCard({ contract }: { contract: Contract | null | undefined }) {
     downloadMutation.mutate(undefined, {
       onError: (error: any) => {
         console.error("Download failed:", error);
-        toast.error("فشل تحميل العقد. تأكد من أن العقد متوفر.");
+        toast.error(t.profile?.downloadFailed || "Failed to download contract. Ensure the contract is available.");
       },
       onSuccess: (blob) => {
         const url = window.URL.createObjectURL(blob);
@@ -45,52 +47,52 @@ function ContractCard({ contract }: { contract: Contract | null | undefined }) {
   return (
     <div className="bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-gray-100 border-t-4 border-t-gold h-full flex flex-col transition-all hover:shadow-md">
       <div className="flex items-center justify-between mb-6 border-b border-gray-50 pb-4">
-        <h2 className="text-base font-bold text-dark flex items-center gap-2">
+        <h2 className="text-base font-bold text-dark flex items-center gap-2 rtl:flex-row-reverse ltr:flex-row">
           <FileText size={20} className="text-gold" />
-          تفاصيل العقد (Contract Details)
+          {t.profile?.contractDetails || "Contract Details"}
         </h2>
         <button
           onClick={handleDownload}
           disabled={downloadMutation.isPending}
           className="flex items-center gap-2 px-4 py-2 bg-gold/10 text-gold hover:bg-gold hover:text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50"
         >
-          {downloadMutation.isPending ? "جاري التحميل..." : (
+          {downloadMutation.isPending ? t.profile?.downloading || "Downloading..." : (
             <>
               <Download size={16} />
-              تحميل PDF
+              {t.profile?.downloadPdf || "Download PDF"}
             </>
           )}
         </button>
       </div>
 
       <div className="space-y-4 flex-1">
-        <div className="grid grid-cols-2 gap-y-6 gap-x-4">
+        <div className="grid grid-cols-2 gap-y-6 gap-x-4 rtl:text-right ltr:text-left">
           <div>
-            <p className="text-xs font-semibold text-brown mb-1.5 uppercase tracking-wide">تاريخ البدء (Start Date)</p>
+            <p className="text-xs font-semibold text-brown mb-1.5 uppercase tracking-wide">{t.profile?.startDate || "Start Date"}</p>
             <p className="text-sm font-bold text-dark">{contract.start_date || "—"}</p>
           </div>
           <div>
-            <p className="text-xs font-semibold text-brown mb-1.5 uppercase tracking-wide">تاريخ الانتهاء (End Date)</p>
+            <p className="text-xs font-semibold text-brown mb-1.5 uppercase tracking-wide">{t.profile?.endDate || "End Date"}</p>
             <p className="text-sm font-bold text-dark">{contract.end_date || "—"}</p>
           </div>
           <div>
-            <p className="text-xs font-semibold text-brown mb-1.5 uppercase tracking-wide">سعر الساعة (Hour Price)</p>
+            <p className="text-xs font-semibold text-brown mb-1.5 uppercase tracking-wide">{t.profile?.hourPrice || "Hour Price"}</p>
             <p className="text-sm font-bold text-dark">{contract.hour_price ? `${contract.hour_price} SYP` : "—"}</p>
           </div>
           <div>
-            <p className="text-xs font-semibold text-brown mb-1.5 uppercase tracking-wide">ساعات العمل/اليوم (Hours/Day)</p>
+            <p className="text-xs font-semibold text-brown mb-1.5 uppercase tracking-wide">{t.profile?.hoursPerDay || "Hours/Day"}</p>
             <p className="text-sm font-bold text-dark">{contract.working_hour_per_day || "—"}</p>
           </div>
           <div className="col-span-2">
-            <p className="text-xs font-semibold text-brown mb-1.5 uppercase tracking-wide">أيام العطلة (Weekend Days)</p>
+            <p className="text-xs font-semibold text-brown mb-1.5 uppercase tracking-wide">{t.profile?.weekendDays || "Weekend Days"}</p>
             <p className="text-sm font-bold text-dark">
               {contract.weekend_days?.length ? contract.weekend_days.join("، ") : "—"}
             </p>
           </div>
           <div className="col-span-2">
-            <p className="text-xs font-semibold text-brown mb-1.5 uppercase tracking-wide">قابل للتجديد (Renewable)</p>
+            <p className="text-xs font-semibold text-brown mb-1.5 uppercase tracking-wide">{t.profile?.renewable || "Renewable"}</p>
             <p className="text-sm font-bold text-dark bg-surface inline-block px-3 py-1 rounded-lg">
-              {contract.renewable ? "نعم (Yes)" : "لا (No)"}
+              {contract.renewable ? t.profile?.yes || "Yes" : t.profile?.no || "No"}
             </p>
           </div>
         </div>
@@ -150,6 +152,8 @@ export default function EmployeeProfile() {
     });
   }
 
+  const { t } = useLanguage();
+
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in">
       <ProfileHeader
@@ -165,6 +169,7 @@ export default function EmployeeProfile() {
             setIsImageModalOpen(true);
           }
         }}
+        hasProfile={hasProfile}
       />
 
       {isEditing ? (

@@ -1,11 +1,14 @@
 // src/core/modules/HR/pages/Offers/OfferCard.tsx
 import type { Offer } from '../../../../../api/service/HrService/OfferService';
+import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
 
 interface OfferCardProps {
   offer: Offer;
 }
 
 const OfferCard = ({ offer }: OfferCardProps) => {
+  const { t } = useLanguage();
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-yellow-100 text-yellow-800';
@@ -26,17 +29,17 @@ const OfferCard = ({ offer }: OfferCardProps) => {
         </div>
       </td>
       <td className="px-6 py-4 text-sm text-gray-500">#{offer.candidate_id}</td>
-      <td className="px-6 py-4 text-sm text-gray-900">${offer.hour_price}/hr</td>
+      <td className="px-6 py-4 text-sm text-gray-900">${offer.hour_price}/{t.hrOffers?.table?.hr || 'hr'}</td>
       <td className="px-6 py-4 text-sm text-gray-900">
         {new Date(offer.start_date).toLocaleDateString()}
       </td>
-      <td className="px-6 py-4 text-sm text-gray-900">{offer.working_hour_per_day} hrs/day</td>
+      <td className="px-6 py-4 text-sm text-gray-900">{offer.working_hour_per_day} {t.hrOffers?.table?.hrsDay || 'hrs/day'}</td>
       <td className="px-6 py-4 text-sm text-gray-500">
-        {offer.weekend_days?.join(', ') || 'N/A'}
+        {offer.weekend_days?.map(d => t.hrOffers?.days?.[d as keyof typeof t.hrOffers.days] || d).join(', ') || (t.hrOffers?.table?.na || 'N/A')}
       </td>
       <td className="px-6 py-4">
         <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(offer.status)}`}>
-          {offer.status}
+          {t.hrOffers?.statuses?.[offer.status as keyof typeof t.hrOffers.statuses] || offer.status}
         </span>
       </td>
     </tr>

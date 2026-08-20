@@ -1,7 +1,7 @@
 // core/modules/HR/pages/Dashboard.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useLanguage } from "../../../../i18n/translations/LanguageContext";
 import {
   Users,
   Calendar,
@@ -87,7 +87,7 @@ const employeeStatusData = [
 // ============= Main Component =============
 
 export default function Dashboard() {
-  const { t, i18n } = useTranslation();
+  const { t, lang } = useLanguage();
   const navigate = useNavigate();
 
   // Navigation functions
@@ -99,14 +99,14 @@ export default function Dashboard() {
   const goToReports = () => navigate("/Hr/reports");
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">
-          {t('welcome')}
+          {t.adminDashboard?.welcome || 'Welcome Back, Admin'}
         </h1>
         <p className="text-gray-500 mt-1 text-sm">
-          {t('dashboardSubtitle')}
+          {t.adminDashboard?.subtitle || 'Here is what is happening across your organization today.'}
         </p>
       </div>
 
@@ -119,7 +119,7 @@ export default function Dashboard() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 mb-1">{t('totalEmployees')}</p>
+              <p className="text-sm text-gray-500 mb-1">{t.adminDashboard?.totalEmployees || 'Total Employees'}</p>
               <p className="text-2xl font-bold text-gray-900">{statsData.totalEmployees}</p>
             </div>
             <div className="bg-blue-50 text-blue-600 p-3 rounded-xl">
@@ -135,7 +135,7 @@ export default function Dashboard() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 mb-1">{t('newHiresMonth')}</p>
+              <p className="text-sm text-gray-500 mb-1">{t.adminDashboard?.newHiresMonth || 'New Hires (Month)'}</p>
               <p className="text-2xl font-bold text-gray-900">{statsData.newHires}</p>
             </div>
             <div className="bg-emerald-50 text-emerald-600 p-3 rounded-xl">
@@ -151,7 +151,7 @@ export default function Dashboard() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 mb-1">{t('monthlyPayroll')}</p>
+              <p className="text-sm text-gray-500 mb-1">{t.adminDashboard?.monthlyPayroll || 'Monthly Payroll'}</p>
               <p className="text-2xl font-bold text-gray-900">{statsData.payrollCost}</p>
             </div>
             <div className="bg-purple-50 text-purple-600 p-3 rounded-xl">
@@ -167,7 +167,7 @@ export default function Dashboard() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 mb-1">{t('attendanceRate')}</p>
+              <p className="text-sm text-gray-500 mb-1">{t.adminDashboard?.attendanceRate || 'Attendance Rate'}</p>
               <p className="text-2xl font-bold text-gray-900">{statsData.attendanceRate}</p>
             </div>
             <div className="bg-teal-50 text-teal-600 p-3 rounded-xl">
@@ -186,7 +186,7 @@ export default function Dashboard() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 mb-1">{t('pendingComplaints')}</p>
+              <p className="text-sm text-gray-500 mb-1">{t.adminDashboard?.pendingComplaints || 'Pending Complaints'}</p>
               <p className="text-2xl font-bold text-gray-900">{statsData.pendingComplaints}</p>
             </div>
             <div className="bg-red-50 text-red-600 p-3 rounded-xl">
@@ -202,7 +202,7 @@ export default function Dashboard() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 mb-1">{t('departments')}</p>
+              <p className="text-sm text-gray-500 mb-1">{t.adminDashboard?.departments || 'Departments'}</p>
               <p className="text-2xl font-bold text-gray-900">{statsData.departments}</p>
             </div>
             <div className="bg-indigo-50 text-indigo-600 p-3 rounded-xl">
@@ -218,7 +218,7 @@ export default function Dashboard() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 mb-1">{t('avgEmployeeRating')}</p>
+              <p className="text-sm text-gray-500 mb-1">{t.adminDashboard?.avgEmployeeRating || 'Avg Employee Rating'}</p>
               <p className="text-2xl font-bold text-gray-900">{statsData.avgRating}</p>
             </div>
             <div className="bg-yellow-50 text-yellow-600 p-3 rounded-xl">
@@ -234,7 +234,7 @@ export default function Dashboard() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 mb-1">{t('onTimeArrival')}</p>
+              <p className="text-sm text-gray-500 mb-1">{t.adminDashboard?.onTimeArrival || 'On-Time Arrival'}</p>
               <p className="text-2xl font-bold text-gray-900">88%</p>
             </div>
             <div className="bg-cyan-50 text-cyan-600 p-3 rounded-xl">
@@ -250,7 +250,7 @@ export default function Dashboard() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-800">
-              {t('monthlyNewHires')}
+              {t.adminDashboard?.monthlyNewHires || 'Monthly New Hires'}
             </h3>
             <BarChart className="w-5 h-5 text-gray-400" />
           </div>
@@ -269,7 +269,7 @@ export default function Dashboard() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-800">
-              {t('weeklyAttendanceTrend')}
+              {t.adminDashboard?.weeklyAttendanceTrend || 'Weekly Attendance Trend'}
             </h3>
             <TrendingUp className="w-5 h-5 text-gray-400" />
           </div>
@@ -304,7 +304,7 @@ export default function Dashboard() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-800">
-              {t('employeeStatusDistribution')}
+              {t.adminDashboard?.employeeStatusDistribution || 'Employee Status Distribution'}
             </h3>
             <Users className="w-5 h-5 text-gray-400" />
           </div>
@@ -319,7 +319,11 @@ export default function Dashboard() {
                   outerRadius={90}
                   paddingAngle={5}
                   dataKey="value"
-                  label={({ name, value }) => `${t(name === 'On Leave' ? 'onLeave' : name.toLowerCase())} (${value}%)`}
+                  label={({ name, value }) => {
+                    const key = name === 'On Leave' ? 'onLeave' : name.toLowerCase();
+                    const translatedName = t.adminDashboard?.[key as keyof typeof t.adminDashboard] || name;
+                    return `${translatedName} (${value}%)`;
+                  }}
                   labelLine={true}
                 >
                   {employeeStatusData.map((entry, index) => (
@@ -337,7 +341,9 @@ export default function Dashboard() {
                   className="w-3 h-3 rounded-full" 
                   style={{ backgroundColor: status.color }}
                 />
-                <span className="text-sm text-gray-600">{t(status.name === 'On Leave' ? 'onLeave' : status.name.toLowerCase())}</span>
+                <span className="text-sm text-gray-600">
+                  {t.adminDashboard?.[status.name === 'On Leave' ? 'onLeave' : status.name.toLowerCase() as keyof typeof t.adminDashboard] || status.name}
+                </span>
                 <span className="text-sm font-semibold text-gray-900">{status.value}%</span>
               </div>
             ))}
@@ -348,13 +354,13 @@ export default function Dashboard() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
             <h3 className="text-lg font-semibold text-gray-800">
-              {t('leaveRequests')}
+              {t.adminDashboard?.leaveRequests || 'Leave Requests'}
             </h3>
             <span
               onClick={goToLeaves}
               className="text-sm text-orange-600 bg-orange-50 px-3 py-1 rounded-full cursor-pointer hover:bg-orange-100 transition-colors"
             >
-              {statsData.pendingLeaves} {t('pending')}
+              {statsData.pendingLeaves} {t.adminDashboard?.pending || 'Pending'}
             </span>
           </div>
           <div className="divide-y divide-gray-50">
@@ -367,7 +373,7 @@ export default function Dashboard() {
                     <p className="text-xs text-gray-400 mt-1">{request.department}</p>
                   </div>
                   <div className="bg-orange-50 text-orange-600 px-3 py-1 rounded-full text-xs font-medium">
-                    {t('pending')}
+                    {t.adminDashboard?.pending || 'Pending'}
                   </div>
                 </div>
               </div>
@@ -382,7 +388,7 @@ export default function Dashboard() {
           <div className="flex items-center gap-2">
             <Megaphone className="w-5 h-5 text-blue-500" />
             <h3 className="text-lg font-semibold text-gray-800">
-              {t('recentAnnouncements')}
+              {t.adminDashboard?.recentAnnouncements || 'Recent Announcements'}
             </h3>
           </div>
         </div>
@@ -401,7 +407,7 @@ export default function Dashboard() {
                       : "bg-yellow-50 text-yellow-600"
                   }`}
                 >
-                  {t(announcement.priority.toLowerCase())}
+                  {t.adminDashboard?.[announcement.priority.toLowerCase() as keyof typeof t.adminDashboard] || announcement.priority}
                 </span>
               </div>
             </div>

@@ -1,5 +1,6 @@
 // src/core/modules/HR/pages/JobPostings/JobPostingsFilters.tsx
 import { Search, RefreshCw } from "lucide-react";
+import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
 
 interface JobPostingsFiltersProps {
   searchTerm: string;
@@ -12,6 +13,7 @@ export default function JobPostingsFilters({
   setSearchTerm,
   refetch,
 }: JobPostingsFiltersProps) {
+  const { t } = useLanguage();
   return (
     <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
       <div className="flex flex-wrap gap-4 items-center">
@@ -19,7 +21,7 @@ export default function JobPostingsFilters({
           <Search className="w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search by job title..."
+            placeholder={t.hrJobPostings?.searchPlaceholder || 'Search by job title...'}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
@@ -29,7 +31,7 @@ export default function JobPostingsFilters({
           onClick={() => refetch()}
           className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-700"
         >
-          <RefreshCw className="w-4 h-4" /> Refresh
+          <RefreshCw className="w-4 h-4" /> {t.hrComplaints?.refresh || 'Refresh'}
         </button>
       </div>
     </div>

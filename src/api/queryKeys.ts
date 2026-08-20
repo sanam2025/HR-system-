@@ -24,7 +24,7 @@ export const queryKeys = {
   },
   leaveRequests: {
     all: ["leave-requests"] as const,
-    list: () => [...queryKeys.leaveRequests.all, "list"] as const,
+    list: (page: number = 1) => [...queryKeys.leaveRequests.all, "list", page] as const,
     detail: (id: number) => [...queryKeys.leaveRequests.all, "detail", id] as const,
     mine: (params: Record<string, unknown>) =>
       [...queryKeys.leaveRequests.all, "mine", params] as const,
@@ -32,7 +32,7 @@ export const queryKeys = {
   },
   hourlyLeaveRequests: {
     all: ["hourly-leave-requests"] as const,
-    list: () => [...queryKeys.hourlyLeaveRequests.all, "list"] as const,
+    list: (page: number = 1) => [...queryKeys.hourlyLeaveRequests.all, "list", page] as const,
     detail: (id: number) => [...queryKeys.hourlyLeaveRequests.all, "detail", id] as const,
     mine: (params: Record<string, unknown>) =>
       [...queryKeys.hourlyLeaveRequests.all, "mine", params] as const,
@@ -44,11 +44,11 @@ export const queryKeys = {
   },
   payroll: {
     all: ["payroll"] as const,
-    myPayslips: () => [...queryKeys.payroll.all, "my-payslips"] as const,
+    myPayslips: (page: number = 1) => [...queryKeys.payroll.all, "my-payslips", page] as const,
     currentMonthPayslips: () => [...queryKeys.payroll.all, "current-month-payslips"] as const,
     payslipsSummary: () => [...queryKeys.payroll.all, "payslips-summary"] as const,
     myBaseSalaries: () => [...queryKeys.payroll.all, "my-base-salaries"] as const,
-    myDeductions: () => [...queryKeys.payroll.all, "my-deductions"] as const,
+    myDeductions: (page: number = 1) => [...queryKeys.payroll.all, "my-deductions", page] as const,
     myIncentives: () => [...queryKeys.payroll.all, "my-incentives"] as const,
   },
   overtime: {

@@ -12,7 +12,7 @@ export const apiClient = axios.create({
     timeout: 10000
 })
 
-import { getAuthToken } from '../store/authStore';
+import { getAuthToken, useAuthStore } from '../store/authStore';
 
 apiClient.interceptors.request.use(
     (config) =>{

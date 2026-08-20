@@ -1,6 +1,6 @@
-// src/core/modules/HR/pages/Attendance/AttendanceFilters.tsx
 import React from 'react';
 import { Calendar } from 'lucide-react';
+import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
 
 //  تعديل الـ Props: حذف searchTerm و setSearchTerm
 interface AttendanceFiltersProps {
@@ -20,13 +20,15 @@ export default function AttendanceFilters({
   onFilter,
   isLoading = false,
 }: AttendanceFiltersProps) {
+  const { t, lang } = useLanguage();
+  
   return (
     <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
       <div className="flex flex-wrap items-end gap-4">
         {/* من تاريخ */}
         <div className="flex-1 min-w-[150px]">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            From Date
+            {t.attendance?.filter?.fromDate || 'From Date'}
           </label>
           <div className="relative">
             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -42,7 +44,7 @@ export default function AttendanceFilters({
         {/* إلى تاريخ */}
         <div className="flex-1 min-w-[150px]">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            To Date
+            {t.attendance?.filter?.toDate || 'To Date'}
           </label>
           <div className="relative">
             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -62,7 +64,7 @@ export default function AttendanceFilters({
             disabled={isLoading}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Filtering...' : 'Apply Filter'}
+            {isLoading ? (t.hrAttendance?.filtering || 'Filtering...') : (t.hrAttendance?.applyFilter || 'Apply Filter')}
           </button>
         </div>
       </div>

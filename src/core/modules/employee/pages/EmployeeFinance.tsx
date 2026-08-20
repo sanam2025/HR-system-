@@ -13,12 +13,18 @@ import {
   OvertimeCard,
   PayslipsCard,
 } from "../components/speciel-components/FinanceComponents";
+import { useState } from "react";
 import { ApiError } from "../../../../lib/http/ApiError";
+import { useLanguage } from "../../../../i18n/translations/LanguageContext";
 
 export default function EmployeeFinance() {
-  const payslips = useMyPayslips();
+  const { t } = useLanguage();
+  const [deductionsPage, setDeductionsPage] = useState(1);
+  const [payslipsPage, setPayslipsPage] = useState(1);
+
+  const payslips = useMyPayslips(payslipsPage);
   const baseSalaries = useMyBaseSalaries();
-  const deductions = useMyDeductions();
+  const deductions = useMyDeductions(deductionsPage);
   const incentives = useMyIncentives();
   const overtimes = useMyOvertimes();
   const downloadPayslip = useDownloadPayslip();
@@ -27,8 +33,8 @@ export default function EmployeeFinance() {
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in">
       <div className="min-w-0">
-        <h1 className="text-xl sm:text-2xl font-bold text-dark">Finance</h1>
-        <p className="text-sm text-gray-400 mt-1">Payslips, base salary, deductions, incentives, and overtime.</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-dark">{t.finance?.title || "Finance"}</h1>
+        <p className="text-sm text-gray-400 mt-1">{t.finance?.subtitle || "Payslips, base salary, deductions, incentives, and overtime."}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
@@ -38,6 +44,8 @@ export default function EmployeeFinance() {
           errorMessage={(payslips.error as ApiError | null)?.message ?? null}
           onDownload={(id) => downloadPayslip.mutate(id)}
           downloadingId={downloadPayslip.isPending ? (downloadPayslip.variables as number) : null}
+          page={payslipsPage}
+          onPageChange={setPayslipsPage}
         />
         <BaseSalaryCard
           salaries={baseSalaries.data}
@@ -51,6 +59,8 @@ export default function EmployeeFinance() {
           deductions={deductions.data}
           isLoading={deductions.isLoading}
           errorMessage={(deductions.error as ApiError | null)?.message ?? null}
+          page={deductionsPage}
+          onPageChange={setDeductionsPage}
         />
         <IncentivesCard
           incentives={incentives.data}

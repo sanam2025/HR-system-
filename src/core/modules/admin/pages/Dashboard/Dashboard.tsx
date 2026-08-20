@@ -11,8 +11,10 @@ import { AdditionalStats } from "./cards/AdditinalStats";
 import { StatsCards } from "./cards/StatsCards";
 import { EmployeeStatusChart } from "./charts/EmployeeStatusChart";
 import { PayrollHistoryChart } from "./charts/PayrollHistoryChart";
+import { useLanguage } from "../../../../../i18n/translations/LanguageContext";
 
 export default function Dashboard() {
+  const { t, lang } = useLanguage();
   const { data: employeesResponse, isLoading: isLoadingEmployees } = useEmployees();
   const { data: departmentsResponse, isLoading: isLoadingDepartments } = useDepartments();
   const { data: settingsData } = useSettings();
@@ -75,25 +77,25 @@ export default function Dashboard() {
 
   const stats = [
     {
-      title: 'Total Employees',
+      title: t.adminDashboard?.totalEmployees || 'Total Employees',
       value: totalEmployees,
       icon: 'Users',
       color: 'blue',
     },
     {
-      title: 'Active Employees',
+      title: t.adminDashboard?.activeEmployees || 'Active Employees',
       value: activeEmployees,
       icon: 'UserCheck',
       color: 'emerald',
     },
     {
-      title: 'Departments',
+      title: t.adminDashboard?.departments || 'Departments',
       value: departmentsCount,
       icon: 'Building',
       color: 'purple',
     },
     {
-      title: 'Pending Terminations',
+      title: t.adminDashboard?.pendingTerminations || 'Pending Terminations',
       value: pendingTerminations,
       icon: 'AlertCircle',
       color: 'red',
@@ -105,12 +107,12 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-4 md:p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-4 md:p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t.adminDashboard?.welcome || 'Welcome Back'}</h1>
           <p className="text-gray-500 text-sm mt-0.5">
-            Overview of employee statistics and metrics
+            {t.adminDashboard?.subtitle || 'Overview of employee statistics and metrics'}
           </p>
         </div>
       </div>

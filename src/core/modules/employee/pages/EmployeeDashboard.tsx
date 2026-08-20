@@ -12,6 +12,7 @@ import { useMyComplaints } from "../../../../api/hooks/useComplaints";
 import { useMyPayslips, useMyDeductions } from "../../../../api/hooks/usePayroll";
 import { useMyLeaveRequests } from "../../../../api/hooks/useLeaveRequests";
 import useAuthStore from "../../../../store/authStore";
+import { useLanguage } from "../../../../i18n/translations/LanguageContext";
 import { ApiError } from "../../../../lib/http/ApiError";
 import { isSameCalendarDay } from "../../../../lib/date";
 import type { AttendanceRecord } from "../../../../api/models";
@@ -36,6 +37,7 @@ function SectionCard({
   children: React.ReactNode;
   color?: string;
 }) {
+  const { t } = useLanguage();
   return (
     <div 
       className="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col min-h-[160px] relative overflow-hidden group hover:shadow-md transition-all duration-300"
@@ -59,8 +61,8 @@ function SectionCard({
           <Link to={to} className="absolute inset-0 z-10">
             <span className="sr-only">View {title} details</span>
           </Link>
-          <span>View all</span>
-          <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          <span>{t.common?.viewAll || 'View all'}</span>
+          <ChevronRight className="w-4 h-4 transition-transform rtl:-scale-x-100 group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
         </div>
       )}
     </div>
@@ -86,6 +88,7 @@ function ErrorState({ msg }: { msg: string }) {
 
 // ─── Attendance summary ───────────────────────────────────────────────────────
 function AttendanceSummary() {
+  const { t } = useLanguage();
   const monthly = useMyMonthlyAttendance();
   const checkIn = useCheckIn();
   const checkOut = useCheckOut();
@@ -101,7 +104,7 @@ function AttendanceSummary() {
   const presentDays = monthly.data?.filter((r) => r.check_in).length ?? 0;
   const absentDays = monthly.data?.filter((r) => !r.check_in).length ?? 0;
 
-  if (monthly.isLoading) return <p className="text-sm text-gray-400 animate-pulse">Loading...</p>;
+  if (monthly.isLoading) return <p className="text-sm text-gray-400 animate-pulse">{t.common?.loading || (lang === 'ar' ? 'جاري التحميل...' : 'Loading...')}</p>;
   if (monthly.isError) return <ErrorState msg={(monthly.error as ApiError).message} />;
 
   return (
@@ -109,17 +112,18 @@ function AttendanceSummary() {
       <div className="flex items-center gap-2">
         <StatusDot color={checkedOut ? "green" : checkedIn ? "yellow" : "gray"} />
         <span className="text-sm font-medium text-dark">
-          {checkedOut ? "Checked Out" : checkedIn ? "Checked In" : "Not Checked In Today"}
+          {checkedOut ? t.common?.checkedOut || "Checked Out" : checkedIn ? t.common?.checkedIn || "Checked In" : t.common?.notCheckedIn || "Not Checked In Today"}
         </span>
       </div>
-      <StatRow label="Present this month" value={presentDays} color="text-green-600" />
-      <StatRow label="Absent this month" value={absentDays} color="text-red-500" />
+      <StatRow label={t.dashboard?.presentThisMonth || "Present this month"} value={presentDays} color="text-green-600" />
+      <StatRow label={t.dashboard?.absentThisMonth || "Absent this month"} value={absentDays} color="text-red-500" />
     </div>
   );
 }
 
 // ─── Tasks summary ────────────────────────────────────────────────────────────
 function TasksSummary() {
+  const { t } = useLanguage();
   const userId = useAuthStore((s) => s.user?.id);
   const taskQuery = useTasks(userId ? { user_id: userId } : {}, { enabled: Boolean(userId) });
   const startTask = useStartTask();
@@ -131,16 +135,16 @@ function TasksSummary() {
   const submitted = tasks.filter((t) => String(t.status).toLowerCase() === "submitted").length;
   const completed = tasks.filter((t) => ["completed", "approved"].includes(String(t.status).toLowerCase())).length;
 
-  if (taskQuery.isLoading) return <p className="text-sm text-gray-400 animate-pulse">Loading...</p>;
+  if (taskQuery.isLoading) return <p className="text-sm text-gray-400 animate-pulse">{t.common?.loading || (lang === 'ar' ? 'جاري التحميل...' : 'Loading...')}</p>;
   if (taskQuery.isError) return <ErrorState msg={(taskQuery.error as ApiError).message} />;
-  if (tasks.length === 0) return <EmptyState text="No tasks assigned yet." />;
+  if (tasks.length === 0) return <EmptyState text={t.tasks?.noTasks || "No tasks assigned yet."} />;
 
   return (
     <div className="space-y-1">
-      <StatRow label="Pending" value={pending} color="text-yellow-600" />
-      <StatRow label="In Progress" value={inProgress} color="text-blue-600" />
-      <StatRow label="Submitted" value={submitted} color="text-purple-600" />
-      <StatRow label="Completed" value={completed} color="text-green-600" />
+      <StatRow label={t.tasks?.columns?.pending || "Pending"} value={pending} color="text-yellow-600" />
+      <StatRow label={t.tasks?.columns?.inProgress || "In Progress"} value={inProgress} color="text-blue-600" />
+      <StatRow label={t.tasks?.columns?.submitted || "Submitted"} value={submitted} color="text-purple-600" />
+      <StatRow label={t.tasks?.columns?.completed || "Completed"} value={completed} color="text-green-600" />
       {/* Quick-action: start first pending task */}
       {pending > 0 && (() => {
         const first = tasks.find((t) => String(t.status).toLowerCase() === "pending");
@@ -151,7 +155,7 @@ function TasksSummary() {
             disabled={startTask.isPending}
             className="mt-2 w-full py-2 text-xs font-medium bg-green-500 text-white rounded-xl disabled:opacity-40 hover:bg-green-600 transition-colors"
           >
-            {startTask.isPending ? "Starting…" : `▶ Start "${first.title}"`}
+            {startTask.isPending ? t.tasks?.starting || "Starting…" : `${t.tasks?.start || "▶ Start"} "${first.title}"`}
           </button>
         ) : null;
       })()}
@@ -165,7 +169,7 @@ function TasksSummary() {
             disabled={submitTask.isPending}
             className="mt-1 w-full py-2 text-xs font-medium border border-green-500 text-green-600 rounded-xl disabled:opacity-40 hover:bg-green-50 transition-colors"
           >
-            {submitTask.isPending ? "Submitting…" : `📤 Submit "${first.title}"`}
+            {submitTask.isPending ? t.tasks?.submitting || "Submitting…" : `${t.tasks?.submit || "📤 Submit"} "${first.title}"`}
           </button>
         ) : null;
       })()}
@@ -175,10 +179,11 @@ function TasksSummary() {
 
 // ─── Announcements summary ────────────────────────────────────────────────────
 function AnnouncementsSummary() {
+  const { t } = useLanguage();
   const q = useActiveAnnouncements();
-  if (q.isLoading) return <p className="text-sm text-gray-400 animate-pulse">Loading...</p>;
+  if (q.isLoading) return <p className="text-sm text-gray-400 animate-pulse">{t.common?.loading || (lang === 'ar' ? 'جاري التحميل...' : 'Loading...')}</p>;
   if (q.isError) return <ErrorState msg={(q.error as ApiError).message} />;
-  if (!q.data || q.data.length === 0) return <EmptyState text="No active announcements." />;
+  if (!q.data || q.data.length === 0) return <EmptyState text={t.announcements?.list?.emptyMsg || "No active announcements."} />;
 
   return (
     <ul className="space-y-2">
@@ -196,14 +201,15 @@ function AnnouncementsSummary() {
 
 // ─── Finance summary ──────────────────────────────────────────────────────────
 function FinanceSummary() {
+  const { t } = useLanguage();
   const payslips = useMyPayslips();
   const deductions = useMyDeductions();
 
   if (payslips.isLoading || deductions.isLoading)
-    return <p className="text-sm text-gray-400 animate-pulse">Loading...</p>;
+    return <p className="text-sm text-gray-400 animate-pulse">{t.common?.loading || (lang === 'ar' ? 'جاري التحميل...' : 'Loading...')}</p>;
 
-  const latestPayslip = payslips.data?.[0] as (Record<string, unknown> | undefined);
-  const totalDeductions = (deductions.data ?? []).reduce(
+  const latestPayslip = payslips.data?.items?.[0] as (Record<string, unknown> | undefined);
+  const totalDeductions = (deductions.data?.items ?? []).reduce(
     (sum, d) => sum + Number((d as Record<string, unknown>).amount ?? 0), 0
   );
 
@@ -212,20 +218,20 @@ function FinanceSummary() {
       {latestPayslip ? (
         <>
           <StatRow
-            label="Last payslip month"
+            label={t.finance?.lastPayslip || "Last payslip month"}
             value={String((latestPayslip as Record<string, unknown>).month ?? (latestPayslip as Record<string, unknown>).pay_period ?? "—")}
           />
           <StatRow
-            label="Net salary"
+            label={t.finance?.netSalary || "Net salary"}
             value={`${Number((latestPayslip as Record<string, unknown>).net_salary ?? (latestPayslip as Record<string, unknown>).net ?? 0).toLocaleString()} SAR`}
             color="text-green-600"
           />
         </>
       ) : (
-        <EmptyState text="No payslip data yet." />
+        <EmptyState text={t.finance?.noPayslips || "No payslip data yet."} />
       )}
       <StatRow
-        label="Total deductions"
+        label={t.finance?.totalDeductions || "Total deductions"}
         value={`${totalDeductions.toLocaleString()} SAR`}
         color="text-red-500"
       />
@@ -235,10 +241,11 @@ function FinanceSummary() {
 
 // ─── Complaints summary ───────────────────────────────────────────────────────
 function ComplaintsSummary() {
+  const { t } = useLanguage();
   const q = useMyComplaints();
-  if (q.isLoading) return <p className="text-sm text-gray-400 animate-pulse">Loading...</p>;
+  if (q.isLoading) return <p className="text-sm text-gray-400 animate-pulse">{t.common?.loading || (lang === 'ar' ? 'جاري التحميل...' : 'Loading...')}</p>;
   if (q.isError) return <ErrorState msg={(q.error as ApiError).message} />;
-  if (!q.data || q.data.length === 0) return <EmptyState text="No complaints submitted yet." />;
+  if (!q.data || q.data.length === 0) return <EmptyState text={t.complaints?.emptyMsg || "No complaints submitted yet."} />;
 
   const complaints = q.data as unknown as Array<Record<string, unknown>>;
   const open = complaints.filter((c) =>
@@ -250,9 +257,9 @@ function ComplaintsSummary() {
 
   return (
     <div className="space-y-1">
-      <StatRow label="Total complaints" value={complaints.length} />
-      <StatRow label="Open / Under review" value={open} color="text-yellow-600" />
-      <StatRow label="Resolved" value={resolved} color="text-green-600" />
+      <StatRow label={t.complaints?.total || "Total complaints"} value={complaints.length} />
+      <StatRow label={t.complaints?.open || "Open / Under review"} value={open} color="text-yellow-600" />
+      <StatRow label={t.complaints?.resolved || "Resolved"} value={resolved} color="text-green-600" />
       {complaints.slice(0, 2).map((c) => (
         <div key={String(c.id)} className="mt-2 rounded-xl bg-gray-50 p-3">
           <p className="text-xs font-medium text-dark truncate">{String(c.subject ?? c.title ?? "Complaint")}</p>
@@ -265,35 +272,37 @@ function ComplaintsSummary() {
 
 // ─── Leave summary ────────────────────────────────────────────────────────────
 function LeaveSummary() {
+  const { t } = useLanguage();
   const q = useMyLeaveRequests();
-  if (q.isLoading) return <p className="text-sm text-gray-400 animate-pulse">Loading...</p>;
+  if (q.isLoading) return <p className="text-sm text-gray-400 animate-pulse">{t.common?.loading || (lang === 'ar' ? 'جاري التحميل...' : 'Loading...')}</p>;
   if (q.isError) return <ErrorState msg={(q.error as ApiError).message} />;
 
-  const leaves = q.data ?? [];
+  const leaves = q.data?.items ?? [];
   const pending = leaves.filter((l) => String(l.status).toLowerCase() === "pending").length;
   const approved = leaves.filter((l) => String(l.status).toLowerCase() === "approved").length;
   const rejected = leaves.filter((l) => String(l.status).toLowerCase() === "rejected").length;
 
-  if (leaves.length === 0) return <EmptyState text="No leave requests yet." />;
+  if (leaves.length === 0) return <EmptyState text={t.leaves?.noRequests || "No leave requests yet."} />;
 
   return (
     <div className="space-y-1">
-      <StatRow label="Pending" value={pending} color="text-yellow-600" />
-      <StatRow label="Approved" value={approved} color="text-green-600" />
-      <StatRow label="Rejected" value={rejected} color="text-red-500" />
+      <StatRow label={t.leaves?.status?.pending || "Pending"} value={pending} color="text-yellow-600" />
+      <StatRow label={t.leaves?.status?.approved || "Approved"} value={approved} color="text-green-600" />
+      <StatRow label={t.leaves?.status?.rejected || "Rejected"} value={rejected} color="text-red-500" />
     </div>
   );
 }
 
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 export default function EmployeeDashboard() {
+  const { t, lang } = useLanguage();
   const user = useAuthStore((s) => s.user);
 
   const greeting = user?.fullName
-    ? `Welcome back, ${user.fullName.split(" ")[0]}`
-    : "Welcome back";
+    ? (t.dashboard?.welcomeBackName || `Welcome back, {{name}}`).replace('{{name}}', user.fullName.split(" ")[0])
+    : (t.dashboard?.welcomeBack || `Welcome back`);
 
-  const date = new Date().toLocaleDateString(undefined, {
+  const date = new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', {
     weekday: "long", month: "long", day: "numeric",
   });
 
@@ -311,7 +320,7 @@ export default function EmployeeDashboard() {
         {/* Attendance */}
         <SectionCard
           icon={<CalendarCheck size={18} />}
-          title="Attendance - الحضور"
+          title={t.nav?.attendance || "Attendance"}
           to="/employee/attendance"
           color="#4A7C59"
         >
@@ -321,7 +330,7 @@ export default function EmployeeDashboard() {
         {/* Tasks */}
         <SectionCard
           icon={<ClipboardList size={18} />}
-          title="Tasks - المهام"
+          title={t.nav?.tasks || "Tasks"}
           to="/employee/tasks"
           color="#6B6358"
         >
@@ -331,7 +340,7 @@ export default function EmployeeDashboard() {
         {/* Announcements */}
         <SectionCard
           icon={<Megaphone size={18} />}
-          title="Announcements - التعميمات"
+          title={t.nav?.announcements || "Announcements"}
           color="#C4A66A"
         >
           <AnnouncementsSummary />
@@ -340,7 +349,7 @@ export default function EmployeeDashboard() {
         {/* Leave Requests */}
         <SectionCard
           icon={<FileText size={18} />}
-          title="Leave Requests - طلبات الإجازة"
+          title={t.nav?.leaves || "Leave Requests"}
           to="/employee/attendance"
           color="#4A4E4A"
         >
@@ -350,7 +359,7 @@ export default function EmployeeDashboard() {
         {/* Finance */}
         <SectionCard
           icon={<DollarSign size={18} />}
-          title="Finance - المالية"
+          title={t.dashboard?.finance || "Finance"}
           to="/employee/finance"
           color="#4A7C59"
         >
@@ -360,7 +369,7 @@ export default function EmployeeDashboard() {
         {/* Complaints */}
         <SectionCard
           icon={<MessageSquareWarning size={18} />}
-          title="Complaints - الشكاوي"
+          title={t.dashboard?.complaints || "Complaints"}
           to="/employee/complaints"
           color="#6B6358"
         >

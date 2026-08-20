@@ -2,8 +2,8 @@ import { CalendarIcon, Edit, FileText, Tag, X, Users, AlertCircle, Clock } from 
 import React, { useState } from 'react'
 import toast from 'react-hot-toast';
 import Loading from '../../../../../../shared/components/Loading'
-import type { Announcements, AnnouncementsPriority, AnnouncementsTargetAudience } from '../../../types/types'
 import { useUpdateAnnouncement } from '../../../hooks/Announcements/useAnnouncementsMutation'
+import { useLanguage } from "../../../../../../i18n/translations/LanguageContext";
 
 type UpdateAnnouncementProps = {
     isOpen: boolean
@@ -16,6 +16,7 @@ function UpdateAnnouncementForm({
     setIsModalOpen, 
     announcementData,
 }: UpdateAnnouncementProps) {
+    const { t } = useLanguage();
     
     if (!isOpen || !announcementData) return null;
 
@@ -49,22 +50,22 @@ function UpdateAnnouncementForm({
     const handleEdit = async () => {
         try {
             if (!editData.title?.trim()) {
-                toast.error('Title is required');
+                toast.error(t.adminAnnouncements?.form?.titleRequired || 'Title is required');
                 return;
             }
 
             if (!editData.content?.trim()) {
-                toast.error('Content is required');
+                toast.error(t.adminAnnouncements?.form?.contentRequired || 'Content is required');
                 return;
             }
 
             if (!editData.starts_at) {
-                toast.error('Start date is required');
+                toast.error(t.adminAnnouncements?.form?.startsAtRequired || 'Start date is required');
                 return;
             }
 
             if (!editData.expires_at) {
-                toast.error('Expiry date is required');
+                toast.error(t.adminAnnouncements?.form?.expiresAtRequired || 'Expiry date is required');
                 return;
             }
 
@@ -93,7 +94,7 @@ function UpdateAnnouncementForm({
 
             await updateAnnouncemet({id:announcementData?.id ,announcementData:formattedData});
 
-            toast.success('Announcement updated successfully!');
+            toast.success(t.adminAnnouncements?.form?.updateSuccess || 'Announcement updated successfully!');
             setIsModalOpen(false);
 
         } catch (e: any) {
@@ -104,19 +105,20 @@ function UpdateAnnouncementForm({
                     e.response.data?.message || 
                     e.response.data?.error || 
                     e.response.statusText ||
+                    t.adminAnnouncements?.form?.validationError ||
                     'Something went wrong';
                 
                 if (e.response.data?.errors) {
                     const errors = e.response.data.errors;
                     const errorMessages = Object.values(errors).flat();
-                    toast.error(errorMessages[0] as string || 'Validation error');
+                    toast.error(errorMessages[0] as string || t.adminAnnouncements?.form?.validationError || 'Validation error');
                 } else {
                     toast.error(errorMessage);
                 }
             } else if (e.request) {
-                toast.error('No response from server. Please check your connection.');
+                toast.error(t.adminAnnouncements?.form?.noResponse || 'No response from server. Please check your connection.');
             } else {
-                toast.error(e.message || 'Failed to update announcement');
+                toast.error(e.message || t.adminAnnouncements?.form?.validationError || 'Failed to update announcement');
             }
         }
     }
@@ -136,8 +138,8 @@ function UpdateAnnouncementForm({
                             <Edit className="w-5 h-5" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-gray-900">Edit Announcement</h2>
-                            <p className="text-sm text-gray-500">Update the announcement details</p>
+                            <h2 className="text-xl font-bold text-gray-900">{t.adminAnnouncements?.form?.update || 'Edit Announcement'}</h2>
+                            <p className="text-sm text-gray-500">{t.adminAnnouncements?.subtitle || 'Update the announcement details'}</p>
                         </div>
                     </div>
                     <button 
@@ -153,7 +155,7 @@ function UpdateAnnouncementForm({
                     <div className="space-y-5">
                         <div>
                             <label htmlFor="edit-title" className="block text-sm font-medium text-gray-700 mb-1.5">
-                                Title <span className="text-red-500">*</span>
+                                {t.adminAnnouncements?.form?.titleLabel || 'Title'} <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -174,7 +176,7 @@ function UpdateAnnouncementForm({
 
                         <div>
                             <label htmlFor="edit-content" className="block text-sm font-medium text-gray-700 mb-1.5">
-                                Content <span className="text-red-500">*</span>
+                                {t.adminAnnouncements?.form?.contentLabel || 'Content'} <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
                                 <div className="absolute top-3 left-3 flex items-start pointer-events-none">
@@ -196,7 +198,7 @@ function UpdateAnnouncementForm({
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
                                 <label htmlFor="edit-priority" className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Priority <span className="text-red-500">*</span>
+                                    {t.adminAnnouncements?.form?.priorityLabel || 'Priority'} <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -210,16 +212,16 @@ function UpdateAnnouncementForm({
                                         className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white appearance-none cursor-pointer"
                                         required
                                     >
-                                        <option value="low">Low</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="high">High</option>
+                                        <option value="low">{t.adminDashboard?.low || 'Low'}</option>
+                                        <option value="medium">{t.adminDashboard?.medium || 'Medium'}</option>
+                                        <option value="high">{t.adminDashboard?.high || 'High'}</option>
                                     </select>
                                 </div>
                             </div>
 
                             <div>
                                 <label htmlFor="edit-target_audience" className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Target Audience <span className="text-red-500">*</span>
+                                    {t.adminAnnouncements?.form?.audienceLabel || 'Target Audience'} <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -233,9 +235,9 @@ function UpdateAnnouncementForm({
                                         className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white appearance-none cursor-pointer"
                                         required
                                     >
-                                        <option value="all">All Employees</option>
-                                        <option value="managers">Managers Only</option>
-                                        <option value="department">Specific Department</option>
+                                        <option value="all">{t.adminAnnouncements?.form?.allEmployees || 'All Employees'}</option>
+                                        <option value="managers">{t.adminAnnouncements?.form?.managersOnly || 'Managers Only'}</option>
+                                        <option value="department">{t.adminAnnouncements?.form?.specificDepartment || 'Specific Department'}</option>
                                     </select>
                                 </div>
                             </div>
@@ -244,7 +246,7 @@ function UpdateAnnouncementForm({
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
                                 <label htmlFor="edit-starts_at" className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Starts At <span className="text-red-500">*</span>
+                                    {t.adminAnnouncements?.view?.published || 'Starts At'} <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -264,7 +266,7 @@ function UpdateAnnouncementForm({
 
                             <div>
                                 <label htmlFor="edit-expires_at" className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Expires At <span className="text-red-500">*</span>
+                                    {t.adminAnnouncements?.form?.expiresAtLabel || 'Expires At'} <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -290,7 +292,7 @@ function UpdateAnnouncementForm({
                             onClick={() => setIsModalOpen(false)}
                             className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200"
                         >
-                            Cancel
+                            {t.adminAnnouncements?.form?.cancel || 'Cancel'}
                         </button>
                         <button
                             type="submit"
@@ -298,7 +300,7 @@ function UpdateAnnouncementForm({
                             onClick={handleEdit}
                             className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {isPending ? 'Updating...' : 'Update Announcement'}
+                            {isPending ? (t.adminAnnouncements?.loading || 'Updating...') : (t.adminAnnouncements?.form?.update || 'Update Announcement')}
                         </button>
                     </div>
                 </div>

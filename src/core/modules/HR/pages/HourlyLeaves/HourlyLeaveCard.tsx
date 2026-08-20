@@ -1,6 +1,6 @@
-// src/core/modules/HR/pages/HourlyLeaves/HourlyLeaveCard.tsx
 import { CheckCircle, XCircle, Eye } from 'lucide-react';
 import type { HourlyLeaveRequest } from '../../../../../api/service/HrService/HourlyLeaveService';
+import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
 
 interface HourlyLeaveCardProps {
   request: HourlyLeaveRequest;
@@ -11,6 +11,8 @@ interface HourlyLeaveCardProps {
 }
 
 const HourlyLeaveCard = ({ request, onApprove, onReject, onView, isUpdating }: HourlyLeaveCardProps) => {
+  const { t, lang } = useLanguage();
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-yellow-100 text-yellow-800';
@@ -27,7 +29,7 @@ const HourlyLeaveCard = ({ request, onApprove, onReject, onView, isUpdating }: H
           <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium text-sm">
             {request.employee_name?.charAt(0) || '?'}
           </div>
-          <span className="ml-3 text-sm font-medium text-gray-900">{request.employee_name}</span>
+          <span className={`text-sm font-medium text-gray-900 ${lang === 'ar' ? 'mr-3' : 'ml-3'}`}>{request.employee_name}</span>
         </div>
       </td>
       <td className="px-6 py-4 text-sm text-gray-500">{request.department || 'N/A'}</td>
@@ -37,10 +39,13 @@ const HourlyLeaveCard = ({ request, onApprove, onReject, onView, isUpdating }: H
       <td className="px-6 py-4 text-sm text-gray-900">
         {request.start_time} - {request.end_time}
       </td>
-      <td className="px-6 py-4 text-sm text-gray-900">{request.hours} hrs</td>
+      <td className="px-6 py-4 text-sm text-gray-900">{request.hours} {lang === 'ar' ? 'ساعات' : 'hrs'}</td>
       <td className="px-6 py-4">
         <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(request.status)}`}>
-          {request.status}
+          {request.status === 'pending' && (t.hrLeaves?.statusPending || 'Pending')}
+          {request.status === 'approved' && (t.hrLeaves?.statusApproved || 'Approved')}
+          {request.status === 'rejected' && (t.hrLeaves?.statusRejected || 'Rejected')}
+          {!['pending', 'approved', 'rejected'].includes(request.status) && request.status}
         </span>
       </td>
       <td className="px-6 py-4 text-right">
@@ -51,7 +56,7 @@ const HourlyLeaveCard = ({ request, onApprove, onReject, onView, isUpdating }: H
                 onClick={() => onApprove(request.id)}
                 disabled={isUpdating}
                 className="p-1 text-green-500 hover:text-green-700 disabled:opacity-50"
-                title="Approve"
+                title={t.hrLeaves?.approve || 'Approve'}
               >
                 <CheckCircle className="w-4 h-4" />
               </button>
@@ -59,7 +64,7 @@ const HourlyLeaveCard = ({ request, onApprove, onReject, onView, isUpdating }: H
                 onClick={() => onReject(request.id)}
                 disabled={isUpdating}
                 className="p-1 text-red-500 hover:text-red-700 disabled:opacity-50"
-                title="Reject"
+                title={t.hrLeaves?.reject || 'Reject'}
               >
                 <XCircle className="w-4 h-4" />
               </button>
@@ -68,7 +73,7 @@ const HourlyLeaveCard = ({ request, onApprove, onReject, onView, isUpdating }: H
           <button
             onClick={() => onView(request.id)}
             className="p-1 text-blue-500 hover:text-blue-700"
-            title="View Details"
+            title={t.hrLeaves?.viewDetails || 'View Details'}
           >
             <Eye className="w-4 h-4" />
           </button>

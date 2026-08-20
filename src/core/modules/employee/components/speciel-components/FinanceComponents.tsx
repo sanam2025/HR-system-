@@ -11,6 +11,9 @@ import type {
   Overtime,
   Payslip,
 } from "../../../../../api/models";
+import type { Paginated } from "../../../../../lib/http/client";
+import { PaginationControls } from "../../../../../shared/components/ui/PaginationControls";
+import { useLanguage } from "../../../../../i18n/translations/LanguageContext";
 
 function money(value: unknown): string {
   return typeof value === "number" ? value.toLocaleString() : String(value ?? "—");
@@ -25,14 +28,19 @@ function overtimeStatusVariant(status: string): "success" | "warning" | "danger"
 }
 
 export interface PayslipsCardProps {
-  payslips: Payslip[] | undefined;
+  payslips: Paginated<Payslip> | undefined;
   isLoading: boolean;
   errorMessage?: string | null;
   onDownload: (id: number) => void;
   downloadingId?: number | null;
+  page?: number;
+  onPageChange?: (page: number) => void;
 }
 
-export function PayslipsCard({ payslips, isLoading, errorMessage, onDownload, downloadingId }: PayslipsCardProps) {
+export function PayslipsCard({ payslips, isLoading, errorMessage, onDownload, downloadingId, page, onPageChange }: PayslipsCardProps) {
+  const { t } = useLanguage();
+  const items = payslips?.items;
+
   return (
     <article className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100 relative overflow-hidden hover:shadow-md transition-all">
       <div className="absolute top-0 right-0 w-1.5 h-full bg-[#4A7C59]" />
@@ -40,20 +48,20 @@ export function PayslipsCard({ payslips, isLoading, errorMessage, onDownload, do
         <div className="p-2 bg-[#4A7C59]/10 rounded-xl">
           <FileText size={22} aria-hidden="true" strokeWidth={2.5} />
         </div>
-        <span>Payslips - قسائم الراتب</span>
+        <span>{t.finance?.payslips || "Payslips"}</span>
       </header>
       {isLoading ? (
         <LoadingSkeleton lines={3} />
       ) : errorMessage ? (
         <QueryErrorNotice message={errorMessage} />
-      ) : !payslips || payslips.length === 0 ? (
+      ) : !items || items.length === 0 ? (
         <div className="text-center py-6">
            <FileText className="mx-auto text-gray-300 mb-2" size={32} />
-           <p className="text-sm font-semibold text-gray-400">No payslips available yet.</p>
+           <p className="text-sm font-semibold text-gray-400">{t.finance?.emptyPayslips || "No payslips available yet."}</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {payslips.map((payslip) => (
+          {items.map((payslip) => (
             <div
               key={payslip.id}
               className="flex items-center justify-between gap-3 p-4 rounded-xl border border-gray-100 bg-gray-50/50 hover:bg-gray-50 transition-colors"
@@ -73,10 +81,17 @@ export function PayslipsCard({ payslips, isLoading, errorMessage, onDownload, do
                 className="flex items-center justify-center gap-2 px-4 py-2 bg-white border-2 border-[#4A7C59] text-[#4A7C59] rounded-xl text-xs font-bold hover:bg-[#4A7C59]/10 disabled:opacity-50 transition-all shadow-sm"
               >
                 <Download size={14} />
-                {downloadingId === payslip.id ? "..." : "Download"}
+                {downloadingId === payslip.id ? "..." : t.finance?.download || "Download"}
               </button>
             </div>
           ))}
+          {payslips && onPageChange && page && (
+            <PaginationControls
+              page={page}
+              lastPage={payslips.lastPage}
+              onPageChange={onPageChange}
+            />
+          )}
         </div>
       )}
     </article>
@@ -92,6 +107,7 @@ export function BaseSalaryCard({
   isLoading: boolean;
   errorMessage?: string | null;
 }) {
+  const { t } = useLanguage();
   return (
     <article className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100 relative overflow-hidden hover:shadow-md transition-all">
       <div className="absolute top-0 right-0 w-1.5 h-full bg-[#4A7C59]" />
@@ -99,7 +115,7 @@ export function BaseSalaryCard({
         <div className="p-2 bg-[#4A7C59]/10 rounded-xl">
           <Banknote size={22} aria-hidden="true" strokeWidth={2.5} />
         </div>
-        <span>Base Salary - الراتب الأساسي</span>
+        <span>{t.finance?.baseSalary || "Base Salary"}</span>
       </header>
       {isLoading ? (
         <LoadingSkeleton lines={2} />
@@ -108,13 +124,13 @@ export function BaseSalaryCard({
       ) : !salaries || salaries.length === 0 ? (
         <div className="text-center py-6">
            <Banknote className="mx-auto text-gray-300 mb-2" size={32} />
-           <p className="text-sm font-semibold text-gray-400">No base salary on file.</p>
+           <p className="text-sm font-semibold text-gray-400">{t.finance?.emptyBaseSalary || "No base salary on file."}</p>
         </div>
       ) : (
         <div className="space-y-3">
           {salaries.map((salary, i) => (
             <div key={salary.id ?? i} className="p-4 rounded-xl border border-gray-100 bg-gray-50/50 flex justify-between items-center">
-              <p className="text-sm font-bold text-gray-600">Hourly rate</p>
+              <p className="text-sm font-bold text-gray-600">{t.finance?.hourlyRate || "Hourly rate"}</p>
               <p className="text-lg font-black text-[#4A7C59]">{money(salary.hour_price)}</p>
             </div>
           ))}
@@ -128,11 +144,18 @@ export function DeductionsCard({
   deductions,
   isLoading,
   errorMessage,
+  page,
+  onPageChange,
 }: {
-  deductions: Deduction[] | undefined;
+  deductions: Paginated<Deduction> | undefined;
   isLoading: boolean;
   errorMessage?: string | null;
+  page?: number;
+  onPageChange?: (page: number) => void;
 }) {
+  const { t } = useLanguage();
+  const items = deductions?.items;
+
   return (
     <article className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100 relative overflow-hidden hover:shadow-md transition-all">
       <div className="absolute top-0 right-0 w-1.5 h-full bg-red-500" />
@@ -140,28 +163,35 @@ export function DeductionsCard({
         <div className="p-2 bg-red-50 rounded-xl">
           <MinusCircle size={22} aria-hidden="true" strokeWidth={2.5} />
         </div>
-        <span>Deductions - الخصومات</span>
+        <span>{t.finance?.deductions || "Deductions"}</span>
       </header>
       {isLoading ? (
         <LoadingSkeleton lines={2} />
       ) : errorMessage ? (
         <QueryErrorNotice message={errorMessage} />
-      ) : !deductions || deductions.length === 0 ? (
+      ) : !items || items.length === 0 ? (
         <div className="text-center py-6">
            <MinusCircle className="mx-auto text-gray-300 mb-2" size={32} />
-           <p className="text-sm font-semibold text-gray-400">No deductions on file.</p>
+           <p className="text-sm font-semibold text-gray-400">{t.finance?.emptyDeductions || "No deductions on file."}</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {deductions.map((deduction) => (
+          {items.map((deduction) => (
             <div key={deduction.id} className="flex items-center justify-between p-4 rounded-xl border border-red-100 bg-red-50/30 hover:bg-red-50/80 transition-colors">
               <div className="min-w-0">
-                <p className="text-sm font-bold text-gray-800 truncate">{deduction.reason ?? "Deduction"}</p>
+                <p className="text-sm font-bold text-gray-800 truncate">{deduction.reason ?? t.finance?.deduction ?? "Deduction"}</p>
                 <p className="text-xs font-semibold text-gray-500 mt-1">{deduction.date}</p>
               </div>
               <p className="text-lg font-black text-red-600 flex-shrink-0">-{money(deduction.amount)}</p>
             </div>
           ))}
+          {deductions && onPageChange && page && (
+            <PaginationControls
+              page={page}
+              lastPage={deductions.lastPage}
+              onPageChange={onPageChange}
+            />
+          )}
         </div>
       )}
     </article>
@@ -177,6 +207,7 @@ export function IncentivesCard({
   isLoading: boolean;
   errorMessage?: string | null;
 }) {
+  const { t } = useLanguage();
   return (
     <article className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100 relative overflow-hidden hover:shadow-md transition-all">
       <div className="absolute top-0 right-0 w-1.5 h-full bg-emerald-500" />
@@ -184,7 +215,7 @@ export function IncentivesCard({
         <div className="p-2 bg-emerald-50 rounded-xl">
           <Gift size={22} aria-hidden="true" strokeWidth={2.5} />
         </div>
-        <span>Incentives - الحوافز</span>
+        <span>{t.finance?.incentives || "Incentives"}</span>
       </header>
       {isLoading ? (
         <LoadingSkeleton lines={2} />
@@ -193,14 +224,14 @@ export function IncentivesCard({
       ) : !incentives || incentives.length === 0 ? (
         <div className="text-center py-6">
            <Gift className="mx-auto text-gray-300 mb-2" size={32} />
-           <p className="text-sm font-semibold text-gray-400">No incentives on file.</p>
+           <p className="text-sm font-semibold text-gray-400">{t.finance?.emptyIncentives || "No incentives on file."}</p>
         </div>
       ) : (
         <div className="space-y-3">
           {incentives.map((incentive) => (
             <div key={incentive.id} className="flex items-center justify-between p-4 rounded-xl border border-emerald-100 bg-emerald-50/30 hover:bg-emerald-50/80 transition-colors">
               <div className="min-w-0">
-                <p className="text-sm font-bold text-gray-800 truncate">{incentive.reason ?? "Incentive"}</p>
+                <p className="text-sm font-bold text-gray-800 truncate">{incentive.reason ?? t.finance?.incentive ?? "Incentive"}</p>
                 <p className="text-xs font-semibold text-gray-500 mt-1">{incentive.date}</p>
               </div>
               <p className="text-lg font-black text-emerald-600 flex-shrink-0">+{money(incentive.amount)}</p>
@@ -229,6 +260,7 @@ export function OvertimeCard({
   isSubmitting,
   submitError,
 }: OvertimeCardProps) {
+  const { t } = useLanguage();
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -251,7 +283,7 @@ export function OvertimeCard({
         <div className="p-2 bg-[#4A7C59]/10 rounded-xl">
           <Clock3 size={22} aria-hidden="true" strokeWidth={2.5} />
         </div>
-        <span>Overtime - العمل الإضافي</span>
+        <span>{t.finance?.overtime || "Overtime"}</span>
       </header>
 
       <form onSubmit={handleSubmit} className="space-y-4 mb-6 bg-gray-50/50 p-4 sm:p-5 rounded-2xl border border-gray-100">
@@ -263,7 +295,7 @@ export function OvertimeCard({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label htmlFor="overtime-date" className="block text-xs font-bold text-gray-600 mb-1.5">
-              Date - التاريخ
+              {t.finance?.overtimeForm?.date || "Date"}
             </label>
             <input
               id="overtime-date"
@@ -276,7 +308,7 @@ export function OvertimeCard({
           </div>
           <div>
             <label htmlFor="overtime-start" className="block text-xs font-bold text-gray-600 mb-1.5">
-              Start - البداية
+              {t.finance?.overtimeForm?.start || "Start"}
             </label>
             <input
               id="overtime-start"
@@ -289,7 +321,7 @@ export function OvertimeCard({
           </div>
           <div>
             <label htmlFor="overtime-end" className="block text-xs font-bold text-gray-600 mb-1.5">
-              End - النهاية
+              {t.finance?.overtimeForm?.end || "End"}
             </label>
             <input
               id="overtime-end"
@@ -303,12 +335,12 @@ export function OvertimeCard({
         </div>
         <div>
            <label htmlFor="overtime-notes" className="block text-xs font-bold text-gray-600 mb-1.5">
-              Notes (optional) - ملاحظات (اختياري)
+              {t.finance?.overtimeForm?.notes || "Notes (optional)"}
            </label>
            <input
              id="overtime-notes"
              type="text"
-             placeholder="Enter notes..."
+             placeholder={t.finance?.overtimeForm?.notesPlaceholder || "Enter notes..."}
              value={notes}
              onChange={(e) => setNotes(e.target.value)}
              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-sm font-bold text-gray-800 focus:outline-none focus:ring-4 focus:ring-[#4A7C59]/10 focus:border-[#4A7C59] transition-all bg-white"
@@ -320,7 +352,7 @@ export function OvertimeCard({
           className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 bg-[#4A7C59] text-white rounded-xl text-sm font-bold shadow-md hover:bg-opacity-90 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:transform-none"
         >
           <Clock3 size={16} />
-          {isSubmitting ? "Submitting... - جاري الإرسال" : "Request Overtime - طلب عمل إضافي"}
+          {isSubmitting ? t.finance?.overtimeForm?.submitting || "Submitting..." : t.finance?.overtimeForm?.submit || "Request Overtime"}
         </button>
       </form>
 
@@ -331,7 +363,7 @@ export function OvertimeCard({
       ) : !overtimes || overtimes.length === 0 ? (
         <div className="text-center py-6">
            <Clock3 className="mx-auto text-gray-300 mb-2" size={32} />
-           <p className="text-sm font-semibold text-gray-400">No overtime requests yet.</p>
+           <p className="text-sm font-semibold text-gray-400">{t.finance?.emptyOvertime || "No overtime requests yet."}</p>
         </div>
       ) : (
         <div className="space-y-3">

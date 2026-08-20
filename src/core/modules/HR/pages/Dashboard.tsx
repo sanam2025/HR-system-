@@ -13,6 +13,7 @@ import Loading from '../../../../shared/components/Loading';
 import toast from 'react-hot-toast';
 import type { CreateAnnouncementData } from '../../../../api/service/HrService/Types/AnnouncementsService.types';
 import { AxiosError } from 'axios';
+import { useLanguage } from '../../../../i18n/translations/LanguageContext';
 
 //  استيراد أنواع الأقسام والموظفين
 import type { Department, Employee } from '../../../../api/service/HrService/Types/DepartmentsService.types';
@@ -34,6 +35,7 @@ const STATS_CONFIG = [
 const getStatValue = (key: keyof typeof STATS_DATA) => STATS_DATA[key];
 
 export default function Dashboard() {
+  const { t, lang } = useLanguage();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState<(Department & { employees?: Employee[] }) | null>(null);
@@ -62,7 +64,7 @@ export default function Dashboard() {
     const actualId = (dept as any).department_id || (dept as any).department?.id || dept.id;
     const nameData = departmentsNames.find((n: any) => String(n.id) === String(actualId));
     
-    let actualName = nameData?.name || 'Unknown Department';
+    let actualName = nameData?.name || t.hrDashboard?.unknownDepartment || 'Unknown Department';
     if (typeof (dept as any).department === 'string' && (dept as any).department.trim() !== '') {
       actualName = (dept as any).department;
     } else if ((dept as any).department?.name) {
@@ -180,11 +182,11 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Welcome to HR Dashboard</h1>
-        <p className="text-gray-500 mt-1 text-sm">Overview of employee performance and statistics.</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t.hrDashboard?.welcomeTitle || 'Welcome to HR Dashboard'}</h1>
+        <p className="text-gray-500 mt-1 text-sm">{t.hrDashboard?.welcomeSubtitle || 'Overview of employee performance and statistics.'}</p>
       </div>
 
       {/* Announcements Section */}
@@ -192,7 +194,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Megaphone className="w-5 h-5 text-blue-500" />
-            <h2 className="text-lg font-semibold text-gray-800"> Announcements</h2>
+            <h2 className="text-lg font-semibold text-gray-800">{t.hrDashboard?.announcements || 'Announcements'}</h2>
             {!announcementsLoading && (
               <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
                 {announcements.length}
@@ -211,7 +213,7 @@ export default function Dashboard() {
           !announcementsLoading && (
             <div className="bg-gray-50 rounded-lg p-6 text-center text-gray-400 border border-dashed border-gray-300">
               <Megaphone className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-              <p className="text-sm">No announcements at the moment</p>
+              <p className="text-sm">{t.hrDashboard?.noAnnouncements || 'No announcements at the moment'}</p>
             </div>
           )
         )}
@@ -222,7 +224,7 @@ export default function Dashboard() {
         {STATS_CONFIG.map(({ key, title, icon: Icon, color, path }) => (
           <StatCard
             key={key}
-            title={title}
+            title={t.hrDashboard?.[key] || title}
             value={key === 'totalEmployees' ? totalEmployees : getStatValue(key)}
             icon={<Icon className="w-5 h-5" />}
             color={color}
@@ -236,7 +238,7 @@ export default function Dashboard() {
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
             <Building2 className="w-5 h-5 text-purple-500" />
-            <h2 className="text-lg font-semibold text-gray-800"> Departments</h2>
+            <h2 className="text-lg font-semibold text-gray-800">{t.hrDashboard?.departments || 'Departments'}</h2>
             <span className="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full">
               {departments.length}
             </span>
@@ -251,10 +253,10 @@ export default function Dashboard() {
                 <div className="p-4 border-b border-gray-100 flex justify-between items-center">
                   <div>
                     <h3 className="font-semibold text-gray-800">
-                      {department.name || (department as any).department_name || 'Unknown Department'}
+                      {department.name || (department as any).department_name || (t.hrDashboard?.unknownDepartment || 'Unknown Department')}
                     </h3>
                     {department.manager_name && (
-                      <p className="text-xs text-gray-500">Manager: {department.manager_name}</p>
+                      <p className="text-xs text-gray-500">{t.hrDashboard?.manager || 'Manager'}: {department.manager_name}</p>
                     )}
                   </div>
                   <ChevronRight className="w-4 h-4 text-gray-400" />
@@ -262,7 +264,7 @@ export default function Dashboard() {
                 <div className="p-4">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Users className="w-4 h-4" />
-                    <span>{department.employees?.length || 0} employees</span>
+                    <span>{department.employees?.length || 0} {t.hrDashboard?.employeesCount || 'employees'}</span>
                   </div>
                   {department.employees && department.employees.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-1">
@@ -299,7 +301,7 @@ export default function Dashboard() {
           <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden">
             <div className="flex justify-between items-center p-5 border-b border-gray-100">
               <h3 className="text-xl font-bold text-gray-800">
-                {selectedDepartment.name || (selectedDepartment as any).department_name || 'Unknown Department'} - Employees
+                {selectedDepartment.name || (selectedDepartment as any).department_name || (t.hrDashboard?.unknownDepartment || 'Unknown Department')} - {t.hrDashboard?.employeesList || 'Employees'}
               </h3>
               <button
                 onClick={() => setSelectedDepartment(null)}
@@ -321,7 +323,7 @@ export default function Dashboard() {
                 });
 
                 if (sortedEmps.length === 0) {
-                  return <p className="text-gray-500 text-center py-4">No employees in this department.</p>;
+                  return <p className="text-gray-500 text-center py-4">{t.hrDashboard?.noEmployees || 'No employees in this department.'}</p>;
                 }
 
                 return (
@@ -333,11 +335,11 @@ export default function Dashboard() {
                         </div>
                         <div className="flex-1">
                           <p className="font-semibold text-gray-800">{emp.full_name}</p>
-                          <p className="text-xs text-gray-500">{emp.email || emp.position || 'Employee'}</p>
+                          <p className="text-xs text-gray-500">{emp.email || emp.position || (t.hrDashboard?.employeeRole || 'Employee')}</p>
                         </div>
                         {emp.id === managerId && (
                           <span className="text-xs font-medium bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-                            Manager
+                            {t.hrDashboard?.manager || 'Manager'}
                           </span>
                         )}
                       </div>

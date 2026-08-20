@@ -8,9 +8,11 @@ import DeleteForm from '../forms/DeleteForm';
 import toast from 'react-hot-toast';
 import Loading from '../../../../../../shared/components/Loading';
 import { usePublishAnnouncemet } from '../../../hooks/Announcements/useAnnouncementsMutation';
+import { useLanguage } from "../../../../../../i18n/translations/LanguageContext";
 
 function AnnouncementsCards({ announcement }: { announcement: Announcements }) {
 
+    const { t, lang } = useLanguage();
     const [isOpen, setisOpen] = useState(false);
     const [isOpenEdit, setIsOpenEdit] = useState(false);
     const [isOpenDelete, setIsOpenDelete] = useState(false);
@@ -21,13 +23,13 @@ function AnnouncementsCards({ announcement }: { announcement: Announcements }) {
         try {
             await publishAnnouncemet(announcement?.id);
             console.log('Publishing announcement:', announcement.id);
-            toast.success('Announcement published successfully!');
+            toast.success(t.adminAnnouncements?.actions?.publishSuccess || 'Announcement published successfully!');
         } catch (e: any) {
             console.error('Error publishing announcement:', e);
             if (e.response) {
-                toast.error(e.response.data?.message || 'Failed to publish announcement');
+                toast.error(e.response.data?.message || t.adminAnnouncements?.actions?.publishFail || 'Failed to publish announcement');
             } else {
-                toast.error('Failed to publish announcement');
+                toast.error(t.adminAnnouncements?.actions?.publishFail || 'Failed to publish announcement');
             }
         }
     };
@@ -44,11 +46,11 @@ function AnnouncementsCards({ announcement }: { announcement: Announcements }) {
                             {announcement.title}
                         </h4>
                         <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${getPriorityStyles(announcement.priority)}`}>
-                            {announcement.priority.charAt(0).toUpperCase() + announcement.priority.slice(1)}
+                            {t.adminDashboard?.[announcement.priority.toLowerCase() as keyof typeof t.adminDashboard] || announcement.priority}
                         </span>
                         <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${getStatusStyles(announcement.status)}`}>
                             <span className="inline-block w-1.5 h-1.5 rounded-full mr-1.5 bg-current"></span>
-                            {announcement.status.charAt(0).toUpperCase() + announcement.status.slice(1)}
+                            {t.adminAnnouncements?.stats?.[announcement.status.toLowerCase() as keyof typeof t.adminAnnouncements.stats] || announcement.status}
                         </span>
                     </div>
 
@@ -68,7 +70,7 @@ function AnnouncementsCards({ announcement }: { announcement: Announcements }) {
                         {announcement.expires_at && (
                             <span className="flex items-center gap-1">
                                 <Clock className="w-3.5 h-3.5" />
-                                Expires: {formatDate(announcement.expires_at)}
+                                {t.adminAnnouncements?.form?.expiresAtLabel || 'Expires At'}: {formatDate(announcement.expires_at)}
                             </span>
                         )}
                     </div>
@@ -78,7 +80,7 @@ function AnnouncementsCards({ announcement }: { announcement: Announcements }) {
                     {!isActive && (
                         <button 
                             className="p-2 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-all duration-200"
-                            title="Publish announcement"
+                            title={t.adminAnnouncements?.actions?.publishTitle || "Publish announcement"}
                             onClick={handlePublish}
                             disabled={isPending}
                         >
@@ -88,21 +90,21 @@ function AnnouncementsCards({ announcement }: { announcement: Announcements }) {
 
                     <button 
                         className="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
-                        title="View details"
+                        title={t.adminAnnouncements?.actions?.viewTitle || "View details"}
                         onClick={() => setisOpen(true)}
                     >
-                        <Eye className="w-4 h-4" />
+                        <Eye className={`w-4 h-4 ${lang === 'ar' ? 'rotate-180 transform' : ''}`} />
                     </button>
                     <button 
                         className="p-2 text-amber-500 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-all duration-200"
-                        title="Edit announcement"
+                        title={t.adminAnnouncements?.actions?.editTitle || "Edit announcement"}
                         onClick={() => setIsOpenEdit(true)}
                     >
                         <Edit className="w-4 h-4" />
                     </button>
                     <button 
                         className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200"
-                        title="Delete announcement"
+                        title={t.adminAnnouncements?.actions?.deleteTitle || "Delete announcement"}
                         onClick={() => setIsOpenDelete(true)}
                     >
                         <Trash2 className="w-4 h-4" />

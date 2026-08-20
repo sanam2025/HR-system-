@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useJobPostings } from "../../hooks/useJobPostings";
 import type { JobRequisition } from "../../../../../api/service/HrService/Types/HRService.types";
 import type { JobPosting } from "../../../../../api/service/HrService/Types/JobPostingsService.types";
+import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
 
 interface RecruitmentCardProps {
   req: JobRequisition;
@@ -21,6 +22,7 @@ export default function RecruitmentCard({
   isLoadingReject,
 }: RecruitmentCardProps) {
   const navigate = useNavigate();
+  const { t, lang } = useLanguage();
   
   //  جلب جميع الوظائف المنشورة
   const { postings } = useJobPostings();
@@ -82,7 +84,7 @@ export default function RecruitmentCard({
       <td className="px-4 py-3 text-gray-600">{req.skills_count || 0}</td>
       <td className="px-4 py-3">
         <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(req.status || '')}`}>
-          {req.status || 'N/A'}
+          {t.hrRecruitment?.stats?.[req.status as keyof typeof t.hrRecruitment.stats] || req.status || 'N/A'}
         </span>
       </td>
       <td className="px-4 py-3">
@@ -98,10 +100,10 @@ export default function RecruitmentCard({
             </>
           )}
           <button onClick={goToApplicants} className="p-1 text-purple-500 hover:text-purple-700" title="View Applicants">
-            <Users className="w-4 h-4" />
+            <Users className="w-4 h-4 rtl:-scale-x-100" />
           </button>
           <button onClick={(e) => { e.stopPropagation(); goToDetails(); }} className="p-1 text-blue-500 hover:text-blue-700" title="View Details">
-            <Eye className="w-4 h-4" />
+            <Eye className="w-4 h-4 rtl:-scale-x-100" />
           </button>
         </div>
       </td>

@@ -1,8 +1,10 @@
 import { useStartTask, useSubmitTask, useTasks } from "../../../../api/hooks/useTasks";
 import { TaskListCard, TaskStatusSummaryCard } from "../components/speciel-components/TaskComponents";
 import { ApiError } from "../../../../lib/http/ApiError";
+import { useLanguage } from "../../../../i18n/translations/LanguageContext";
 
 export default function EmployeeTasks() {
+  const { t } = useLanguage();
   const taskQuery = useTasks({});
   const tasks = taskQuery.data?.items ?? [];
 
@@ -12,8 +14,8 @@ export default function EmployeeTasks() {
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in">
       <div className="min-w-0">
-        <h1 className="text-xl sm:text-2xl font-bold text-dark">My Tasks - المهام</h1>
-        <p className="text-sm text-gray-400 mt-1">Your current tasks are loaded from the authenticated task API.</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-dark">{t.tasks?.title || "My Tasks"}</h1>
+        <p className="text-sm text-gray-400 mt-1">{t.tasks?.subtitle || "Your current tasks are loaded from the authenticated task API."}</p>
       </div>
 
       <div className="w-full flex flex-col gap-6">

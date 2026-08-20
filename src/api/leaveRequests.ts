@@ -1,4 +1,5 @@
-import { getListOrEmpty, httpClient, unwrap } from "../lib/http/client";
+import { getListOrEmpty, getPaginatedListOrEmpty, httpClient, unwrap } from "../lib/http/client";
+import type { Paginated } from "../lib/http/client";
 import { endpoints } from "./endpoints";
 import type { RequestOptions } from "../lib/http/client";
 import type { MessageResponse } from "../lib/http/types";
@@ -45,10 +46,10 @@ export async function deleteLeaveRequest(
 
 /** The signed-in employee's own leave requests, optionally filtered by status. */
 export async function listMyLeaveRequests(
-  params: { status?: LeaveRequestStatus } = {},
+  params: { status?: LeaveRequestStatus; page?: number } = {},
   options?: RequestOptions
-): Promise<LeaveRequest[]> {
-  return getListOrEmpty<LeaveRequest>(endpoints.leaveRequests.list, {
+): Promise<Paginated<LeaveRequest>> {
+  return getPaginatedListOrEmpty<LeaveRequest>(endpoints.leaveRequests.list, {
     ...options,
     params: { ...params, ...options?.params },
   });

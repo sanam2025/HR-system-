@@ -9,6 +9,7 @@ import { apiClient } from '../../api/apiClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { NavItem } from './SideBar';
 import { useAuthStore } from '../../store/authStore';
+import { isSameCalendarDay } from '../../lib/date';
 
 const getCurrentLocation = (): Promise<{ latitude: number; longitude: number }> => {
   return new Promise((resolve, reject) => {
@@ -18,7 +19,13 @@ const getCurrentLocation = (): Promise<{ latitude: number; longitude: number }> 
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-      (err) => reject(new Error("GEOLOCATION_DENIED"))
+      (err) => {
+        if (err.code === 1) reject(new Error("GEOLOCATION_DENIED"));
+        else if (err.code === 2) reject(new Error("POSITION_UNAVAILABLE"));
+        else if (err.code === 3) reject(new Error("TIMEOUT"));
+        else reject(new Error("GEOLOCATION_ERROR"));
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
     );
   });
 };
@@ -134,14 +141,20 @@ export default function Topbar({
     localStorage.setItem('isCheckedIn', status === 'checked_in' ? 'true' : 'false');
   };
 
-  // Initialize from API on mount (source of truth)
+  // Initialize from API on mount and when user changes (source of truth)
+  const token = useAuthStore(state => state.token);
+
   useEffect(() => {
+    if (!token) {
+      updateAttendanceState('not_checked_in');
+      return;
+    }
     getMyMonthlyAttendance().then((data: any[]) => {
       if (!Array.isArray(data)) return;
-      const todayStr = new Date().toISOString().split('T')[0];
-      const todayRec = data.find((r: any) =>
-        (r.date || r.check_date || r.created_at?.split('T')[0]) === todayStr
-      );
+      const todayRec = data.find((r: any) => {
+        const dateString = r.date || r.check_date || r.created_at;
+        return dateString ? isSameCalendarDay(dateString) : false;
+      });
       if (!todayRec) {
         updateAttendanceState('not_checked_in');
         return;
@@ -152,20 +165,18 @@ export default function Topbar({
         updateAttendanceState('checked_in');
       }
     }).catch(() => { /* silent: keep localStorage value */ });
-  }, []);
+  }, [token]);
 
   const handleCheckInOut = async () => {
     setIsLoadingCheck(true);
     try {
-      if (isCheckedIn) {
+      if (attendanceStatus === 'checked_in') {
         await submitCheckOut();
-        setIsCheckedIn(false);
-        localStorage.setItem('isCheckedIn', 'false');
+        updateAttendanceState('completed');
         toast.success(lang === 'ar' ? 'تم تسجيل الانصراف بنجاح' : 'Checked out successfully');
       } else {
         await submitCheckIn();
-        setIsCheckedIn(true);
-        localStorage.setItem('isCheckedIn', 'true');
+        updateAttendanceState('checked_in');
         toast.success(lang === 'ar' ? 'تم تسجيل الحضور بنجاح' : 'Checked in successfully');
       }
     } catch (error: any) {
@@ -300,6 +311,24 @@ export default function Topbar({
                       toast.error(lang === 'ar' ? 'يجب السماح بالوصول للموقع الجغرافي لتسجيل الحضور' : 'Location access is required to check in');
                       return;
                     }
+                    if (msg === "POSITION_UNAVAILABLE") {
+                      toast.error(lang === 'ar' ? 'معلومات الموقع غير متوفرة (تأكد من تفعيل خدمة الموقع في جهازك)' : 'Location information is unavailable');
+                      return;
+                    }
+                    if (msg === "TIMEOUT") {
+                      toast.error(lang === 'ar' ? 'انتهى وقت طلب الموقع الجغرافي، يرجى المحاولة مرة أخرى' : 'Location request timed out');
+                      return;
+                    }
+                    if (msg === "GEOLOCATION_ERROR") {
+                      toast.error(lang === 'ar' ? 'حدث خطأ غير معروف في استخراج الموقع الجغرافي' : 'Unknown geolocation error');
+                      return;
+                    }
+                    
+                    let translatedMsg = msg;
+                    if (msg.toLowerCase().includes('outside the company location')) {
+                      translatedMsg = lang === 'ar' ? 'أنت خارج موقع الشركة المسموح به للتسجيل' : 'You are outside the company location';
+                    }
+
                     if (
                       msg.includes('already checked in') ||
                       msg.includes('check in again') ||
@@ -307,9 +336,9 @@ export default function Topbar({
                       msg.includes('already')
                     ) {
                       updateAttendanceState('checked_in');
-                      toast.info(lang === 'ar' ? 'سجّلت حضورك بالفعل — اضغط لتسجيل الانصراف' : 'Already checked in — click to check out', { duration: 5000 });
+                      toast(lang === 'ar' ? 'سجّلت حضورك بالفعل — اضغط لتسجيل الانصراف' : 'Already checked in — click to check out', { icon: 'ℹ️', duration: 5000 });
                     } else {
-                      toast.error(msg || (lang === 'ar' ? 'خطأ في تسجيل الحضور' : 'Check-in error'));
+                      toast.error(translatedMsg || (lang === 'ar' ? 'خطأ في تسجيل الحضور' : 'Check-in error'));
                     }
                   } finally {
                     setIsLoadingCheck(false);
@@ -339,15 +368,33 @@ export default function Topbar({
                       toast.error(lang === 'ar' ? 'يجب السماح بالوصول للموقع الجغرافي لتسجيل الانصراف' : 'Location access is required to check out');
                       return;
                     }
+                    if (msg === "POSITION_UNAVAILABLE") {
+                      toast.error(lang === 'ar' ? 'معلومات الموقع غير متوفرة (تأكد من تفعيل خدمة الموقع في جهازك)' : 'Location information is unavailable');
+                      return;
+                    }
+                    if (msg === "TIMEOUT") {
+                      toast.error(lang === 'ar' ? 'انتهى وقت طلب الموقع الجغرافي، يرجى المحاولة مرة أخرى' : 'Location request timed out');
+                      return;
+                    }
+                    if (msg === "GEOLOCATION_ERROR") {
+                      toast.error(lang === 'ar' ? 'حدث خطأ غير معروف في استخراج الموقع الجغرافي' : 'Unknown geolocation error');
+                      return;
+                    }
+                    
+                    let translatedMsg = msg;
+                    if (msg.toLowerCase().includes('outside the company location')) {
+                      translatedMsg = lang === 'ar' ? 'أنت خارج موقع الشركة المسموح به للتسجيل' : 'You are outside the company location';
+                    }
+
                     if (
                       msg.includes('no active check in') ||
                       msg.includes('already checked out') ||
                       msg.includes('not checked in')
                     ) {
                       updateAttendanceState('completed');
-                      toast.info(lang === 'ar' ? 'أنت مسجل انصراف بالفعل لهذا اليوم' : 'Already checked out for today', { duration: 5000 });
+                      toast(lang === 'ar' ? 'أنت مسجل انصراف بالفعل لهذا اليوم' : 'Already checked out for today', { icon: 'ℹ️', duration: 5000 });
                     } else {
-                      toast.error(msg ? (lang === 'ar' ? `خطأ انصراف: ${msg}` : `Check-out error: ${msg}`) : (lang === 'ar' ? 'خطأ في تسجيل الانصراف' : 'Check-out error'));
+                      toast.error(translatedMsg ? (lang === 'ar' ? `خطأ انصراف: ${translatedMsg}` : `Check-out error: ${translatedMsg}`) : (lang === 'ar' ? 'خطأ في تسجيل الانصراف' : 'Check-out error'));
                       console.error(error);
                     }
                   } finally {
@@ -366,7 +413,7 @@ export default function Topbar({
             {attendanceStatus === 'completed' && (
               <button
                 onClick={() => {
-                  toast.info(lang === 'ar' ? 'تسجيل الحضور والانصراف مسموح به مرة واحدة فقط في اليوم' : 'Check-in & Check-out allowed only once per day', { duration: 4000 });
+                  toast(lang === 'ar' ? 'تسجيل الحضور والانصراف مسموح به مرة واحدة فقط في اليوم' : 'Check-in & Check-out allowed only once per day', { icon: 'ℹ️', duration: 4000 });
                 }}
                 title={lang === 'ar' ? 'اكتمل الحضور والانصراف اليوم' : 'Attendance completed today'}
                 className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer shadow-sm border bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200"
@@ -460,7 +507,7 @@ export default function Topbar({
                               {subtitle && <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>}
                               {extraInfo && <p className="text-xs text-green font-semibold mt-0.5">{extraInfo}</p>}
                               <span className="text-xs text-gray-400 mt-1 block">
-                                {n.created_at ? new Date(n.created_at).toLocaleString() : ''}
+                                {n.created_at ? new Date(n.created_at).toLocaleString(lang === 'ar' ? 'ar-EG' : 'en-US') : ''}
                               </span>
                             </div>
                             {isUnread && <div className="mt-1.5 flex-shrink-0 w-2 h-2 rounded-full bg-blue-500"></div>}

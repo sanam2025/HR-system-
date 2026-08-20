@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   LeaveBalanceCard,
   HourlyLeaveRequestsCard,
@@ -18,7 +18,10 @@ import { ApiError } from "../../../../lib/http/ApiError";
 import { isSameCalendarDay } from "../../../../lib/date";
 
 export default function EmployeeAttendance() {
-  const leaveRequests = useMyLeaveRequests();
+  const [leavePage, setLeavePage] = useState(1);
+  const [hourlyLeavePage, setHourlyLeavePage] = useState(1);
+
+  const leaveRequests = useMyLeaveRequests(undefined, leavePage);
   const hourlyLeaveRequests = useMyHourlyLeaveRequests();
   const leaveBalance = useMyLeaveBalance();
   const monthly = useMyMonthlyAttendance();
@@ -51,6 +54,8 @@ export default function EmployeeAttendance() {
           errorMessage={(leaveRequests.error as ApiError | null)?.message ?? null}
           onCancel={(id) => deleteLeaveRequest.mutate(id)}
           cancelingId={deleteLeaveRequest.isPending ? (deleteLeaveRequest.variables as number) : null}
+          page={leavePage}
+          onPageChange={setLeavePage}
         />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
@@ -65,6 +70,8 @@ export default function EmployeeAttendance() {
           errorMessage={(hourlyLeaveRequests.error as ApiError | null)?.message ?? null}
           onCancel={(id) => deleteHourlyLeaveRequest.mutate(id)}
           cancelingId={deleteHourlyLeaveRequest.isPending ? (deleteHourlyLeaveRequest.variables as number) : null}
+          page={hourlyLeavePage}
+          onPageChange={setHourlyLeavePage}
         />
       </div>
     </div>

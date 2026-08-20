@@ -152,3 +152,19 @@ export async function getListOrEmpty<T>(
     throw apiError;
   }
 }
+
+export async function getPaginatedListOrEmpty<T>(
+  path: string,
+  options?: RequestOptions
+): Promise<Paginated<T>> {
+  try {
+    const response = await httpClient.get(path, options);
+    return unwrapPaginated<T>(response);
+  } catch (error) {
+    const apiError = ApiError.from(error);
+    if (apiError.kind === "not_found") {
+      return { items: [], page: 1, perPage: 0, total: 0, lastPage: 1 };
+    }
+    throw apiError;
+  }
+}

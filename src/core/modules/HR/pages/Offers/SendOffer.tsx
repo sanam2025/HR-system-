@@ -5,6 +5,7 @@ import { ArrowLeft, DollarSign, Calendar, Clock } from "lucide-react";
 import { useSendOffer } from "../../hooks/useOffer";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
+import { useLanguage } from "../../../../../i18n/translations/LanguageContext";
 
 export const SendOffer = () => {
   const navigate = useNavigate();
@@ -12,8 +13,9 @@ export const SendOffer = () => {
   const [searchParams] = useSearchParams();
   const candidateIdFromUrl = searchParams.get("candidateId");
 
-  const jobIdNumber = jobId ? Number(jobId) : undefined;
+  const { jobIdNumber } = { jobIdNumber: jobId ? Number(jobId) : undefined };
   const { mutate: sendOffer, isPending } = useSendOffer(jobIdNumber);
+  const { t, lang } = useLanguage();
 
   const [form, setForm] = useState({
     hour_price: "",
@@ -27,12 +29,12 @@ export const SendOffer = () => {
   const getErrorMessage = (err: unknown): string => {
     if (err instanceof AxiosError) {
       const data = err.response?.data as { message?: string };
-      return data?.message || err.message || "Failed to send offer";
+      return data?.message || err.message || (t.hrOffers?.toasts?.failedSend || "Failed to send offer");
     }
     if (err instanceof Error) {
       return err.message;
     }
-    return "Failed to send offer";
+    return t.hrOffers?.toasts?.failedSend || "Failed to send offer";
   };
 
   const [selectedCandidateId, setSelectedCandidateId] = useState<string>(candidateIdFromUrl || "");
@@ -56,17 +58,17 @@ export const SendOffer = () => {
     const candidateToUse = candidateIdFromUrl || selectedCandidateId;
 
     if (!candidateToUse) {
-      toast.error("No candidate selected");
+      toast.error(t.hrOffers?.toasts?.noCandidate || "No candidate selected");
       return;
     }
 
     if (!form.hour_price || !form.start_date || !form.working_hour_per_day) {
-      toast.error("Please fill in all required fields");
+      toast.error(t.hrOffers?.toasts?.fillRequired || "Please fill in all required fields");
       return;
     }
 
     if (form.weekend_days.length === 0) {
-      toast.error("Please select at least one weekend day");
+      toast.error(t.hrOffers?.toasts?.selectWeekend || "Please select at least one weekend day");
       return;
     }
 
@@ -87,7 +89,7 @@ export const SendOffer = () => {
     sendOffer(data, {
       onSuccess: () => {
         //  3. بعد نجاح الطلب، طلع الأليرت فقط
-        toast.success(" Offer sent successfully!");
+        toast.success(t.hrOffers?.toasts?.offerSent || "Offer sent successfully!");
       },
       onError: (err: unknown) => {
         console.error(" Send offer error:", err);
@@ -113,21 +115,21 @@ export const SendOffer = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
           <button
             onClick={() => navigate(-1)} //  إغلاق الفورم فوراً عند الضغط على الرجوع
             className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3"
           >
-            <ArrowLeft className="w-4 h-4" /> Back
+            <ArrowLeft className={`w-4 h-4 ${lang === 'ar' ? 'rotate-180' : ''}`} /> {t.hrOffers?.sendOffer?.back || 'Back'}
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">Send Offer</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t.hrOffers?.sendOffer?.title || 'Send Offer'}</h1>
           <p className="text-gray-500 text-sm mt-1">
-            Send a job offer to the candidate
+            {t.hrOffers?.sendOffer?.subtitle || 'Send a job offer to the candidate'}
             {candidateIdFromUrl && (
               <span className="text-purple-600 block mt-1">
-                 Sending offer to Candidate #{candidateIdFromUrl}
+                 {t.hrOffers?.sendOffer?.sendingTo || 'Sending offer to Candidate #'}{candidateIdFromUrl}
               </span>
             )}
           </p>
@@ -138,7 +140,7 @@ export const SendOffer = () => {
             {!candidateIdFromUrl ? (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Candidate *
+                  {t.hrOffers?.sendOffer?.candidateLabel || 'Candidate *'}
                 </label>
                 <select
                   className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -146,7 +148,7 @@ export const SendOffer = () => {
                   onChange={(e) => setSelectedCandidateId(e.target.value)}
                   required
                 >
-                  <option value="" disabled>Select Candidate</option>
+                  <option value="" disabled>{t.hrOffers?.sendOffer?.selectCandidate || 'Select Candidate'}</option>
                   {candidates.map((c) => (
                     <option key={c.id} value={c.id}>{c.full_name}</option>
                   ))}
@@ -165,17 +167,17 @@ export const SendOffer = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Hour Price ($) *
+                {t.hrOffers?.sendOffer?.hourPriceLabel || 'Hour Price ($) *'}
               </label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <DollarSign className={`absolute ${lang === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400`} />
                 <input
                   type="number"
                   name="hour_price"
                   value={form.hour_price}
                   onChange={handleChange}
-                  placeholder="Enter hour price"
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder={t.hrOffers?.sendOffer?.hourPricePlaceholder || 'Enter hour price'}
+                  className={`w-full ${lang === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 border rounded-lg focus:ring-2 focus:ring-blue-500`}
                   required
                 />
               </div>
@@ -183,16 +185,16 @@ export const SendOffer = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Start Date *
+                {t.hrOffers?.sendOffer?.startDateLabel || 'Start Date *'}
               </label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Calendar className={`absolute ${lang === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400`} />
                 <input
                   type="date"
                   name="start_date"
                   value={form.start_date}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={`w-full ${lang === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-left`}
                   required
                 />
               </div>
@@ -200,17 +202,17 @@ export const SendOffer = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Working Hours Per Day *
+                {t.hrOffers?.sendOffer?.workingHoursLabel || 'Working Hours Per Day *'}
               </label>
               <div className="relative">
-                <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Clock className={`absolute ${lang === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400`} />
                 <input
                   type="number"
                   name="working_hour_per_day"
                   value={form.working_hour_per_day}
                   onChange={handleChange}
-                  placeholder="Enter working hours per day"
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder={t.hrOffers?.sendOffer?.workingHoursPlaceholder || 'Enter working hours per day'}
+                  className={`w-full ${lang === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 border rounded-lg focus:ring-2 focus:ring-blue-500`}
                   required
                 />
               </div>
@@ -218,7 +220,7 @@ export const SendOffer = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Weekend Days *
+                {t.hrOffers?.sendOffer?.weekendDaysLabel || 'Weekend Days *'}
               </label>
               <div className="flex flex-wrap gap-3">
                 {weekendOptions.map((day) => (
@@ -232,12 +234,12 @@ export const SendOffer = () => {
                         : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                     }`}
                   >
-                    {day.charAt(0).toUpperCase() + day.slice(1)}
+                    {t.hrOffers?.days?.[day as keyof typeof t.hrOffers.days] || (day.charAt(0).toUpperCase() + day.slice(1))}
                   </button>
                 ))}
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                Selected: {form.weekend_days.join(", ") || "None"}
+                {t.hrOffers?.sendOffer?.selected || 'Selected:'} {form.weekend_days.map(d => t.hrOffers?.days?.[d as keyof typeof t.hrOffers.days] || d).join(", ") || (t.hrOffers?.sendOffer?.none || "None")}
               </p>
             </div>
 
@@ -247,14 +249,14 @@ export const SendOffer = () => {
                 disabled={isPending}
                 className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50"
               >
-                {isPending ? "Sending..." : "Send Offer"}
+                {isPending ? (t.hrOffers?.sendOffer?.sending || 'Sending...') : (t.hrOffers?.sendOffer?.sendOfferBtn || 'Send Offer')}
               </button>
               <button
                 type="button"
                 onClick={() => navigate(-1)} //  إغلاق الفورم فوراً عند الضغط على Cancel
                 className="px-4 py-2 border text-gray-700 rounded-lg hover:bg-gray-50"
               >
-                Cancel
+                {t.hrOffers?.sendOffer?.cancel || 'Cancel'}
               </button>
             </div>
           </form>

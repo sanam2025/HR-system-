@@ -3,6 +3,7 @@ import { useState } from 'react'
 import toast from 'react-hot-toast';
 import { useCreateAnnouncemet } from '../../../hooks/Announcements/useAnnouncementsMutation'
 import type { CreateAnnouncemetPayload } from '../../../types/types'
+import { useLanguage } from "../../../../../../i18n/translations/LanguageContext";
 
 type AddAnnouncementProps = {
     isOpen: boolean
@@ -10,7 +11,7 @@ type AddAnnouncementProps = {
 }
 
 function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
-
+    const { t } = useLanguage();
     const [data, setData] = useState<CreateAnnouncemetPayload>({
         title: '',
         content: '',
@@ -27,26 +28,26 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
         setData(prev => ({ ...prev, [name]: value }))
     }
 
-    const handleSubmit = async (e:React.SubmitEvent<HTMLFormElement>) =>{
+    const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) =>{
         e.preventDefault();
         try{
             if(!data.title.trim()){
-                toast.error('the tile field is require');
+                toast.error(t.adminAnnouncements?.form?.titleRequired || 'The title field is required');
                 return;
             }
     
             if(!data.content.trim()){
-                toast.error('the content field is require');
+                toast.error(t.adminAnnouncements?.form?.contentRequired || 'The content field is required');
                 return;
             }
     
             if(!data.starts_at.trim()){
-                toast.error('the starts at field is require');
+                toast.error(t.adminAnnouncements?.form?.startsAtRequired || 'The starts at field is required');
                 return;
             }
     
             if(!data.expires_at.trim()){
-                toast.error('the expires at field is require');
+                toast.error(t.adminAnnouncements?.form?.expiresAtRequired || 'The expires at field is required');
                 return;
             }
     
@@ -66,7 +67,7 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
             };
 
             await AddAnnouncement(formattedData);
-            toast.success('Announcemet Added successfully');
+            toast.success(t.adminAnnouncements?.form?.addSuccess || 'Announcement Added successfully');
             setIsModalOpen(false);
         }catch (e: any) {
             console.error('Full error:', e);
@@ -76,19 +77,20 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
                     e.response.data?.message || 
                     e.response.data?.error || 
                     e.response.statusText ||
+                    t.adminAnnouncements?.form?.validationError ||
                     'Something went wrong';
                 
                 if (e.response.data?.errors) {
                     const errors = e.response.data.errors;
                     const errorMessages = Object.values(errors).flat();
-                    toast.error(errorMessages[0] as string || 'Validation error');
+                    toast.error(errorMessages[0] as string || t.adminAnnouncements?.form?.validationError || 'Validation error');
                 } else {
                     toast.error(errorMessage);
                 }
             } else if (e.request) {
-                toast.error('No response from server. Please check your connection.');
+                toast.error(t.adminAnnouncements?.form?.noResponse || 'No response from server. Please check your connection.');
             } else {
-                toast.error(e.message || 'Failed to update holiday');
+                toast.error(e.message || t.adminAnnouncements?.form?.validationError || 'Failed to update holiday');
             }
         }
     }
@@ -112,8 +114,8 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
                             <FileText className="w-5 h-5" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-gray-900">Add New Announcement</h2>
-                            <p className="text-sm text-gray-500">Fill in the details to create a new announcement</p>
+                            <h2 className="text-xl font-bold text-gray-900">{t.adminAnnouncements?.newAnnouncement || 'Add New Announcement'}</h2>
+                            <p className="text-sm text-gray-500">{t.adminAnnouncements?.subtitle || 'Fill in the details to create a new announcement'}</p>
                         </div>
                     </div>
                     <button 
@@ -128,7 +130,7 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
                     <div className="space-y-5">
                         <div>
                             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1.5">
-                                Title <span className="text-red-500">*</span>
+                                {t.adminAnnouncements?.form?.titleLabel || 'Title'} <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -149,7 +151,7 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
 
                         <div>
                             <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1.5">
-                                Content <span className="text-red-500">*</span>
+                                {t.adminAnnouncements?.form?.contentLabel || 'Content'} <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
                                 <div className="absolute top-3 left-3 flex items-start pointer-events-none">
@@ -172,7 +174,7 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
                                 <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Priority <span className="text-red-500">*</span>
+                                    {t.adminAnnouncements?.form?.priorityLabel || 'Priority'} <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -186,16 +188,16 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
                                         className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white appearance-none cursor-pointer"
                                         required
                                     >
-                                        <option value="low">Low</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="high">High</option>
+                                        <option value="low">{t.adminDashboard?.low || 'Low'}</option>
+                                        <option value="medium">{t.adminDashboard?.medium || 'Medium'}</option>
+                                        <option value="high">{t.adminDashboard?.high || 'High'}</option>
                                     </select>
                                 </div>
                             </div>
 
                             <div>
                                 <label htmlFor="target_audience" className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Target Audience <span className="text-red-500">*</span>
+                                    {t.adminAnnouncements?.form?.audienceLabel || 'Target Audience'} <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -209,9 +211,9 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
                                         className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200 bg-gray-50 hover:bg-white focus:bg-white appearance-none cursor-pointer"
                                         required
                                     >
-                                        <option value="all">All Employees</option>
-                                        <option value="managers">Managers Only</option>
-                                        <option value="department">Specific Department</option>
+                                        <option value="all">{t.adminAnnouncements?.form?.allEmployees || 'All Employees'}</option>
+                                        <option value="managers">{t.adminAnnouncements?.form?.managersOnly || 'Managers Only'}</option>
+                                        <option value="department">{t.adminAnnouncements?.form?.specificDepartment || 'Specific Department'}</option>
                                     </select>
                                 </div>
                             </div>
@@ -220,7 +222,7 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
                                 <label htmlFor="starts_at" className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Starts At <span className="text-red-500">*</span>
+                                    {t.adminAnnouncements?.view?.published || 'Starts At'} <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -240,7 +242,7 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
 
                             <div>
                                 <label htmlFor="expires_at" className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Expires At <span className="text-red-500">*</span>
+                                    {t.adminAnnouncements?.form?.expiresAtLabel || 'Expires At'} <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -266,7 +268,7 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
                             onClick={() => setIsModalOpen(false)}
                             className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200"
                         >
-                            Cancel
+                            {t.adminAnnouncements?.form?.cancel || 'Cancel'}
                         </button>
                         <button
                             type="submit"
@@ -274,7 +276,7 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
                             disabled={isLoading}
                         >
                             <Plus className="w-4 h-4" />
-                            {isLoading? 'Publishing...' : 'Publish Announcement'}
+                            {isLoading? (t.adminAnnouncements?.loading || 'Publishing...') : (t.adminAnnouncements?.form?.submit || 'Publish Announcement')}
                         </button>
                     </div>
                 </form>

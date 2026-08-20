@@ -1,10 +1,10 @@
-import { getListOrEmpty, httpClient, unwrap } from "../lib/http/client";
+import { getListOrEmpty, getPaginatedListOrEmpty, httpClient, unwrap } from "../lib/http/client";
 import { endpoints } from "./endpoints";
-import type { RequestOptions } from "../lib/http/client";
+import type { RequestOptions, Paginated } from "../lib/http/client";
 import type { BaseSalary, Deduction, Incentive, Payslip, PayslipsSummary } from "./models";
 
-export async function listMyPayslips(options?: RequestOptions): Promise<Payslip[]> {
-  return getListOrEmpty<Payslip>(endpoints.payroll.myPayslips, options);
+export async function listMyPayslips(options?: RequestOptions): Promise<Paginated<Payslip>> {
+  return getPaginatedListOrEmpty<Payslip>(endpoints.payroll.myPayslips, options);
 }
 
 export async function getPayslip(id: number, options?: RequestOptions): Promise<Payslip> {
@@ -33,8 +33,8 @@ export async function listMyBaseSalaries(options?: RequestOptions): Promise<Base
   return getListOrEmpty<BaseSalary>(endpoints.payroll.myBaseSalaries, options);
 }
 
-export async function listMyDeductions(options?: RequestOptions): Promise<Deduction[]> {
-  return getListOrEmpty<Deduction>(endpoints.payroll.myDeductions, options);
+export async function listMyDeductions(options?: RequestOptions): Promise<Paginated<Deduction>> {
+  return getPaginatedListOrEmpty<Deduction>(endpoints.payroll.myDeductions, options);
 }
 
 export async function listMyIncentives(options?: RequestOptions): Promise<Incentive[]> {

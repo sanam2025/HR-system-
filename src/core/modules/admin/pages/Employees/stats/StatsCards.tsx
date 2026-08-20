@@ -1,6 +1,7 @@
 import { Users, Building, User, Loader2 } from 'lucide-react'
 import { useDepartmentsCount } from '../../../hooks/orginization/useOrginization'
 import type { Employee } from '../../../../../../api/Types/types.types';
+import { useLanguage } from "../../../../../../i18n/translations/LanguageContext";
 
 
 type StatsCardsProps = {
@@ -10,6 +11,7 @@ type StatsCardsProps = {
 function StatsCards({
     employees
 }: StatsCardsProps) {
+    const { t } = useLanguage();
     const { data: counts, isLoading } = useDepartmentsCount();
 
     const totalEmployees = employees?.length || 0;
@@ -20,7 +22,7 @@ function StatsCards({
             <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-sm text-gray-500">Total Employees</p>
+                        <p className="text-sm text-gray-500">{t.adminEmployeeSearch?.totalEmployees || 'Total Employees'}</p>
                         <p className="text-2xl font-bold text-gray-900">{totalEmployees}</p>
                     </div>
                     <div className="bg-blue-50 text-blue-600 p-3 rounded-xl">
@@ -32,7 +34,7 @@ function StatsCards({
             <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-sm text-gray-500">Departments</p>
+                        <p className="text-sm text-gray-500">{t.adminEmployeeSearch?.departments || 'Departments'}</p>
                         {isLoading ? (
                             <div className="flex items-center gap-2 mt-1">
                                 <Loader2 className="w-4 h-4 text-emerald-600 animate-spin" />
@@ -51,7 +53,7 @@ function StatsCards({
             <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-sm text-gray-500">Active Employees</p>
+                        <p className="text-sm text-gray-500">{t.adminEmployeeSearch?.activeEmployees || 'Active Employees'}</p>
                         <p className="text-2xl font-bold text-indigo-600">{totalActiveEmployees}</p>
                     </div>
                     <div className="bg-indigo-50 text-indigo-600 p-3 rounded-xl">

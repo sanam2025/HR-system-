@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useAuthStore } from "../store/authStore";
 
 const BASE_URL = 'https://masarhr.alwaysdata.net/api/';
 
@@ -14,8 +15,7 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
     (config) =>{
-        const DEV_TOKEN = import.meta.env.VITE_DEV_TOKEN;
-        const token = localStorage.getItem('token') || DEV_TOKEN || '4|adYsZORjUrpDGgjzLvwNXAZRL8M8eEUYk8laLCAX44215aec';
+        const token = useAuthStore.getState().token;
         if(token){
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -37,8 +37,8 @@ apiClient.interceptors.response.use(
 
         if (response){
             if(response.status === 401){
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
+                useAuthStore.getState().logout();
+                console.warn('[API] Unauthorized — token cleared via authStore in client.ts');
             }
         }
 

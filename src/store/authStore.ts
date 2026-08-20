@@ -49,7 +49,12 @@ const useAuthStoreDefault = create<AuthState>()(
       isAuthenticated: () => Boolean(get().token),
       setSession: (token, user) => set({ token, user }),
       setUser: (user) => set({ user }),
-      clearSession: () => set({ token: null, user: null, currentUser: null }),
+      clearSession: () => {
+        localStorage.removeItem('attendanceStatus');
+        localStorage.removeItem('attendanceStatusDate');
+        localStorage.removeItem('isCheckedIn');
+        set({ token: null, user: null, currentUser: null });
+      },
       setHasHydrated: (value) => set({ hasHydrated: value }),
 
       // Legacy interface
@@ -65,7 +70,12 @@ const useAuthStoreDefault = create<AuthState>()(
         };
         set({ currentUser: user, user: authUser });
       },
-      logout: () => set({ token: null, user: null, currentUser: null }),
+      logout: () => {
+        localStorage.removeItem('attendanceStatus');
+        localStorage.removeItem('attendanceStatusDate');
+        localStorage.removeItem('isCheckedIn');
+        set({ token: null, user: null, currentUser: null });
+      },
     }),
     {
       name: "masar-hr.auth",

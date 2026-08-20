@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { DoorOpen, KeyRound, Upload, Camera, User } from "lucide-react";
 import { Badge, LoadingSkeleton, QueryErrorNotice } from "../commend-components";
 import { humanizeStatus } from "../../../../../lib/text";
+import { useLanguage } from "../../../../../i18n/translations/LanguageContext";
 import type {
   Contract,
   CreateProfilePayload,
@@ -84,7 +85,9 @@ export function ProfileHeader({
   isEditing: boolean;
   onPictureChange?: (file: File | null) => void;
   onPictureClick?: () => void;
+  hasProfile?: boolean;
 }) {
+  const { t } = useLanguage();
   return (
     <section className="bg-surface rounded-2xl p-5 sm:p-7 shadow-sm border border-gray-100 border-r-4 border-r-green flex flex-col sm:flex-row items-center gap-5 sm:gap-6 transition-all duration-200 hover:shadow-md animate-scale-in">
       <ProfileAvatar fullName={fullName} pictureUrl={pictureUrl} isEditing={isEditing} onPictureChange={onPictureChange} onPictureClick={onPictureClick} />
@@ -97,7 +100,7 @@ export function ProfileHeader({
           </div>
         ) : (
           <p className="text-xs text-gray-400 mt-1">
-            يرجى تعبئة بيانات الملف الشخصي (Please fill in your profile data).
+            {t.profile?.fillData || "Please fill in your profile data."}
           </p>
         )}
       </div>
@@ -110,7 +113,7 @@ export function ProfileHeader({
             : "bg-green text-white hover:bg-green-dark hover:shadow-md"
         }`}
       >
-        {isEditing ? "إلغاء (Cancel)" : "تعديل الملف (Edit Profile)"}
+        {isEditing ? t.profile?.cancel || "Cancel" : (hasProfile ? (t.profile?.editProfile || "Edit Profile") : (t.profile?.createProfile || "Create Profile"))}
       </button>
     </section>
   );
@@ -126,21 +129,22 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 }
 
 export function PersonalDetailsCard({ profile }: { profile: Profile | undefined | null }) {
+  const { t } = useLanguage();
   return (
     <section className="bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-gray-100 border-t-4 border-t-green h-full flex flex-col transition-all hover:shadow-md">
       <h3 className="text-base font-bold text-dark mb-6 border-b border-gray-50 pb-4 flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        التفاصيل الشخصية (Personal Details)
+        {t.profile?.personalDetails || "Personal Details"}
       </h3>
       {!profile ? (
         <p className="text-sm text-gray-400">
-          No profile on file yet — use "Edit Profile" above to create one.
+          {t.profile?.noProfile || "No profile on file yet — use 'Edit Profile' above to create one."}
         </p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 sm:gap-x-8 gap-y-6 flex-1">
-          <DetailRow label="الجنس (Gender)" value={profile.gender} />
-          <DetailRow label="تاريخ الميلاد (Date of Birth)" value={profile.birth_date} />
-          <DetailRow label="العنوان (Address)" value={profile.address} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 sm:gap-x-8 gap-y-6 flex-1 rtl:text-right ltr:text-left">
+          <DetailRow label={t.profile?.gender || "Gender"} value={profile.gender === "male" ? (t.profile?.male || "Male") : (t.profile?.female || "Female")} />
+          <DetailRow label={t.profile?.dob || "Date of Birth"} value={profile.birth_date} />
+          <DetailRow label={t.profile?.address || "Address"} value={profile.address} />
         </div>
       )}
     </section>
@@ -179,6 +183,7 @@ export function ProfileForm({
   isSubmitting: boolean;
   errorMessage?: string | null;
 }) {
+  const { t } = useLanguage();
   const [gender, setGender] = useState<Gender>(initialValues?.gender ?? "male");
   const [birthDate, setBirthDate] = useState(formatDateForInput(initialValues?.birth_date));
   const [address, setAddress] = useState(initialValues?.address ?? "");
@@ -201,15 +206,15 @@ export function ProfileForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-gray-100 border-t-4 border-t-green transition-all duration-200">
-      <h3 className="text-base font-bold text-dark border-b border-gray-50 pb-4 flex items-center gap-2">
+      <h3 className="text-base font-bold text-dark border-b border-gray-50 pb-4 flex items-center gap-2 rtl:flex-row-reverse ltr:flex-row">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-        تحديث البيانات (Update Profile)
+        {t.profile?.updateProfile || "Update Profile"}
       </h3>
       
       {requirePicture && (
-        <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm font-semibold mb-4 border border-red-100 flex items-center gap-2">
+        <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm font-semibold mb-4 border border-red-100 flex items-center gap-2 rtl:flex-row-reverse ltr:flex-row">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          يرجى رفع صورة شخصية من خلال النقر على مكان الصورة في الأعلى.
+          {t.profile?.requirePic || "Please upload a profile picture by clicking on the avatar space above."}
         </div>
       )}
       
@@ -219,10 +224,10 @@ export function ProfileForm({
         </p>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 rtl:text-right ltr:text-left">
         <div>
           <label htmlFor="profile-gender" className="block text-xs font-semibold text-brown mb-1.5 uppercase tracking-wide">
-            الجنس (Gender)
+            {t.profile?.gender || "Gender"}
           </label>
           <select
             id="profile-gender"
@@ -230,13 +235,13 @@ export function ProfileForm({
             onChange={(e) => setGender(e.target.value as Gender)}
             className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green/20 focus:border-green transition-all"
           >
-            <option value="male">ذكر (Male)</option>
-            <option value="female">أنثى (Female)</option>
+            <option value="male">{t.profile?.male || "Male"}</option>
+            <option value="female">{t.profile?.female || "Female"}</option>
           </select>
         </div>
         <div>
           <label htmlFor="profile-birth-date" className="block text-xs font-semibold text-brown mb-1.5 uppercase tracking-wide">
-            تاريخ الميلاد (Date of Birth)
+            {t.profile?.dob || "Date of Birth"}
           </label>
           <input
             id="profile-birth-date"
@@ -249,7 +254,7 @@ export function ProfileForm({
         </div>
         <div>
           <label htmlFor="profile-address" className="block text-xs font-semibold text-brown mb-1.5 uppercase tracking-wide">
-            العنوان (Address)
+            {t.profile?.address || "Address"}
           </label>
           <input
             id="profile-address"
@@ -268,7 +273,7 @@ export function ProfileForm({
         disabled={isSubmitting || requirePicture}
         className="w-full py-3 bg-green text-white rounded-xl text-sm font-bold shadow-sm hover:bg-green-dark hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
       >
-        {isSubmitting ? "جاري الحفظ..." : "حفظ البيانات (Save Profile)"}
+        {isSubmitting ? t.profile?.saving || "Saving..." : t.profile?.saveProfile || "Save Profile"}
       </button>
     </form>
   );
@@ -291,6 +296,7 @@ export function DocumentsCard({
     missing_documents: string[];
   } | null;
 }) {
+  const { t } = useLanguage();
   const [idCard, setIdCard] = useState<File | null>(null);
   const [photo, setPhoto] = useState<File | null>(null);
   const [bankInfo, setBankInfo] = useState<File | null>(null);
@@ -346,14 +352,14 @@ export function DocumentsCard({
           <div className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-green/20 text-sm bg-surface transition-all">
             <span className="text-dark font-bold truncate flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-green"></span>
-              تم الرفع (Uploaded)
+              {t.profile?.uploaded || "Uploaded"}
             </span>
             <button
               type="button"
               onClick={() => handleViewUploaded(id)}
               className="px-4 py-1.5 bg-green text-white rounded-lg text-xs font-bold hover:bg-green-dark transition-all shadow-sm active:scale-[0.97]"
             >
-              فتح الملف (View)
+              {t.profile?.view || "View"}
             </button>
           </div>
         </div>
@@ -377,12 +383,12 @@ export function DocumentsCard({
             htmlFor={id}
             className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-gray-200 text-sm bg-white cursor-pointer hover:border-gold hover:shadow-sm transition-all"
           >
-            <span className={file ? "text-green font-bold truncate flex items-center gap-2" : "text-gray-400 font-medium truncate"}>
+            <span className={file ? "text-green font-bold truncate flex items-center gap-2 rtl:flex-row-reverse ltr:flex-row" : "text-gray-400 font-medium truncate"}>
               {file && <span className="w-2 h-2 rounded-full bg-green"></span>}
-              {file ? "تم إرفاق وثيقة (Attached)" : placeholder}
+              {file ? t.profile?.attached || "Attached" : placeholder}
             </span>
             <span className="px-3 py-1.5 bg-gold/10 text-gold rounded-lg text-xs font-bold whitespace-nowrap hover:bg-gold/20 transition-colors">
-              تصفح (Browse)
+              {t.profile?.browse || "Browse"}
             </span>
           </label>
         </div>
@@ -393,26 +399,26 @@ export function DocumentsCard({
   const needsUpload = !isUploaded("id_card") || !isUploaded("photo") || !isUploaded("bank_info");
 
   return (
-    <section className="bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-gray-100 border-t-4 border-t-brown transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-      <h3 className="text-base font-bold text-dark mb-6 border-b border-gray-50 pb-4 flex items-center gap-2">
+    <section className="bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-gray-100 border-t-4 border-t-brown transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md rtl:text-right ltr:text-left">
+      <h3 className="text-base font-bold text-dark mb-6 border-b border-gray-50 pb-4 flex items-center gap-2 rtl:flex-row-reverse ltr:flex-row">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brown"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-        الوثائق (Documents)
+        {t.profile?.documents || "Documents"}
       </h3>
       
       {status && status.completed && (
         <div className="mb-6 rounded-2xl border border-green-light bg-surface p-5 text-sm">
-          <p className="font-bold text-green flex items-center gap-2">
+          <p className="font-bold text-green flex items-center gap-2 rtl:flex-row-reverse ltr:flex-row">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            تم رفع وثائق التوظيف (Onboarding documents uploaded)
+            {t.profile?.docsUploaded || "Onboarding documents uploaded"}
           </p>
-          <p className="text-xs text-brown mt-1.5 font-medium">لقد قمت برفع جميع الوثائق المطلوبة.</p>
+          <p className="text-xs text-brown mt-1.5 font-medium">{t.profile?.docsUploadedSub || "You have uploaded all required documents."}</p>
         </div>
       )}
 
       {status && !status.completed && status.missing_documents.length > 0 && (
-        <div className="mb-6 rounded-2xl border-l-4 border-gold bg-gold/5 p-5 text-sm">
-          <p className="font-bold text-dark">وثائق التوظيف مطلوبة (Onboarding documents required)</p>
-          <p className="text-xs text-brown mt-1.5 font-medium">يرجى رفع الوثائق الناقصة أدناه.</p>
+        <div className="mb-6 rounded-2xl border-l-4 border-gold bg-gold/5 p-5 text-sm rtl:border-r-4 rtl:border-l-0">
+          <p className="font-bold text-dark">{t.profile?.docsReq || "Onboarding documents required"}</p>
+          <p className="text-xs text-brown mt-1.5 font-medium">{t.profile?.docsReqSub || "Please upload the missing documents below."}</p>
         </div>
       )}
 
@@ -428,12 +434,12 @@ export function DocumentsCard({
           </p>
         )}
         
-        {needsUpload && <p className="text-xs font-semibold text-brown uppercase tracking-wide">يرجى إرفاق الوثائق التالية:</p>}
+        {needsUpload && <p className="text-xs font-semibold text-brown uppercase tracking-wide">{t.profile?.attachFollowing || "Please attach the following documents:"}</p>}
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {renderDocInput("id_card", "الهوية الشخصية (ID Card)", "image/*,application/pdf", idCard, setIdCard, "اختر ملف (Choose File)")}
-          {renderDocInput("photo", "الصورة الشخصية (Photo)", "image/*", photo, setPhoto, "اختر صورة (Choose Photo)")}
-          {renderDocInput("bank_info", "المعلومات البنكية (Bank Information)", "image/*,application/pdf", bankInfo, setBankInfo, "اختر ملف (Choose File)")}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 rtl:text-right ltr:text-left">
+          {renderDocInput("id_card", t.profile?.idCard || "ID Card", "image/*,application/pdf", idCard, setIdCard, t.profile?.chooseFile || "Choose File")}
+          {renderDocInput("photo", t.profile?.photo || "Photo", "image/*", photo, setPhoto, t.profile?.choosePhoto || "Choose Photo")}
+          {renderDocInput("bank_info", t.profile?.bankInfo || "Bank Information", "image/*,application/pdf", bankInfo, setBankInfo, t.profile?.chooseFile || "Choose File")}
         </div>
 
         {needsUpload && (
@@ -443,7 +449,7 @@ export function DocumentsCard({
             className="w-full flex items-center justify-center gap-2 py-3 bg-green text-white rounded-xl text-sm font-bold shadow-sm hover:bg-green-dark hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-6 active:scale-[0.98]"
           >
             <Upload size={16} />
-            {isUploading ? "جاري الرفع…" : "رفع الوثائق (Upload)"}
+            {isUploading ? t.profile?.uploading || "Uploading..." : t.profile?.uploadDocs || "Upload"}
           </button>
         )}
       </form>

@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, RefreshCw } from 'lucide-react';
 import { useComplaints } from '../../hooks/useComplaints';
 import type { Complaint } from '../../../../../api/service/HrService/Types/ComplaintsService.types';
+import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
 
 export default function Complaints() {
   const navigate = useNavigate();
+  const { t, lang } = useLanguage();
   const { complaints, isLoading, refetch } = useComplaints();
 
   const getStatusBadge = (status: string) => {
@@ -15,25 +17,25 @@ export default function Complaints() {
       resolved: 'bg-green-100 text-green-700',
       rejected: 'bg-red-100 text-red-700',
     };
-    return <span className={`text-xs px-2 py-0.5 rounded-full ${styles[status] || styles.pending}`}>{status}</span>;
+    return <span className={`text-xs px-2 py-0.5 rounded-full ${styles[status] || styles.pending}`}>{t.hrComplaints?.status?.[status as keyof typeof t.hrComplaints.status] || status}</span>;
   };
 
   if (isLoading) {
-    return <div className="p-6 text-center">Loading...</div>;
+    return <div className="p-6 text-center">{t.hrComplaints?.loading || 'Loading...'}</div>;
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900"> Complaints Management</h1>
-          <p className="text-gray-500 text-sm">View and manage all complaints from employees and managers</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t.hrComplaints?.title || 'Complaints Management'}</h1>
+          <p className="text-gray-500 text-sm">{t.hrComplaints?.subtitle || 'View and manage all complaints from employees and managers'}</p>
         </div>
         <button
           onClick={() => refetch()}
           className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
         >
-          <RefreshCw className="w-4 h-4" /> Refresh
+          <RefreshCw className="w-4 h-4" /> {t.hrComplaints?.refresh || 'Refresh'}
         </button>
       </div>
 
@@ -42,13 +44,13 @@ export default function Complaints() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Complainant</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Against</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 uppercase">#</th>
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 uppercase">{t.hrComplaints?.table?.title || 'Title'}</th>
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 uppercase">{t.hrComplaints?.table?.complainant || 'Complainant'}</th>
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 uppercase">{t.hrComplaints?.table?.against || 'Against'}</th>
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 uppercase">{t.hrComplaints?.table?.status || 'Status'}</th>
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 uppercase">{t.hrComplaints?.table?.date || 'Date'}</th>
+                <th className="px-4 py-3 text-end text-xs font-medium text-gray-500 uppercase">{t.hrComplaints?.table?.actions || 'Actions'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -62,7 +64,7 @@ export default function Complaints() {
                   <td className="px-4 py-3 text-sm text-gray-500">
                     {new Date(complaint.created_at).toLocaleDateString()}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-end">
                     {complaint.status === 'pending' && (
                       <button
                         onClick={() => navigate(`/Hr/complaints/${complaint.id}`)}
@@ -78,7 +80,7 @@ export default function Complaints() {
               {complaints.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
-                    No complaints found
+                    {t.hrComplaints?.noComplaints || 'No complaints found'}
                   </td>
                 </tr>
               )}

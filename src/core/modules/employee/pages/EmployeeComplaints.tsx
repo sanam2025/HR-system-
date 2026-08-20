@@ -7,6 +7,7 @@ import { useCreateComplaint, useMyComplaints } from "../../../../api/hooks/useCo
 import { useDepartmentMembers } from "../../../../api/hooks/usePeople";
 import { ApiError } from "../../../../lib/http/ApiError";
 import { humanizeStatus } from "../../../../lib/text";
+import { useLanguage } from "../../../../i18n/translations/LanguageContext";
 import type { Colleague } from "../../../../api/models";
 
 function statusVariant(status?: string): "success" | "warning" | "danger" | "default" {
@@ -18,6 +19,7 @@ function statusVariant(status?: string): "success" | "warning" | "danger" | "def
 }
 
 export default function EmployeeComplaints() {
+  const { t } = useLanguage();
   const myComplaints = useMyComplaints();
   const createComplaint = useCreateComplaint();
   const directory = useDepartmentMembers();
@@ -35,7 +37,7 @@ export default function EmployeeComplaints() {
       { subject_id: subject.id, title, description },
       {
         onSuccess: () => {
-          setSuccessMessage("Complaint submitted successfully. - تم إرسال الشكوى بنجاح.");
+          setSuccessMessage(t.complaints?.success || "Complaint submitted successfully.");
           setSubject(null);
           setTitle("");
           setDescription("");
@@ -47,8 +49,8 @@ export default function EmployeeComplaints() {
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in">
       <div className="min-w-0 mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-dark">Complaints - الشكاوي</h1>
-        <p className="text-sm text-gray-500 mt-1">File a complaint and track the ones you've submitted.</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-dark">{t.complaints?.title || "Complaints"}</h1>
+        <p className="text-sm text-gray-500 mt-1">{t.complaints?.subtitle || "File a complaint and track the ones you've submitted."}</p>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -60,7 +62,7 @@ export default function EmployeeComplaints() {
             <div className="p-2.5 bg-[#4A7C59]/15 rounded-xl text-[#3A6246]">
               <MessageSquareWarning size={24} aria-hidden="true" strokeWidth={2.5} />
             </div>
-            <span>File a Complaint - تقديم شكوى</span>
+            <span>{t.complaints?.fileComplaint || "File a Complaint"}</span>
           </header>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -80,7 +82,7 @@ export default function EmployeeComplaints() {
             <div className="space-y-5">
               <div className="[&_label]:block [&_label]:text-xs [&_label]:font-bold [&_label]:text-gray-700 [&_label]:mb-2 [&_input]:w-full [&_input]:px-5 [&_input]:py-3.5 [&_input]:rounded-2xl [&_input]:border-2 [&_input]:border-gray-300 [&_input]:text-sm [&_input]:font-bold [&_input]:text-gray-900 [&_input]:focus:outline-none [&_input]:focus:ring-4 [&_input]:focus:ring-[#4A7C59]/20 [&_input]:focus:border-[#4A7C59] [&_input]:transition-all [&_input]:bg-gray-50/80 [&_input]:hover:bg-white">
                 <PersonPicker
-                  label="Who is this about? - عمّن هذه الشكوى؟"
+                  label={t.complaints?.who || "Who is this about?"}
                   people={directory.people}
                   isLoading={directory.isLoading}
                   errorMessage={(directory.error as ApiError | null)?.message ?? null}
@@ -91,7 +93,7 @@ export default function EmployeeComplaints() {
 
               <div>
                 <label htmlFor="complaint-title" className="block text-xs font-bold text-gray-700 mb-2">
-                  Title - عنوان الشكوى
+                  {t.complaints?.form?.title || "Title"}
                 </label>
                 <input
                   id="complaint-title"
@@ -99,14 +101,14 @@ export default function EmployeeComplaints() {
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="E.g., Inappropriate behavior..."
+                  placeholder={t.complaints?.form?.titlePlaceholder || "E.g., Inappropriate behavior..."}
                   className="w-full px-5 py-3.5 rounded-2xl border-2 border-gray-300 text-sm font-bold text-gray-900 bg-gray-50/80 hover:bg-white focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#4A7C59]/20 focus:border-[#4A7C59] transition-all"
                 />
               </div>
 
               <div>
                 <label htmlFor="complaint-description" className="block text-xs font-bold text-gray-700 mb-2">
-                  Description - التفاصيل
+                  {t.complaints?.form?.description || "Description"}
                 </label>
                 <textarea
                   id="complaint-description"
@@ -114,7 +116,7 @@ export default function EmployeeComplaints() {
                   rows={4}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Please describe the incident in detail..."
+                  placeholder={t.complaints?.form?.descPlaceholder || "Please describe the incident in detail..."}
                   className="w-full px-5 py-3.5 rounded-2xl border-2 border-gray-300 text-sm font-bold text-gray-900 bg-gray-50/80 hover:bg-white focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#4A7C59]/20 focus:border-[#4A7C59] transition-all resize-none"
                 />
               </div>
@@ -126,7 +128,7 @@ export default function EmployeeComplaints() {
               className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-[#3A6246] text-white rounded-2xl text-base font-bold shadow-lg shadow-[#3A6246]/30 hover:bg-[#2C4A35] hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:transform-none"
             >
               <MessageSquareWarning size={18} />
-              {createComplaint.isPending ? "Submitting... - جاري الإرسال" : "Submit Complaint - إرسال الشكوى"}
+              {createComplaint.isPending ? t.complaints?.form?.submitting || "Submitting..." : t.complaints?.form?.submit || "Submit Complaint"}
             </button>
           </form>
         </article>
@@ -138,7 +140,7 @@ export default function EmployeeComplaints() {
             <div className="p-2.5 bg-gray-200 rounded-xl text-gray-700">
               <List size={24} aria-hidden="true" strokeWidth={2.5} />
             </div>
-            <span>My Complaints - شكاويي</span>
+            <span>{t.complaints?.myComplaints || "My Complaints"}</span>
           </header>
 
           {myComplaints.isLoading ? (
@@ -148,7 +150,7 @@ export default function EmployeeComplaints() {
           ) : !myComplaints.data || myComplaints.data.length === 0 ? (
             <div className="text-center py-10 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300">
                <MessageSquareWarning className="mx-auto text-gray-400 mb-3" size={48} strokeWidth={1.5} />
-               <p className="text-sm font-bold text-gray-500">You haven't filed any complaints yet.<br/>لم تقم بتقديم أي شكوى بعد.</p>
+               <p className="text-sm font-bold text-gray-500">{t.complaints?.emptyState || "You haven't filed any complaints yet."}</p>
             </div>
           ) : (
             <div className="space-y-4">

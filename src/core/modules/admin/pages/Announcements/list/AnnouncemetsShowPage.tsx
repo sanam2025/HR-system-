@@ -2,6 +2,7 @@
 import { Calendar, Clock, Users, User, FileText, X} from 'lucide-react'
 import type { Announcements } from '../../../types/types'
 import { formatDate, formatTime, getPriorityStyles, getStatusStyles, getTargetAudienceLabel } from '../../../util/utils'
+import { useLanguage } from "../../../../../../i18n/translations/LanguageContext";
 
 type AnnouncementsShowProps = {
     isOpen: boolean
@@ -14,7 +15,7 @@ function AnnouncementsShow({
     setIsModalOpen, 
     announcement 
 }: AnnouncementsShowProps) {
-    
+    const { t, lang } = useLanguage();
     if (!isOpen) return null;
 
     return (
@@ -33,7 +34,7 @@ function AnnouncementsShow({
                         </div>
                         <div>
                             <h2 className="text-xl font-bold text-gray-900">{announcement?.title}</h2>
-                            <p className="text-sm text-gray-500">Announcement Details</p>
+                            <p className="text-sm text-gray-500">{t.adminAnnouncements?.view?.details || 'Announcement Details'}</p>
                         </div>
                     </div>
                     <button 
@@ -48,15 +49,15 @@ function AnnouncementsShow({
                     <div className="space-y-6">
                         <div className="flex items-center gap-3 flex-wrap">
                             <span className={`text-sm px-3 py-1.5 rounded-full font-medium border ${getPriorityStyles(announcement?.priority as string)}`}>
-                                Priority: {announcement?.priority.charAt(0).toUpperCase() as string + announcement?.priority.slice(1)}
+                                {t.adminAnnouncements?.form?.priorityLabel || 'Priority'}: {t.adminDashboard?.[announcement?.priority?.toLowerCase() as keyof typeof t.adminDashboard] || announcement?.priority}
                             </span>
                             <span className={`text-sm px-3 py-1.5 rounded-full font-medium border ${getStatusStyles(announcement?.status as string)}`}>
-                                Status: {announcement?.status.charAt(0).toUpperCase() as string + announcement?.status.slice(1)}
+                                {t.adminAnnouncements?.table?.status || 'Status'}: {t.adminAnnouncements?.stats?.[announcement?.status?.toLowerCase() as keyof typeof t.adminAnnouncements.stats] || announcement?.status}
                             </span>
                         </div>
 
                         <div>
-                            <h4 className="text-sm font-medium text-gray-700 mb-2">Content</h4>
+                            <h4 className="text-sm font-medium text-gray-700 mb-2">{t.adminAnnouncements?.form?.contentLabel || 'Content'}</h4>
                             <div className="bg-gradient-to-br from-gray-50 to-blue-50/50 rounded-xl p-4 border border-gray-100">
                                 <p className="text-gray-800 whitespace-pre-wrap">{announcement?.content}</p>
                             </div>
@@ -67,7 +68,7 @@ function AnnouncementsShow({
                                 <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-blue-100">
                                     <Calendar className="w-4 h-4 text-blue-600" />
                                     <div>
-                                        <p className="text-xs text-gray-500">Starts At</p>
+                                        <p className="text-xs text-gray-500">{t.adminAnnouncements?.view?.published || 'Starts At'}</p>
                                         <p className="text-sm font-medium text-gray-900">{formatDate(announcement?.starts_at as Date)}</p>
                                         <p className="text-xs text-blue-600">{formatTime(announcement?.starts_at as Date)}</p>
                                     </div>
@@ -76,7 +77,7 @@ function AnnouncementsShow({
                                 <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-100">
                                     <Clock className="w-4 h-4 text-amber-600" />
                                     <div>
-                                        <p className="text-xs text-gray-500">Expires At</p>
+                                        <p className="text-xs text-gray-500">{t.adminAnnouncements?.form?.expiresAtLabel || 'Expires At'}</p>
                                         <p className="text-sm font-medium text-gray-900">{formatDate(announcement?.expires_at as Date)}</p>
                                         <p className="text-xs text-amber-600">{formatTime(announcement?.expires_at as Date)}</p>
                                     </div>
@@ -87,7 +88,7 @@ function AnnouncementsShow({
                                 <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-100">
                                     <Users className="w-4 h-4 text-purple-600" />
                                     <div>
-                                        <p className="text-xs text-gray-500">Target Audience</p>
+                                        <p className="text-xs text-gray-500">{t.adminAnnouncements?.form?.audienceLabel || 'Target Audience'}</p>
                                         <p className="text-sm font-medium text-gray-900">
                                             {getTargetAudienceLabel(announcement?.target_audience as string)}
                                         </p>
@@ -97,7 +98,7 @@ function AnnouncementsShow({
                                 <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100">
                                     <User className="w-4 h-4 text-green-600" />
                                     <div>
-                                        <p className="text-xs text-gray-500">Author</p>
+                                        <p className="text-xs text-gray-500">{t.adminAnnouncements?.view?.author || 'Author'}</p>
                                         <p className="text-sm font-medium text-gray-900">{announcement?.author.full_name}</p>
                                     </div>
                                 </div>
@@ -106,8 +107,8 @@ function AnnouncementsShow({
 
                         <div className="border-t border-gray-100 pt-4">
                             <div className="flex items-center justify-between text-xs text-gray-400">
-                                <span>Created: {formatDate(announcement?.created_at as Date)} at {formatTime(announcement?.created_at as Date)}</span>
-                                <span>Updated: {formatDate(announcement?.updated_at as Date)} at {formatTime(announcement?.updated_at as Date)}</span>
+                                <span>{t.adminAnnouncements?.view?.created || 'Created'}: {formatDate(announcement?.created_at as Date)} {t.adminAnnouncements?.view?.at || 'at'} {formatTime(announcement?.created_at as Date)}</span>
+                                <span>{t.adminAnnouncements?.view?.updated || 'Updated'}: {formatDate(announcement?.updated_at as Date)} {t.adminAnnouncements?.view?.at || 'at'} {formatTime(announcement?.updated_at as Date)}</span>
                             </div>
                         </div>
                     </div>
@@ -118,7 +119,7 @@ function AnnouncementsShow({
                             onClick={() => setIsModalOpen(false)}
                             className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200"
                         >
-                            Close
+                            {t.adminAnnouncements?.form?.cancel || 'Close'}
                         </button>
                     </div>
                 </div>

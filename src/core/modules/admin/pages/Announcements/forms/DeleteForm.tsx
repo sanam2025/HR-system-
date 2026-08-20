@@ -3,6 +3,7 @@ import Loading from '../../../../../../shared/components/Loading'
 import type { Announcements } from '../../../types/types'
 import toast from 'react-hot-toast';
 import { useDeleteAnnouncement } from '../../../hooks/Announcements/useAnnouncementsMutation'
+import { useLanguage } from "../../../../../../i18n/translations/LanguageContext";
 
 type DeleteFormProps = {
     isOpen: boolean
@@ -15,7 +16,7 @@ function DeleteForm({
     setIsModalOpen, 
     announcement,
 }: DeleteFormProps) {
-
+    const { t } = useLanguage();
     const { mutateAsync: deleteAnnouncement, isPending: isLoading } = useDeleteAnnouncement();
     
     if (!isOpen) return null;
@@ -24,7 +25,7 @@ function DeleteForm({
         try {
             if (announcement && announcement.id) {
                 const response = await deleteAnnouncement(announcement.id);
-                toast.success(response?.data?.message || 'Announcement deleted successfully!');
+                toast.success(response?.data?.message || t.adminAnnouncements?.form?.deleteSuccess || 'Announcement deleted successfully!');
                 setIsModalOpen(false);
             }
         } catch (e: any) {
@@ -35,19 +36,20 @@ function DeleteForm({
                     e.response.data?.message || 
                     e.response.data?.error || 
                     e.response.statusText ||
+                    t.adminAnnouncements?.form?.validationError ||
                     'Something went wrong';
                 
                 if (e.response.data?.errors) {
                     const errors = e.response.data.errors;
                     const errorMessages = Object.values(errors).flat();
-                    toast.error(errorMessages[0] as string || 'Validation error');
+                    toast.error(errorMessages[0] as string || t.adminAnnouncements?.form?.validationError || 'Validation error');
                 } else {
                     toast.error(errorMessage);
                 }
             } else if (e.request) {
-                toast.error('No response from server. Please check your connection.');
+                toast.error(t.adminAnnouncements?.form?.noResponse || 'No response from server. Please check your connection.');
             } else {
-                toast.error(e.message || 'Failed to delete announcement');
+                toast.error(e.message || t.adminAnnouncements?.form?.deleteFail || 'Failed to delete announcement');
             }
         }
     };
@@ -61,10 +63,10 @@ function DeleteForm({
                     </div>
                     <div className='flex-1'>
                         <h3 className='text-lg font-semibold text-gray-900 mb-2'>
-                            Delete Announcement
+                            {t.adminAnnouncements?.form?.deleteTitle || 'Delete Announcement'}
                         </h3>
                         <p className='text-gray-600'>
-                            Are you sure you want to delete "{announcement?.title}"? This action cannot be undone.
+                            {t.adminAnnouncements?.form?.deleteDesc?.replace('{title}', announcement?.title || '') || `Are you sure you want to delete "${announcement?.title}"? This action cannot be undone.`}
                         </p>
                     </div>
                 </div>
@@ -76,7 +78,7 @@ function DeleteForm({
                         disabled={isLoading}
                         className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-all disabled:opacity-50 cursor-pointer"
                     >
-                        Cancel
+                        {t.adminAnnouncements?.form?.cancel || 'Cancel'}
                     </button>
                     <button
                         type="button"
@@ -84,7 +86,7 @@ function DeleteForm({
                         disabled={isLoading}
                         className="px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700 transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                     >
-                        {isLoading ? <Loading size={1.2} borderWidth='2px' color='white'/> : 'Delete'}
+                        {isLoading ? <Loading size={1.2} borderWidth='2px' color='white'/> : (t.adminAnnouncements?.form?.deleteBtn || 'Delete')}
                     </button>
                 </div>
             </div>

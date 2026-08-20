@@ -19,6 +19,7 @@ import { apiClient } from "../../../../api/client";
 import type { PayrollRecord } from "../types/payroll.types";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../../../../store/authStore";
+import { useLanguage } from "../../../../i18n/translations/LanguageContext";
 
 const formatSalary = (amount: number) => {
   return new Intl.NumberFormat("en-US", {
@@ -34,12 +35,15 @@ const CalendarIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const EmptyState = () => (
-  <div className="text-center py-12">
-    <DollarSign className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-    <p className="text-sm text-gray-400">No payroll records found</p>
-  </div>
-);
+const EmptyState = () => {
+  const { t } = useLanguage();
+  return (
+    <div className="text-center py-12">
+      <DollarSign className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+      <p className="text-sm text-gray-400">{t.hrPayroll?.emptyState || 'No payroll records found'}</p>
+    </div>
+  );
+};
 
 export default function Payroll() {
   // ------------------- Hooks -------------------
@@ -48,6 +52,7 @@ export default function Payroll() {
   const createIncentive = useCreateIncentive();
   const createDeduction = useCreateDeduction();
   const { currentUser } = useAuthStore();
+  const { t, lang } = useLanguage();
 
   // ------------------- Local States -------------------
   const [records, setRecords] = useState<PayrollRecord[]>([]);
@@ -113,7 +118,7 @@ export default function Payroll() {
           }
         } catch (error: any) {
           if (error?.response?.status !== 403) {
-            toast.error("Failed to load payroll data");
+            toast.error(t.hrPayroll?.toasts?.loadError || "Failed to load payroll data");
           }
         }
       } catch (error: any) {
@@ -127,7 +132,7 @@ export default function Payroll() {
   // ------------------- Handlers -------------------
   const handleCreateIncentive = () => {
     if (!newIncentive.user_id) {
-      toast.error("Please select an employee");
+      toast.error(t.hrPayroll?.toasts?.selectEmployee || "Please select an employee");
       return;
     }
     createIncentive.mutate(newIncentive, {
@@ -140,7 +145,7 @@ export default function Payroll() {
 
   const handleCreateDeduction = () => {
     if (!newDeduction.user_id) {
-      toast.error("Please select an employee");
+      toast.error(t.hrPayroll?.toasts?.selectEmployee || "Please select an employee");
       return;
     }
     createDeduction.mutate(newDeduction, {
@@ -174,13 +179,13 @@ export default function Payroll() {
   );
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div className="mb-8">
         <div className="flex justify-between items-start flex-wrap gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Payroll Management</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t.hrPayroll?.title || 'Payroll Management'}</h1>
             <p className="text-gray-500 mt-1 text-sm">
-              Manage employee salaries, incentives, and deductions.
+              {t.hrPayroll?.subtitle || 'Manage employee salaries, incentives, and deductions.'}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -188,16 +193,16 @@ export default function Payroll() {
               onClick={() => setShowIncentiveModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium"
             >
-              <Plus className="w-4 h-4" /> Create Incentive
+              <Plus className="w-4 h-4" /> {t.hrPayroll?.createIncentive || 'Create Incentive'}
             </button>
             <button 
               onClick={() => setShowDeductionModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
             >
-              <Plus className="w-4 h-4" /> Create Deduction
+              <Plus className="w-4 h-4" /> {t.hrPayroll?.createDeduction || 'Create Deduction'}
             </button>
             <button onClick={() => setShowHistory(!showHistory)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-              <List className="w-4 h-4" /> History
+              <List className="w-4 h-4" /> {showHistory ? (t.hrPayroll?.hideHistory || 'Hide History') : (t.hrPayroll?.history || 'History')}
             </button>
             <div className="flex items-center gap-2 bg-white rounded-xl shadow-sm border border-gray-100 px-4 py-2">
               <CalendarIcon className="w-4 h-4 text-gray-400" />
@@ -211,7 +216,7 @@ export default function Payroll() {
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-100 text-sm mb-1">Total Salaries Due</p>
+              <p className="text-blue-100 text-sm mb-1">{t.hrPayroll?.totalSalariesDue || 'Total Salaries Due'}</p>
               <p className="text-3xl font-bold">{formatSalary(totalNetSalary)}</p>
               <p className="text-blue-100 text-xs mt-2">{new Date().toLocaleString('default', { month: 'long' })} {new Date().getFullYear()}</p>
             </div>
@@ -229,7 +234,7 @@ export default function Payroll() {
               <Users className="w-4 h-4 text-blue-600" />
             </div>
             <div>
-              <p className="text-xs text-gray-400">Total Employees</p>
+              <p className="text-xs text-gray-400">{t.hrPayroll?.totalEmployees || 'Total Employees'}</p>
               <p className="text-lg font-bold text-gray-800">{records.length}</p>
             </div>
           </div>
@@ -241,7 +246,7 @@ export default function Payroll() {
               <TrendingUp className="w-4 h-4 text-emerald-600" />
             </div>
             <div>
-              <p className="text-xs text-gray-400">Total Incentives</p>
+              <p className="text-xs text-gray-400">{t.hrPayroll?.totalIncentives || 'Total Incentives'}</p>
               <p className="text-lg font-bold text-gray-800">{formatSalary(totalIncentives)}</p>
             </div>
           </div>
@@ -253,7 +258,7 @@ export default function Payroll() {
               <TrendingDown className="w-4 h-4 text-red-600" />
             </div>
             <div>
-              <p className="text-xs text-gray-400">Total Deductions</p>
+              <p className="text-xs text-gray-400">{t.hrPayroll?.totalDeductions || 'Total Deductions'}</p>
               <p className="text-lg font-bold text-gray-800">{formatSalary(totalDeductions)}</p>
             </div>
           </div>
@@ -265,7 +270,7 @@ export default function Payroll() {
               <DollarSign className="w-4 h-4 text-indigo-600" />
             </div>
             <div>
-              <p className="text-xs text-gray-400">Base Salary</p>
+              <p className="text-xs text-gray-400">{t.hrPayroll?.baseSalary || 'Base Salary'}</p>
               <p className="text-lg font-bold text-gray-800">{formatSalary(totalBaseSalary)}</p>
             </div>
           </div>
@@ -277,12 +282,12 @@ export default function Payroll() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/30">
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Employee</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Department</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Base Salary</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Deductions</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Incentives</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Net Salary</th>
+                <th className={`px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.hrPayroll?.table?.employee || 'Employee'}</th>
+                <th className={`px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.hrPayroll?.table?.department || 'Department'}</th>
+                <th className={`px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.hrPayroll?.table?.baseSalary || 'Base Salary'}</th>
+                <th className={`px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.hrPayroll?.table?.deductions || 'Deductions'}</th>
+                <th className={`px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.hrPayroll?.table?.incentives || 'Incentives'}</th>
+                <th className={`px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.hrPayroll?.table?.netSalary || 'Net Salary'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -312,25 +317,25 @@ export default function Payroll() {
       {showHistory && (
         <div className="mt-12 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden p-6">
           <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
-            <h3 className="text-lg font-bold text-gray-800"> Incentives & Deductions History</h3>
+            <h3 className="text-lg font-bold text-gray-800"> {t.hrPayroll?.incentivesDeductionsHistory || 'Incentives & Deductions History'}</h3>
             <button onClick={() => setShowHistory(false)} className="text-sm text-blue-600 hover:text-blue-800 font-medium">
-              Hide History
+              {t.hrPayroll?.hideHistory || 'Hide History'}
             </button>
           </div>
 
           {historyItems.length === 0 ? (
-            <p className="text-gray-400 text-center py-8">No history found</p>
+            <p className="text-gray-400 text-center py-8">{t.hrPayroll?.noHistory || 'No history found'}</p>
           ) : (
             <div className="flex flex-col">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Employee</th>
-                      <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Type</th>
-                      <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Amount</th>
-                      <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Reason</th>
-                      <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Date</th>
+                      <th className={`px-5 py-3 text-xs font-semibold text-gray-400 uppercase ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.hrPayroll?.table?.employee || 'Employee'}</th>
+                      <th className={`px-5 py-3 text-xs font-semibold text-gray-400 uppercase ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.hrPayroll?.table?.type || 'Type'}</th>
+                      <th className={`px-5 py-3 text-xs font-semibold text-gray-400 uppercase ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.hrPayroll?.table?.amount || 'Amount'}</th>
+                      <th className={`px-5 py-3 text-xs font-semibold text-gray-400 uppercase ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.hrPayroll?.table?.reason || 'Reason'}</th>
+                      <th className={`px-5 py-3 text-xs font-semibold text-gray-400 uppercase ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{t.hrPayroll?.table?.date || 'Date'}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -341,7 +346,7 @@ export default function Payroll() {
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                             item.type === 'incentive' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
                           }`}>
-                            {item.type === 'incentive' ? 'Incentive' : 'Deduction'}
+                            {item.type === 'incentive' ? (t.hrPayroll?.table?.incentives || 'Incentive') : (t.hrPayroll?.table?.deductions || 'Deduction')}
                           </span>
                         </td>
                         <td className={`px-5 py-3 text-sm font-semibold ${
@@ -358,7 +363,7 @@ export default function Payroll() {
               </div>
               <div className="flex items-center justify-between border-t border-gray-100 px-5 py-3 mt-4">
                 <span className="text-sm text-gray-500">
-                  Showing {(historyPage - 1) * itemsPerPage + 1} to {Math.min(historyPage * itemsPerPage, historyItems.length)} of {historyItems.length} entries
+                  {t.hrPayroll?.showing || 'Showing'} {(historyPage - 1) * itemsPerPage + 1} {t.hrPayroll?.to || 'to'} {Math.min(historyPage * itemsPerPage, historyItems.length)} {t.hrPayroll?.of || 'of'} {historyItems.length} {t.hrPayroll?.entries || 'entries'}
                 </span>
                 <div className="flex items-center gap-2">
                   <button
@@ -369,7 +374,7 @@ export default function Payroll() {
                     <ChevronLeft className="w-5 h-5" />
                   </button>
                   <span className="text-sm font-medium text-gray-700">
-                    Page {historyPage} of {totalHistoryPages}
+                    {t.hrPayroll?.page || 'Page'} {historyPage} {t.hrPayroll?.of || 'of'} {totalHistoryPages}
                   </span>
                   <button
                     onClick={() => setHistoryPage(p => Math.min(totalHistoryPages, p + 1))}
@@ -390,14 +395,14 @@ export default function Payroll() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-gray-900">Create Incentive</h3>
+              <h3 className="text-xl font-bold text-gray-900">{t.hrPayroll?.modal?.createIncentiveTitle || 'Create Incentive'}</h3>
               <button onClick={() => setShowIncentiveModal(false)} className="p-1 hover:bg-gray-100 rounded">
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Employee *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t.hrPayroll?.modal?.employee || 'Employee *'}</label>
                 <select
                   value={newIncentive.user_id}
                   onChange={(e) =>
@@ -408,7 +413,7 @@ export default function Payroll() {
                   }
                   className="w-full border rounded-lg px-3 py-2 bg-white"
                 >
-                  <option value={0}>Select Employee</option>
+                  <option value={0}>{t.hrPayroll?.modal?.selectEmployee || 'Select Employee'}</option>
                   {/*  تصحيح: employees معرفة الآن، وتم إزالة any بوضع النوع مباشرة */}
                   {employees.map((emp: { id: number; full_name?: string; name?: string }) => (
                     <option key={emp.id} value={emp.id}>
@@ -419,7 +424,7 @@ export default function Payroll() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Amount (SYP)
+                  {t.hrPayroll?.modal?.amount || 'Amount (SYP)'}
                 </label>
                 <input
                   type="number"
@@ -435,7 +440,7 @@ export default function Payroll() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Reason
+                  {t.hrPayroll?.modal?.reason || 'Reason'}
                 </label>
                 <input
                   type="text"
@@ -448,7 +453,7 @@ export default function Payroll() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Date
+                  {t.hrPayroll?.modal?.date || 'Date'}
                 </label>
                 <input
                   type="date"
@@ -464,13 +469,13 @@ export default function Payroll() {
                   onClick={() => setShowIncentiveModal(false)}
                   className="px-4 py-2 border rounded-lg hover:bg-gray-50"
                 >
-                  Cancel
+                  {t.hrPayroll?.modal?.cancel || 'Cancel'}
                 </button>
                 <button
                   onClick={handleCreateIncentive}
                   className="px-5 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
                 >
-                  Create
+                  {t.hrPayroll?.modal?.create || 'Create'}
                 </button>
               </div>
             </div>
@@ -483,14 +488,14 @@ export default function Payroll() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-gray-900">Create Deduction</h3>
+              <h3 className="text-xl font-bold text-gray-900">{t.hrPayroll?.modal?.createDeductionTitle || 'Create Deduction'}</h3>
               <button onClick={() => setShowDeductionModal(false)} className="p-1 hover:bg-gray-100 rounded">
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Employee *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t.hrPayroll?.modal?.employee || 'Employee *'}</label>
                 <select
                   value={newDeduction.user_id}
                   onChange={(e) =>
@@ -501,7 +506,7 @@ export default function Payroll() {
                   }
                   className="w-full border rounded-lg px-3 py-2 bg-white"
                 >
-                  <option value={0}>Select Employee</option>
+                  <option value={0}>{t.hrPayroll?.modal?.selectEmployee || 'Select Employee'}</option>
                   {/*  تصحيح: employees معرفة الآن، وتم إزالة any بوضع النوع مباشرة */}
                   {employees.map((emp: { id: number; full_name?: string; name?: string }) => (
                     <option key={emp.id} value={emp.id}>
@@ -512,7 +517,7 @@ export default function Payroll() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Amount (SYP)
+                  {t.hrPayroll?.modal?.amount || 'Amount (SYP)'}
                 </label>
                 <input
                   type="number"
@@ -528,7 +533,7 @@ export default function Payroll() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Reason
+                  {t.hrPayroll?.modal?.reason || 'Reason'}
                 </label>
                 <input
                   type="text"
@@ -541,7 +546,7 @@ export default function Payroll() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Date
+                  {t.hrPayroll?.modal?.date || 'Date'}
                 </label>
                 <input
                   type="date"
@@ -557,13 +562,13 @@ export default function Payroll() {
                   onClick={() => setShowDeductionModal(false)}
                   className="px-4 py-2 border rounded-lg hover:bg-gray-50"
                 >
-                  Cancel
+                  {t.hrPayroll?.modal?.cancel || 'Cancel'}
                 </button>
                 <button
                   onClick={handleCreateDeduction}
                   className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                 >
-                  Create
+                  {t.hrPayroll?.modal?.create || 'Create'}
                 </button>
               </div>
             </div>

@@ -2,6 +2,7 @@
 import type { Announcements } from '../../../types/types';
 import AnnouncementsCards from './AnnouncementsCards';
 import { AnnouncementsSkeleton } from './AnnouncementsSkeleton';
+import { useLanguage } from "../../../../../../i18n/translations/LanguageContext";
 
 type AnnouncementProps = {
     announcements: Announcements[] | undefined;
@@ -16,6 +17,7 @@ function AnnouncementsList({
     error,
     refetch
 }:AnnouncementProps) {
+  const { t } = useLanguage();
 
   if(isLoading){
     return <AnnouncementsSkeleton/>
@@ -38,7 +40,7 @@ function AnnouncementsList({
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800">All Announcements</h3>
+          <h3 className="text-lg font-semibold text-gray-800">{t.adminAnnouncements?.title || 'All Announcements'}</h3>
         </div>
         <div className="divide-y divide-gray-50">
           {announcements?.map((announcement) => (

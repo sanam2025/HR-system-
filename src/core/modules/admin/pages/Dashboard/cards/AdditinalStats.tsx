@@ -7,27 +7,31 @@ type AdditionalStatsProps = {
   inactiveEmployees: number;
 };
 
+import { useLanguage } from "../../../../../../i18n/translations/LanguageContext";
+
 export const AdditionalStats = ({ 
   completedPayrolls, 
   attendanceRate, 
   inactiveEmployees 
 }: AdditionalStatsProps) => {
+  const { t } = useLanguage();
+
   const stats = [
     {
       icon: Clock,
-      label: 'Completed Payrolls',
+      label: t.adminDashboard?.completedPayrolls || 'Completed Payrolls',
       value: completedPayrolls,
       color: 'orange',
     },
     {
       icon: TrendingUp,
-      label: 'Attendance Rate',
+      label: t.adminDashboard?.attendanceRate || 'Attendance Rate',
       value: `${attendanceRate}%`,
       color: 'teal',
     },
     {
       icon: UserX,
-      label: 'Inactive Employees',
+      label: t.adminDashboard?.inactiveEmployees || 'Inactive Employees',
       value: inactiveEmployees,
       color: 'red',
     },

@@ -2,10 +2,10 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import * as api from "../payroll";
 import { queryKeys } from "../queryKeys";
 
-export function useMyPayslips() {
+export function useMyPayslips(page: number = 1) {
   return useQuery({
-    queryKey: queryKeys.payroll.myPayslips(),
-    queryFn: () => api.listMyPayslips(),
+    queryKey: queryKeys.payroll.myPayslips(page),
+    queryFn: () => api.listMyPayslips({ params: { page } }),
   });
 }
 
@@ -30,10 +30,10 @@ export function useMyBaseSalaries() {
   });
 }
 
-export function useMyDeductions() {
+export function useMyDeductions(page: number = 1) {
   return useQuery({
-    queryKey: queryKeys.payroll.myDeductions(),
-    queryFn: () => api.listMyDeductions(),
+    queryKey: queryKeys.payroll.myDeductions(page),
+    queryFn: () => api.listMyDeductions({ params: { page } }),
   });
 }
 

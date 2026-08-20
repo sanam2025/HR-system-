@@ -17,6 +17,7 @@ import { useUpdateSettings } from "../../hooks/Settings/useSettingsMutation";
 import { formatTimeSettings, formatWeekendDays } from "../../util/utils";
 import { SettingsSkeleton } from "./Skeleton";
 import toast from "react-hot-toast";
+import { useLanguage } from "../../../../../i18n/translations/LanguageContext";
 
 type EditingState = {
   workingHours: boolean;
@@ -28,6 +29,8 @@ type EditingState = {
 };
 
 export default function Settings() {
+  const { lang, t } = useLanguage();
+  const settingsLang = t.adminSettings;
   const { data: settingsData, isLoading, refetch } = useSettings();
   const { mutateAsync: updateSettings, isPending } = useUpdateSettings();
   const settings = settingsData?.data;
@@ -86,11 +89,11 @@ export default function Settings() {
         };
         
         await updateSettings(formattedData);
-        toast.success('Settings updated successfully');
+        toast.success(settingsLang.updateSuccess);
         setEditing({ ...editing, [section]: false });
         refetch();
     } catch (error) {
-        toast.error("Failed to update settings");
+        toast.error(settingsLang.updateFail);
     }
 };
 
@@ -109,7 +112,7 @@ export default function Settings() {
 
   if (isLoading) {
     return (
-      <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+      <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
             <div className="h-8 bg-gray-200 rounded w-48 animate-pulse"></div>
@@ -124,12 +127,12 @@ export default function Settings() {
 
   if (!settings) {
     return (
-      <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+      <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">System Settings</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{settingsLang.title}</h1>
             <p className="text-gray-500 mt-0.5 text-sm">
-              Configure your system preferences and general settings
+              {settingsLang.subtitle}
             </p>
           </div>
         </div>
@@ -137,9 +140,9 @@ export default function Settings() {
           <div className="bg-gray-50 rounded-full p-4 mb-4">
             <Database className="w-12 h-12 text-gray-400" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">No Settings Found</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">{settingsLang.noSettings}</h2>
           <p className="text-gray-500 text-sm text-center max-w-md">
-            No settings have been configured yet.
+            {settingsLang.noSettingsDesc}
           </p>
         </div>
       </div>
@@ -147,16 +150,16 @@ export default function Settings() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir="ltr">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">System Settings</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{settingsLang.title}</h1>
           <p className="text-gray-500 mt-0.5 text-sm">
-            Configure your system preferences and general settings
+            {settingsLang.subtitle}
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs text-gray-400">
-          <span>Last updated:</span>
+          <span>{settingsLang.lastUpdated}</span>
           <span className="font-medium text-gray-600">
             {settings.updated_at ? new Date(settings.updated_at).toLocaleString() : "N/A"}
           </span>
@@ -194,12 +197,12 @@ export default function Settings() {
               </div>
             )}
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">Working Hours</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{settingsLang.workingHours.title}</h3>
           <div className="space-y-1.5">
             {editing.workingHours ? (
               <>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Check-in:</span>
+                  <span className="text-sm text-gray-500">{settingsLang.workingHours.checkIn}</span>
                   <input
                     type="time"
                     value={formData.expected_check_in?.slice(0, 5) || ""}
@@ -208,7 +211,7 @@ export default function Settings() {
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Check-out:</span>
+                  <span className="text-sm text-gray-500">{settingsLang.workingHours.checkOut}</span>
                   <input
                     type="time"
                     value={formData.expected_check_out?.slice(0, 5) || ""}
@@ -217,7 +220,7 @@ export default function Settings() {
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Grace Period:</span>
+                  <span className="text-sm text-gray-500">{settingsLang.workingHours.gracePeriod}</span>
                   <input
                     type="number"
                     value={formData.grace_period}
@@ -229,23 +232,23 @@ export default function Settings() {
             ) : (
               <>
                 <p className="text-sm text-gray-500 flex items-center justify-between">
-                  <span>Check-in:</span>
+                  <span>{settingsLang.workingHours.checkIn}</span>
                   <span className="font-medium text-gray-700">{formatTimeSettings(settings.expected_check_in)}</span>
                 </p>
                 <p className="text-sm text-gray-500 flex items-center justify-between">
-                  <span>Check-out:</span>
+                  <span>{settingsLang.workingHours.checkOut}</span>
                   <span className="font-medium text-gray-700">{formatTimeSettings(settings.expected_check_out)}</span>
                 </p>
                 <p className="text-sm text-gray-500 flex items-center justify-between">
-                  <span>Grace Period:</span>
-                  <span className="font-medium text-gray-700">{settings.grace_period} minutes</span>
+                  <span>{settingsLang.workingHours.gracePeriod}</span>
+                  <span className="font-medium text-gray-700">{settings.grace_period} {settingsLang.workingHours.minutes}</span>
                 </p>
               </>
             )}
           </div>
           {!editing.workingHours && (
             <p className="text-xs text-blue-600 mt-3 flex items-center gap-1">
-              <Edit className="w-3 h-3" /> Click to edit
+              <Edit className="w-3 h-3" /> {settingsLang.clickToEdit}
             </p>
           )}
         </div>
@@ -280,12 +283,12 @@ export default function Settings() {
               </div>
             )}
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">Leave Settings</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{settingsLang.leaveSettings.title}</h3>
           <div className="space-y-1.5">
             {editing.leaveSettings ? (
               <>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Annual Leave:</span>
+                  <span className="text-sm text-gray-500">{settingsLang.leaveSettings.annualLeave}</span>
                   <input
                     type="number"
                     value={formData.annual_leave_days}
@@ -294,7 +297,7 @@ export default function Settings() {
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Sick Leave:</span>
+                  <span className="text-sm text-gray-500">{settingsLang.leaveSettings.sickLeave}</span>
                   <input
                     type="number"
                     value={formData.sick_leave_days}
@@ -303,7 +306,7 @@ export default function Settings() {
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Probation Period:</span>
+                  <span className="text-sm text-gray-500">{settingsLang.leaveSettings.probationPeriod}</span>
                   <input
                     type="number"
                     value={formData.probation_period_days}
@@ -315,23 +318,23 @@ export default function Settings() {
             ) : (
               <>
                 <p className="text-sm text-gray-500 flex items-center justify-between">
-                  <span>Annual Leave:</span>
-                  <span className="font-medium text-gray-700">{settings.annual_leave_days} days</span>
+                  <span>{settingsLang.leaveSettings.annualLeave}</span>
+                  <span className="font-medium text-gray-700">{settings.annual_leave_days} {settingsLang.leaveSettings.days}</span>
                 </p>
                 <p className="text-sm text-gray-500 flex items-center justify-between">
-                  <span>Sick Leave:</span>
-                  <span className="font-medium text-gray-700">{settings.sick_leave_days} days</span>
+                  <span>{settingsLang.leaveSettings.sickLeave}</span>
+                  <span className="font-medium text-gray-700">{settings.sick_leave_days} {settingsLang.leaveSettings.days}</span>
                 </p>
                 <p className="text-sm text-gray-500 flex items-center justify-between">
-                  <span>Probation Period:</span>
-                  <span className="font-medium text-gray-700">{settings.probation_period_days} days</span>
+                  <span>{settingsLang.leaveSettings.probationPeriod}</span>
+                  <span className="font-medium text-gray-700">{settings.probation_period_days} {settingsLang.leaveSettings.days}</span>
                 </p>
               </>
             )}
           </div>
           {!editing.leaveSettings && (
             <p className="text-xs text-emerald-600 mt-3 flex items-center gap-1">
-              <Edit className="w-3 h-3" /> Click to edit
+              <Edit className="w-3 h-3" /> {settingsLang.clickToEdit}
             </p>
           )}
         </div>
@@ -366,11 +369,11 @@ export default function Settings() {
               </div>
             )}
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">Termination Settings</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{settingsLang.terminationSettings.title}</h3>
           <div className="space-y-1.5">
             {editing.termination ? (
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Notice Period:</span>
+                <span className="text-sm text-gray-500">{settingsLang.terminationSettings.noticePeriod}</span>
                 <input
                   type="number"
                   value={formData.termination_notice_days}
@@ -380,14 +383,14 @@ export default function Settings() {
               </div>
             ) : (
               <p className="text-sm text-gray-500 flex items-center justify-between">
-                <span>Notice Period:</span>
-                <span className="font-medium text-gray-700">{settings.termination_notice_days} days</span>
+                <span>{settingsLang.terminationSettings.noticePeriod}</span>
+                <span className="font-medium text-gray-700">{settings.termination_notice_days} {settingsLang.leaveSettings.days}</span>
               </p>
             )}
           </div>
           {!editing.termination && (
             <p className="text-xs text-rose-600 mt-3 flex items-center gap-1">
-              <Edit className="w-3 h-3" /> Click to edit
+              <Edit className="w-3 h-3" /> {settingsLang.clickToEdit}
             </p>
           )}
         </div>
@@ -422,7 +425,7 @@ export default function Settings() {
               </div>
             )}
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">Weekend Settings</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{settingsLang.weekendSettings.title}</h3>
           <div className="space-y-1.5">
             {editing.weekend ? (
               <div className="flex flex-wrap gap-2">
@@ -442,14 +445,14 @@ export default function Settings() {
               </div>
             ) : (
               <p className="text-sm text-gray-500 flex items-center justify-between">
-                <span>Weekend Days:</span>
+                <span>{settingsLang.weekendSettings.weekendDays}</span>
                 <span className="font-medium text-gray-700">{formatWeekendDays(settings.weekend_days)}</span>
               </p>
             )}
           </div>
           {!editing.weekend && (
             <p className="text-xs text-purple-600 mt-3 flex items-center gap-1">
-              <Edit className="w-3 h-3" /> Click to edit
+              <Edit className="w-3 h-3" /> {settingsLang.clickToEdit}
             </p>
           )}
         </div>
@@ -484,11 +487,11 @@ export default function Settings() {
               </div>
             )}
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">Legal Settings</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{settingsLang.legalSettings.title}</h3>
           <div className="space-y-1.5">
             {editing.legal ? (
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Jurisdiction:</span>
+                <span className="text-sm text-gray-500">{settingsLang.legalSettings.jurisdiction}</span>
                 <input
                   type="text"
                   value={formData.jurisdiction}
@@ -498,14 +501,14 @@ export default function Settings() {
               </div>
             ) : (
               <p className="text-sm text-gray-500 flex items-center justify-between">
-                <span>Jurisdiction:</span>
+                <span>{settingsLang.legalSettings.jurisdiction}</span>
                 <span className="font-medium text-gray-700">{settings.jurisdiction}</span>
               </p>
             )}
           </div>
           {!editing.legal && (
             <p className="text-xs text-amber-600 mt-3 flex items-center gap-1">
-              <Edit className="w-3 h-3" /> Click to edit
+              <Edit className="w-3 h-3" /> {settingsLang.clickToEdit}
             </p>
           )}
         </div>
@@ -540,11 +543,11 @@ export default function Settings() {
               </div>
             )}
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">Currency Settings</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{settingsLang.currencySettings.title}</h3>
           <div className="space-y-1.5">
             {editing.currency ? (
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Base Currency:</span>
+                <span className="text-sm text-gray-500">{settingsLang.currencySettings.baseCurrency}</span>
                 <input
                   type="text"
                   value={formData.currency}
@@ -554,14 +557,14 @@ export default function Settings() {
               </div>
             ) : (
               <p className="text-sm text-gray-500 flex items-center justify-between">
-                <span>Base Currency:</span>
+                <span>{settingsLang.currencySettings.baseCurrency}</span>
                 <span className="font-medium text-gray-700">{settings.currency}</span>
               </p>
             )}
           </div>
           {!editing.currency && (
             <p className="text-xs text-cyan-600 mt-3 flex items-center gap-1">
-              <Edit className="w-3 h-3" /> Click to edit
+              <Edit className="w-3 h-3" /> {settingsLang.clickToEdit}
             </p>
           )}
         </div>
@@ -572,17 +575,17 @@ export default function Settings() {
               <Database className="w-6 h-6" />
             </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">System Info</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{settingsLang.systemInfo.title}</h3>
           <div className="space-y-1.5">
             <p className="text-sm text-gray-500 flex items-center justify-between">
-              <span>Last Updated:</span>
+              <span>{settingsLang.systemInfo.lastUpdatedLabel}</span>
               <span className="font-medium text-gray-700">
                 {settings.updated_at ? new Date(settings.updated_at).toLocaleString() : "N/A"}
               </span>
             </p>
           </div>
           <p className="text-xs text-gray-400 mt-3 flex items-center gap-1">
-            <AlertCircle className="w-3 h-3" /> System information
+            <AlertCircle className="w-3 h-3" /> {settingsLang.systemInfo.infoDesc}
           </p>
         </div>
       </div>

@@ -1,7 +1,7 @@
 // core/modules/Admin/pages/Organization.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useLanguage } from "../../../../i18n/translations/LanguageContext";
 import { 
   FolderTree, 
   Users, 
@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 export default function Organization() {
-  const { t, i18n } = useTranslation();
+  const { t, lang } = useLanguage();
   const navigate = useNavigate();
 
   const departments = [
@@ -50,18 +50,18 @@ export default function Organization() {
   ];
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('organizationStructure')}</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t.adminOrganization?.title || 'Organization Structure'}</h1>
           <p className="text-gray-500 mt-1 text-sm">
-            {t('manageHierarchy')}
+            {t.adminOrganization?.subtitle || 'Manage company hierarchy and departments'}
           </p>
         </div>
         <button className="bg-green text-white px-4 py-2 rounded-xl hover:bg-green-dark transition-all flex items-center gap-2">
           <Plus className="w-4 h-4" />
-          {t('addDepartment')}
+          {t.adminOrganization?.addDepartment || 'Add Department'}
         </button>
       </div>
 
@@ -70,7 +70,7 @@ export default function Organization() {
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">{t('totalDepartments')}</p>
+              <p className="text-sm text-gray-500">{t.adminOrganization?.totalDepartments || 'Total Departments'}</p>
               <p className="text-2xl font-bold text-gray-900">8</p>
             </div>
             <div className="bg-indigo-50 text-indigo-600 p-3 rounded-xl">
@@ -82,7 +82,7 @@ export default function Organization() {
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">{t('totalEmployees')}</p>
+              <p className="text-sm text-gray-500">{t.adminOrganization?.totalEmployees || 'Total Employees'}</p>
               <p className="text-2xl font-bold text-emerald-600">248</p>
             </div>
             <div className="bg-emerald-50 text-emerald-600 p-3 rounded-xl">
@@ -94,7 +94,7 @@ export default function Organization() {
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">{t('departmentManagers')}</p>
+              <p className="text-sm text-gray-500">{t.adminOrganization?.departmentManagers || 'Department Managers'}</p>
               <p className="text-2xl font-bold text-orange-600">8</p>
             </div>
             <div className="bg-orange-50 text-orange-600 p-3 rounded-xl">
@@ -130,15 +130,15 @@ export default function Organization() {
               <div className="flex items-center gap-4 mb-3">
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-gray-600">{t('managerLabel')} {dept.manager}</span>
+                  <span className="text-sm text-gray-600">{t.adminOrganization?.manager || 'Manager:'} {dept.manager}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-gray-600">{dept.employees} {t('employees')}</span>
+                  <span className="text-sm text-gray-600">{dept.employees} {t.adminOrganization?.employees || 'employees'}</span>
                 </div>
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-2">{t('subDepartmentsLabel')}</p>
+                <p className="text-xs text-gray-500 mb-2">{t.adminOrganization?.subDepartments || 'Sub-departments:'}</p>
                 <div className="flex flex-wrap gap-2">
                   {dept.subDepartments.map((sub, idx) => (
                     <span key={idx} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">

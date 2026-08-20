@@ -5,11 +5,13 @@ import Loading from '../../../../shared/components/Loading';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
 import { useProfile } from '../hooks/useProfile';
+import { useLanguage } from '../../../../i18n/translations/LanguageContext';
 
 export default function EmployeeProfile() {
   const navigate = useNavigate();
   useParams<{ id: string; }>();
   const [editMode, setEditMode] = useState(false);
+  const { t, lang } = useLanguage();
 
   //  استخدام هوك الـ Profile (سيجلب بيانات الموظف حسب الـ ID أو الحالي)
   const { profile, isLoading, error, refetch } = useProfile();
@@ -29,12 +31,12 @@ export default function EmployeeProfile() {
     try {
       // هنا يمكنك إضافة طلب تحديث الملف الشخصي
       // await apiClient.put(`/profiles/${id}`, formData);
-      toast.success('Profile updated successfully!');
+      toast.success(t.hrEmployeeProfile?.updateSuccess || 'Profile updated successfully!');
       setEditMode(false);
       refetch();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      toast.error('Failed to update profile');
+      toast.error(t.hrEmployeeProfile?.updateFailed || 'Failed to update profile');
     }
   };
 
@@ -53,12 +55,12 @@ export default function EmployeeProfile() {
           onClick={() => navigate('/Hr')}
           className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft className={`w-4 h-4 ${lang === 'ar' ? 'rotate-180' : ''}`} /> {t.hrEmployeeProfile?.backToDashboard || 'Back to Dashboard'}
         </button>
         <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-          <p className="text-red-500">Error loading profile: {error}</p>
+          <p className="text-red-500">{t.hrEmployeeProfile?.errorLoading || 'Error loading profile:'} {error}</p>
           <button onClick={() => refetch()} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg">
-            Retry
+            {t.hrEmployeeProfile?.retry || 'Retry'}
           </button>
         </div>
       </div>
@@ -66,25 +68,25 @@ export default function EmployeeProfile() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       {/* Back Button */}
       <button
         onClick={() => navigate('/Hr')}
         className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3"
       >
-        <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+        <ArrowLeft className={`w-4 h-4 ${lang === 'ar' ? 'rotate-180' : ''}`} /> {t.hrEmployeeProfile?.backToDashboard || 'Back to Dashboard'}
       </button>
 
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Employee Profile</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t.hrEmployeeProfile?.title || 'Employee Profile'}</h1>
         {!editMode && (
           <button
             onClick={() => setEditMode(true)}
             className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
           >
             <Pencil className="w-4 h-4" />
-            Edit Profile
+            {t.hrEmployeeProfile?.editProfile || 'Edit Profile'}
           </button>
         )}
       </div>
@@ -106,7 +108,7 @@ export default function EmployeeProfile() {
                   className="border rounded px-2 py-1 w-full"
                 />
               ) : (
-                profile?.full_name || 'Unknown'
+                profile?.full_name || (t.hrEmployeeProfile?.unknown || 'Unknown')
               )}
             </h2>
             <p className="text-gray-500">{profile?.email || ''}</p>
@@ -117,7 +119,7 @@ export default function EmployeeProfile() {
         <div className="space-y-4 border-t pt-4">
           <div className="flex items-center gap-3 text-gray-600">
             <Mail className="w-4 h-4" />
-            <span className="text-sm">Email: </span>
+            <span className="text-sm">{t.hrEmployeeProfile?.email || 'Email:'} </span>
             {editMode ? (
               <input
                 type="email"
@@ -132,7 +134,7 @@ export default function EmployeeProfile() {
 
           <div className="flex items-center gap-3 text-gray-600">
             <Phone className="w-4 h-4" />
-            <span className="text-sm">Phone: </span>
+            <span className="text-sm">{t.hrEmployeeProfile?.phone || 'Phone:'} </span>
             {editMode ? (
               <input
                 type="text"
@@ -147,7 +149,7 @@ export default function EmployeeProfile() {
 
           <div className="flex items-center gap-3 text-gray-600">
             <MapPin className="w-4 h-4" />
-            <span className="text-sm">Address: </span>
+            <span className="text-sm">{t.hrEmployeeProfile?.address || 'Address:'} </span>
             {editMode ? (
               <input
                 type="text"
@@ -162,13 +164,13 @@ export default function EmployeeProfile() {
 
           <div className="flex items-center gap-3 text-gray-600">
             <Calendar className="w-4 h-4" />
-            <span className="text-sm">Birth Date: </span>
+            <span className="text-sm">{t.hrEmployeeProfile?.birthDate || 'Birth Date:'} </span>
             <span className="text-sm">{profile?.birth_date ? new Date(profile.birth_date).toLocaleDateString() : '-'}</span>
           </div>
 
           <div className="flex items-center gap-3 text-gray-600">
             <Briefcase className="w-4 h-4" />
-            <span className="text-sm">Gender: </span>
+            <span className="text-sm">{t.hrEmployeeProfile?.gender || 'Gender:'} </span>
             <span className="text-sm">{profile?.gender || '-'}</span>
           </div>
         </div>
@@ -180,13 +182,13 @@ export default function EmployeeProfile() {
               onClick={handleSave}
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
             >
-              Save Changes
+              {t.hrEmployeeProfile?.saveChanges || 'Save Changes'}
             </button>
             <button
               onClick={() => setEditMode(false)}
               className="px-4 py-2 border rounded-lg hover:bg-gray-50"
             >
-              Cancel
+              {t.hrEmployeeProfile?.cancel || 'Cancel'}
             </button>
           </div>
         )}

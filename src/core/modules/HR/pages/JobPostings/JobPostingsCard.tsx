@@ -2,6 +2,7 @@
 import { Eye, Edit, XCircle, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { JobPosting } from "../../../../../api/service/HrService/Types/JobPostingsService.types";
+import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
 
 interface JobPostingsCardProps {
   posting: JobPosting;
@@ -19,6 +20,7 @@ export default function JobPostingsCard({
   isDeleting,
 }: JobPostingsCardProps) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <tr className="hover:bg-gray-50 transition-colors">
@@ -41,7 +43,7 @@ export default function JobPostingsCard({
               : "bg-gray-100 text-gray-700"
           }`}
         >
-          {posting.status}
+          {t.hrJobPostings?.stats?.[posting.status as keyof typeof t.hrJobPostings.stats] || posting.status}
         </span>
       </td>
       <td className="px-4 py-3">
@@ -51,14 +53,14 @@ export default function JobPostingsCard({
             className="p-1.5 text-blue-500 hover:bg-blue-50 rounded"
             title="View"
           >
-            <Eye className="w-3.5 h-3.5" />
+            <Eye className="w-3.5 h-3.5 rtl:-scale-x-100" />
           </button>
           <button
             onClick={() => navigate(`/Hr/job-postings/edit/${posting.id}`)}
             className="p-1.5 text-amber-500 hover:bg-amber-50 rounded"
             title="Edit"
           >
-            <Edit className="w-3.5 h-3.5" />
+            <Edit className="w-3.5 h-3.5 rtl:-scale-x-100" />
           </button>
           {posting.status === "open" && (
             <button
