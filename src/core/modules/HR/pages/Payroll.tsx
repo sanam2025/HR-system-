@@ -56,11 +56,12 @@ export default function Payroll() {
   // ------------------- Local States -------------------
   const [records, setRecords] = useState<PayrollRecord[]>([]);
   const [employees, setEmployees] = useState<{ id: number; full_name?: string; name?: string }[]>([]);
-  
+
   const [showIncentiveModal, setShowIncentiveModal] = useState(false);
   const [showDeductionModal, setShowDeductionModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [historyPage, setHistoryPage] = useState(1);
+  const [serverSummary, setServerSummary] = useState<any>(null);
 
   const [newIncentive, setNewIncentive] = useState({
     user_id: 0,
@@ -89,27 +90,61 @@ export default function Payroll() {
 
           let payslips: any[] = [];
           if (isHr) {
-            const payslipsRes = await PayrollsService.getCurrentMonthPayslips();
-            payslips = payslipsRes.data?.data || payslipsRes.data || [];
+            try {
+              const [payslipsRes, summaryRes] = await Promise.all([
+                PayrollsService.getCurrentMonthPayslips(),
+                PayrollsService.getPayslipsSummary().catch(() => null)
+              ]);
+              const pData = payslipsRes.data?.data || payslipsRes.data;
+              payslips = Array.isArray(pData) ? pData : Array.isArray(pData?.payslips) ? pData.payslips : [];
+
+              if (summaryRes) {
+                const sData = summaryRes.data?.data || summaryRes.data;
+                setServerSummary(sData?.summary || sData);
+              }
+            } catch (err) {
+              console.error("Error fetching HR payslips", err);
+            }
           } else {
-            const payrollRes = await PayrollsService.getCurrentPayroll();
-            payslips = payrollRes.data?.data || [];
+            try {
+              const payrollRes = await PayrollsService.getCurrentPayroll();
+              const pData = payrollRes.data?.data || payrollRes.data;
+              payslips = Array.isArray(pData) ? pData : Array.isArray(pData?.payslips) ? pData.payslips : [];
+              setServerSummary(pData?.summary || pData);
+            } catch (err) {
+              console.error("Error fetching payroll", err);
+            }
           }
-          
+
           if (payslips.length > 0) {
-            const mapped = Array.isArray(payslips) ? payslips.map((p: any) => ({
+            const mapped = Array.isArray(payslips) ? payslips.map((p: any) => {
+              const details = p.salary_details || {};
+              const emp = p.employee || {};
+              
+              let base = Number(details.base_salary || details.basic_salary || details.salary || p.base_salary || p.gross_salary || p.baseSalary || p.basic_salary || p.salary || emp.salary || 0);
+              let net = Number(details.net_salary || details.net || details.total_salary || p.net_salary || p.netSalary || p.net_total || p.net_amount || p.net || 0);
+              
+              // Include overtime_amount in bonuses/incentives
+              let b = Number(details.incentive_amount || 0) + Number(details.overtime_amount || 0) + 
+                      Number(details.incentive || details.allowance || details.allowances || details.total_allowances || details.rewards || details.incentives || details.bonuses || details.total_incentives || p.incentives_total || p.incentives || p.bonuses || emp.incentives || 0);
+              
+              let d = Number(details.deductions_amount || 0) + 
+                      Number(details.deduction || details.penalties || details.total_deduction || details.deductions || details.total_deductions || p.deductions_total || p.deductions || emp.deductions || 0);
+
+              return {
                 id: p.id,
-                employeeName: p.user_name || p.user?.name || p.user?.full_name || (lang === 'ar' ? 'غير معروف' : 'Unknown'),
-                department: p.department_name || p.user?.department || (lang === 'ar' ? 'عام' : 'General'),
-                baseSalary: Number(p.basic_salary || p.base_salary || 0),
-                bonuses: Number(p.incentives || p.bonuses || 0),
-                deductions: Number(p.deductions || 0),
-                netSalary: Number(p.net_salary || 0),
-                month: p.month || String(new Date().getMonth() + 1),
+                employeeName: (p.user_name || p.user?.name || p.user?.full_name || p.employee?.name || p.employee?.full_name || p.employee_name || p.name || emp.name || emp.full_name || (lang === 'ar' ? 'غير معروف' : 'Unknown')),
+                department: p.department_name || p.user?.department || p.employee?.department || emp.department || p.department || (lang === 'ar' ? 'عام' : 'General'),
+                baseSalary: base,
+                bonuses: b,
+                deductions: d,
+                netSalary: net,
+                month: p.month || String(new Date().getMonth()),
                 year: p.year || new Date().getFullYear(),
                 status: p.status || 'generated',
-              })) : [];
-              setRecords(mapped);
+              };
+            }) : [];
+            setRecords(mapped);
           }
         } catch (error: any) {
           if (error?.response?.status !== 403) {
@@ -151,10 +186,10 @@ export default function Payroll() {
   };
 
   // ------------------- Calculations -------------------
-  const totalBaseSalary = records.reduce((acc, r) => acc + (Number(r.baseSalary) || 0), 0);
-  const totalIncentives = incentives.reduce((acc, r) => acc + (Number(r.amount) || 0), 0);
-  const totalDeductions = deductions.reduce((acc, r) => acc + (Number(r.amount) || 0), 0);
-  const totalNetSalary = records.reduce((acc, r) => acc + (Number(r.netSalary) || 0), 0);
+  const totalBaseSalary = serverSummary?.base_salary || serverSummary?.total_salary || records.reduce((acc, r) => acc + (Number(r.baseSalary) || 0), 0);
+  const totalIncentives = serverSummary?.incentives || serverSummary?.total_incentives || incentives.reduce((acc, r) => acc + (Number(r.amount) || 0), 0);
+  const totalDeductions = serverSummary?.deductions || serverSummary?.total_deductions || deductions.reduce((acc, r) => acc + (Number(r.amount) || 0), 0);
+  const totalNetSalary = serverSummary?.net_salary || serverSummary?.total_net_salary || records.reduce((acc, r) => acc + (Number(r.netSalary) || 0), 0);
 
   // ------------------- History Pagination -------------------
   const historyItems = useMemo(() => {
@@ -184,15 +219,14 @@ export default function Payroll() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
-          {/* Action Buttons */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
-            <button 
+            <button
               onClick={() => setShowIncentiveModal(true)}
               className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-[#4A7C59] text-white rounded-lg hover:bg-[#3a6347] transition-colors text-xs sm:text-sm font-medium flex-1 sm:flex-initial"
             >
               <Plus className="w-4 h-4" /> {lang === 'ar' ? 'إضافة مكافأة' : 'Create Incentive'}
             </button>
-            <button 
+            <button
               onClick={() => setShowDeductionModal(true)}
               className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-[#6B6358] text-white rounded-lg hover:bg-[#5a5348] transition-colors text-xs sm:text-sm font-medium flex-1 sm:flex-initial"
             >
@@ -204,7 +238,11 @@ export default function Payroll() {
             <div className="flex items-center justify-center gap-2 bg-white rounded-xl shadow-sm border border-gray-100 px-3 sm:px-4 py-2 text-xs sm:text-sm flex-1 sm:flex-initial">
               <CalendarIcon className="w-4 h-4 text-gray-400" />
               <span className="font-medium text-gray-700">
-                {new Date().toLocaleString(lang === 'ar' ? 'ar-SA' : 'default', { month: 'long', year: 'numeric' })}
+                {(() => {
+                  const d = new Date();
+                  d.setMonth(d.getMonth() - 1);
+                  return d.toLocaleString(lang === 'ar' ? 'ar-SA' : 'default', { month: 'long', year: 'numeric' });
+                })()}
               </span>
             </div>
           </div>
@@ -367,15 +405,13 @@ export default function Payroll() {
                       <tr key={`${item.type}-${item.id}`}>
                         <td className="px-5 py-3 text-sm text-gray-800">{item.name || item.user?.full_name || `User #${item.user_id || 'Unknown'}`}</td>
                         <td className="px-5 py-3 text-sm">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            item.type === 'incentive' ? 'bg-[#4A7C59]/10 text-[#4A7C59]' : 'bg-[#6B6358]/10 text-[#6B6358]'
-                          }`}>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.type === 'incentive' ? 'bg-[#4A7C59]/10 text-[#4A7C59]' : 'bg-[#6B6358]/10 text-[#6B6358]'
+                            }`}>
                             {item.type === 'incentive' ? (lang === 'ar' ? 'مكافأة' : 'Incentive') : (lang === 'ar' ? 'خصم' : 'Deduction')}
                           </span>
                         </td>
-                        <td className={`px-5 py-3 text-sm font-semibold ${
-                          item.type === 'incentive' ? 'text-[#4A7C59]' : 'text-[#6B6358]'
-                        }`}>
+                        <td className={`px-5 py-3 text-sm font-semibold ${item.type === 'incentive' ? 'text-[#4A7C59]' : 'text-[#6B6358]'
+                          }`}>
                           {item.type === 'incentive' ? '+' : '-'} {formatSalary(item.amount, lang)}
                         </td>
                         <td className="px-5 py-3 text-sm text-gray-600">{item.reason || '-'}</td>

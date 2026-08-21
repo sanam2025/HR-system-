@@ -35,7 +35,6 @@ export default function HRLayout() {
     { label: t.hrNav?.contracts || (lang === 'ar' ? 'العقود' : 'Contracts'), icon: FileText, path: '/Hr/contracts', exact: false },
     { label: t.hrNav?.jobPostings || (lang === 'ar' ? 'الوظائف' : 'Job Postings'), icon: Briefcase, path: '/Hr/job-postings', exact: false },
     { label: t.hrNav?.performance || (lang === 'ar' ? 'الأداء' : 'Performance'), icon: TrendingUp, path: '/Hr/performance', exact: false },
-    { label: t.hrNav?.tasks || (lang === 'ar' ? 'المهام' : 'Tasks'), icon: ClipboardList, path: '/Hr/tasks', exact: false },
     { label: t.hrNav?.announcements || (lang === 'ar' ? 'التعميمات' : 'Announcements'), icon: Megaphone, path: '/Hr/announcements', exact: false },
     { label: t.hrNav?.complaints || (lang === 'ar' ? 'الشكاوي' : 'Complaints'), icon: Scale, path: '/Hr/complaints', exact: false },
   ];

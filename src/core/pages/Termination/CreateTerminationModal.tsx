@@ -56,7 +56,7 @@ export default function CreateTerminationModal({ isOpen, onClose, onSubmit, isSu
     }
     
     formData.append('termination_date', date);
-    if (document) formData.append('documents', document);
+    if (document) formData.append('document', document);
 
     onSubmit(formData);
   };

@@ -21,7 +21,7 @@ export const SendOffer = () => {
     hour_price: "",
     start_date: "",
     weekend_days: [] as string[],
-    working_hour_per_day: "",
+    working_hours_per_day: "",
   });
 
   const weekendOptions = ["friday", "saturday", "sunday"];
@@ -45,7 +45,9 @@ export const SendOffer = () => {
       import('../../../../../api/service/HrService/CandidatesService').then(({ CandidatesService }) => {
         CandidatesService.getByJobId(jobIdNumber)
           .then((res) => {
-            setCandidates(res.data?.data || []);
+            const data = res.data as any;
+            const candidatesArray = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : Array.isArray(data?.candidates) ? data.candidates : [];
+            setCandidates(candidatesArray);
           })
           .catch((err) => console.error(err));
       });
@@ -62,7 +64,7 @@ export const SendOffer = () => {
       return;
     }
 
-    if (!form.hour_price || !form.start_date || !form.working_hour_per_day) {
+    if (!form.hour_price || !form.start_date || !form.working_hours_per_day) {
       toast.error(t.hrOffers?.toasts?.fillRequired || "Please fill in all required fields");
       return;
     }
@@ -77,7 +79,7 @@ export const SendOffer = () => {
       hour_price: Number(form.hour_price),
       start_date: form.start_date,
       weekend_days: form.weekend_days,
-      working_hour_per_day: Number(form.working_hour_per_day),
+      working_hours_per_day: Number(form.working_hours_per_day),
     };
 
     console.log(" Sending offer:", data);
@@ -143,7 +145,7 @@ export const SendOffer = () => {
                   {t.hrOffers?.sendOffer?.candidateLabel || 'Candidate *'}
                 </label>
                 <select
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:border-green focus:ring-green"
                   value={selectedCandidateId}
                   onChange={(e) => setSelectedCandidateId(e.target.value)}
                   required
@@ -177,7 +179,7 @@ export const SendOffer = () => {
                   value={form.hour_price}
                   onChange={handleChange}
                   placeholder={t.hrOffers?.sendOffer?.hourPricePlaceholder || 'Enter hour price'}
-                  className={`w-full ${lang === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 border rounded-lg focus:ring-2 focus:ring-blue-500`}
+                  className={`w-full ${lang === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 border rounded-lg focus:ring-2 focus:border-green focus:ring-green`}
                   required
                 />
               </div>
@@ -194,7 +196,7 @@ export const SendOffer = () => {
                   name="start_date"
                   value={form.start_date}
                   onChange={handleChange}
-                  className={`w-full ${lang === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-left`}
+                  className={`w-full ${lang === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 border rounded-lg focus:ring-2 focus:border-green focus:ring-green text-left`}
                   required
                 />
               </div>
@@ -208,11 +210,11 @@ export const SendOffer = () => {
                 <Clock className={`absolute ${lang === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400`} />
                 <input
                   type="number"
-                  name="working_hour_per_day"
-                  value={form.working_hour_per_day}
+                  name="working_hours_per_day"
+                  value={form.working_hours_per_day}
                   onChange={handleChange}
                   placeholder={t.hrOffers?.sendOffer?.workingHoursPlaceholder || 'Enter working hours per day'}
-                  className={`w-full ${lang === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 border rounded-lg focus:ring-2 focus:ring-blue-500`}
+                  className={`w-full ${lang === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 border rounded-lg focus:ring-2 focus:border-green focus:ring-green`}
                   required
                 />
               </div>
@@ -230,7 +232,7 @@ export const SendOffer = () => {
                     onClick={() => handleWeekendToggle(day)}
                     className={`px-4 py-2 rounded-lg border transition-colors ${
                       form.weekend_days.includes(day)
-                        ? "bg-purple-500 text-white border-purple-500"
+                        ? "bg-green text-white border-green"
                         : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                     }`}
                   >
@@ -247,7 +249,7 @@ export const SendOffer = () => {
               <button
                 type="submit"
                 disabled={isPending}
-                className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-green text-white rounded-lg hover:bg-green/90 transition-colors disabled:opacity-50"
               >
                 {isPending ? (t.hrOffers?.sendOffer?.sending || 'Sending...') : (t.hrOffers?.sendOffer?.sendOfferBtn || 'Send Offer')}
               </button>

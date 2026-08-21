@@ -42,7 +42,7 @@ function AnnouncementsCards({ announcement }: { announcement: Announcements }) {
             <div className="flex justify-between items-start">
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 flex-wrap mb-2">
-                        <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                        <h4 className="font-semibold text-gray-900 group-hover:text-[#4A7C59] transition-colors">
                             {announcement.title}
                         </h4>
                         <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${getPriorityStyles(announcement.priority)}`}>
@@ -89,7 +89,7 @@ function AnnouncementsCards({ announcement }: { announcement: Announcements }) {
                     )}
 
                     <button 
-                        className="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                        className="p-2 text-[#4A7C59] hover:text-[#3d6649] hover:bg-[#4A7C59]/10 rounded-lg transition-all duration-200"
                         title={t.adminAnnouncements?.actions?.viewTitle || "View details"}
                         onClick={() => setisOpen(true)}
                     >

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { CheckCircle, XCircle, Calendar, User, Clock, AlertTriangle, Plus, Loader2, Wallet } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
@@ -7,7 +8,8 @@ import {
   getDepartmentLeaveRequests, approveLeaveRequest, rejectLeaveRequest, 
   getMyLeaveRequests, submitLeaveRequest, getMyLeaveBalance,
   getDepartmentHourlyLeaveRequests, approveHourlyLeaveRequest, rejectHourlyLeaveRequest,
-  getMyHourlyLeaveRequests, submitHourlyLeaveRequest
+  getMyHourlyLeaveRequests, submitHourlyLeaveRequest,
+  getAllLeaveRequests, getAllHourlyLeaveRequests
 } from '../../../api/manager';
 
 const typeColors: Record<string, string> = {
@@ -85,26 +87,31 @@ export default function LeaveRequests() {
 // ── Sub-component: Team Leaves ──
 function TeamLeavesView({ lv, lang, subType }: { lv: any; lang: string; subType: 'daily' | 'hourly' }) {
   const queryClient = useQueryClient();
-  const tabs = [lv.tabs.all, lv.tabs.pending, lv.tabs.approved, lv.tabs.rejected];
-  const tabKeys = ['all', 'معلقة', 'موافقة', 'مرفوضة'];
+  const location = useLocation();
+  const isHR = location.pathname.toLowerCase().startsWith('/hr');
+  const tabs = isHR 
+    ? [lv.tabs.all, lv.tabs.approved, lv.tabs.rejected] 
+    : [lv.tabs.all, lv.tabs.pending, lv.tabs.approved, lv.tabs.rejected];
+  
+  const tabKeys = isHR 
+    ? ['all', 'موافقة', 'مرفوضة'] 
+    : ['all', 'معلقة', 'موافقة', 'مرفوضة'];
+    
   const queryKey = subType === 'daily' ? 'department-leave-requests' : 'department-hourly-leave-requests';
 
   const [activeTabIdx, setActiveTabIdx] = useState(1);
   const [confirm, setConfirm] = useState<{ id: number; action: 'approve' | 'reject' } | null>(null);
 
-  const apiStatusMap: Record<number, string | undefined> = {
-    0: undefined,
-    1: 'pending',
-    2: 'approved',
-    3: 'rejected',
-  };
-  const currentApiStatus = apiStatusMap[activeTabIdx];
+  const activeKey = tabKeys[activeTabIdx] || 'all';
+  const currentApiStatus = activeKey === 'all' ? undefined : 
+                           activeKey === 'معلقة' ? 'pending' : 
+                           activeKey === 'موافقة' ? 'approved' : 'rejected';
 
   const { data: rawRequests, isLoading } = useQuery({
-    queryKey: [queryKey, activeTabIdx, subType],
+    queryKey: [queryKey, activeTabIdx, subType, isHR],
     queryFn: () => (subType === 'daily' 
-      ? getDepartmentLeaveRequests(currentApiStatus) 
-      : getDepartmentHourlyLeaveRequests(currentApiStatus)),
+      ? (isHR ? getAllLeaveRequests(currentApiStatus) : getDepartmentLeaveRequests(currentApiStatus))
+      : (isHR ? getAllHourlyLeaveRequests(currentApiStatus) : getDepartmentHourlyLeaveRequests(currentApiStatus))),
   });
 
   const safeRequests = Array.isArray(rawRequests) 
@@ -113,7 +120,7 @@ function TeamLeavesView({ lv, lang, subType }: { lv: any; lang: string; subType:
         ? rawRequests.data 
         : (Array.isArray(rawRequests?.data?.data) ? rawRequests.data.data : []));
 
-  const requests = safeRequests.map((req: any) => {
+  let requests = safeRequests.map((req: any) => {
     const rawStatus = (req.status || 'pending').toString().toLowerCase().trim();
     let normStatus = 'معلقة';
     if (rawStatus === 'approved' || rawStatus === 'موافقة' || rawStatus === 'موافق' || rawStatus === 'accepted' || rawStatus === '1') normStatus = 'موافقة';
@@ -136,7 +143,10 @@ function TeamLeavesView({ lv, lang, subType }: { lv: any; lang: string; subType:
     };
   });
 
-  const activeKey = tabKeys[activeTabIdx];
+  if (isHR) {
+    requests = requests.filter(r => r.status !== 'معلقة');
+  }
+
   const filtered = requests.filter(r => activeKey === 'all' || r.status === activeKey);
   const pendingCount = requests.filter(r => r.status === 'معلقة').length;
 

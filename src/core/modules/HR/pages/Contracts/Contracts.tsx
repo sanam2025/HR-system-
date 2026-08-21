@@ -108,13 +108,18 @@ export default function Contracts() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {currentContracts.map((contract: Contract) => ( //  إضافة النوع
+              {currentContracts.map((c: Contract) => {
+                const contract = c as any;
+                const empName = contract.employee?.full_name || contract.employee?.user?.full_name || contract.employee?.name || contract.employee_name || contract.user?.full_name || (t.hrContracts?.table?.na || 'N/A');
+                const empEmail = contract.employee?.email || contract.employee?.user?.email || contract.user?.email || '';
+                
+                return (
                 <tr key={contract.id} className="hover:bg-gray-50">
                   <td className="px-5 py-4 text-sm font-medium text-gray-900">{contract.contract_number}</td>
                   <td className="px-5 py-4">
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium text-gray-900">{contract.employee?.full_name || (t.hrContracts?.table?.na || 'N/A')}</span>
-                      <span className="text-xs text-gray-500">{contract.employee?.email || ''}</span>
+                      <span className="text-sm font-medium text-gray-900">{empName}</span>
+                      <span className="text-xs text-gray-500">{empEmail}</span>
                     </div>
                   </td>
                   <td className="px-5 py-4 text-sm text-gray-600">{contract.department}</td>
@@ -131,7 +136,8 @@ export default function Contracts() {
                     )}
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

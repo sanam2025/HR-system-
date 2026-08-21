@@ -31,12 +31,6 @@ export default function Complaints() {
           <h1 className="text-2xl font-bold text-gray-900">{t.hrComplaints?.title || 'Complaints Management'}</h1>
           <p className="text-gray-500 text-sm">{t.hrComplaints?.subtitle || 'View and manage all complaints from employees and managers'}</p>
         </div>
-        <button
-          onClick={() => refetch()}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-        >
-          <RefreshCw className="w-4 h-4" /> {t.hrComplaints?.refresh || 'Refresh'}
-        </button>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">

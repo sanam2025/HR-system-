@@ -37,7 +37,7 @@ const resources = {
       termination: 'Terminations',
       
       // Dashboard
-            systemName: 'HR System',
+            systemName: 'Masar HR',
       university: 'University of Damascus',
       managerRole: 'Department Manager',
       userName: 'Ahmad Front',
@@ -284,7 +284,7 @@ const resources = {
       noRecruitmentRequests: 'No recruitment requests available.',
       
       // Admin Dashboard
-      adminPortal: 'Admin Portal',
+      adminPortal: 'Masar HR',
       administration: 'Administration',
       adminMenu: 'ADMINMENU',
       welcome: 'Welcome',
@@ -451,7 +451,7 @@ const resources = {
       termination: 'إنهاء الخدمة',
 
       // Dashboard
-            systemName: 'نظام الموارد البشرية',
+            systemName: 'Masar HR',
       university: 'جامعة دمشق',
       managerRole: 'مدير القسم',
       userName: 'أحمد محمد الصالح',
@@ -698,7 +698,7 @@ const resources = {
       noRecruitmentRequests: 'لا توجد طلبات توظيف متاحة.',
       
       // Admin Dashboard
-      adminPortal: 'بوابة الإدارة',
+      adminPortal: 'Masar HR',
       administration: 'الإدارة',
       adminMenu: 'قائمة الإدارة',
       welcome: 'مرحباً',

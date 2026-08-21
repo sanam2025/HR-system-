@@ -4,20 +4,16 @@ import { ArrowLeft, Pencil, Mail, Phone, MapPin, Calendar, Briefcase } from 'luc
 import Loading from '../../../../shared/components/Loading';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
-import { useProfile } from '../hooks/useProfile';
+import { useEmployeeProfile } from '../hooks/useProfile';
 import { useLanguage } from '../../../../i18n/translations/LanguageContext';
 
 export default function EmployeeProfile() {
   const navigate = useNavigate();
-  useParams<{ id: string; }>();
+  const { id } = useParams<{ id: string; }>();
   const [editMode, setEditMode] = useState(false);
   const { t, lang } = useLanguage();
 
-  //  استخدام هوك الـ Profile (سيجلب بيانات الموظف حسب الـ ID أو الحالي)
-  const { profile, isLoading, error, refetch } = useProfile();
-
-  // إذا كان لديك ID في الرابط، استخدم useEmployeeProfile بدلاً من ذلك
-  // const { profile, isLoading, error, refetch } = useEmployeeProfile(Number(id));
+  const { profile, isLoading, error, refetch } = useEmployeeProfile(Number(id));
 
   //  نموذج التعديل (افتراضي)
   const [formData, setFormData] = useState({

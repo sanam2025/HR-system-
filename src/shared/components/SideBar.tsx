@@ -26,13 +26,13 @@ export default function Sidebar({
   onToggle,
   navItems,
   brand = { logo: '🏢', title: 'HR System', subtitle: 'جامعة دمشق' },
-  user  = { avatar: 'م', name: 'مستخدم', role: '' },
+  user = { avatar: 'م', name: 'مستخدم', role: '' },
   navSectionLabel = 'القائمة الرئيسية',
 }: SidebarProps) {
   const { isRTL } = useLanguage();
-  
-  const ToggleIcon = open 
-    ? (isRTL ? ChevronRight : ChevronLeft) 
+
+  const ToggleIcon = open
+    ? (isRTL ? ChevronRight : ChevronLeft)
     : (isRTL ? ChevronLeft : ChevronRight);
 
   return (
@@ -50,13 +50,13 @@ export default function Sidebar({
 
         {/* Logo */}
         <div className="flex items-center gap-3 px-5 py-6 border-b border-white/10">
-          <div className="w-9 h-9 bg-green rounded-xl flex items-center justify-center text-lg flex-shrink-0">
-            {brand.logo ?? '🏢'}
+          <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center text-lg flex-shrink-0 p-1 overflow-hidden">
+            <img src="/logo-transparent.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
           {open && (
-            <div>
-              <p className="text-white font-bold text-sm leading-tight">{brand.title}</p>
-              <p className="text-white/40 text-[10px]">{brand.subtitle}</p>
+            <div className="overflow-hidden">
+              <p className="text-white font-bold text-sm leading-tight truncate">{brand.title}</p>
+              <p className="text-white/40 text-[10px] truncate mt-0.5">{brand.subtitle}</p>
             </div>
           )}
         </div>

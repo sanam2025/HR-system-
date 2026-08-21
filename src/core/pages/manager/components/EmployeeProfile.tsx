@@ -1,10 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { getEmployeeProfile, getEmployeeContract, getEmployeeDocuments, getEmployeeContractDownloadUrl, getEmployeeDocumentDownloadUrl, getEmployeePerformanceSummary, getTasks, getMyProfile } from '../../../../api/manager';
+import { getEmployeeProfile, getEmployeeContract, getEmployeeDocuments, getEmployeeContractDownloadUrl, getEmployeeDocumentDownloadUrl, getEmployeePerformanceSummary, getTasks, getMyProfile, downloadEmployeeContract, downloadEmployeeDocument } from '../../../../api/manager';
 import { ArrowRight, ArrowLeft, Phone, Mail, Calendar, Star, CheckSquare, Clock, Loader2, MapPin, User, Briefcase, FileText, Download, File, Edit2, X } from 'lucide-react';
 import { useLanguage } from '../../../../i18n/translations/LanguageContext';
 import { useAuthStore } from '../../../../store/authStore';
 import EditProfileModal from './EditProfileModal';
+import toast from 'react-hot-toast';
 
 import { TASK_STATUS_COLORS, TASK_STATUS_EN, CHART_MONTHS_EN, ATTENDANCE_STATUS_INFO } from '../../../constants';
 
@@ -45,13 +46,20 @@ export default function EmployeeProfile() {
 
   const currentUser = useAuthStore(state => state.currentUser);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [downloadingContract, setDownloadingContract] = useState(false);
+  const [downloadingDocument, setDownloadingDocument] = useState<number | null>(null);
 
   const fetchProfile = async () => {
     try {
       setLoading(true);
 
-      // إذا لا يوجد id في الرابط، نجلب بروفايل المستخدم الحالي
-      const data = id ? await getEmployeeProfile(Number(id)) : await getMyProfile();
+      let data = null;
+      try {
+        data = id ? await getEmployeeProfile(Number(id)) : await getMyProfile();
+      } catch (err) {
+        console.warn("Profile fetch failed or not found.");
+      }
+
       let profile = data?.data || data;
       let isProfileExists = !!profile;
 
@@ -64,6 +72,27 @@ export default function EmployeeProfile() {
           job_title: currentUser.role || 'موظف',
           department: currentUser.department || 'الإدارة',
         };
+      }
+
+      // Fallback for when ID is provided (e.g. HR viewing employee) but no profile exists
+      if (!profile && id) {
+        try {
+          const { EmployeesService } = await import('../../../../api/service/HrService/EmployeesService');
+          const usersRes = await EmployeesService.getEmployees();
+          const users = usersRes.data?.data || usersRes.data || [];
+          const targetUser = users.find((u: any) => u.id === Number(id));
+          if (targetUser) {
+            profile = {
+               id: targetUser.id,
+               name: targetUser.full_name || targetUser.name || 'بدون اسم',
+               email: targetUser.email || '',
+               job_title: targetUser.position || targetUser.role || 'موظف',
+               department: targetUser.department?.name || targetUser.department || '',
+            };
+          }
+        } catch (e) {
+          console.warn("Failed to fetch from EmployeesService fallback.");
+        }
       }
 
       if (!profile) {
@@ -479,14 +508,33 @@ export default function EmployeeProfile() {
                   <p className="text-sm text-gray-500 mt-0.5">{contract.start_date} {contract.end_date ? ` - ${contract.end_date}` : ''}</p>
                 </div>
               </div>
-              <a
-                href={getEmployeeContractDownloadUrl(Number(id))}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-200 px-4 py-2 rounded-xl transition-all"
+              <button
+                onClick={async () => {
+                  if (!id) return;
+                  try {
+                    setDownloadingContract(true);
+                    toast.loading(t.profile?.downloading || 'Downloading...', { id: 'download-contract' });
+                    const blob = await downloadEmployeeContract(Number(id));
+                    const url = window.URL.createObjectURL(new Blob([blob]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', 'contract.pdf');
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    window.URL.revokeObjectURL(url);
+                    toast.success('تم التحميل بنجاح', { id: 'download-contract' });
+                  } catch (e: any) {
+                    toast.error(e?.response?.data?.message || 'فشل التحميل', { id: 'download-contract' });
+                  } finally {
+                    setDownloadingContract(false);
+                  }
+                }}
+                disabled={downloadingContract}
+                className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-200 px-4 py-2 rounded-xl transition-all disabled:opacity-50"
               >
-                <Download size={16} /> {ep.download || 'Download'}
-              </a>
+                <Download size={16} /> {downloadingContract ? (t.profile?.downloading || 'Downloading...') : (ep.download || 'Download')}
+              </button>
             </div>
           </div>
         )}
@@ -522,15 +570,33 @@ export default function EmployeeProfile() {
                     </p>
                   </div>
                 </div>
-                <a
-                  href={getEmployeeDocumentDownloadUrl(Number(id), doc.id)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center justify-center w-10 h-10 text-purple-500 hover:text-white hover:bg-purple-500 border border-purple-100 rounded-xl transition-all"
-                  title={ep.download || 'Download'}
-                >
-                  <Download size={18} />
-                </a>
+                  <button
+                    onClick={async () => {
+                      try {
+                        setDownloadingDocument(doc.id);
+                        toast.loading(t.profile?.downloading || 'Downloading...', { id: `download-doc-${doc.id}` });
+                        const blob = await downloadEmployeeDocument(doc.id);
+                        const url = window.URL.createObjectURL(new Blob([blob]));
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.setAttribute('download', `document_${doc.id}.pdf`);
+                        document.body.appendChild(link);
+                        link.click();
+                        link.remove();
+                        window.URL.revokeObjectURL(url);
+                        toast.success('تم التحميل بنجاح', { id: `download-doc-${doc.id}` });
+                      } catch (e: any) {
+                        toast.error(e?.response?.data?.message || 'فشل التحميل', { id: `download-doc-${doc.id}` });
+                      } finally {
+                        setDownloadingDocument(null);
+                      }
+                    }}
+                    disabled={downloadingDocument === doc.id}
+                    className="p-2 text-purple-600 hover:bg-purple-100 rounded-lg transition-colors disabled:opacity-50"
+                    title={ep.download || 'Download'}
+                  >
+                    {downloadingDocument === doc.id ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                  </button>
               </div>
             ))}
           </div>

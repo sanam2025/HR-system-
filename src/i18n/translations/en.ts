@@ -428,7 +428,7 @@ const en = {
     welcomeTitle: "Welcome to HR Dashboard",
     welcomeSubtitle: "Overview of employee performance and statistics.",
     totalEmployees: "Total Employees",
-    pendingLeaves: "Pending Leave Requests",
+    approvedLeaves: "Approved Leave Requests",
     payrollCost: "Payroll Cost",
     attendanceRate: "Attendance Rate",
     announcements: "Announcements",
@@ -613,7 +613,7 @@ const en = {
     }
   },
   layout: {
-    systemName: "HR System",
+    systemName: "Masar HR",
     university: "University of Damascus",
     managerRole: "Department Manager",
     userName: "Ahmad Front",

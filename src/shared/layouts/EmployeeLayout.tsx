@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, User, CalendarCheck, ListTodo, Wallet, MessageCircle
+  LayoutDashboard, User, CalendarCheck, ListTodo, Wallet, MessageCircle, LogOut
 } from "lucide-react";
 import type { NavItem } from "../components/SideBar";
 import AppLayout from "./AppLayout";
@@ -17,6 +17,7 @@ export default function EmployeeLayout() {
     { label: t('tasks'), icon: ListTodo, path: "/employee/tasks", exact: false },
     { label: isAr ? 'المالية & العمل الاضافي' : 'Finance & Overtime', icon: Wallet, path: "/employee/finance", exact: false },
     { label: isAr ? 'الشكاوي' : 'Complaints', icon: MessageCircle, path: "/employee/complaints", exact: false },
+    { label: isAr ? 'الاستقالة' : 'Resignation', icon: LogOut, path: "/employee/resignation", exact: false },
   ];
 
   const pageTitles: Record<string, string> = {
@@ -26,6 +27,7 @@ export default function EmployeeLayout() {
     "/employee/tasks": t('tasks'),
     "/employee/finance": isAr ? 'المالية & العمل الاضافي' : 'Finance & Overtime',
     "/employee/complaints": isAr ? 'الشكاوي' : 'Complaints',
+    "/employee/resignation": isAr ? 'الاستقالة' : 'Resignation',
   };
   return (
     <AppLayout

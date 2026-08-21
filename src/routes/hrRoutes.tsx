@@ -102,7 +102,7 @@ export const hrRoutes = {
     { path: "complaints/:id", element: <SuspenseWrapper><ComplaintDetail /></SuspenseWrapper> },
 
     // === الموظفون ===
-    { path: "employee/:id", element: <SuspenseWrapper><EmployeeProfileHR /></SuspenseWrapper> },
+    { path: "employee/:id", element: <SuspenseWrapper><UnifiedEmployeeProfile /></SuspenseWrapper> },
     { path: "employees/:id", element: <SuspenseWrapper><UnifiedEmployeeProfile /></SuspenseWrapper> },
     { path: "department/:id", element: <SuspenseWrapper><DepartmentDetail /></SuspenseWrapper> },
   ],

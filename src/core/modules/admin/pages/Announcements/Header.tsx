@@ -16,7 +16,7 @@ function Header() {
               {t.adminAnnouncements?.subtitle || 'Create and manage company announcements'}
               </p>
           </div>
-          <button type='button' className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2" onClick={() => setIsOpen(true)}>
+          <button type='button' className="bg-[#4A7C59] text-white px-4 py-2 rounded-xl hover:bg-[#3d6649] transition-all flex items-center gap-2" onClick={() => setIsOpen(true)}>
               <Plus className="w-4 h-4" />
               {t.adminAnnouncements?.newAnnouncement || 'New Announcement'}
           </button>

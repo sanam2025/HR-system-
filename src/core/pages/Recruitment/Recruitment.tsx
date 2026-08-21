@@ -54,21 +54,21 @@ export default function Recruitment() {
       queryClient.invalidateQueries({ queryKey: ['skills'] });
       setForm(prev => ({ ...prev, skills: [...prev.skills.filter(id => id !== newSkill.id), newSkill.id] }));
       setCustomSkill('');
-      toast.success('تمت إضافة المهارة الجديدة ✅');
+      toast.success(lang === 'ar' ? 'تمت إضافة المهارة الجديدة ✅' : 'New skill added successfully ✅');
     },
-    onError: () => toast.error('حدث خطأ أثناء إضافة المهارة')
+    onError: () => toast.error(lang === 'ar' ? 'حدث خطأ أثناء إضافة المهارة' : 'Error adding skill')
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number, data: any }) => updateJobRequisition(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-job-requisitions'] });
-      toast.success('تم تعديل طلب الاحتياج بنجاح ✅');
+      toast.success(lang === 'ar' ? 'تم تعديل طلب الاحتياج بنجاح ✅' : 'Job requisition updated successfully ✅');
       setForm({ title: '', description: '', experience: 1, skills: [] });
       setEditingId(null);
     },
     onError: (err: any) => {
-      const msg = err?.response?.data?.message || err?.response?.data?.error || 'حدث خطأ أثناء تعديل طلب الاحتياج';
+      const msg = err?.response?.data?.message || err?.response?.data?.error || (lang === 'ar' ? 'حدث خطأ أثناء تعديل طلب الاحتياج' : 'Error updating job requisition');
       toast.error(msg);
     }
   });
@@ -77,10 +77,10 @@ export default function Recruitment() {
     mutationFn: deleteJobRequisition,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-job-requisitions'] });
-      toast.success('تم حذف طلب الاحتياج بنجاح 🗑️');
+      toast.success(lang === 'ar' ? 'تم حذف طلب الاحتياج بنجاح 🗑️' : 'Job requisition deleted successfully 🗑️');
     },
     onError: (err: any) => {
-      const msg = err?.response?.data?.message || err?.response?.data?.error || 'حدث خطأ أثناء حذف طلب الاحتياج';
+      const msg = err?.response?.data?.message || err?.response?.data?.error || (lang === 'ar' ? 'حدث خطأ أثناء حذف طلب الاحتياج' : 'Error deleting job requisition');
       toast.error(msg);
     }
   });
@@ -129,7 +129,7 @@ export default function Recruitment() {
   };
 
   const handleDelete = (id: number) => {
-    if (window.confirm('هل أنت متأكد من حذف طلب الاحتياج؟')) {
+    if (window.confirm(lang === 'ar' ? 'هل أنت متأكد من حذف طلب الاحتياج؟' : 'Are you sure you want to delete this requisition?')) {
       deleteMutation.mutate(id);
     }
   };
@@ -140,10 +140,10 @@ export default function Recruitment() {
   };
 
   const getRequisitionStatusBadge = (status: string) => {
-    const isApproved = status === 'approved' || status === 'موافقة';
-    const isRejected = status === 'rejected' || status === 'مرفوضة';
+    const isApproved = status === 'approved' || status === 'موافقة' || status === 'معتمد';
+    const isRejected = status === 'rejected' || status === 'مرفوضة' || status === 'مرفوض';
     const cls = isApproved ? 'bg-green-50 text-green-700 border-green-200' : isRejected ? 'bg-red-50 text-red-600 border-red-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200';
-    const label = isApproved ? 'معتمد' : isRejected ? 'مرفوض' : 'قيد النظر (معلق)';
+    const label = isApproved ? (lang === 'ar' ? 'معتمد' : 'Approved') : isRejected ? (lang === 'ar' ? 'مرفوض' : 'Rejected') : (lang === 'ar' ? 'قيد النظر (معلق)' : 'Under Review (Pending)');
     return <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${cls}`}>{label}</span>;
   };
 
@@ -162,11 +162,11 @@ export default function Recruitment() {
           <h3 className="font-bold text-dark text-lg flex items-center justify-between gap-2 mb-4 border-b border-gray-100 pb-3">
             <div className="flex items-center gap-2">
               <ClipboardList className="text-green" size={20} />
-              {editingId ? 'تعديل طلب احتياج وظيفي' : (v.title || 'تقديم طلب احتياج وظيفي جديد')}
+              {editingId ? (lang === 'ar' ? 'تعديل طلب احتياج وظيفي' : 'Edit Job Requisition') : (v.title || (lang === 'ar' ? 'تقديم طلب احتياج وظيفي جديد' : 'Submit New Job Requisition'))}
             </div>
             {editingId && (
               <button type="button" onClick={handleCancelEdit} className="text-sm text-gray-500 hover:text-gray-700">
-                إلغاء التعديل
+                {lang === 'ar' ? 'إلغاء التعديل' : 'Cancel Edit'}
               </button>
             )}
           </h3>
@@ -221,7 +221,7 @@ export default function Recruitment() {
                     <span
                       key={skillId}
                       onClick={() => toggleSkill(skillId)}
-                      title="انقر للحذف"
+                      title={lang === 'ar' ? 'انقر للحذف' : 'Click to remove'}
                       className="flex items-center gap-1.5 bg-green/10 text-green text-xs font-semibold px-3 py-1.5 rounded-full border border-green/20 cursor-pointer hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all"
                     >
                       {skillObj?.name || `Skill ${skillId}`}
@@ -275,7 +275,7 @@ export default function Recruitment() {
                   disabled={createSkillMutation.isPending || !customSkill.trim()}
                   className="px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200 font-semibold rounded-xl text-sm flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {createSkillMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : 'إضافة'}
+                  {createSkillMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : (lang === 'ar' ? 'إضافة' : 'Add')}
                 </button>
               </div>
             </div>
@@ -287,7 +287,7 @@ export default function Recruitment() {
             className="btn-primary py-3 w-full flex items-center justify-center gap-2 text-sm font-bold disabled:opacity-50"
           >
             {(createMutation.isPending || updateMutation.isPending) ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-            {(createMutation.isPending || updateMutation.isPending) ? 'جاري الإرسال...' : editingId ? 'حفظ التعديلات' : (v.submitBtn || 'إرسال طلب الاحتياج')}
+            {(createMutation.isPending || updateMutation.isPending) ? (lang === 'ar' ? 'جاري الإرسال...' : 'Sending...') : editingId ? (lang === 'ar' ? 'حفظ التعديلات' : 'Save Changes') : (v.submitBtn || (lang === 'ar' ? 'إرسال طلب الاحتياج' : 'Submit Requisition'))}
           </button>
         </form>
 
@@ -296,14 +296,14 @@ export default function Recruitment() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5">
             <h3 className="font-bold text-dark text-base flex items-center gap-2 mb-4 border-b border-gray-100 pb-3">
               <Briefcase size={18} className="text-green" />
-              طلبات الاحتياج السابقة
+              {lang === 'ar' ? 'طلبات الاحتياج السابقة' : 'Previous Job Requisitions'}
             </h3>
 
             {isRequisitionsLoading ? (
               <div className="text-center py-10"><Loader2 className="animate-spin text-green mx-auto" size={24} /></div>
             ) : requisitionsList.length === 0 ? (
               <div className="text-center py-8 text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                <p className="text-xs">لم تقم بإرسال طلبات احتياج وظيفي بعد</p>
+                <p className="text-xs">{lang === 'ar' ? 'لم تقم بإرسال طلبات احتياج وظيفي بعد' : 'You have not submitted any job requisitions yet'}</p>
               </div>
             ) : (
               <div className="space-y-3 max-h-[480px] overflow-y-auto pe-1">
@@ -316,15 +316,15 @@ export default function Recruitment() {
                     <p className="text-xs text-brown line-clamp-2">{req.description}</p>
                     <div className="flex items-center justify-between text-[11px] text-gray-400 pt-1 border-t border-gray-200/40">
                       <div className="flex gap-3">
-                        <span>🎓 الخبرة: <strong>{req.experience} سنة</strong></span>
-                        <span>📅 {req.created_at ? new Date(req.created_at).toLocaleDateString('ar-EG') : ''}</span>
+                        <span>🎓 {lang === 'ar' ? 'الخبرة' : 'Experience'}: <strong>{req.experience} {lang === 'ar' ? 'سنة' : 'years'}</strong></span>
+                        <span>📅 {req.created_at ? new Date(req.created_at).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US') : ''}</span>
                       </div>
                       <div className="flex gap-2">
                         <button
                           type="button"
                           onClick={() => handleEdit(req)}
                           className="text-blue-500 hover:bg-blue-50 p-1 rounded transition-colors"
-                          title="تعديل"
+                          title={lang === 'ar' ? 'تعديل' : 'Edit'}
                         >
                           <Edit size={14} />
                         </button>
@@ -333,7 +333,7 @@ export default function Recruitment() {
                           onClick={() => handleDelete(req.id)}
                           disabled={deleteMutation.isPending}
                           className="text-red-500 hover:bg-red-50 p-1 rounded transition-colors disabled:opacity-50"
-                          title="حذف"
+                          title={lang === 'ar' ? 'حذف' : 'Delete'}
                         >
                           <Trash2 size={14} />
                         </button>

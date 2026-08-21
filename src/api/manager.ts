@@ -64,8 +64,22 @@ export function getEmployeeContractDownloadUrl(employeeId: number) {
   return `${apiClient.defaults.baseURL}employees/${employeeId}/contract/download`;
 }
 
+export async function downloadEmployeeContract(employeeId: number) {
+  const response = await apiClient.get(`employees/${employeeId}/contract/download`, {
+    responseType: 'blob'
+  });
+  return response.data;
+}
+
 export function getEmployeeDocumentDownloadUrl(employeeId: number, documentId: number) {
-  return `${apiClient.defaults.baseURL}my-documents/${documentId}/download`; // As per Postman, although maybe it requires token in header. If it's a GET, we can fetch it.
+  return `${apiClient.defaults.baseURL}my-documents/${documentId}/download`; 
+}
+
+export async function downloadEmployeeDocument(documentId: number) {
+  const response = await apiClient.get(`my-documents/${documentId}/download`, {
+    responseType: 'blob'
+  });
+  return response.data;
 }
 
 export async function getEmployeePerformanceSummary(employeeId: number) {
@@ -164,11 +178,17 @@ export async function getMyMonthlyAttendance() {
 /**
  * عرض طلبات إجازة القسم
  */
-export async function getDepartmentLeaveRequests(status?: string) {
-  let url = 'department-leave-request';
-  if (status && status !== 'all') {
-    url += `?status=${encodeURIComponent(status)}`;
+export async function getDepartmentLeaveRequests(status?: string): Promise<any[]> {
+  if (!status || status === 'all') {
+    const [pending, approved, rejected] = await Promise.all([
+      getDepartmentLeaveRequests('pending'),
+      getDepartmentLeaveRequests('approved'),
+      getDepartmentLeaveRequests('rejected')
+    ]);
+    return [...pending, ...approved, ...rejected];
   }
+
+  const url = `department-leave-request?status=${encodeURIComponent(status)}`;
   const response = await apiClient.get(url);
   const raw = response.data;
   let arr: any[] = [];
@@ -178,6 +198,32 @@ export async function getDepartmentLeaveRequests(status?: string) {
   else if (Array.isArray(raw?.leave_requests)) arr = raw.leave_requests;
   else if (Array.isArray(raw?.requests)) arr = raw.requests;
   else if (Array.isArray(raw?.department_leaves)) arr = raw.department_leaves;
+
+  return arr;
+}
+
+/**
+ * عرض كل طلبات إجازة الشركة (للـ HR)
+ */
+export async function getAllLeaveRequests(status?: string): Promise<any[]> {
+  if (!status || status === 'all') {
+    const [pending, approved, rejected] = await Promise.all([
+      getAllLeaveRequests('pending'),
+      getAllLeaveRequests('approved'),
+      getAllLeaveRequests('rejected')
+    ]);
+    return [...pending, ...approved, ...rejected];
+  }
+
+  const url = `all-leave-request?status=${encodeURIComponent(status)}`;
+  const response = await apiClient.get(url);
+  const raw = response.data;
+  let arr: any[] = [];
+  if (Array.isArray(raw)) arr = raw;
+  else if (Array.isArray(raw?.data)) arr = raw.data;
+  else if (Array.isArray(raw?.data?.data)) arr = raw.data.data;
+  else if (Array.isArray(raw?.leave_requests)) arr = raw.leave_requests;
+  else if (Array.isArray(raw?.requests)) arr = raw.requests;
 
   return arr;
 }
@@ -201,11 +247,17 @@ export async function rejectLeaveRequest(id: number) {
 /**
  * عرض طلبات إجازة المدير الشخصية
  */
-export async function getMyLeaveRequests(status?: string) {
-  let url = 'leaveRequests';
-  if (status && status !== 'all') {
-    url += `?status=${encodeURIComponent(status)}`;
+export async function getMyLeaveRequests(status?: string): Promise<any[]> {
+  if (!status || status === 'all') {
+    const [pending, approved, rejected] = await Promise.all([
+      getMyLeaveRequests('pending'),
+      getMyLeaveRequests('approved'),
+      getMyLeaveRequests('rejected')
+    ]);
+    return [...pending, ...approved, ...rejected];
   }
+
+  const url = `leaveRequests?status=${encodeURIComponent(status)}`;
   const response = await apiClient.get(url);
   const raw = response.data;
   if (Array.isArray(raw)) return raw;
@@ -245,11 +297,43 @@ export async function getMyLeaveBalance() {
 /**
  * عرض طلبات المغادرة (بالساعة) للقسم
  */
-export async function getDepartmentHourlyLeaveRequests(status?: string) {
-  let url = 'department-hourly-leave-request';
-  if (status && status !== 'all') {
-    url += `?status=${encodeURIComponent(status)}`;
+export async function getDepartmentHourlyLeaveRequests(status?: string): Promise<any[]> {
+  if (!status || status === 'all') {
+    const [pending, approved, rejected] = await Promise.all([
+      getDepartmentHourlyLeaveRequests('pending'),
+      getDepartmentHourlyLeaveRequests('approved'),
+      getDepartmentHourlyLeaveRequests('rejected')
+    ]);
+    return [...pending, ...approved, ...rejected];
   }
+
+  const url = `department-hourly-leave-request?status=${encodeURIComponent(status)}`;
+  const response = await apiClient.get(url);
+  const raw = response.data;
+  let arr: any[] = [];
+  if (Array.isArray(raw)) arr = raw;
+  else if (Array.isArray(raw?.data)) arr = raw.data;
+  else if (Array.isArray(raw?.data?.data)) arr = raw.data.data;
+  else if (Array.isArray(raw?.hourly_leaves)) arr = raw.hourly_leaves;
+  else if (Array.isArray(raw?.requests)) arr = raw.requests;
+
+  return arr;
+}
+
+/**
+ * عرض كل طلبات المغادرة (بالساعة) للشركة (للـ HR)
+ */
+export async function getAllHourlyLeaveRequests(status?: string): Promise<any[]> {
+  if (!status || status === 'all') {
+    const [pending, approved, rejected] = await Promise.all([
+      getAllHourlyLeaveRequests('pending'),
+      getAllHourlyLeaveRequests('approved'),
+      getAllHourlyLeaveRequests('rejected')
+    ]);
+    return [...pending, ...approved, ...rejected];
+  }
+
+  const url = `all-hourly-leave-request?status=${encodeURIComponent(status)}`;
   const response = await apiClient.get(url);
   const raw = response.data;
   let arr: any[] = [];
@@ -281,11 +365,17 @@ export async function rejectHourlyLeaveRequest(id: number) {
 /**
  * عرض طلبات المغادرة (بالساعة) للمدير نفسه
  */
-export async function getMyHourlyLeaveRequests(status?: string) {
-  let url = 'hourly-leave-Requests';
-  if (status && status !== 'all') {
-    url += `?status=${encodeURIComponent(status)}`;
+export async function getMyHourlyLeaveRequests(status?: string): Promise<any[]> {
+  if (!status || status === 'all') {
+    const [pending, approved, rejected] = await Promise.all([
+      getMyHourlyLeaveRequests('pending'),
+      getMyHourlyLeaveRequests('approved'),
+      getMyHourlyLeaveRequests('rejected')
+    ]);
+    return [...pending, ...approved, ...rejected];
   }
+
+  const url = `hourly-leave-Requests?status=${encodeURIComponent(status)}`;
   const response = await apiClient.get(url);
   return response.data?.data || response.data;
 }

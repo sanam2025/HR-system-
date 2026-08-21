@@ -14,25 +14,30 @@ import toast from 'react-hot-toast';
 import type { CreateAnnouncementData } from '../../../../api/service/HrService/Types/AnnouncementsService.types';
 import { AxiosError } from 'axios';
 import { useLanguage } from '../../../../i18n/translations/LanguageContext';
+import { useQuery } from '@tanstack/react-query';
+import { PayrollsService } from '../../../../api/service/HrService/PayrollsService';
+import { useAllLeaveRequests } from '../hooks/useLeave';
+import { EmployeesService } from '../../../../api/service/HrService/EmployeesService';
+import { AttendanceService } from '../../../../api/service/HrService/AttendanceService';
 
 //  استيراد أنواع الأقسام والموظفين
 import type { Department, Employee } from '../../../../api/service/HrService/Types/DepartmentsService.types';
 
 const STATS_DATA = {
   totalEmployees: 0,
-  pendingLeaves: 0,
+  approvedLeaves: 0,
   attendanceRate: "0%",
   payrollCost: "0 SYP",
 } as const;
 
 const STATS_CONFIG = [
   { key: "totalEmployees" as const, title: "Total Employees", icon: Users, color: "blue" as const, path: "/Hr/employees" },
-  { key: "pendingLeaves" as const, title: "Pending Leave Requests", icon: Calendar, color: "orange" as const, path: "/Hr/leaves" },
+  { key: "approvedLeaves" as const, title: "Approved Leave Requests", icon: Calendar, color: "orange" as const, path: "/Hr/leaves" },
   { key: "payrollCost" as const, title: "Payroll Cost", icon: DollarSign, color: "green" as const, path: "/Hr/payroll" },
   { key: "attendanceRate" as const, title: "Attendance Rate", icon: TrendingUp, color: "teal" as const, path: "/Hr/attendance" },
 ] as const;
 
-const getStatValue = (key: keyof typeof STATS_DATA) => STATS_DATA[key];
+
 
 export default function Dashboard() {
   const { t, lang } = useLanguage();
@@ -59,6 +64,43 @@ export default function Dashboard() {
   };
 
   const { departments: departmentsNames } = useDepartments();
+  const { requests: allLeaves } = useAllLeaveRequests();
+
+  const { data: payslipsSummary } = useQuery({
+    queryKey: ['payslipsSummaryDashboard'],
+    queryFn: async () => {
+      try {
+        const res = await PayrollsService.getPayslipsSummary();
+        return res.data?.data || res.data;
+      } catch {
+        return null;
+      }
+    }
+  });
+
+  const { data: employeesCountRes } = useQuery({
+    queryKey: ['employeesCountDashboard'],
+    queryFn: async () => {
+      try {
+        const res = await EmployeesService.getCount();
+        return res.data;
+      } catch {
+        return null;
+      }
+    }
+  });
+
+  const { data: attendanceAnalysis } = useQuery({
+    queryKey: ['attendanceAnalysisDashboard'],
+    queryFn: async () => {
+      try {
+        const res = await AttendanceService.getAnalysis();
+        return res.data;
+      } catch {
+        return null;
+      }
+    }
+  });
 
   const departments = departmentsWithUsers.map(dept => {
     const actualId = (dept as any).department_id || (dept as any).department?.id || dept.id;
@@ -124,10 +166,26 @@ export default function Dashboard() {
 
   const hasDepartments = !departmentsLoading && departments.length > 0;
 
-  //  تصحيح reduce: إزالة <number> لأن النوع سيتم استنتاجه تلقائياً
-  const totalEmployees = departments.reduce((acc: number, dept: Department & { employees?: Employee[] }) => {
-    return acc + (dept.employees?.length || 0);
-  }, 0);
+  const totalEmployees = employeesCountRes?.data?.total_users || 0;
+
+  const approvedLeaves = allLeaves?.filter((l: any) => l.status === 'approved').length || 0;
+  
+  const totalPayroll = payslipsSummary?.net_salary || payslipsSummary?.total_net_salary || 0;
+  const payrollCostStr = `${new Intl.NumberFormat(lang === 'ar' ? 'ar-SY' : "en-US", { maximumFractionDigits: 0 }).format(totalPayroll)} ${lang === 'ar' ? 'ل.س' : 'SYP'}`;
+
+  const attendanceRateStr = attendanceAnalysis
+    ? `${attendanceAnalysis.total > 0 ? Math.round(((attendanceAnalysis.present + attendanceAnalysis.late) / attendanceAnalysis.total) * 100) : 0}%`
+    : "0%";
+
+  const getStatValue = (key: keyof typeof STATS_DATA) => {
+    switch (key) {
+      case 'totalEmployees': return totalEmployees;
+      case 'approvedLeaves': return approvedLeaves;
+      case 'payrollCost': return payrollCostStr;
+      case 'attendanceRate': return attendanceRateStr;
+      default: return STATS_DATA[key];
+    }
+  };
 
   const handleCreateAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -225,7 +283,7 @@ export default function Dashboard() {
           <StatCard
             key={key}
             title={t.hrDashboard?.[key] || title}
-            value={key === 'totalEmployees' ? totalEmployees : getStatValue(key)}
+            value={getStatValue(key)}
             icon={<Icon className="w-5 h-5" />}
             color={color}
             onClick={handleNavigate(path)}
@@ -329,7 +387,14 @@ export default function Dashboard() {
                 return (
                   <div className="space-y-3">
                     {sortedEmps.map(emp => (
-                      <div key={emp.id} className={`flex items-center gap-3 p-3 rounded-lg border ${emp.id === managerId ? 'border-purple-200 bg-purple-50' : 'border-gray-100 bg-gray-50'}`}>
+                      <div 
+                        key={emp.id} 
+                        className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${emp.id === managerId ? 'border-purple-200 bg-purple-50 hover:bg-purple-100' : 'border-gray-100 bg-gray-50 hover:bg-gray-100'}`}
+                        onClick={() => {
+                          setSelectedDepartment(null);
+                          navigate(`/Hr/employee/${emp.id}`);
+                        }}
+                      >
                         <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
                           {emp.full_name?.charAt(0) || '?'}
                         </div>

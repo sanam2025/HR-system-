@@ -125,7 +125,7 @@ function Login() {
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Mail className="h-4 w-4 text-white/70" />
+                                    <Mail className="h-4 w-4 text-gray-500" />
                                 </div>
                                 <input
                                     type="email"
@@ -134,7 +134,7 @@ function Login() {
                                     value={loginData.email}
                                     onChange={(e) => handleChange(e)}
                                     placeholder="you@example.com"
-                                    className="w-full pl-10 pr-4 py-2.5 border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-transparent outline-none transition-all duration-200 bg-white/10 text-white placeholder-white/50 hover:bg-white/20 focus:bg-white/20 text-sm sm:text-base"
+                                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#4A7C59]/50 focus:border-transparent outline-none transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 shadow-sm text-sm sm:text-base"
                                     required
                                 />
                             </div>
@@ -146,7 +146,7 @@ function Login() {
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Lock className="h-4 w-4 text-white/70" />
+                                    <Lock className="h-4 w-4 text-gray-500" />
                                 </div>
                                 <input
                                     type={showPassword ? 'text' : 'password'}
@@ -155,13 +155,13 @@ function Login() {
                                     onChange={(e) => handleChange(e)}
                                     placeholder="Enter your password"
                                     name='password'
-                                    className="w-full pl-10 pr-12 py-2.5 border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-transparent outline-none transition-all duration-200 bg-white/10 text-white placeholder-white/50 hover:bg-white/20 focus:bg-white/20 text-sm sm:text-base"
+                                    className="w-full pl-10 pr-12 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#4A7C59]/50 focus:border-transparent outline-none transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 shadow-sm text-sm sm:text-base"
                                     required
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/70 hover:text-white transition-colors hover:cursor-pointer"
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors hover:cursor-pointer"
                                 >
                                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </button>

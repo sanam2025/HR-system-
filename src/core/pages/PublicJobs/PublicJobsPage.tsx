@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { getAvailableJobs, submitJobApplication } from '../../../api/publicJobs';
+import apiClient from '../../../api/axios';
 import {
   Briefcase, Search, Clock, Users,
   CheckCircle2, XCircle, CalendarDays,
@@ -340,13 +341,25 @@ function ApplyModal({
 
 // ── Job Card ─────────────────────────────────────────────
 function JobCard({
-  job, lang, onApply,
+  job: initialJob, lang, onApply,
 }: {
   job: Job;
   lang: Lang;
   onApply: (job: Job) => void;
 }) {
   const tx = TEXTS[lang];
+  
+  // Fetch detailed job data to get skills, experience, etc.
+  const { data: detailedJobResponse } = useQuery({
+    queryKey: ['publicJobDetail', initialJob.id],
+    queryFn: async () => {
+      const res = await apiClient.get(`job-postings/${initialJob.id}`);
+      return res.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+  
+  const job = detailedJobResponse?.data || initialJob;
   const typeLabel = tx[`type${job.type?.charAt(0).toUpperCase() + job.type?.slice(1)}` as 'typeFullTime' | 'typePartTime' | 'typeRemote'];
 
   return (
@@ -379,14 +392,14 @@ function JobCard({
         </div>
 
         {/* Description */}
-        <p className="text-xs sm:text-sm text-[#6B6358] leading-relaxed mb-3">
+        <p className="text-xs sm:text-sm text-[#6B6358] leading-relaxed mb-3 line-clamp-3">
           {job.description}
         </p>
 
         {/* Requirements */}
         {job.skills && job.skills.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-3 sm:mb-4">
-            {job.skills.map(req => (
+            {job.skills.map((req: string) => (
               <span
                 key={req}
                 className="text-[10px] sm:text-[11px] font-semibold bg-[#4A7C59]/8 text-[#4A7C59] border border-[#4A7C59]/15 px-2 sm:px-2.5 py-1 rounded-full"
@@ -398,10 +411,15 @@ function JobCard({
         )}
 
         {/* Meta row */}
-        <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-[#6B6358]">
+        <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-[#6B6358] mt-auto">
           <span className={`flex items-center gap-1 border rounded-full px-2 py-0.5 text-[10px] sm:text-xs ${TYPE_COLORS[job.type || 'default'] || TYPE_COLORS.default}`}>
-            <Clock size={10} /> {typeLabel}
+            <Clock size={10} /> {typeLabel || tx.typeFullTime}
           </span>
+          {job.experience !== undefined && (
+            <span className="flex items-center gap-1 border rounded-full px-2 py-0.5 text-[10px] sm:text-xs bg-indigo-50 text-indigo-700 border-indigo-100">
+              <Briefcase size={10} /> {lang === 'ar' ? 'الخبرة:' : 'Exp:'} {job.experience} {lang === 'ar' ? 'سنوات' : 'Years'}
+            </span>
+          )}
           {job.posted_at && (
             <span className="flex items-center gap-1">
               <CalendarDays size={11} className="text-[#C4A66A] flex-shrink-0" />

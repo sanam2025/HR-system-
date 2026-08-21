@@ -30,7 +30,7 @@ function StatusCards({announcements , isLoading} : {announcements: Announcements
               <p className="text-sm text-gray-500">{t.adminAnnouncements?.stats?.total || 'Total'}</p>
               <p className="text-2xl font-bold text-gray-900">{Total}</p>
             </div>
-            <div className="bg-blue-50 text-blue-600 p-3 rounded-xl">
+            <div className="bg-[#4A7C59]/10 text-[#4A7C59] p-3 rounded-xl">
               <Megaphone className="w-5 h-5" />
             </div>
           </div>

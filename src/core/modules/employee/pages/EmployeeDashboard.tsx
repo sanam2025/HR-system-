@@ -145,34 +145,6 @@ function TasksSummary() {
       <StatRow label={t.tasks?.columns?.inProgress || "In Progress"} value={inProgress} color="text-blue-600" />
       <StatRow label={t.tasks?.columns?.submitted || "Submitted"} value={submitted} color="text-purple-600" />
       <StatRow label={t.tasks?.columns?.completed || "Completed"} value={completed} color="text-green-600" />
-      {/* Quick-action: start first pending task */}
-      {pending > 0 && (() => {
-        const first = tasks.find((t) => String(t.status).toLowerCase() === "pending");
-        return first ? (
-          <button
-            type="button"
-            onClick={() => startTask.mutate(first.id)}
-            disabled={startTask.isPending}
-            className="mt-2 w-full py-2 text-xs font-medium bg-green-500 text-white rounded-xl disabled:opacity-40 hover:bg-green-600 transition-colors"
-          >
-            {startTask.isPending ? t.tasks?.starting || "Starting…" : `${t.tasks?.start || "▶ Start"} "${first.title}"`}
-          </button>
-        ) : null;
-      })()}
-      {/* Quick-action: submit first in_progress task */}
-      {inProgress > 0 && (() => {
-        const first = tasks.find((t) => String(t.status).toLowerCase() === "in_progress");
-        return first ? (
-          <button
-            type="button"
-            onClick={() => submitTask.mutate({ id: first.id, payload: { notes: "Submitted via dashboard" } })}
-            disabled={submitTask.isPending}
-            className="mt-1 w-full py-2 text-xs font-medium border border-green-500 text-green-600 rounded-xl disabled:opacity-40 hover:bg-green-50 transition-colors"
-          >
-            {submitTask.isPending ? t.tasks?.submitting || "Submitting…" : `${t.tasks?.submit || "📤 Submit"} "${first.title}"`}
-          </button>
-        ) : null;
-      })()}
     </div>
   );
 }

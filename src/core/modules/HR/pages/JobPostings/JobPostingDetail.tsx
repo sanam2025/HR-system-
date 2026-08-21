@@ -87,7 +87,47 @@ export default function JobPostingDetail() {
       </button>
 
       <h1 className="text-2xl font-bold text-gray-900 mb-2">{job.job_title}</h1>
-      <p className="text-gray-500 text-sm mb-6">{job.description}</p>
+      
+      <div className="flex flex-wrap gap-3 mb-6">
+        {job.department && (
+          <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-100">
+            {lang === 'ar' ? 'القسم:' : 'Department:'} {job.department}
+          </span>
+        )}
+        {job.status && (
+          <span className={`px-3 py-1 rounded-lg text-sm font-medium border ${job.status === 'open' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'}`}>
+            {lang === 'ar' ? 'الحالة:' : 'Status:'} {job.status === 'open' ? (lang === 'ar' ? 'مفتوح' : 'Open') : (lang === 'ar' ? 'مغلق' : 'Closed')}
+          </span>
+        )}
+        {job.experience !== undefined && (
+          <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-lg text-sm font-medium border border-purple-100">
+            {lang === 'ar' ? 'الخبرة:' : 'Experience:'} {job.experience} {lang === 'ar' ? 'سنوات' : 'Years'}
+          </span>
+        )}
+        {job.posted_at && (
+          <span className="px-3 py-1 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium border border-gray-200">
+            {lang === 'ar' ? 'تاريخ النشر:' : 'Posted At:'} {job.posted_at}
+          </span>
+        )}
+      </div>
+
+      {job.skills && job.skills.length > 0 && (
+        <div className="mb-6">
+          <h4 className="font-semibold text-gray-800 mb-2">{lang === 'ar' ? 'المهارات المطلوبة:' : 'Required Skills:'}</h4>
+          <div className="flex flex-wrap gap-2">
+            {job.skills.map((skill: string, index: number) => (
+              <span key={index} className="px-2.5 py-1 bg-gray-200 text-gray-700 rounded-md text-xs font-medium">
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-8">
+        <h4 className="font-semibold text-gray-800 mb-3">{lang === 'ar' ? 'الوصف الوظيفي:' : 'Job Description:'}</h4>
+        <p className="text-gray-600 text-sm leading-relaxed">{job.description}</p>
+      </div>
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 flex items-center gap-2">
@@ -106,7 +146,7 @@ export default function JobPostingDetail() {
                 <th className={`px-6 py-3 text-xs font-semibold text-gray-500 uppercase ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{detailsLang?.table?.email || 'Email'}</th>
                 <th className={`px-6 py-3 text-xs font-semibold text-gray-500 uppercase ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{detailsLang?.table?.appliedAt || 'Applied At'}</th>
                 <th className={`px-6 py-3 text-xs font-semibold text-gray-500 uppercase ${lang === 'ar' ? 'text-right' : 'text-left'}`}>{detailsLang?.table?.status || 'Status'}</th>
-                <th className={`px-6 py-3 text-xs font-semibold text-gray-500 uppercase ${lang === 'ar' ? 'text-left' : 'text-right'}`}>{detailsLang?.table?.actions || 'Actions'}</th>
+
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -120,23 +160,7 @@ export default function JobPostingDetail() {
                       {c.status}
                     </span>
                   </td>
-                  <td className={`px-6 py-4 flex items-center gap-2 ${lang === 'ar' ? 'justify-start text-left' : 'justify-end text-right'}`}>
-                    {/*  إخفاء الزر إذا كان المتقدم حالته offered */}
-                    {c.status !== 'offered' && c.status !== 'interviewed' && (
-                      <button
-                        onClick={() => {
-                          setSelectedCandidateId(c.id);
-                          setShowScheduleForm(true);
-                        }}
-                        className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs flex items-center gap-1"
-                      >
-                        <Calendar className="w-3 h-3" /> {detailsLang?.actions?.schedule || 'Schedule'}
-                      </button>
-                    )}
-                    <button onClick={() => navigate(`/Hr/recruitment/applicant/${c.id}`)} className="text-blue-600 hover:text-blue-800 text-sm">
-                      {detailsLang?.actions?.view || 'View'}
-                    </button>
-                  </td>
+
                 </tr>
               ))}
             </tbody>

@@ -103,7 +103,7 @@
   }
 
   .btn-primary {
-    @apply bg-white text-[#4A7C59] border border-[#4A7C59] hover:bg-[#f1f5f9] active:scale-[0.98];
+    @apply bg-green text-white hover:bg-green/90 active:scale-[0.98];
   }
 
   .btn-gold {

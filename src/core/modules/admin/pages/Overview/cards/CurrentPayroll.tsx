@@ -41,13 +41,13 @@ function CurrentPayroll({
     },
     {
       title: lang === 'ar' ? 'المكافآت والحوافز' : 'Incentives',
-      value: `$${currentPayroll?.summary.incentives || 0}`,
+      value: currentPayroll?.summary.incentives || 0,
       icon: Award,
       color: "orange",
     },
     {
       title: lang === 'ar' ? 'الخصومات' : 'Deductions',
-      value: `$${currentPayroll?.summary.deductions || 0}`,
+      value: currentPayroll?.summary.deductions || 0,
       icon: MinusCircle,
       color: "red",
     },

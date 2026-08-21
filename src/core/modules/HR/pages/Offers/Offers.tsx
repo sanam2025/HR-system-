@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Plus, Briefcase, Calendar, DollarSign } from 'lucide-react';
 import { useOffers } from '../../hooks/useOffer';
 import { useJobPostings } from '../../hooks/useJobPostings';
 import Loading from '../../../../../shared/components/Loading';
 import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
+import { InterviewsService } from '../../../../../api/service/HrService/InterviewsService';
 
 export const Offers = () => {
   const navigate = useNavigate();
@@ -22,7 +24,24 @@ export const Offers = () => {
   const { offers, isLoading: isLoadingOffers, error } = useOffers(selectedJobId);
   const { t, lang } = useLanguage();
 
-  const isLoading = isLoadingPostings || (selectedJobId && isLoadingOffers);
+  const { data: rawRankingResponse, isLoading: isLoadingRanking } = useQuery({
+    queryKey: ['job-ranking', selectedJobId],
+    queryFn: () => InterviewsService.getRanking(selectedJobId!),
+    enabled: !!selectedJobId,
+  });
+
+  const getArray = (obj: any) => {
+    if (!obj) return [];
+    if (Array.isArray(obj)) return obj;
+    if (Array.isArray(obj.data)) return obj.data;
+    if (Array.isArray(obj.data?.data)) return obj.data.data;
+    if (Array.isArray(obj.ranking)) return obj.ranking;
+    return [];
+  };
+
+  const rankedCandidates = getArray(rawRankingResponse?.data);
+
+  const isLoading = isLoadingPostings || (selectedJobId && isLoadingOffers) || (selectedJobId && isLoadingRanking);
 
   if (isLoading) {
     return (
@@ -56,7 +75,7 @@ export const Offers = () => {
           {selectedJobId && (
             <button
               onClick={() => navigate(`/Hr/job-postings/${selectedJobId}/offers/send`)}
-              className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-green text-white rounded-lg hover:bg-green/90 transition-colors shadow-sm"
             >
               <Plus className="w-4 h-4" />
               {t.hrOffers?.newOffer || 'New Offer'}
@@ -68,7 +87,7 @@ export const Offers = () => {
           <div className="mt-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">{t.hrOffers?.selectJobPosting || 'Select Job Posting'}</label>
             <select
-              className="w-full md:w-1/3 border-gray-300 rounded-lg shadow-sm focus:border-orange-500 focus:ring-orange-500 p-2 border"
+              className="w-full md:w-1/3 border-gray-300 rounded-lg shadow-sm focus:border-green focus:ring-green p-2 border"
               value={selectedJobId || ""}
               onChange={(e) => setSelectedJobId(Number(e.target.value))}
             >
@@ -81,6 +100,57 @@ export const Offers = () => {
         )}
       </div>
 
+      {selectedJobId && rankedCandidates.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
+          <div className="p-4 border-b bg-green-50">
+            <h2 className="text-lg font-bold text-green-800">{lang === 'ar' ? 'المرشحون المرتبون من المدير' : 'Candidates Ranked by Manager'}</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b">
+                <tr>
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase ${lang === 'ar' ? 'text-right' : 'text-left'}`}>
+                    {lang === 'ar' ? 'الترتيب' : 'Rank'}
+                  </th>
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase ${lang === 'ar' ? 'text-right' : 'text-left'}`}>
+                    {lang === 'ar' ? 'المرشح' : 'Candidate'}
+                  </th>
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase ${lang === 'ar' ? 'text-right' : 'text-left'}`}>
+                    {lang === 'ar' ? 'إجراءات' : 'Actions'}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {rankedCandidates.map((item: any, index: number) => {
+                  const candidateName = item.interview?.candidate?.full_name || item.candidate?.full_name || item.candidate_name || `Candidate #${item.interview?.candidate_id || item.candidate_id || index}`;
+                  const candidateId = item.interview?.candidate_id || item.candidate?.id || item.candidate_id || '';
+                  return (
+                  <tr key={item.id || index} className="hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <span className="font-bold text-green-600 bg-green-100 px-2 py-1 rounded-full text-xs">#{item.rank || index + 1}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm font-medium text-gray-900">
+                        {candidateName}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => navigate(`/Hr/job-postings/${selectedJobId}/offers/send?candidateId=${candidateId}`)}
+                        className="px-3 py-1.5 bg-green text-white text-xs rounded-lg hover:bg-green/90 transition-colors shadow-sm flex items-center gap-1"
+                      >
+                        <Plus className="w-3 h-3" />
+                        {lang === 'ar' ? 'إرسال عرض' : 'Send Offer'}
+                      </button>
+                    </td>
+                  </tr>
+                )})}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {!selectedJobId ? (
         <div className="bg-white rounded-xl shadow-sm p-12 text-center">
           <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -92,7 +162,7 @@ export const Offers = () => {
           <p className="text-gray-500">{t.hrOffers?.noOffersSent || 'No offers sent yet'}</p>
           <button
             onClick={() => navigate(`/Hr/job-postings/${selectedJobId}/offers/send`)}
-            className="mt-4 text-orange-500 hover:text-orange-700 font-medium"
+            className="mt-4 text-green hover:text-green/80 font-medium"
           >
             {t.hrOffers?.sendFirstOffer || 'Send your first offer \u2192'}
           </button>

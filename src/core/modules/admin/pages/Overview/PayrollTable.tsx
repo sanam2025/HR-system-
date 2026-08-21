@@ -21,16 +21,6 @@ function PayrollTable({
         <h3 className="font-semibold text-gray-800">
           {lang === 'ar' ? 'جميع سجلات الرواتب' : 'All Payroll Records'}
         </h3>
-        <button 
-          onClick={() => generatePayroll()}
-          disabled={isPending}
-          className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2 text-sm disabled:opacity-50"
-        >
-        <Plus className="w-4 h-4" />
-        {isPending 
-          ? (lang === 'ar' ? 'جاري التوليد...' : 'Generating...') 
-          : (lang === 'ar' ? `توليد مسير الرواتب لـ ${currentMonth} ${currentYear}` : `Generate Payroll for ${currentMonth} ${currentYear}`)}
-        </button>
     </div>
     <div className="overflow-x-auto w-full">
         <table className="w-full min-w-[600px]">

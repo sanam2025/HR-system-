@@ -54,7 +54,8 @@ export const useJobPosting = (jobId?: number) => {
     queryFn: async () => {
       if (!jobId) return null;
       const res = await JobPostingsService.getById(jobId);
-      return res.data?.data || null;
+      // Fallback: If `res.data.data` exists, return it, else return `res.data`
+      return res.data?.data || res.data || null;
     },
     enabled: !!jobId,
   });

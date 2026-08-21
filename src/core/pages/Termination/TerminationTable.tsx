@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserMinus, CheckCircle, XCircle, Search, Trash2, Loader2, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
+import { UserMinus, CheckCircle, XCircle, Search, Trash2, Loader2, Calendar, ChevronDown, ChevronUp, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -27,6 +27,13 @@ export default function TerminationTable({ role }: TerminationTableProps) {
     id: null
   });
   const [actionReason, setActionReason] = useState('');
+  const [detailsId, setDetailsId] = useState<number | null>(null);
+
+  const { data: terminationDetails, isLoading: isLoadingDetails } = useQuery({
+    queryKey: ['terminationRequest', detailsId],
+    queryFn: () => terminationApi.getTermination(detailsId!),
+    enabled: !!detailsId
+  });
 
   // Fetch queries
   const { data: allRequests = [], isLoading: isLoadingAll } = useQuery({
@@ -62,7 +69,15 @@ export default function TerminationTable({ role }: TerminationTableProps) {
       toast.success(tr.toasts.created);
       setIsCreateModalOpen(false);
     },
-    onError: (error: any) => toast.error(error.response?.data?.message || tr.toasts.error)
+    onError: (error: any) => {
+      const data = error.response?.data;
+      if (data?.errors && typeof data.errors === 'object') {
+        const firstError = Object.values(data.errors)[0] as string[];
+        toast.error(firstError[0]);
+      } else {
+        toast.error(data?.message || tr.toasts.error);
+      }
+    }
   });
 
   const approveMutation = useMutation({
@@ -103,6 +118,13 @@ export default function TerminationTable({ role }: TerminationTableProps) {
 
   const handleActionSubmit = () => {
     if (!actionModal.id) return;
+    
+    if (role === 'admin') {
+      toast.error(lang === 'ar' ? "هذا ليس من دورك" : "This is not your role");
+      closeActionModal();
+      return;
+    }
+
     if (actionModal.type === 'approve') approveMutation.mutate(actionModal.id);
     else if (actionModal.type === 'reject') rejectMutation.mutate(actionModal.id);
     else if (actionModal.type === 'delete') deleteMutation.mutate(actionModal.id);
@@ -273,6 +295,13 @@ export default function TerminationTable({ role }: TerminationTableProps) {
                         </td>
                         <td className="px-6 py-4 text-center">
                           <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setDetailsId(req.id); }}
+                              className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              title={lang === 'ar' ? 'عرض التفاصيل' : 'View Details'}
+                            >
+                              <Eye size={18} />
+                            </button>
                             {mainTab === 'all' && req.approvals?.find((a: any) => a.role?.toLowerCase() === role)?.status === 'pending' && (
                               <>
                                 <button
@@ -416,6 +445,115 @@ export default function TerminationTable({ role }: TerminationTableProps) {
                 {(approveMutation.isPending || rejectMutation.isPending || deleteMutation.isPending) && <Loader2 size={16} className="animate-spin" />}
                 {actionModal.type === 'approve' ? tr.modal.confirmApprove : 
                  actionModal.type === 'reject' ? tr.modal.confirmReject : (lang === 'ar' ? 'حذف' : 'Delete')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Details Modal */}
+      {detailsId && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <Eye className="text-blue-600" size={24} />
+                {lang === 'ar' ? 'تفاصيل إنهاء الخدمة' : 'Termination Details'}
+              </h2>
+              <button 
+                onClick={() => setDetailsId(null)}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <XCircle size={24} />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto">
+              {isLoadingDetails ? (
+                <div className="flex justify-center items-center py-20">
+                  <Loader2 className="animate-spin text-blue-600" size={32} />
+                </div>
+              ) : terminationDetails ? (
+                <div className="space-y-6">
+                  {/* Basic Info */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">{tr.columns.employee}</p>
+                      <p className="font-medium text-gray-900">{terminationDetails.user?.name || terminationDetails.employee_name}</p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">{tr.columns.date}</p>
+                      <div className="flex items-center gap-2 text-gray-900 font-medium">
+                        <Calendar size={16} className="text-gray-400" />
+                        {terminationDetails.termination_date}
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">{tr.columns.type}</p>
+                      <p className="font-medium text-gray-900">{(tr.types as any)[terminationDetails.type as keyof typeof tr.types] || terminationDetails.type}</p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">{tr.columns.subtype}</p>
+                      <p className="font-medium text-gray-900">{(tr.subtypes as any)[terminationDetails.subtype as keyof typeof tr.subtypes] || terminationDetails.subtype}</p>
+                    </div>
+                  </div>
+
+                  {/* Reasons & Docs */}
+                  {terminationDetails.legal_reason && (
+                    <div>
+                      <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div>
+                        {lang === 'ar' ? 'السبب' : 'Reason'}
+                      </h3>
+                      <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        {terminationDetails.legal_reason}
+                      </div>
+                    </div>
+                  )}
+
+                  {terminationDetails.decision_reason && (
+                    <div>
+                      <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
+                        {lang === 'ar' ? 'سبب القرار' : 'Decision Reason'}
+                      </h3>
+                      <div className="bg-amber-50/50 p-4 rounded-xl border border-amber-100 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        {terminationDetails.decision_reason}
+                      </div>
+                    </div>
+                  )}
+
+                  {terminationDetails.documents && (
+                    <div>
+                      <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
+                        {lang === 'ar' ? 'المرفقات' : 'Attachments'}
+                      </h3>
+                      <a 
+                        href={`https://masarhr.alwaysdata.net/storage/${terminationDetails.documents}`}
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors border border-purple-100 text-sm font-medium"
+                      >
+                        <Search size={16} />
+                        {lang === 'ar' ? 'عرض المرفق' : 'View Document'}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-10 text-gray-500">
+                  {lang === 'ar' ? 'فشل تحميل التفاصيل' : 'Failed to load details'}
+                </div>
+              )}
+            </div>
+            
+            <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+              <button
+                onClick={() => setDetailsId(null)}
+                className="px-6 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors shadow-sm"
+              >
+                {lang === 'ar' ? 'إغلاق' : 'Close'}
               </button>
             </div>
           </div>

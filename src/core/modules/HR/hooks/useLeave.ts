@@ -6,9 +6,10 @@ import { LeaveService } from '../../../../api/service/HrService/LeaveService';
 //  جلب كل الطلبات
 export const useLeaveRequests = () => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['/leaveRequests'],
+    queryKey: ['/leaveRequests', 'all'],
     queryFn: async () => {
-      const res = await LeaveService.getAll();
+      // Use getAllRequests to fetch from /all-leave-request instead of /leaveRequests
+      const res = await LeaveService.getAllRequests();
       return res.data?.data || [];
     },
   });
@@ -117,9 +118,15 @@ export const useAllLeaveRequests = (from?: string, to?: string) => {
     queryKey: ['all-leave-requests', from, to],
     queryFn: async () => {
       const res = await LeaveService.getAllRequests(from, to);
-      return res.data?.data || [];
+      const raw = res.data;
+      if (Array.isArray(raw)) return raw;
+      if (Array.isArray((raw as any)?.data)) return (raw as any).data;
+      if (Array.isArray((raw as any)?.data?.data)) return (raw as any).data.data;
+      if (Array.isArray((raw as any)?.leave_requests)) return (raw as any).leave_requests;
+      if (Array.isArray((raw as any)?.requests)) return (raw as any).requests;
+      return [];
     },
-    enabled: !!from && !!to,
+    enabled: (from !== undefined || to !== undefined) ? (!!from && !!to) : true,
   });
 
   return {

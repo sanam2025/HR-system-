@@ -35,7 +35,7 @@ export const HourlyLeaveService = {
 
   // ✅ كل طلبات القسم
   getAllDepartmentRequests: (depId?: number) => {
-    let url = '/all-hourly-leave-request';
+    let url = '/all-hourly-leave-requests-hr';
     if (depId) url += `?dep_id=${depId}`;
     return apiClient.get<{ data: HourlyLeaveRequest[] }>(url);
   },

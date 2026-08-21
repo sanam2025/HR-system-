@@ -166,39 +166,7 @@ function AnnouncementForm({ initial, onSave, onCancel }: AnnouncementFormProps) 
         </div>
       </div>
 
-      {/* الجمهور */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="form-label">{lang === 'ar' ? 'الجمهور المستهدف' : 'Target Audience'} <span className="text-red-500">*</span></label>
-          <select
-            className="form-input"
-            value={form.target_audience}
-            onChange={e => set('target_audience', e.target.value)}
-          >
-            <option value="all">{lang === 'ar' ? 'الكل' : 'All'}</option>
-            <option value="employees">{lang === 'ar' ? 'الموظفون' : 'Employees'}</option>
-            <option value="managers">{lang === 'ar' ? 'المدراء' : 'Managers'}</option>
-            <option value="department">{lang === 'ar' ? 'قسم محدد' : 'Specific Department'}</option>
-          </select>
-        </div>
 
-        {form.target_audience === 'department' && (
-          <div>
-            <label className="form-label">{lang === 'ar' ? 'اختر القسم' : 'Select Department'} <span className="text-red-500">*</span></label>
-            <select
-              className="form-input"
-              value={form.department_id}
-              onChange={e => set('department_id', e.target.value ? Number(e.target.value) : '')}
-              required
-            >
-              <option value="">{lang === 'ar' ? 'اختر...' : 'Select...'}</option>
-              {departments.map((dep: any) => (
-                <option key={dep.id} value={dep.id}>{dep.name}</option>
-              ))}
-            </select>
-          </div>
-        )}
-      </div>
 
       {/* أزرار */}
       <div className="flex items-center gap-3 pt-1">
@@ -437,79 +405,60 @@ export default function ManagerAnnouncements() {
                   <th className="px-5 py-3 text-start font-semibold">{t.announcements.list.columns.priority}</th>
                   <th className="px-5 py-3 text-start font-semibold">{t.announcements.list.columns.status}</th>
                   <th className="px-5 py-3 text-start font-semibold">{t.announcements.list.columns.date}</th>
-                  <th className="px-5 py-3 text-center font-semibold w-[1%] whitespace-nowrap">{t.announcements.list.columns.actions}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {list.map((ann, idx) => (
                   <tr key={ann.id} className="hover:bg-gray-50/40 transition-colors">
-                    <td className="px-5 py-3.5 text-gray-400 font-medium">{idx + 1}</td>
+                    <td className="px-5 py-3.5 text-gray-400 font-medium text-start">{idx + 1}</td>
 
                     {/* العنوان + النص المختصر */}
-                    <td className="px-5 py-3.5 max-w-[200px]">
-                      <p className="font-semibold text-dark leading-snug truncate" title={ann.title}>
+                    <td className="px-5 py-3.5 max-w-[200px] text-start">
+                      <p className="font-semibold text-dark leading-snug truncate text-start" title={ann.title} dir="auto">
                         {ann.title.length > 20 ? ann.title.substring(0, 20) + '...' : ann.title}
                       </p>
-                      <p className="text-xs text-brown truncate mt-0.5" title={ann.content}>{ann.content}</p>
+                      <p className="text-xs text-brown truncate mt-0.5 text-start" title={ann.content} dir="auto">{ann.content}</p>
                     </td>
 
                     {/* الجمهور */}
-                    <td className="px-5 py-3.5">
+                    <td className="px-5 py-3.5 text-start">
                       <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full font-medium">
                         {t.announcements.audiences[(ann.target_audience || ann.audience_type) as keyof typeof t.announcements.audiences] ?? ann.target_audience ?? ann.audience_type}
                       </span>
                     </td>
 
                     {/* الأولوية */}
-                    <td className="px-5 py-3.5 text-xs text-brown font-medium">
+                    <td className="px-5 py-3.5 text-xs text-brown font-medium text-start">
                       {(t.announcements.priorities as any)[ann.priority] ?? ann.priority}
                     </td>
 
                     {/* الحالة */}
-                    <td className="px-5 py-3.5">
+                    <td className="px-5 py-3.5 text-start">
                       <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLE[ann.status]}`}>
                         {t.announcements.statuses[ann.status as keyof typeof t.announcements.statuses]}
                       </span>
                     </td>
 
-                    {/* التاريخ */}
-                    <td className="px-5 py-3.5 text-xs text-brown">
+                    {/* Date */}
+                    <td className="px-5 py-3.5 text-xs text-brown text-start">
                       {formatDate(ann.starts_at)}
                     </td>
 
-                    {/* الإجراءات */}
-                    <td className="px-5 py-3.5 w-[1%] whitespace-nowrap">
-                      <div className="flex items-center justify-center gap-1">
-                        {/* نشر فوري — يظهر للمسودة والمجدول */}
-                        {((ann as any).author?.id !== 1 || currentUser?.id === 1) && (ann.status?.toLowerCase() === 'scheduled' || ann.status?.toLowerCase() === 'draft') && (
-                          <button
-                            onClick={() => handlePublish(ann.id)}
-                            disabled={publishing === ann.id}
-                            title={t.announcements.list.publishNow}
-                            className="p-2 text-green hover:bg-green/10 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {publishing === ann.id
-                              ? <span className="inline-block w-4 h-4 border-2 border-green border-t-transparent rounded-full animate-spin" />
-                              : <Send size={16} />
-                            }
-                          </button>
-                        )}
-
-                        {/* 
-                          يمكنه التعديل/الحذف إذا لم يكن المنشئ هو المدير صاحب ال id 1 
-                          والحالة ليست active
-                        */}
-                        {((ann as any).author?.id !== 1 || currentUser?.id === 1) && ann.status?.toLowerCase() !== 'active' && (
+                    {/* Actions */}
+                    <td className="px-5 py-3.5 text-start">
+                      <div className={`flex items-center gap-1.5 ${lang === 'ar' ? 'justify-end' : 'justify-start'}`}>
+                        {ann.status === 'draft' && (
                           <>
-                            {/* تعديل */}
                             <button
-                              onClick={() => { setEditing(ann); setShowNew(false); }}
+                              onClick={() => {
+                                setEditing(ann);
+                                setShowNew(true);
+                              }}
                               title={t.announcements.list.edit}
-                              className="p-2 rounded-xl transition-colors text-[#6B6358] hover:bg-gray-100"
+                              className="p-2 rounded-xl transition-colors text-blue-500 hover:bg-blue-50"
                             >
                               <Edit2 size={16} />
                             </button>
-                            {/* حذف */}
                             <button
                               onClick={() => handleDelete(ann)}
                               title={t.announcements.list.delete}

@@ -57,9 +57,9 @@ export default function EmployeeComplaints() {
         
         {/* TOP/RIGHT SIDE: File a complaint */}
         <article className="bg-white rounded-3xl p-6 sm:p-8 shadow-[0_2px_20px_rgb(0,0,0,0.04)] border border-gray-200 relative overflow-hidden transition-all h-fit">
-          <div className="absolute top-0 start-0 w-2 h-full bg-[#3A6246]" />
-          <header className="flex items-center gap-3 text-[#3A6246] font-bold text-xl mb-6 pb-4 border-b border-gray-200">
-            <div className="p-2.5 bg-[#4A7C59]/15 rounded-xl text-[#3A6246]">
+          <div className="absolute top-0 start-0 w-2 h-full bg-green" />
+          <header className="flex items-center gap-3 text-green font-bold text-xl mb-6 pb-4 border-b border-gray-200">
+            <div className="p-2.5 bg-green/15 rounded-xl text-green">
               <MessageSquareWarning size={24} aria-hidden="true" strokeWidth={2.5} />
             </div>
             <span>{t.complaints?.fileComplaint || "File a Complaint"}</span>
@@ -73,14 +73,14 @@ export default function EmployeeComplaints() {
               </div>
             )}
             {successMessage && (
-              <div className="bg-[#4A7C59]/10 border border-[#4A7C59]/30 text-[#3A6246] px-5 py-4 rounded-2xl text-sm font-bold flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-[#3A6246] animate-pulse"></div>
+              <div className="bg-green/10 border border-green/30 text-green px-5 py-4 rounded-2xl text-sm font-bold flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-green animate-pulse"></div>
                 {successMessage}
               </div>
             )}
             
             <div className="space-y-5">
-              <div className="[&_label]:block [&_label]:text-xs [&_label]:font-bold [&_label]:text-gray-700 [&_label]:mb-2 [&_input]:w-full [&_input]:px-5 [&_input]:py-3.5 [&_input]:rounded-2xl [&_input]:border-2 [&_input]:border-gray-300 [&_input]:text-sm [&_input]:font-bold [&_input]:text-gray-900 [&_input]:focus:outline-none [&_input]:focus:ring-4 [&_input]:focus:ring-[#4A7C59]/20 [&_input]:focus:border-[#4A7C59] [&_input]:transition-all [&_input]:bg-gray-50/80 [&_input]:hover:bg-white">
+              <div className="[&_label]:block [&_label]:text-xs [&_label]:font-bold [&_label]:text-gray-700 [&_label]:mb-2 [&_input]:w-full [&_input]:px-5 [&_input]:py-3.5 [&_input]:rounded-2xl [&_input]:border-2 [&_input]:border-gray-300 [&_input]:text-sm [&_input]:font-bold [&_input]:text-gray-900 [&_input]:focus:outline-none [&_input]:focus:ring-4 [&_input]:focus:ring-green/20 [&_input]:focus:border-green [&_input]:transition-all [&_input]:bg-gray-50/80 [&_input]:hover:bg-white">
                 <PersonPicker
                   label={t.complaints?.who || "Who is this about?"}
                   people={directory.people}
@@ -102,7 +102,7 @@ export default function EmployeeComplaints() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder={t.complaints?.form?.titlePlaceholder || "E.g., Inappropriate behavior..."}
-                  className="w-full px-5 py-3.5 rounded-2xl border-2 border-gray-300 text-sm font-bold text-gray-900 bg-gray-50/80 hover:bg-white focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#4A7C59]/20 focus:border-[#4A7C59] transition-all"
+                  className="w-full px-5 py-3.5 rounded-2xl border-2 border-gray-300 text-sm font-bold text-gray-900 bg-gray-50/80 hover:bg-white focus:bg-white focus:outline-none focus:ring-4 focus:ring-green/20 focus:border-green transition-all"
                 />
               </div>
 
@@ -117,7 +117,7 @@ export default function EmployeeComplaints() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder={t.complaints?.form?.descPlaceholder || "Please describe the incident in detail..."}
-                  className="w-full px-5 py-3.5 rounded-2xl border-2 border-gray-300 text-sm font-bold text-gray-900 bg-gray-50/80 hover:bg-white focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#4A7C59]/20 focus:border-[#4A7C59] transition-all resize-none"
+                  className="w-full px-5 py-3.5 rounded-2xl border-2 border-gray-300 text-sm font-bold text-gray-900 bg-gray-50/80 hover:bg-white focus:bg-white focus:outline-none focus:ring-4 focus:ring-green/20 focus:border-green transition-all resize-none"
                 />
               </div>
             </div>
@@ -125,7 +125,7 @@ export default function EmployeeComplaints() {
             <button
               type="submit"
               disabled={createComplaint.isPending || !subject}
-              className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-[#3A6246] text-white rounded-2xl text-base font-bold shadow-lg shadow-[#3A6246]/30 hover:bg-[#2C4A35] hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:transform-none"
+              className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-green text-white rounded-2xl text-base font-bold shadow-lg shadow-green/30 hover:bg-green/90 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:transform-none"
             >
               <MessageSquareWarning size={18} />
               {createComplaint.isPending ? t.complaints?.form?.submitting || "Submitting..." : t.complaints?.form?.submit || "Submit Complaint"}
@@ -157,7 +157,7 @@ export default function EmployeeComplaints() {
               {myComplaints.data.map((complaint) => (
                 <div key={complaint.id} className="p-5 rounded-2xl border border-gray-200 bg-gray-50 hover:bg-white hover:border-gray-300 hover:shadow-md transition-all group">
                   <div className="flex items-start justify-between gap-4 mb-3">
-                    <p className="text-base font-bold text-gray-900 leading-tight group-hover:text-[#3A6246] transition-colors break-words min-w-0">{complaint.title}</p>
+                    <p className="text-base font-bold text-gray-900 leading-tight group-hover:text-green transition-colors break-words min-w-0">{complaint.title}</p>
                     {complaint.status && (
                       <div className="flex-shrink-0">
                          <Badge variant={statusVariant(complaint.status)}>{humanizeStatus(complaint.status)}</Badge>

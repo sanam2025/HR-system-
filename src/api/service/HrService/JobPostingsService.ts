@@ -12,7 +12,7 @@ export const JobPostingsService = {
   getAll: () => apiClient.get<APIResponseWithData<JobPosting[]>>('HRjob-postings'),
   
   // جلب وظيفة واحدة
-  getById: (id: number) => apiClient.get<JobPostingSingleResponse>(`HRjob-postings/${id}`),
+  getById: (id: number) => apiClient.get<JobPostingSingleResponse>(`job-postings/${id}`),
   
   // جلب المتقدمين لوظيفة محددة
   getCandidatesByJobPosting: (jobPostingId: number) => 

@@ -9,6 +9,7 @@ const EmployeeTasks = React.lazy(() => import('@/core/modules/employee/pages/Emp
 const EmployeeFinance = React.lazy(() => import('@/core/modules/employee/pages/EmployeeFinance'));
 const EmployeeAttendance = React.lazy(() => import('@/core/modules/employee/pages/EmployeeAttendance'));
 const EmployeeComplaints = React.lazy(() => import('@/core/modules/employee/pages/EmployeeComplaints'));
+const EmployeeResignation = React.lazy(() => import('@/core/modules/employee/pages/EmployeeResignation'));
 
 export const employeeRoutes = {
   path: "/employee",
@@ -24,5 +25,6 @@ export const employeeRoutes = {
     { path: "finance", element: <SuspenseWrapper><EmployeeFinance /></SuspenseWrapper> },
     { path: "attendance", element: <SuspenseWrapper><EmployeeAttendance /></SuspenseWrapper> },
     { path: "complaints", element: <SuspenseWrapper><EmployeeComplaints /></SuspenseWrapper> },
+    { path: "resignation", element: <SuspenseWrapper><EmployeeResignation /></SuspenseWrapper> },
   ],
 };

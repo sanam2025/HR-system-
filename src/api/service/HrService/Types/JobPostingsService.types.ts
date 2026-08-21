@@ -8,8 +8,10 @@ export interface JobPosting {
   job_title: string;
   description: string;
   experience: number;
-  skills: number[];
+  department?: string;
+  skills: string[] | number[];
   status: PostingStatus;
+  posted_at?: string;
   created_at: string;
   updated_at: string;
 }

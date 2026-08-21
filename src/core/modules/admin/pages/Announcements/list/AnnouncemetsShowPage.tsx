@@ -27,9 +27,9 @@ function AnnouncementsShow({
                 className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+                <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-[#4A7C59]/10 to-[#4A7C59]/5">
                     <div className="flex items-center gap-3">
-                        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white p-2.5 rounded-xl shadow-lg shadow-blue-200">
+                        <div className="bg-gradient-to-br from-[#4A7C59] to-[#3d6649] text-white p-2.5 rounded-xl shadow-lg shadow-[#4A7C59]/20">
                             <FileText className="w-5 h-5" />
                         </div>
                         <div>
@@ -58,19 +58,19 @@ function AnnouncementsShow({
 
                         <div>
                             <h4 className="text-sm font-medium text-gray-700 mb-2">{t.adminAnnouncements?.form?.contentLabel || 'Content'}</h4>
-                            <div className="bg-gradient-to-br from-gray-50 to-blue-50/50 rounded-xl p-4 border border-gray-100">
+                            <div className="bg-gradient-to-br from-gray-50 to-[#4A7C59]/5 rounded-xl p-4 border border-gray-100">
                                 <p className="text-gray-800 whitespace-pre-wrap">{announcement?.content}</p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-3">
-                                <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-blue-100">
-                                    <Calendar className="w-4 h-4 text-blue-600" />
+                                <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-[#4A7C59]/10 to-[#4A7C59]/5 rounded-lg border border-[#4A7C59]/20">
+                                    <Calendar className="w-4 h-4 text-[#4A7C59]" />
                                     <div>
                                         <p className="text-xs text-gray-500">{t.adminAnnouncements?.view?.published || 'Starts At'}</p>
                                         <p className="text-sm font-medium text-gray-900">{formatDate(announcement?.starts_at as Date)}</p>
-                                        <p className="text-xs text-blue-600">{formatTime(announcement?.starts_at as Date)}</p>
+                                        <p className="text-xs text-[#4A7C59]">{formatTime(announcement?.starts_at as Date)}</p>
                                     </div>
                                 </div>
 

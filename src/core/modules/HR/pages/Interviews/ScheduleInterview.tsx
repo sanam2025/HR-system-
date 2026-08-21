@@ -5,8 +5,10 @@ import { ArrowLeft, Calendar, MapPin } from 'lucide-react';
 import { useInterviews } from '../../hooks/useInterviews';
 import toast from 'react-hot-toast';
 import { AxiosError } from 'axios';
+import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
 
 export const ScheduleInterview = () => {
+  const { lang } = useLanguage();
   const navigate = useNavigate();
   const { jobId: jobIdFromParams } = useParams<{ jobId: string }>();
   const [searchParams] = useSearchParams();
@@ -46,12 +48,12 @@ export const ScheduleInterview = () => {
     e.preventDefault();
     
     if (!form.scheduled_at) {
-      toast.error('Please select a date and time');
+      toast.error(lang === 'ar' ? 'يرجى اختيار التاريخ والوقت' : 'Please select a date and time');
       return;
     }
     
     if (isWeekend(form.scheduled_at)) {
-      toast.error('Interviews cannot be scheduled on weekends (Friday, Saturday)');
+      toast.error(lang === 'ar' ? 'لا يمكن تحديد مقابلات في عطلة نهاية الأسبوع (الجمعة، السبت)' : 'Interviews cannot be scheduled on weekends (Friday, Saturday)');
       return;
     }
     
@@ -86,7 +88,7 @@ export const ScheduleInterview = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
           <button
@@ -97,17 +99,13 @@ export const ScheduleInterview = () => {
                 navigate('/Hr/interviews');
               }
             }}
-            className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3"
+            className={`flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3 ${lang === 'ar' ? 'flex-row-reverse w-fit' : ''}`}
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Interviews
+            <ArrowLeft className={`w-4 h-4 ${lang === 'ar' ? 'rotate-180' : ''}`} /> {lang === 'ar' ? 'العودة للمقابلات' : 'Back to Interviews'}
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">Schedule Interview</h1>
-          <p className="text-gray-500 text-sm mt-1">Schedule a new interview for this job posting</p>
-          {candidateIdFromUrl && (
-            <p className="text-sm text-purple-600 mt-2">
-               Scheduling interview for Candidate #{candidateIdFromUrl}
-            </p>
-          )}
+          <h1 className="text-2xl font-bold text-gray-900">{lang === 'ar' ? 'تحديد موعد مقابلة' : 'Schedule Interview'}</h1>
+          <p className="text-gray-500 text-sm mt-1">{lang === 'ar' ? 'جدولة مقابلة جديدة لهذه الوظيفة' : 'Schedule a new interview for this job posting'}</p>
+
         </div>
 
         <div className="bg-white rounded-xl shadow-sm p-6">
@@ -135,49 +133,49 @@ export const ScheduleInterview = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Scheduled Date & Time *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{lang === 'ar' ? 'التاريخ والوقت المجدول *' : 'Scheduled Date & Time *'}</label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Calendar className={`absolute ${lang === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400`} />
                 <input
                   type="datetime-local"
                   name="scheduled_at"
                   value={form.scheduled_at}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={`w-full ${lang === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 border rounded-lg focus:ring-2 focus:ring-green/30 focus:border-green transition-all duration-150`}
                   required
                 />
               </div>
-              <p className="text-xs text-gray-400 mt-1">Choose a weekday (Sunday - Thursday, avoid Friday/Saturday)</p>
+              <p className="text-xs text-gray-400 mt-1">{lang === 'ar' ? 'اختر يوم عمل (الأحد - الخميس، تجنب الجمعة/السبت)' : 'Choose a weekday (Sunday - Thursday, avoid Friday/Saturday)'}</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Location Type *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{lang === 'ar' ? 'نوع الموقع *' : 'Location Type *'}</label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <MapPin className={`absolute ${lang === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400`} />
                 <select
                   name="location_type"
                   value={form.location_type}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={`w-full ${lang === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 border rounded-lg focus:ring-2 focus:ring-green/30 focus:border-green transition-all duration-150`}
                 >
-                  <option value="on_site">On Site</option>
-                  <option value="online">Online</option>
-                  <option value="phone">Phone</option>
+                  <option value="on_site">{lang === 'ar' ? 'في الموقع' : 'On Site'}</option>
+                  <option value="online">{lang === 'ar' ? 'عبر الإنترنت (أونلاين)' : 'Online'}</option>
+                  <option value="phone">{lang === 'ar' ? 'هاتفي' : 'Phone'}</option>
                 </select>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Location Details</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{lang === 'ar' ? 'تفاصيل الموقع' : 'Location Details'}</label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                <MapPin className={`absolute ${lang === 'ar' ? 'right-3' : 'left-3'} top-3 w-4 h-4 text-gray-400`} />
                 <textarea
                   name="location_details"
                   value={form.location_details}
                   onChange={handleChange}
-                  placeholder="Enter location details"
+                  placeholder={lang === 'ar' ? 'أدخل تفاصيل الموقع' : 'Enter location details'}
                   rows={3}
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={`w-full ${lang === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 border rounded-lg focus:ring-2 focus:ring-green/30 focus:border-green transition-all duration-150`}
                 />
               </div>
             </div>
@@ -186,9 +184,11 @@ export const ScheduleInterview = () => {
               <button
                 type="submit"
                 disabled={isScheduling}
-                className="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 bg-green text-white font-semibold rounded-lg hover:bg-green/90 disabled:opacity-50 transition-colors"
               >
-                {isScheduling ? 'Scheduling...' : 'Schedule Interview'}
+                {isScheduling 
+                  ? (lang === 'ar' ? 'جاري الجدولة...' : 'Scheduling...') 
+                  : (lang === 'ar' ? 'تحديد الموعد' : 'Schedule Interview')}
               </button>
               <button
                 type="button"
@@ -201,7 +201,7 @@ export const ScheduleInterview = () => {
                 }}
                 className="px-4 py-2 border text-gray-700 rounded-lg hover:bg-gray-50"
               >
-                Cancel
+                {lang === 'ar' ? 'إلغاء' : 'Cancel'}
               </button>
             </div>
           </form>

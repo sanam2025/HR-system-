@@ -34,7 +34,23 @@ export const useContract = (id: number) => {
     queryKey: ['contract', id],
     queryFn: async () => {
       const res = await ContractsService.getById(id);
-      return res.data?.data || null;
+      const raw = res.data?.data || res.data;
+      if (!raw) return null;
+      
+      return {
+        id: raw.id,
+        contractNumber: `CONT-${raw.id}`,
+        employeeName: raw.user?.full_name || 'Unknown',
+        employeeEmail: raw.user?.email || '',
+        department: raw.department || 'Unknown',
+        position: 'Employee', // not provided by the API snippet
+        startDate: raw.start_date,
+        endDate: raw.end_date,
+        salary: Number(raw.estimated_monthly_salary) || 0,
+        status: raw.status || 'active',
+        workingHours: raw.working_hours_per_day ? `${raw.working_hours_per_day} Hours/Day` : '8 Hours/Day',
+        benefits: raw.jurisdiction || 'No specific benefits'
+      };
     },
     enabled: !!id,
   });

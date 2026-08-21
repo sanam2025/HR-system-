@@ -1,10 +1,11 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { ClipboardList, Play, Send, Paperclip, FileText, X, Calendar, Star, Award, CheckCircle, Clock, Activity, CheckSquare } from "lucide-react";
+import { ClipboardList, Play, Send, Paperclip, FileText, X, Calendar, Star, Award, CheckCircle, Clock, Activity, CheckSquare, Loader2 } from "lucide-react";
 import { Badge, LoadingSkeleton } from "../commend-components";
 import { humanizeStatus } from "../../../../../lib/text";
 import { useLanguage } from "../../../../../i18n/translations/LanguageContext";
 import type { SubmitTaskPayload, Task } from "../../../../../api/models";
+import { useTask } from "../../../../../api/hooks/useTasks";
 
 function taskDueDate(task: Task): string {
   return task.due_date || task.dueDate || "—";
@@ -24,6 +25,40 @@ function canStart(status: string): boolean {
 
 function canSubmit(status: string): boolean {
   return status.toLowerCase() === "in_progress";
+}
+
+function TaskFeedbackContent({ taskId }: { taskId: number }) {
+  const { t, isRTL } = useLanguage();
+  const { data: task, isLoading } = useTask(taskId);
+
+  if (isLoading) {
+    return (
+      <div className="mt-4 flex items-center justify-center py-2">
+        <Loader2 className="animate-spin text-gray-400" size={16} />
+      </div>
+    );
+  }
+
+  if (!task) return null;
+
+  const comment = task.comment || task.latest_submission?.comment || task.latest_submission?.review?.comment;
+
+  if (!comment) return null;
+
+  return (
+    <div className="mt-4 space-y-3">
+      <div className="mt-2 rtl:mr-14 ltr:ml-14 bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-white/50 shadow-sm relative">
+        <div className="absolute top-0 rtl:right-0 ltr:left-0 w-1 h-full bg-[#4A7C59]/40 rtl:rounded-r-xl ltr:rounded-l-xl" />
+        <div className="flex items-center gap-2 mb-2 text-xs font-bold text-gray-500">
+          <FileText size={14} />
+          <span>{t.tasks?.reviewerNotes || "Reviewer Notes"}</span>
+        </div>
+        <p className="text-sm text-gray-700 italic font-medium">
+          "{comment}"
+        </p>
+      </div>
+    </div>
+  );
 }
 
 function SubmitTaskForm({
@@ -217,45 +252,32 @@ export function TaskListCard({
                   </p>
 
                   {/* Evaluation Block */}
-                  {(task.score != null || task.latest_submission?.review?.score != null) && (
+                  {(task.score != null) && (
                     <div className="mt-5">
-                      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-[#4A7C59]/10 via-[#4A7C59]/5 to-transparent border border-[#4A7C59]/20 p-5">
-                        {/* Decorative Icon Background */}
-                        <div className="absolute -top-4 -right-2 text-[#4A7C59]/10 pointer-events-none transform -rotate-12">
-                          <Award size={100} />
-                        </div>
+                      <div className="bg-gray-50/50 border border-gray-100 rounded-xl p-4 relative overflow-hidden flex items-center justify-between">
+                        <div className="absolute -right-4 -top-4 w-24 h-24 bg-white rounded-full blur-2xl opacity-60" />
                         
-                        <div className="relative z-10 flex flex-col gap-3 rtl:text-right ltr:text-left">
-                          <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-yellow-500/30 flex-shrink-0">
-                              <Star size={24} className="fill-white" />
-                            </div>
-                            <div className="flex-1">
-                              <h5 className="text-xs font-bold text-[#4A7C59]/80 uppercase tracking-wider mb-1">{t.tasks?.finalScore || "Final Score"}</h5>
-                              <div className="flex items-baseline rtl:justify-start ltr:justify-start gap-1 rtl:flex-row-reverse ltr:flex-row" dir="ltr">
-                                <span className="text-2xl font-black text-[#4A7C59] leading-none">
-                                  {task.score ?? task.latest_submission?.review?.score}
-                                </span>
-                                <span className="text-sm font-bold text-gray-400">/ 100</span>
-                              </div>
+                        <div className="flex items-center gap-4 relative z-10">
+                          <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center flex-shrink-0 shadow-sm">
+                            <Star size={20} className="fill-current" />
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider mb-0.5">{t.tasks?.finalScore || "FINAL SCORE"}</p>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-xl font-black text-green-700 leading-none">{Number(task.score).toFixed(2)}</span>
+                              <span className="text-sm font-bold text-gray-400">/ 100</span>
                             </div>
                           </div>
-
-                          {task.latest_submission?.review?.comment && (
-                            <div className="mt-2 rtl:mr-14 ltr:ml-14 bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-white/50 shadow-sm relative">
-                              <div className="absolute top-0 rtl:right-0 ltr:left-0 w-1 h-full bg-[#4A7C59]/40 rtl:rounded-r-xl ltr:rounded-l-xl" />
-                              <div className="flex items-center gap-2 mb-2 text-xs font-bold text-gray-500">
-                                <FileText size={14} />
-                                <span>{t.tasks?.reviewerNotes || "Reviewer Notes"}</span>
-                              </div>
-                              <p className="text-sm text-gray-700 italic font-medium">
-                                "{task.latest_submission.review.comment}"
-                              </p>
-                            </div>
-                          )}
                         </div>
+                        
+                        <Award size={48} className="text-green-500/10 absolute -left-2 -bottom-2 z-0 transform -rotate-12" />
                       </div>
                     </div>
+                  )}
+
+                  {/* Submission and Feedback Details */}
+                  {['submitted', 'approved', 'rejected', 'completed'].includes((task.status || '').toLowerCase()) && (
+                    <TaskFeedbackContent taskId={task.id} />
                   )}
                 </div>
 

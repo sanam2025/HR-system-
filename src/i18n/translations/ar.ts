@@ -424,7 +424,7 @@ const ar = {
     welcomeTitle: "مرحباً بك في لوحة تحكم الموارد البشرية",
     welcomeSubtitle: "نظرة عامة على أداء الموظفين والإحصائيات.",
     totalEmployees: "إجمالي الموظفين",
-    pendingLeaves: "طلبات الإجازة المعلقة",
+    approvedLeaves: "طلبات الإجازة المقبولة",
     payrollCost: "تكلفة الرواتب",
     attendanceRate: "معدل الحضور",
     announcements: "التعميمات",
@@ -464,7 +464,7 @@ const ar = {
     pendingLeavesList: "📋 طلبات الإجازة المعلقة",
     noPendingLeaves: "لا توجد طلبات معلقة",
     pendingLeaves: "طلبات إجازة معلقة",
-    pendingOvertime: "طلبات عمل إضافي",
+    pendingOvertime: "طلبات عمل إضافي معلقة",
     completedTasks: "مهام مكتملة هذا الشهر",
     presentEmployees: "موظفون حاضرون",
     finance: "المالية",
@@ -609,7 +609,7 @@ const ar = {
     }
   },
   layout: {
-    systemName: "HR System",
+    systemName: "Masar HR",
     university: "جامعة دمشق",
     managerRole: "مدير القسم",
     userName: "Ahmad Front",

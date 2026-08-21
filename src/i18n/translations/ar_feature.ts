@@ -40,7 +40,7 @@ const ar = {
     pendingLeavesList: '📋 طلبات الإجازة المعلقة',
     noPendingLeaves: 'لا توجد طلبات معلقة',
     pendingLeaves: 'طلبات إجازة معلقة',
-    pendingOvertime: 'طلبات عمل إضافي',
+    pendingOvertime: 'طلبات عمل إضافي معلقة',
     completedTasks: 'مهام مكتملة هذا الشهر',
     presentEmployees: 'موظفون حاضرون'
   },
@@ -117,7 +117,7 @@ const ar = {
 
   // ── Sidebar / Topbar ──
   layout: {
-    systemName: 'HR System',
+    systemName: 'Masar HR',
     university: 'جامعة دمشق',
     managerRole: 'مدير القسم',
     userName: 'Ahmad Front',

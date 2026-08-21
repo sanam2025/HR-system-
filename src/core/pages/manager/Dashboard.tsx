@@ -83,10 +83,10 @@ export default function Dashboard() {
     queryFn: getTasks,
   });
 
-  // 6. Pending Leaves (GET department-leave-request?status=pending)
+  // 6. Pending Leaves (GET department-leave-request)
   const { data: rawLeaves = [], isLoading: loadingLeaves } = useQuery({
     queryKey: ['department-pending-leaves'],
-    queryFn: () => getDepartmentLeaveRequests('pending')
+    queryFn: () => getDepartmentLeaveRequests() // Fetch all to filter locally safely
   });
 
   // 7. Department Overtime Requests (GET my-department-overtime)
@@ -95,31 +95,60 @@ export default function Dashboard() {
     queryFn: getDepartmentOvertimeRequests,
   });
 
+  // Helper to extract nested counts
+  const extractCount = (obj: any, keys: string[]) => {
+    if (obj == null) return 0;
+    if (typeof obj === 'number') return obj;
+    const unwrapped = obj.data?.data ?? obj.data ?? obj;
+    for (const k of keys) {
+      if (unwrapped[k] !== undefined && unwrapped[k] !== null) {
+        return Number(unwrapped[k]);
+      }
+    }
+    return 0;
+  };
+
   // Process numbers & stats safely
-  const totalEmployees = usersCountData?.employees_count ?? usersCountData?.employees ?? usersCountData?.total_employees ?? usersCountData?.data?.employees_count ?? 0;
-  const presentToday = attendanceAnalysisData?.present_today ?? attendanceAnalysisData?.presentCount ?? attendanceAnalysisData?.present ?? 0;
-  const attendanceRate = attendanceAnalysisData?.attendance_rate ?? attendanceAnalysisData?.rate ?? attendanceAnalysisData?.percentage ?? 0;
+  const totalEmployees = extractCount(usersCountData, ['employees_count', 'employees', 'total_employees', 'count']);
+  const presentToday = extractCount(attendanceAnalysisData, ['present_today', 'presentCount', 'present']);
+  const attendanceRate = extractCount(attendanceAnalysisData, ['attendance_rate', 'rate', 'percentage']);
 
-  const completedTasksThisMonth = typeof completedTasksData === 'number'
-    ? completedTasksData
-    : (completedTasksData?.completed_count ?? completedTasksData?.count ?? completedTasksData?.completedTasksThisMonth ?? 0);
+  const completedTasksThisMonth = extractCount(completedTasksData, ['completed_count', 'count', 'completedTasksThisMonth', 'completed']);
 
-  const safeOvertimes = Array.isArray(rawOvertimes) ? rawOvertimes : (rawOvertimes?.data || []);
-  const pendingOvertimeCount = safeOvertimes.filter((o: any) => o.status === 'pending' || !o.status).length;
+  const getArray = (obj: any) => {
+    if (!obj) return [];
+    if (Array.isArray(obj)) return obj;
+    if (Array.isArray(obj.data)) return obj.data;
+    if (Array.isArray(obj.data?.data)) return obj.data.data;
+    if (Array.isArray(obj.overtimes)) return obj.overtimes;
+    if (Array.isArray(obj.leave_requests)) return obj.leave_requests;
+    if (Array.isArray(obj.requests)) return obj.requests;
+    if (Array.isArray(obj.department_leaves)) return obj.department_leaves;
+    return [];
+  };
 
-  const safeLeaves = Array.isArray(rawLeaves) ? rawLeaves : (rawLeaves?.data || []);
-  const pendingLeavesCount = safeLeaves.length;
+  const safeOvertimes = getArray(rawOvertimes);
+  const pendingOvertimeCount = safeOvertimes.filter((o: any) => {
+    const s = typeof o.status === 'string' ? o.status.toLowerCase() : '';
+    return s.includes('pending') || s === 'قيد الانتظار' || s === 'معلقة' || !o.status;
+  }).length;
+
+  const safeLeaves = getArray(rawLeaves);
+  const pendingLeavesCount = safeLeaves.filter((l: any) => {
+    const s = typeof l.status === 'string' ? l.status.toLowerCase() : '';
+    return s.includes('pending') || s === 'قيد الانتظار' || s === 'معلقة' || !l.status;
+  }).length;
 
   const pendingLeaves = safeLeaves.map((req: any) => ({
     id: req.id,
-    employeeName: req.employee?.user?.name || req.employee?.name || req.user?.name || req.employeeName || 'غير متوفر',
+    employeeName: req.name || req.employee?.user?.full_name || req.employee?.user?.name || req.user?.full_name || req.user?.name || req.employee?.name || req.employee_name || req.user_name || req.employeeName || 'غير متوفر',
     type: req.type || 'إجازة',
     from: req.start_date || req.from || '',
     to: req.end_date || req.to || '',
     days: req.days_count || req.days || 1,
   }));
 
-  const safeTasksList = Array.isArray(rawTasks) ? rawTasks : (rawTasks?.data || []);
+  const safeTasksList = getArray(rawTasks);
   const activeTasks = safeTasksList;
   const pendingTasksList = activeTasks.filter((tk: any) => tk.status !== 'مكتملة' && tk.status !== 'completed').slice(0, 4).map((tk: any) => ({
     id: tk.id,
@@ -296,7 +325,14 @@ export default function Dashboard() {
           onClick={() => navigate('/manager/tasks')}
           className="rounded-2xl p-4 text-right w-full transition-all hover:shadow-md hover:-translate-y-0.5 text-green-700 bg-green-50"
         >
-          <p className="text-2xl font-extrabold mt-2">{completedTasksThisMonth}</p>
+          <p className="text-2xl font-extrabold mt-2">
+            {completedTasksThisMonth > 0 
+              ? completedTasksThisMonth 
+              : safeTasksList.filter((tk: any) => {
+                  const st = typeof tk.status === 'string' ? tk.status.toLowerCase().trim() : '';
+                  return st === 'مكتملة' || st === 'completed' || st === 'approved' || st === 'تمت';
+                }).length}
+          </p>
           <p className="text-xs font-semibold mt-1 opacity-80">{d.completedTasks}</p>
         </button>
 

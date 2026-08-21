@@ -146,16 +146,9 @@ export const endpoints = {
   },
 
   resignations: {
-    // CONFIRMED via live backend testing: `POST /resignations` passes role
-    // checks for a real employee (a validation error on `type` came back,
-    // not a 403) so this is genuinely self-service. `GET /resignations/mine`
-    // 403s "User does not have the right roles." for the same account
-    // though — likely a backend role-middleware bug (wrong guard on that
-    // one route) rather than an intentional restriction, since submitting
-    // one's own resignation but never being able to see it back makes no
-    // product sense. Wired anyway with the "mine" call tolerating that
-    // 403 gracefully. See CHANGELOG.md.
+    // The create endpoint is correctly named
     create: "resignations",
-    mine: "resignations/mine",
+    // The backend route for fetching my resignations has a typo "resigna/mine"
+    mine: "resigna/mine",
   },
 } as const;

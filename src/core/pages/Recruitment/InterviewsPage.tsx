@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { Send, Loader2, User, Trophy, ChevronUp, ChevronDown, ClipboardList, Search, AlertCircle, Briefcase, ChevronRight, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -82,7 +82,7 @@ export default function InterviewsPage() {
 
   // ratings applied locally on pending (right panel)
   const [ratings, setRatings] = useState<Record<number, number>>({});
-  const [order, setOrder] = useState<number[]>([]);
+  const [order, setOrder] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [isSubmittingAll, setIsSubmittingAll] = useState(false);
   const [rankingSent, setRankingSent] = useState(false);
@@ -206,7 +206,7 @@ export default function InterviewsPage() {
         const normalized = all.map(normalizeInterview);
         setPendingInterviews(normalized);
         setRatings(Object.fromEntries(normalized.map((c: any) => [c.id, c.rate || 0])));
-        setOrder(normalized.map((c: any) => c.id));
+        setOrder(normalized.map((c: any) => String(c.id)));
       })
       .catch(err => {
         const msg = err?.response?.data?.message || (lang === 'ar' ? 'تعذّر تحميل بيانات المقابلات' : 'Failed to load interviews');
@@ -228,33 +228,100 @@ export default function InterviewsPage() {
       .finally(() => setRankedLoading(false));
   }, [jobPostingId, rankingSent]);
 
+  const interviewsForJob = pendingInterviews.filter(c => {
+    const cJobId = c.job_posting_id || c.job_posting?.id || c.candidate?.job_posting_id || c.candidate?.job_posting?.id;
+    return !jobPostingId || cJobId === jobPostingId;
+  });
+
   // ── Filter for search ──
-  const filtered = pendingInterviews.filter(c => {
+  const filtered = interviewsForJob.filter(c => {
     const name = getFullName(c).toLowerCase();
     const q = search.toLowerCase();
     return name.includes(q);
   });
 
-  const allRated = pendingInterviews.length > 0 && pendingInterviews.every(c => (ratings[c.id] || 0) > 0);
+  const allRated = interviewsForJob.length > 0 && interviewsForJob.every(c => (ratings[c.id] || 0) > 0);
 
   // ── Ranking order (right panel local sort) ──
-  const localRanked = [...pendingInterviews].sort((a, b) => {
+  const displayRanked = useMemo(() => {
+    const combinedMap = new Map();
+    rankedInterviews.forEach(c => combinedMap.set(String(c.id), c));
+    interviewsForJob.forEach(c => {
+      if ((ratings[c.id] || 0) > 0) {
+        combinedMap.set(String(c.id), c);
+      }
+    });
+    
+    return Array.from(combinedMap.values()).sort((a, b) => {
+      const scoreA = ratings[a.id] || a.rate || 0;
+      const scoreB = ratings[b.id] || b.rate || 0;
+      const diff = scoreB - scoreA;
+      if (diff !== 0) return diff;
+      
+      let indexA = order.indexOf(String(a.id));
+      let indexB = order.indexOf(String(b.id));
+      if (indexA === -1) indexA = 999999;
+      if (indexB === -1) indexB = 999999;
+      
+      return indexA - indexB;
+    });
+  }, [rankedInterviews, interviewsForJob, ratings, order]);
+
+  const localRanked = [...interviewsForJob].sort((a, b) => {
     const diff = (ratings[b.id] || 0) - (ratings[a.id] || 0);
     if (diff !== 0) return diff;
-    return order.indexOf(a.id) - order.indexOf(b.id);
+    
+    let indexA = order.indexOf(String(a.id));
+    let indexB = order.indexOf(String(b.id));
+    if (indexA === -1) indexA = 999999;
+    if (indexB === -1) indexB = 999999;
+    
+    return indexA - indexB;
   });
 
+  const [isSavingRanking, setIsSavingRanking] = useState(false);
+  const handleSaveRankingOnly = async () => {
+    if (!jobPostingId) return;
+    setIsSavingRanking(true);
+    try {
+      const rankingPayload = displayRanked.map((c, i) => ({ interview_id: c.id, rank: i + 1 }));
+      await submitCandidatesRanking(jobPostingId, { ranking: rankingPayload });
+      toast.success(lang === 'ar' ? 'تم حفظ الترتيب بنجاح' : 'Ranking saved successfully');
+    } catch {
+      toast.error(iv.toasts.error);
+    } finally {
+      setIsSavingRanking(false);
+    }
+  };
+
   const moveInOrder = (id: number, dir: -1 | 1) => {
-    const score = ratings[id] || 0;
-    const sameScoreInOrder = order.filter(oid => (ratings[oid] || 0) === score);
-    const pos = sameScoreInOrder.indexOf(id);
+    const strId = String(id);
+    const candidate = displayRanked.find(c => String(c.id) === strId);
+    if (!candidate) return;
+
+    const score = ratings[id] || candidate.rate || 0;
+
+    const sameScoreCandidates = displayRanked.filter(c => {
+      const cScore = ratings[c.id] || c.rate || 0;
+      return cScore === score;
+    });
+
+    const pos = sameScoreCandidates.findIndex(c => String(c.id) === strId);
     if (dir === -1 && pos === 0) return;
-    if (dir === 1 && pos === sameScoreInOrder.length - 1) return;
-    const newOrder = [...order];
-    const idxA = newOrder.indexOf(id);
-    const idxB = newOrder.indexOf(sameScoreInOrder[pos + dir]);
-    [newOrder[idxA], newOrder[idxB]] = [newOrder[idxB], newOrder[idxA]];
-    setOrder(newOrder);
+    if (dir === 1 && pos === sameScoreCandidates.length - 1) return;
+
+    const swapWithId = String(sameScoreCandidates[pos + dir].id);
+
+    setOrder(prev => {
+      const newOrder = [...prev];
+      displayRanked.forEach(c => {
+        if (!newOrder.includes(String(c.id))) newOrder.push(String(c.id));
+      });
+      const idxA = newOrder.indexOf(strId);
+      const idxB = newOrder.indexOf(swapWithId);
+      [newOrder[idxA], newOrder[idxB]] = [newOrder[idxB], newOrder[idxA]];
+      return newOrder;
+    });
   };
 
   const handleSendAll = async () => {
@@ -291,7 +358,7 @@ export default function InterviewsPage() {
   };
 
   // ── Job Picker screen — اعرض فقط إذا لم تكن هناك مقابلات محملة ──
-  if (!jobPostingId && pendingInterviews.length === 0) return (
+  if (!jobPostingId && interviewsForJob.length === 0) return (
     <div className="space-y-6">
       
       <div>
@@ -377,39 +444,41 @@ export default function InterviewsPage() {
     <div className="space-y-6">
       
 
-      {/* ── Job indicator + change button — أخفي إذا كان null ── */}
-      {!urlJobPostingId && jobPostingId && (
-        <div className="flex items-center gap-3 bg-green/5 border border-green/20 rounded-xl px-4 py-3">
-          <Briefcase size={16} className="text-green" />
-          <span className="text-sm font-semibold text-green flex-1">
-            {(() => {
-              const job = mergedJobs.find(j => j.id === jobPostingId);
-              return job?.job_title || (lang === 'ar' ? `وظيفة #${jobPostingId}` : `Job #${jobPostingId}`);
-            })()}
-          </span>
-          <button
-            onClick={() => { setSelectedJobId(null); setPendingInterviews([]); setRankedInterviews([]); setRankingSent(false); }}
-            className="text-xs text-green underline font-semibold"
-          >
-            {lang === 'ar' ? 'تغيير الوظيفة' : 'Change Job'}
-          </button>
-        </div>
-      )}
-
       {/* ── Header ── */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <h2 className="text-xl font-extrabold text-dark flex items-center gap-2">
-            <ClipboardList size={22} className="text-green" />
-            {iv.title}
-          </h2>
+          <div className="flex items-center gap-4 mb-2">
+            <h2 className="text-xl font-extrabold text-dark flex items-center gap-2">
+              <ClipboardList size={22} className="text-green" />
+              {iv.title}
+            </h2>
+            
+            {/* ── Job indicator + change button ── */}
+            {!urlJobPostingId && jobPostingId && (
+              <div className="flex items-center gap-2 bg-green/5 border border-green/20 rounded-lg px-3 py-1.5">
+                <Briefcase size={14} className="text-green" />
+                <span className="text-xs font-semibold text-green flex-1">
+                  {(() => {
+                    const job = mergedJobs.find(j => j.id === jobPostingId);
+                    return job?.job_title || (lang === 'ar' ? `وظيفة #${jobPostingId}` : `Job #${jobPostingId}`);
+                  })()}
+                </span>
+                <button
+                  onClick={() => { setSelectedJobId(null); setPendingInterviews([]); setRankedInterviews([]); setRankingSent(false); }}
+                  className="text-[10px] text-green underline font-semibold ms-2"
+                >
+                  {lang === 'ar' ? 'تغيير الوظيفة' : 'Change Job'}
+                </button>
+              </div>
+            )}
+          </div>
           <p className="text-sm text-brown mt-1">
-            {pendingInterviews.length} {iv.candidatesCount} · {pendingInterviews.filter(c => (ratings[c.id] || 0) > 0).length} {iv.ratedCount}
+            {interviewsForJob.length} {iv.candidatesCount} · {interviewsForJob.filter(c => (ratings[c.id] || 0) > 0).length} {iv.ratedCount}
           </p>
         </div>
 
         {/* زر إرسال التقييم — يظهر دائماً عند وجود مرشحين */}
-        {pendingInterviews.length > 0 && (
+        {interviewsForJob.length > 0 && (
           <button
             onClick={handleSendAll}
             disabled={!allRated || isSubmittingAll || rankingSent}
@@ -424,7 +493,7 @@ export default function InterviewsPage() {
         )}
       </div>
 
-      {pendingInterviews.length > 0 && !allRated && (
+      {interviewsForJob.length > 0 && !allRated && (
         <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-amber-700 text-sm font-medium">
           ⚠️ {iv.rateAllWarning}
         </div>
@@ -454,7 +523,7 @@ export default function InterviewsPage() {
           ) : filtered.length === 0 ? (
             <div className="text-center py-16 text-gray-400">
               <User size={40} className="mx-auto mb-3 opacity-30" />
-              <p>{pendingInterviews.length === 0
+              <p>{interviewsForJob.length === 0
                 ? (lang === 'ar' ? 'لا توجد مقابلات معلقة لهذه الوظيفة' : 'No pending interviews for this job')
                 : iv.noResults}
               </p>
@@ -535,22 +604,6 @@ export default function InterviewsPage() {
 
             {/* الترتيب المحلي الفوري مدمج مع ترتيب السيرفر */}
             {(() => {
-              const combinedMap = new Map();
-              rankedInterviews.forEach(c => combinedMap.set(c.id, c));
-              pendingInterviews.forEach(c => {
-                if ((ratings[c.id] || 0) > 0) {
-                  combinedMap.set(c.id, c);
-                }
-              });
-              
-              const displayRanked = Array.from(combinedMap.values()).sort((a, b) => {
-                const scoreA = ratings[a.id] || a.rate || 0;
-                const scoreB = ratings[b.id] || b.rate || 0;
-                const diff = scoreB - scoreA;
-                if (diff !== 0) return diff;
-                return order.indexOf(a.id) - order.indexOf(b.id);
-              });
-
               if (displayRanked.length === 0) {
                 return (
                   <div className="text-center py-10 text-gray-400">
@@ -581,6 +634,24 @@ export default function InterviewsPage() {
                           <p className="text-sm font-bold text-dark truncate">{name}</p>
                           <StarRating value={score} max={5} />
                         </div>
+
+                        <div className="flex flex-col items-center gap-1 mx-2 text-gray-400">
+                          <button
+                            onClick={() => moveInOrder(c.id, -1)}
+                            className="p-1 hover:text-green hover:bg-green/10 rounded-md transition-colors"
+                            title={lang === 'ar' ? 'تحريك للأعلى' : 'Move up'}
+                          >
+                            <ChevronUp size={16} />
+                          </button>
+                          <button
+                            onClick={() => moveInOrder(c.id, 1)}
+                            className="p-1 hover:text-green hover:bg-green/10 rounded-md transition-colors"
+                            title={lang === 'ar' ? 'تحريك للأسفل' : 'Move down'}
+                          >
+                            <ChevronDown size={16} />
+                          </button>
+                        </div>
+
                         <span className={`text-sm font-extrabold w-8 text-end ${score > 0
                           ? i === 0 ? 'text-amber-500' : i === 1 ? 'text-gray-500' : i === 2 ? 'text-amber-700' : 'text-dark'
                           : 'text-gray-300'
@@ -593,6 +664,25 @@ export default function InterviewsPage() {
                 </div>
               );
             })()}
+
+            {displayRanked.length > 0 && (
+              <div className="mt-5">
+                <button
+                  onClick={handleSaveRankingOnly}
+                  disabled={isSavingRanking}
+                  className="w-full flex items-center justify-center gap-2 bg-green/10 text-green hover:bg-green hover:text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-50"
+                >
+                  {isSavingRanking ? (
+                    <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                  ) : (
+                    <>
+                      <Trophy size={16} />
+                      {lang === 'ar' ? 'حفظ الترتيب' : 'Save Ranking'}
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
 
             {rankingSent && (
               <div className="mt-5 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-700 font-semibold text-center">

@@ -15,7 +15,7 @@ function Header({isLoading} : {isLoading: boolean}) {
                     {t.adminHolidays?.subtitle || 'Manage company holidays and official days off'}
                 </p>
             </div>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2 disabled:opacity-50" disabled={isLoading} onClick={() => setIsModalOpen(true)}>
+            <button className="bg-green text-white px-4 py-2 rounded-xl hover:bg-green-dark transition-all flex items-center gap-2 disabled:opacity-50 shadow-sm" disabled={isLoading} onClick={() => setIsModalOpen(true)}>
                 <Plus className="w-4 h-4" />
                 {t.adminHolidays?.addHoliday || 'Add Holiday'}
             </button>

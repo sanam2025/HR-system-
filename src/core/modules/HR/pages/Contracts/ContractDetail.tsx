@@ -58,7 +58,7 @@ export default function ContractDetail() {
         <button
           onClick={handleDownload}
           disabled={downloadMutation.isPending}
-          className={`flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors ${lang === 'ar' ? 'flex-row-reverse' : ''}`}
+          className={`flex items-center gap-2 px-4 py-2 bg-green text-white rounded-lg hover:bg-green/90 transition-colors ${lang === 'ar' ? 'flex-row-reverse' : ''}`}
         >
           <Download className="w-4 h-4" />
           {downloadMutation.isPending ? (t.hrContracts?.detail?.downloading || 'Downloading...') : (t.hrContracts?.detail?.downloadPdf || 'Download PDF')}

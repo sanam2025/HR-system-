@@ -4,9 +4,12 @@ import { StatusBadge } from "./StatusBadge";
 import type { Termination } from "../../../types/types";
 import { useApprove, useReject } from "../../../hooks/Terminations/useTerminationMutation";
 import toast from "react-hot-toast";
+import { useAuthStore } from "../../../../../../store/authStore";
+import { useLanguage } from "../../../../../../i18n/translations/LanguageContext";
 
 export const TerminationCard = ({ termination }: { termination: Termination }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { lang } = useLanguage();
 
   const typeLabels = {
     immediate: "Immediate Termination",
@@ -25,7 +28,16 @@ export const TerminationCard = ({ termination }: { termination: Termination }) =
   const { mutateAsync: approve, isPending: isLoadingApprove } = useApprove();
   const { mutateAsync: reject, isPending: isLoadingReject } = useReject();
 
+  const user = useAuthStore((s) => s.user);
+  const currentUser = useAuthStore((s) => s.currentUser);
+  
+  const isAdmin = user?.role === 'admin' || currentUser?.role === 'admin';
+
   const handleApprove = async () => {
+    if (isAdmin) {
+      toast.error(lang === 'ar' ? "هذا ليس من دورك" : "This is not your role");
+      return;
+    }
     try {
       const response = await approve(termination.id);
       toast.success(response?.message || `Termination for ${termination.user?.name} approved successfully`);
@@ -36,6 +48,10 @@ export const TerminationCard = ({ termination }: { termination: Termination }) =
   };
 
   const handleReject = async () => {
+    if (isAdmin) {
+      toast.error(lang === 'ar' ? "هذا ليس من دورك" : "This is not your role");
+      return;
+    }
     try {
       const response = await reject(termination.id);
       toast.success(response?.message || `Termination for ${termination.user?.name} rejected successfully`);

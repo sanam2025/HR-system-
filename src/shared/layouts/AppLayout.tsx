@@ -51,7 +51,7 @@ export default function AppLayout({
     defaultTitle;
 
   return (
-    <div className="flex min-h-screen bg-transparent w-full overflow-x-hidden" dir={dir}>
+    <div className="flex h-screen bg-transparent w-full overflow-hidden" dir={dir}>
       <Sidebar
         open={sidebarOpen}
         onToggle={toggleSidebar}
@@ -60,9 +60,9 @@ export default function AppLayout({
         user={activeUser}
         navSectionLabel={navSectionLabel}
       />
-      <div className={`flex flex-col flex-1 min-h-screen w-full transition-all duration-300 ${sidebarOpen ? 'md:ms-64' : 'md:ms-16'}`}>
+      <div className={`flex flex-col flex-1 h-screen w-full transition-all duration-300 ${sidebarOpen ? 'md:ms-64' : 'md:ms-16'}`}>
         <Topbar title={title} onToggleSidebar={toggleSidebar} user={activeUser} navItems={navItems} />
-        <main className="flex-1 p-3 sm:p-5 md:p-6 pb-16 overflow-x-hidden overflow-y-auto w-full">
+        <main className="flex-1 p-3 sm:p-5 md:p-6 pb-16 overflow-x-hidden overflow-y-auto w-full relative">
           <Outlet />
         </main>
       </div>

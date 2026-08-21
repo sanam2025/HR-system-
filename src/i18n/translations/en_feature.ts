@@ -116,7 +116,7 @@ const en = {
 
   // ── Sidebar / Topbar ─
   layout: {
-    systemName: 'HR System',
+    systemName: 'Masar HR',
     university: 'University of Damascus',
     managerRole: 'Department Manager',
     userName: 'Ahmad Front',

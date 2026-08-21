@@ -139,7 +139,7 @@ export default function PeriodicEvaluation() {
                     <option disabled>{isRTL ? 'جاري التحميل...' : 'Loading...'}</option>
                   ) : (
                     evaluations.map(ev => {
-                      const isEvaluated = ev.status !== 'pending' && ev.status !== 'draft';
+                      const isEvaluated = !['pending', 'draft', 'pending_manager'].includes(ev.status);
                       return (
                         <option key={ev.id} value={ev.id}>
                           {ev.employee?.user?.name || ev.employee?.name || `موظف #${ev.id}`} {isEvaluated ? (isRTL ? '(تم التقييم مسبقاً)' : '(Already Evaluated)') : ''}
@@ -325,7 +325,7 @@ export default function PeriodicEvaluation() {
           </div>
 
           {(() => {
-            const isEvaluated = selectedEval && selectedEval.status !== 'pending' && selectedEval.status !== 'draft';
+            const isEvaluated = selectedEval && !['pending', 'draft', 'pending_manager'].includes(selectedEval.status);
             return (
               <button
                 type="submit"

@@ -233,10 +233,12 @@ export interface Task {
   reviewer?: TaskPerson | null;
   rating?: number | null;
   score?: number | string | null;
+  comment?: string | null;
   latest_submission?: {
     id?: number | string;
     notes?: string;
     attachment_url?: string | null;
+    comment?: string | null;
     review?: {
       score?: number | string;
       comment?: string;
