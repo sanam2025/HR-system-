@@ -1,12 +1,8 @@
-// src/core/modules/HR/hooks/useAnnouncements.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { AnnouncementsService } from '../../../../api/service/HrService/AnnouncementsService';
 import type { CreateAnnouncementData, UpdateAnnouncementData } from '../../../../api/service/HrService/Types/AnnouncementsService.types';
-import { AxiosError } from 'axios';
-
-//  جلب التعميمات النشطة (استخدام /announcements/active كما في الـ Collection)
-export const useActiveAnnouncements = (params: Record<string, unknown> = {}) => {
+import { AxiosError } from 'axios';export const useActiveAnnouncements = (params: Record<string, unknown> = {}) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['announcements', 'active', params],
     queryFn: async () => {
@@ -21,10 +17,7 @@ export const useActiveAnnouncements = (params: Record<string, unknown> = {}) => 
     error: error?.message || null,
     refetch,
   };
-};
-
-//  إنشاء تعميم جديد
-export const useCreateAnnouncement = () => {
+};export const useCreateAnnouncement = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -45,10 +38,7 @@ export const useCreateAnnouncement = () => {
       }
     },
   });
-};
-
-//  تحديث تعميم (جديد)
-export const useUpdateAnnouncement = () => {
+};export const useUpdateAnnouncement = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -69,10 +59,7 @@ export const useUpdateAnnouncement = () => {
       }
     },
   });
-};
-
-//  حذف تعميم
-export const useDeleteAnnouncement = () => {
+};export const useDeleteAnnouncement = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -90,10 +77,7 @@ export const useDeleteAnnouncement = () => {
       }
     },
   });
-};
-
-//  جلب كل التعميمات (للمسؤول، إذا احتجتها لاحقاً)
-export const useAnnouncements = (params: Record<string, unknown> = {}) => {
+};export const useAnnouncements = (params: Record<string, unknown> = {}) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['announcements', params],
     queryFn: async () => {
@@ -108,10 +92,7 @@ export const useAnnouncements = (params: Record<string, unknown> = {}) => {
     error: error?.message || null,
     refetch,
   };
-};
-
-//  نشر تعميم فوراً
-export const usePublishAnnouncement = () => {
+};export const usePublishAnnouncement = () => {
   const queryClient = useQueryClient();
 
   return useMutation({

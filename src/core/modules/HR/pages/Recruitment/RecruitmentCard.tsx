@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Recruitment/RecruitmentCard.tsx
 import { CheckCircle, XCircle, Eye, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useJobPostings } from "../../hooks/useJobPostings";
@@ -22,13 +21,7 @@ export default function RecruitmentCard({
   isLoadingReject,
 }: RecruitmentCardProps) {
   const navigate = useNavigate();
-  const { t, lang } = useLanguage();
-  
-  //  جلب جميع الوظائف المنشورة
-  const { postings } = useJobPostings();
-
-  //  البحث عن الوظيفة المنشورة التي تطابق job_title
-  const getJobPostingId = (): number | undefined => {
+  const { t, lang } = useLanguage();  const { postings } = useJobPostings();  const getJobPostingId = (): number | undefined => {
     if (!postings || postings.length === 0) return undefined;
     const match = postings.find((p: JobPosting) => p.job_title === req.job_title);
     return match?.id;

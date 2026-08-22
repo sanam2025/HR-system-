@@ -1,4 +1,3 @@
-// core/modules/HR/Components/Special_Components/ContractTableRow.tsx
 import React from "react";
 import { Eye, RefreshCw, FileText } from "lucide-react";
 import type { EmployeeContract } from "../../types/contract.types";

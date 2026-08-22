@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/EmployeeProfile/EmployeeProfile.tsx
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Pencil, Mail, Phone, MapPin, Calendar, Briefcase } from 'lucide-react';
 import Loading from '../../../../shared/components/Loading';
@@ -13,10 +12,7 @@ export default function EmployeeProfile() {
   const [editMode, setEditMode] = useState(false);
   const { t, lang } = useLanguage();
 
-  const { profile, isLoading, error, refetch } = useEmployeeProfile(Number(id));
-
-  //  نموذج التعديل (افتراضي)
-  const [formData, setFormData] = useState({
+  const { profile, isLoading, error, refetch } = useEmployeeProfile(Number(id));  const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
     email: profile?.email || '',
     phone_number: profile?.phone_number || '',
@@ -24,14 +20,9 @@ export default function EmployeeProfile() {
   });
 
   const handleSave = async () => {
-    try {
-      // هنا يمكنك إضافة طلب تحديث الملف الشخصي
-      // await apiClient.put(`/profiles/${id}`, formData);
-      toast.success(t.hrEmployeeProfile?.updateSuccess || 'Profile updated successfully!');
+    try {      toast.success(t.hrEmployeeProfile?.updateSuccess || 'Profile updated successfully!');
       setEditMode(false);
-      refetch();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
+      refetch();    } catch (err) {
       toast.error(t.hrEmployeeProfile?.updateFailed || 'Failed to update profile');
     }
   };
@@ -64,17 +55,12 @@ export default function EmployeeProfile() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Back Button */}
-      <button
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>      <button
         onClick={() => navigate('/Hr')}
         className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-3"
       >
         <ArrowLeft className={`w-4 h-4 ${lang === 'ar' ? 'rotate-180' : ''}`} /> {t.hrEmployeeProfile?.backToDashboard || 'Back to Dashboard'}
-      </button>
-
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      </button>      <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">{t.hrEmployeeProfile?.title || 'Employee Profile'}</h1>
         {!editMode && (
           <button
@@ -85,12 +71,7 @@ export default function EmployeeProfile() {
             {t.hrEmployeeProfile?.editProfile || 'Edit Profile'}
           </button>
         )}
-      </div>
-
-      {/* Profile Card */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        {/* Profile Header */}
-        <div className="flex items-center gap-4 mb-6">
+      </div>      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">        <div className="flex items-center gap-4 mb-6">
           <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl">
             {profile?.full_name?.charAt(0) || '?'}
           </div>
@@ -109,10 +90,7 @@ export default function EmployeeProfile() {
             </h2>
             <p className="text-gray-500">{profile?.email || ''}</p>
           </div>
-        </div>
-
-        {/* Profile Details */}
-        <div className="space-y-4 border-t pt-4">
+        </div>        <div className="space-y-4 border-t pt-4">
           <div className="flex items-center gap-3 text-gray-600">
             <Mail className="w-4 h-4" />
             <span className="text-sm">{t.hrEmployeeProfile?.email || 'Email:'} </span>
@@ -169,10 +147,7 @@ export default function EmployeeProfile() {
             <span className="text-sm">{t.hrEmployeeProfile?.gender || 'Gender:'} </span>
             <span className="text-sm">{profile?.gender || '-'}</span>
           </div>
-        </div>
-
-        {/* Action Buttons (Edit Mode) */}
-        {editMode && (
+        </div>        {editMode && (
           <div className="flex gap-3 mt-6 border-t pt-4">
             <button
               onClick={handleSave}

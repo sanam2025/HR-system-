@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Leaves/LeaveDetail.tsx
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, User, Briefcase, CheckCircle, XCircle } from 'lucide-react';
 import { useLeaveRequest, useApproveLeave, useRejectLeave } from '../../hooks/useLeave';
@@ -77,9 +76,7 @@ export const LeaveDetail = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Header */}
-      <div className="mb-6">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>      <div className="mb-6">
         <button
           onClick={() => navigate('/Hr/Leaves')}
           className="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-4"
@@ -113,12 +110,7 @@ export const LeaveDetail = () => {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Details Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Employee Info */}
-        <div className="bg-white rounded-xl shadow-sm p-5">
+      </div>      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">        <div className="bg-white rounded-xl shadow-sm p-5">
           <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3 flex items-center gap-2">
             <User className="w-4 h-4" /> {t.hrLeaves?.details?.employeeInfo || 'Employee'}
           </h3>
@@ -127,10 +119,7 @@ export const LeaveDetail = () => {
             <p className="text-sm text-gray-500">{t.hrLeaves?.details?.id || 'ID'}: #{request.employee_id}</p>
             <p className="text-sm text-gray-500">{request.department || 'N/A'}</p>
           </div>
-        </div>
-
-        {/* Leave Details */}
-        <div className="bg-white rounded-xl shadow-sm p-5">
+        </div>        <div className="bg-white rounded-xl shadow-sm p-5">
           <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3 flex items-center gap-2">
             <Briefcase className="w-4 h-4" /> {t.hrLeaves?.details?.leaveDetails || 'Leave Details'}
           </h3>
@@ -156,10 +145,7 @@ export const LeaveDetail = () => {
               </div>
             )}
           </div>
-        </div>
-
-        {/* Dates & Status */}
-        <div className="bg-white rounded-xl shadow-sm p-5">
+        </div>        <div className="bg-white rounded-xl shadow-sm p-5">
           <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3 flex items-center gap-2">
             <Calendar className="w-4 h-4" /> {t.hrLeaves?.details?.dates || 'Dates'}
           </h3>

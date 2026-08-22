@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Announcements/Announcements.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Edit, Trash2, Send, Eye, X } from 'lucide-react';
@@ -97,18 +96,7 @@ export default function Announcements() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900"> Manage Announcements</h1>
           <p className="text-gray-500 text-sm">Create and manage announcements for employees</p>
-        </div>
-        {/*  تم حذف زر Add Announcement من هنا */}
-        {/* <button
-          onClick={() => { setShowForm(true); setEditingId(null); setFormData({ title: '', content: '', audience: 'all', status: 'draft', starts_at: '', ends_at: '' }); }}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-        >
-          <Plus className="w-4 h-4" /> Add Announcement
-        </button> */}
-      </div>
-
-      {/* Form Modal (يظهر عند التعديل فقط) */}
-      {showForm && (
+        </div>      </div>      {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
@@ -156,10 +144,7 @@ export default function Announcements() {
             </form>
           </div>
         </div>
-      )}
-
-      {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      )}      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b">

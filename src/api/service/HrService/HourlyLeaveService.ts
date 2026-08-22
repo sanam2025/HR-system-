@@ -1,4 +1,3 @@
-// src/api/service/HrService/HourlyLeaveService.ts
 import { apiClient } from '../../client';
 
 export interface HourlyLeaveRequest {
@@ -14,27 +13,10 @@ export interface HourlyLeaveRequest {
   department: string;
 }
 
-export const HourlyLeaveService = {
-  // ✅ جلب كل الطلبات
-  getAll: () => apiClient.get<{ data: HourlyLeaveRequest[] }>('/hourly-leave-Requests'),
-
-  // ✅ جلب تفاصيل طلب
-  getById: (id: number) => apiClient.get<{ data: HourlyLeaveRequest }>(`/hourly-leave-Requests/${id}`),
-
-  // ✅ موافقة على طلب
-  approve: (id: number) => apiClient.put(`/hourly-leave-requests/${id}/approve`),
-
-  // ✅ رفض طلب
-  reject: (id: number) => apiClient.put(`/hourly-leave-requests/${id}/reject`),
-
-  // ✅ طلبات قسم معين
-  getDepartmentRequests: (status?: string) =>
+export const HourlyLeaveService = {  getAll: () => apiClient.get<{ data: HourlyLeaveRequest[] }>('/hourly-leave-Requests'),  getById: (id: number) => apiClient.get<{ data: HourlyLeaveRequest }>(`/hourly-leave-Requests/${id}`),  approve: (id: number) => apiClient.put(`/hourly-leave-requests/${id}/approve`),  reject: (id: number) => apiClient.put(`/hourly-leave-requests/${id}/reject`),  getDepartmentRequests: (status?: string) =>
     apiClient.get<{ data: HourlyLeaveRequest[] }>(
       `/department-hourly-leave-request${status ? `?status=${status}` : ''}`
-    ),
-
-  // ✅ كل طلبات القسم
-  getAllDepartmentRequests: (depId?: number) => {
+    ),  getAllDepartmentRequests: (depId?: number) => {
     let url = '/all-hourly-leave-requests-hr';
     if (depId) url += `?dep_id=${depId}`;
     return apiClient.get<{ data: HourlyLeaveRequest[] }>(url);

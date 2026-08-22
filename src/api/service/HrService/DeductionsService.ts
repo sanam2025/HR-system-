@@ -1,4 +1,3 @@
-// src/api/service/HrService/DeductionsService.ts
 import { apiClient } from '../../client';
 import type { DeductionRecord } from './Types/payroll.types';
 

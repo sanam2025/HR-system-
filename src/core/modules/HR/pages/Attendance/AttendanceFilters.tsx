@@ -1,9 +1,6 @@
 import React from 'react';
 import { Calendar } from 'lucide-react';
-import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
-
-//  تعديل الـ Props: حذف searchTerm و setSearchTerm
-interface AttendanceFiltersProps {
+import { useLanguage } from '../../../../../i18n/translations/LanguageContext';interface AttendanceFiltersProps {
   fromDate: string;
   setFromDate: (value: string) => void;
   toDate: string;
@@ -24,9 +21,7 @@ export default function AttendanceFilters({
   
   return (
     <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-      <div className="flex flex-wrap items-end gap-4">
-        {/* من تاريخ */}
-        <div className="flex-1 min-w-[150px]">
+      <div className="flex flex-wrap items-end gap-4">        <div className="flex-1 min-w-[150px]">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {t.attendance?.filter?.fromDate || 'From Date'}
           </label>
@@ -39,10 +34,7 @@ export default function AttendanceFilters({
               className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
             />
           </div>
-        </div>
-
-        {/* إلى تاريخ */}
-        <div className="flex-1 min-w-[150px]">
+        </div>        <div className="flex-1 min-w-[150px]">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {t.attendance?.filter?.toDate || 'To Date'}
           </label>
@@ -55,10 +47,7 @@ export default function AttendanceFilters({
               className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
             />
           </div>
-        </div>
-
-        {/* زر الفلترة */}
-        <div className="flex gap-2">
+        </div>        <div className="flex gap-2">
           <button
             onClick={onFilter}
             disabled={isLoading}

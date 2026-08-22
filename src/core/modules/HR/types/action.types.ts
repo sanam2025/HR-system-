@@ -1,4 +1,3 @@
-// shared/types/action.types.ts
 import type { ReactNode } from 'react';
 
 /**

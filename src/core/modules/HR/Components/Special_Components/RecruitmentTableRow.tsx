@@ -1,4 +1,3 @@
-// core/modules/HR/Components/Special_Components/RecruitmentTableRow.tsx
 import React from "react";
 import { Eye, Edit, CheckCircle, XCircle, Clock } from "lucide-react";
 import type {

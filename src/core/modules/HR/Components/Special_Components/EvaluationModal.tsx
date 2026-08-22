@@ -1,4 +1,3 @@
-// core/modules/HR/Components/Special_Components/EvaluationModal.tsx
 import React, { useState } from "react";
 import { X, Star, FileText } from "lucide-react";
 import type { Employee } from "../../types/employee.types";
@@ -29,9 +28,7 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({ isOpen, employ
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" dir="ltr">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
-        {/* Header */}
-        <div className="border-b border-gray-100 px-6 py-4 flex justify-between items-center">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">        <div className="border-b border-gray-100 px-6 py-4 flex justify-between items-center">
           <div>
             <h2 className="text-xl font-semibold text-gray-800">Employee Evaluation</h2>
             <p className="text-sm text-gray-500 mt-0.5">Rate and provide feedback for {employee.name}</p>
@@ -39,19 +36,11 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({ isOpen, employ
           <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
             <X className="w-5 h-5" />
           </button>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {/* Employee Info */}
-          <div className="bg-gray-50 rounded-lg p-3">
+        </div>        <form onSubmit={handleSubmit} className="p-6 space-y-5">          <div className="bg-gray-50 rounded-lg p-3">
             <p className="text-sm text-gray-600">Employee: <span className="font-semibold text-gray-800">{employee.name}</span></p>
             <p className="text-sm text-gray-600">Position: <span className="font-semibold text-gray-800">{employee.jobTitle}</span></p>
             <p className="text-sm text-gray-600">Department: <span className="font-semibold text-gray-800">{employee.department}</span></p>
-          </div>
-
-          {/* Rating */}
-          <div>
+          </div>          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Rating *</label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -80,10 +69,7 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({ isOpen, employ
               {rating === 4 && "Good - Exceeds expectations"}
               {rating === 5 && "Excellent - Outstanding performance"}
             </p>
-          </div>
-
-          {/* Comments */}
-          <div>
+          </div>          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Comments / Notes</label>
             <div className="relative">
               <FileText className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
@@ -95,10 +81,7 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({ isOpen, employ
                 placeholder="Write your feedback about the employee's performance..."
               />
             </div>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+          </div>          <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
               Cancel
             </button>

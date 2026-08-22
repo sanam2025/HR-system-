@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Resignations/Resignations.tsx
 import { useState } from "react";
 import { Eye, Zap, Search, LogOut, Loader2 } from "lucide-react";
 import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
@@ -34,7 +33,6 @@ export default function Resignations() {
 
   return (
     <div className="space-y-6 p-6" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Header */}
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -44,8 +42,6 @@ export default function Resignations() {
           <p className="text-gray-500 mt-1">{t('manageResignationRequests') || 'Manage standard and immediate resignation requests.'}</p>
         </div>
       </div>
-
-      {/* Toolbar */}
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex bg-gray-50 p-1 rounded-xl w-full md:w-auto">
           <button
@@ -86,8 +82,6 @@ export default function Resignations() {
           <Search className={`absolute ${lang === 'ar' ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-gray-400`} size={18} />
         </div>
       </div>
-
-      {/* Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
@@ -106,7 +100,6 @@ export default function Resignations() {
               <thead>
                 <tr className="bg-gray-50/50 border-b border-gray-100 text-gray-500 text-sm">
                   <th className="px-6 py-4 font-medium text-start">{t('employee') || 'Employee'}</th>
-                  <th className="px-6 py-4 font-medium text-start">{t('department') || 'Department'}</th>
                   <th className="px-6 py-4 font-medium text-start">{t('position') || 'Position'}</th>
                   <th className="px-6 py-4 font-medium text-start">{t('lastWorkingDay') || 'Last Working Day'}</th>
                   <th className="px-6 py-4 font-medium text-start">{t('status') || 'Status'}</th>
@@ -117,11 +110,10 @@ export default function Resignations() {
                 {filteredRequests.map((r: Resignation) => (
                   <tr key={r.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-gray-900">{r.employee?.full_name || 'Unknown'}</div>
-                      <div className="text-xs text-gray-400 mt-1">ID: {r.user_id || 'N/A'}</div>
+                      <div className="font-semibold text-gray-900">{r.employee?.full_name || r.employee?.name || r.user?.full_name || r.user?.name || r.employee_name || r.name || 'Unknown'}</div>
+                      <div className="text-xs text-gray-400 mt-1">ID: {r.user_id || r.employee?.id || r.employee_id || 'N/A'}</div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{r.employee?.department?.name || 'N/A'}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{r.employee?.position?.name || 'N/A'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{r.employee?.position?.name || r.employee?.job_title || r.position?.name || r.position_name || r.job_title || 'N/A'}</td>
                     <td className="px-6 py-4 text-sm text-gray-600 font-medium">{r.last_working_day || 'N/A'}</td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${

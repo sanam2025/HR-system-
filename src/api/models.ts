@@ -9,8 +9,6 @@
 
 export type ID = number;
 
-// ── Onboarding / documents / contracts ────────────────────────────────────
-
 export interface OnboardingUploadPayload {
   id_card: File;
   photo: File;
@@ -60,8 +58,6 @@ export interface Contract {
   renewable: boolean;
 }
 
-// ── Profile ─────────────────────────────────────────────────────────────
-
 export const Gender = { Male: "male", Female: "female" } as const;
 export type Gender = (typeof Gender)[keyof typeof Gender];
 
@@ -99,8 +95,6 @@ export type UpdateProfilePayload = Partial<Omit<CreateProfilePayload, "picture">
   picture?: File;
 };
 
-// ── Attendance ─────────────────────────────────────────────────────────────
-
 export const AttendanceStatus = {
   Present: "present",
   Absent: "absent",
@@ -135,8 +129,6 @@ export interface CheckInOutPayload {
   longitude: string;
 }
 
-// ── Leave requests ─────────────────────────────────────────────────────────
-
 export const LeaveType = {
   Annual: "annual",
   Sick: "sick",
@@ -166,9 +158,6 @@ export interface CreateLeaveRequestPayload {
   start_date: string;
   type: LeaveType;
   days_count: number;
-  // Added to the collection's "Store Leave Request" form after the leave
-  // request model above was first written — optional so existing callers
-  // that don't pass it keep compiling.
   reason?: string;
 }
 
@@ -222,8 +211,6 @@ export interface Task {
   description?: string;
   status: TaskStatus;
   priority?: TaskPriority;
-  // CONFIRMED live: the response uses `due_date` (snake_case); `dueDate`
-  // is kept only as a fallback for any older/camelCase source.
   dueDate?: string;
   due_date?: string;
   assigneeId?: ID;
@@ -249,9 +236,6 @@ export interface Task {
   reviewed_at?: string | null;
   is_overdue?: boolean;
   createdAt?: string;
-  // The "post task m" request in the collection uses `assigned_to` on the
-  // *create* payload; the read response uses a nested `assignee` object
-  // instead (see above) — kept as an optional fallback.
   assigned_to?: ID;
 }
 
@@ -286,8 +270,6 @@ export interface TaskSubmission {
   submitted_at?: string;
 }
 
-// ── Hourly leave requests ─────────────────────────────────────────────────
-
 export interface HourlyLeaveRequest {
   id: ID;
   employee_id: ID;
@@ -306,14 +288,6 @@ export interface CreateHourlyLeaveRequestPayload {
 }
 
 export type UpdateHourlyLeaveRequestPayload = Partial<CreateHourlyLeaveRequestPayload>;
-
-// ── Payroll: payslips, base salary, deductions, incentives ────────────────
-//
-// None of these folders have a single saved response example in the
-// collection, so — same rationale as the file header — every type below
-// pins down only the fields confirmed by a request payload or a path
-// parameter and otherwise stays permissive via an index signature. Pages
-// must render unknown fields defensively rather than assuming a shape.
 
 export interface Payslip {
   id: ID;
@@ -348,8 +322,6 @@ export interface PayslipsSummary {
   [key: string]: unknown;
 }
 
-// ── Overtime ────────────────────────────────────────────────────────────
-
 export interface CreateOvertimePayload {
   date: string;
   start_time: string;
@@ -368,8 +340,6 @@ export interface Overtime {
   [key: string]: unknown;
 }
 
-// ── Complaints ──────────────────────────────────────────────────────────
-
 export interface CreateComplaintPayload {
   subject_id: number;
   title: string;
@@ -386,8 +356,6 @@ export interface Complaint {
   [key: string]: unknown;
 }
 
-// ── Notifications ───────────────────────────────────────────────────────
-
 /**
  * CONFIRMED via live backend testing: this is Laravel's default database
  * notification shape — the human-readable text lives at `data.message`
@@ -403,8 +371,6 @@ export interface AppNotification {
   [key: string]: unknown;
 }
 
-// ── Announcements ───────────────────────────────────────────────────────
-
 export interface Announcement {
   id: ID;
   title: string;
@@ -415,8 +381,6 @@ export interface Announcement {
   expires_at?: string;
   [key: string]: unknown;
 }
-
-// ── People directory (for picking a complaint subject, etc.) ─────────────
 
 /**
  * CONFIRMED via live backend testing: `GET /users/employees` and
@@ -435,8 +399,6 @@ export interface Colleague {
   profile_id?: ID | null;
   role: "employee" | "manager";
 }
-
-// ── Resignations ────────────────────────────────────────────────────────
 
 /**
  * Only `"immediate"` is CONFIRMED valid (the collection's example payload,

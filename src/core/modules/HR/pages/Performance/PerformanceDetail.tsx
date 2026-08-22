@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Performance/PerformanceDetail.tsx
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -58,10 +57,7 @@ export default function PerformanceDetail() {
             <p className="text-xs text-gray-500 uppercase">Status</p>
             <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">Pending HR Review</span>
           </div>
-        </div>
-
-        {/* Automated Metrics */}
-        {evaluation.automated_metrics && (
+        </div>        {evaluation.automated_metrics && (
           <div className="border-t border-gray-100 pt-4 mb-4">
             <h3 className="text-sm font-semibold text-gray-700 mb-2">Automated Metrics</h3>
             <div className="grid grid-cols-3 gap-2 text-sm">
@@ -70,10 +66,7 @@ export default function PerformanceDetail() {
               <p><span className="text-gray-500">Tasks On-Time:</span> {evaluation.automated_metrics.on_time_rate}%</p>
             </div>
           </div>
-        )}
-
-        {/* Manager Evaluation */}
-        <div className="border-t border-gray-100 pt-4 mb-4">
+        )}        <div className="border-t border-gray-100 pt-4 mb-4">
           <h3 className="text-sm font-semibold text-gray-700 mb-2">Manager's Evaluation</h3>
           <p className="text-sm text-gray-600"><span className="font-medium">Behavioral:</span> {evaluation.behavioral_rating}</p>
           <p className="text-sm text-gray-600 mt-1"><span className="font-medium">Notes:</span> {evaluation.manager_notes || 'No notes provided.'}</p>
@@ -85,10 +78,7 @@ export default function PerformanceDetail() {
               </ul>
             </div>
           )}
-        </div>
-
-        {/* HR Notes Input */}
-        <div className="border-t border-gray-100 pt-4">
+        </div>        <div className="border-t border-gray-100 pt-4">
           <h3 className="text-sm font-semibold text-gray-700 mb-2">HR Review</h3>
           <textarea
             value={hrNotes}

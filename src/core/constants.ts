@@ -1,21 +1,14 @@
-// ── Task status color map (Arabic keys → Tailwind classes) ──
 export const TASK_STATUS_COLORS: Record<string, string> = {
   'جديدة': 'bg-blue-50 text-blue-700',
   'قيد التنفيذ': 'bg-yellow-50 text-yellow-700',
   'مكتملة': 'bg-green-50 text-green-700',
   'متأخرة': 'bg-red-50 text-red-600',
-};
-
-// ── Task status English labels ──
-export const TASK_STATUS_EN: Record<string, string> = {
+};export const TASK_STATUS_EN: Record<string, string> = {
   'جديدة': 'New',
   'قيد التنفيذ': 'In Progress',
   'مكتملة': 'Completed',
   'متأخرة': 'Late',
-};
-
-// ── Month name map (Arabic → English abbreviation) ──
-export const CHART_MONTHS_EN: Record<string, string> = {
+};export const CHART_MONTHS_EN: Record<string, string> = {
   'يناير': 'Jan',
   'فبراير': 'Feb',
   'مارس': 'Mar',
@@ -28,16 +21,11 @@ export const CHART_MONTHS_EN: Record<string, string> = {
   'أكتوبر': 'Oct',
   'نوفمبر': 'Nov',
   'ديسمبر': 'Dec',
-};
-
-// ── Attendance status map (normalised English key → Arabic / English labels + CSS) ──
-export const ATTENDANCE_STATUS_INFO: Record<string, { labelAr: string; labelEn: string; colorClass: string }> = {
+};export const ATTENDANCE_STATUS_INFO: Record<string, { labelAr: string; labelEn: string; colorClass: string }> = {
   'حاضر':    { labelAr: 'حاضر',  labelEn: 'Present',  colorClass: 'bg-green-50 text-green-700 border border-green-200' },
   'غائب':    { labelAr: 'غائب',  labelEn: 'Absent',   colorClass: 'bg-red-50 text-red-600 border border-red-200' },
   'تأخير':   { labelAr: 'تأخير', labelEn: 'Late',     colorClass: 'bg-yellow-50 text-yellow-700 border border-yellow-200' },
-  'إجازة':   { labelAr: 'إجازة', labelEn: 'On Leave', colorClass: 'bg-blue-50 text-blue-700 border border-blue-200' },
-  // English aliases (legacy data)
-  'Present': { labelAr: 'حاضر',  labelEn: 'Present',  colorClass: 'bg-green-50 text-green-700 border border-green-200' },
+  'إجازة':   { labelAr: 'إجازة', labelEn: 'On Leave', colorClass: 'bg-blue-50 text-blue-700 border border-blue-200' },  'Present': { labelAr: 'حاضر',  labelEn: 'Present',  colorClass: 'bg-green-50 text-green-700 border border-green-200' },
   'present': { labelAr: 'حاضر',  labelEn: 'Present',  colorClass: 'bg-green-50 text-green-700 border border-green-200' },
   'Absent':  { labelAr: 'غائب',  labelEn: 'Absent',   colorClass: 'bg-red-50 text-red-600 border border-red-200' },
   'absent':  { labelAr: 'غائب',  labelEn: 'Absent',   colorClass: 'bg-red-50 text-red-600 border border-red-200' },

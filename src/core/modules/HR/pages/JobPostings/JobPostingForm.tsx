@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/JobPostingForm.tsx
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Save } from "lucide-react";
@@ -6,10 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { JobPostingsService } from "../../../../../api/service/HrService/JobPostingsService";
 import Loading from "../../../../../shared/components/Loading";
-import { useLanguage } from "../../../../../i18n/translations/LanguageContext";
-
-// تعريف نوع الخطأ
-interface ApiError {
+import { useLanguage } from "../../../../../i18n/translations/LanguageContext";interface ApiError {
   message: string;
   response?: {
     data?: {
@@ -42,10 +38,7 @@ export default function JobPostingForm() {
     description: "",
     experience: 0,
     skills: [] as number[],
-  });
-
-  // جلب البيانات إذا كان في وضع التعديل
-  const { data: response, isLoading } = useQuery({
+  });  const { data: response, isLoading } = useQuery({
     queryKey: ["job-posting", id],
     queryFn: () => JobPostingsService.getById(Number(id)),
     enabled: isEditMode && !!id,

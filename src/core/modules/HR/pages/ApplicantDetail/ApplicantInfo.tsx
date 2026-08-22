@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/ApplicantDetail/ApplicantInfo.tsx
 import { Mail, Phone, Calendar, Briefcase } from "lucide-react";
 import type { Candidate } from "../../../../../api/service/HrService/Types/CandidatesService.types";
 

@@ -72,9 +72,7 @@ export const TerminationCard = ({ termination }: { termination: Termination }) =
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
       <div className="p-5">
-        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
-          {/* Left Section */}
-          <div className="flex-1 min-w-0">
+        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">          <div className="flex-1 min-w-0">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-semibold text-sm">

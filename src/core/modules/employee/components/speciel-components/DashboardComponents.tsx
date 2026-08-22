@@ -9,8 +9,6 @@ function formatTime(isoOrTime: string | null): string | null {
   if (!Number.isNaN(asDate.getTime())) {
     return asDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   }
-  // Some Laravel APIs return a bare "HH:MM:SS" time string rather than a
-  // full ISO datetime — display it as-is rather than failing to parse.
   return isoOrTime;
 }
 

@@ -1,4 +1,3 @@
-// core/modules/HR/Components/Special_Components/LeaveRequestTableRow.tsx
 import React from "react";
 import { Eye, Edit, CheckCircle, XCircle, Clock } from "lucide-react";
 import type { LeaveRequest, LeaveStatus } from "../../types/leaves.types";
@@ -95,10 +94,7 @@ export const LeaveRequestTableRow: React.FC<LeaveRequestTableRowProps> = ({
       </td>
     </tr>
   );
-};
-
-// Helper function
-const formatDate = (dateString: string): string => {
+};const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
   return date.toLocaleDateString("en-GB");
 };

@@ -1,10 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { useLanguage } from '../../i18n/translations/LanguageContext';
-
-// ── Types ──
-export interface NavItem {
+import { useLanguage } from '../../i18n/translations/LanguageContext';export interface NavItem {
   label: string;
   icon: LucideIcon;
   path: string;
@@ -18,10 +15,7 @@ export interface SidebarProps {
   brand?: { logo?: string; title?: string; subtitle?: string };
   user?: { avatar: string; name: string; role: string };
   navSectionLabel?: string;
-}
-
-// ── Component ──
-export default function Sidebar({
+}export default function Sidebar({
   open,
   onToggle,
   navItems,
@@ -46,10 +40,7 @@ export default function Sidebar({
         bg-dark-sidebar shadow-[0_4px_20px_rgba(0,0,0,0.15)]
         transition-all duration-300
         ${open ? 'w-64' : 'w-0 overflow-hidden md:w-16'}
-      `}>
-
-        {/* Logo */}
-        <div className="flex items-center gap-3 px-5 py-6 border-b border-white/10">
+      `}>        <div className="flex items-center gap-3 px-5 py-6 border-b border-white/10">
           <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center text-lg flex-shrink-0 p-1 overflow-hidden">
             <img src="/logo-transparent.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
@@ -59,10 +50,7 @@ export default function Sidebar({
               <p className="text-white/40 text-[10px] truncate mt-0.5">{brand.subtitle}</p>
             </div>
           )}
-        </div>
-
-        {/* User */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10">
+        </div>        <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10">
           <div className="w-9 h-9 rounded-full bg-green flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
             {user.avatar}
           </div>
@@ -72,10 +60,7 @@ export default function Sidebar({
               <p className="text-gold text-[10px]">{user.role}</p>
             </div>
           )}
-        </div>
-
-        {/* Nav */}
-        <nav className="flex-1 py-3 overflow-y-auto scrollbar-hide">
+        </div>        <nav className="flex-1 py-3 overflow-y-auto scrollbar-hide">
           {open && (
             <p className="px-5 py-2 text-white/30 text-[10px] font-bold uppercase tracking-widest">
               {navSectionLabel}
@@ -106,10 +91,7 @@ export default function Sidebar({
               </NavLink>
             );
           })}
-        </nav>
-
-        {/* Toggle */}
-        <button
+        </nav>        <button
           onClick={onToggle}
           className="flex items-center justify-center py-4 text-white/40 hover:text-white transition-colors border-t border-white/10"
         >

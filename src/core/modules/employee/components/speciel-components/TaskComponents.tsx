@@ -216,14 +216,11 @@ export function TaskListCard({
                 key={task.id}
                 className="group relative p-6 rounded-3xl border border-gray-200 hover:border-[#4A7C59]/40 shadow-sm hover:shadow-lg transition-all duration-300 bg-white flex flex-col gap-5 overflow-hidden"
               >
-                {/* Status Indicator Stripe */}
                 <div className={`absolute top-0 bottom-0 right-0 w-1.5 ${
                   status.toLowerCase() === "completed" || status.toLowerCase() === "approved" ? "bg-green-500" :
                   status.toLowerCase() === "rejected" || status.toLowerCase() === "cancelled" ? "bg-red-500" :
                   "bg-yellow-400"
                 }`} />
-
-                {/* Header: Title and Meta */}
                 <div className="flex flex-col sm:flex-row justify-between items-start gap-4 relative z-10 pr-2">
                   <div className="flex items-start gap-4">
                     <div className="mt-1 w-10 h-10 rounded-full bg-[#4A7C59]/10 text-[#4A7C59] flex items-center justify-center flex-shrink-0 shadow-sm">
@@ -243,15 +240,11 @@ export function TaskListCard({
                     </div>
                   </div>
                 </div>
-
-                {/* Body: Description */}
                 <div className="bg-gray-50/70 rounded-2xl p-5 border border-gray-100 relative z-10 rtl:text-right ltr:text-left">
                   <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{t.tasks?.description || "Description"}</h4>
                   <p className="text-sm text-gray-500 leading-relaxed rtl:pr-11 ltr:pl-11">
                     {task.description ?? t.tasks?.emptyDescription ?? "No description available."}
                   </p>
-
-                  {/* Evaluation Block */}
                   {(task.score != null) && (
                     <div className="mt-5">
                       <div className="bg-gray-50/50 border border-gray-100 rounded-xl p-4 relative overflow-hidden flex items-center justify-between">
@@ -274,14 +267,10 @@ export function TaskListCard({
                       </div>
                     </div>
                   )}
-
-                  {/* Submission and Feedback Details */}
                   {['submitted', 'approved', 'rejected', 'completed'].includes((task.status || '').toLowerCase()) && (
                     <TaskFeedbackContent taskId={task.id} />
                   )}
                 </div>
-
-                {/* Footer: Actions */}
                 <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-2 relative z-10">
                   {canStart(status) && (
                     <button
@@ -337,7 +326,6 @@ export function TaskStatusSummaryCard({ tasks }: { tasks: Task[] }) {
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-2">
-      {/* Pending */}
       <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center group hover:shadow-lg transition-all duration-300 relative overflow-hidden">
         <div className="absolute top-0 w-full h-1 bg-gray-200"></div>
         <div className="w-12 h-12 bg-gray-50 text-gray-500 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-3 transition-transform">
@@ -346,8 +334,6 @@ export function TaskStatusSummaryCard({ tasks }: { tasks: Task[] }) {
         <h3 className="text-3xl font-black text-gray-800 leading-none mb-1">{pending}</h3>
         <p className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-widest">{t.tasks?.pending || "Pending"}</p>
       </div>
-
-      {/* In Progress */}
       <div className="bg-white p-5 rounded-3xl shadow-sm border border-blue-50 flex flex-col items-center justify-center text-center group hover:shadow-lg transition-all duration-300 relative overflow-hidden">
         <div className="absolute top-0 w-full h-1 bg-blue-400"></div>
         <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-3 transition-transform">
@@ -356,8 +342,6 @@ export function TaskStatusSummaryCard({ tasks }: { tasks: Task[] }) {
         <h3 className="text-3xl font-black text-blue-700 leading-none mb-1">{inProgress}</h3>
         <p className="text-[10px] sm:text-xs font-bold text-blue-500/80 uppercase tracking-widest">{t.tasks?.inProgress || "In Progress"}</p>
       </div>
-
-      {/* Submitted */}
       <div className="bg-white p-5 rounded-3xl shadow-sm border border-purple-50 flex flex-col items-center justify-center text-center group hover:shadow-lg transition-all duration-300 relative overflow-hidden">
         <div className="absolute top-0 w-full h-1 bg-purple-400"></div>
         <div className="w-12 h-12 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-3 transition-transform">
@@ -366,8 +350,6 @@ export function TaskStatusSummaryCard({ tasks }: { tasks: Task[] }) {
         <h3 className="text-3xl font-black text-purple-700 leading-none mb-1">{submitted}</h3>
         <p className="text-[10px] sm:text-xs font-bold text-purple-500/80 uppercase tracking-widest">{t.tasks?.submitted || "Submitted"}</p>
       </div>
-
-      {/* Approved / Completed */}
       <div className="bg-white p-5 rounded-3xl shadow-sm border border-green-50 flex flex-col items-center justify-center text-center group hover:shadow-lg transition-all duration-300 relative overflow-hidden">
         <div className="absolute top-0 w-full h-1 bg-green-500"></div>
         <div className="w-12 h-12 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 group-hover:rotate-3 transition-transform">

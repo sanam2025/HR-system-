@@ -14,10 +14,7 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
     },
   },
-});
-
-// ── Error Boundary ──
-interface ErrorBoundaryState {
+});interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
 }

@@ -88,7 +88,6 @@ export default function ResignationDetail() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button 
@@ -109,9 +108,7 @@ export default function ResignationDetail() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Main Details */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Employee Info Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <User className="text-green w-5 h-5" />
@@ -120,20 +117,18 @@ export default function ResignationDetail() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <p className="text-sm text-gray-500 mb-1">{t('employeeName') || 'Employee Name'}</p>
-                <p className="font-medium text-gray-900">{resignation.employee?.full_name || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 mb-1">{t('department') || 'Department'}</p>
-                <p className="font-medium text-gray-900">{resignation.employee?.department?.name || 'N/A'}</p>
+                <p className="font-medium text-gray-900">
+                  {resignation.employee?.full_name || resignation.employee?.name || resignation.user?.full_name || resignation.user?.name || resignation.employee_name || resignation.name || (lang === 'ar' ? 'غير متوفر' : 'N/A')}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500 mb-1">{t('position') || 'Position'}</p>
-                <p className="font-medium text-gray-900">{resignation.employee?.position?.name || 'N/A'}</p>
+                <p className="font-medium text-gray-900">
+                  {resignation.employee?.position?.name || resignation.employee?.job_title || resignation.position?.name || resignation.position_name || resignation.job_title || (lang === 'ar' ? 'غير متوفر' : 'N/A')}
+                </p>
               </div>
             </div>
           </div>
-
-          {/* Resignation Details Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <FileText className="text-green w-5 h-5" />
@@ -165,10 +160,7 @@ export default function ResignationDetail() {
             </div>
           </div>
         </div>
-
-        {/* Right Column - Actions & Documents */}
         <div className="space-y-6">
-          {/* Documents Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <FileText className="text-blue-500 w-5 h-5" />
@@ -202,8 +194,6 @@ export default function ResignationDetail() {
               </div>
             )}
           </div>
-
-          {/* HR Classification (Only for Immediate) */}
           {resignation.type === 'immediate' && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 border-t-4 border-t-yellow-400">
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">

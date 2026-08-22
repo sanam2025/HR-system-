@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Payroll/Payroll.tsx
 import React, { useState, useEffect, useMemo } from "react";
 import {
   DollarSign,
@@ -44,17 +43,12 @@ const EmptyState = ({ isAr }: { isAr: boolean }) => (
   </div>
 );
 
-export default function Payroll() {
-  // ------------------- Hooks -------------------
-  const { lang, isRTL } = useLanguage();
+export default function Payroll() {  const { lang, isRTL } = useLanguage();
   const { incentives } = useIncentives();
   const { deductions } = useDeductions();
   const createIncentive = useCreateIncentive();
   const createDeduction = useCreateDeduction();
-  const { currentUser } = useAuthStore();
-
-  // ------------------- Local States -------------------
-  const [records, setRecords] = useState<PayrollRecord[]>([]);
+  const { currentUser } = useAuthStore();  const [records, setRecords] = useState<PayrollRecord[]>([]);
   const [employees, setEmployees] = useState<{ id: number; full_name?: string; name?: string }[]>([]);
 
   const [showIncentiveModal, setShowIncentiveModal] = useState(false);
@@ -75,10 +69,7 @@ export default function Payroll() {
     amount: 0,
     reason: "",
     date: new Date().toISOString().split("T")[0],
-  });
-
-  // ------------------- جلب البيانات -------------------
-  useEffect(() => {
+  });  useEffect(() => {
     const fetchData = async () => {
       try {
         const empRes = await apiClient.get("/users/employees");
@@ -122,10 +113,7 @@ export default function Payroll() {
               const emp = p.employee || {};
               
               let base = Number(details.base_salary || details.basic_salary || details.salary || p.base_salary || p.gross_salary || p.baseSalary || p.basic_salary || p.salary || emp.salary || 0);
-              let net = Number(details.net_salary || details.net || details.total_salary || p.net_salary || p.netSalary || p.net_total || p.net_amount || p.net || 0);
-              
-              // Include overtime_amount in bonuses/incentives
-              let b = Number(details.incentive_amount || 0) + Number(details.overtime_amount || 0) + 
+              let net = Number(details.net_salary || details.net || details.total_salary || p.net_salary || p.netSalary || p.net_total || p.net_amount || p.net || 0);              let b = Number(details.incentive_amount || 0) + Number(details.overtime_amount || 0) + 
                       Number(details.incentive || details.allowance || details.allowances || details.total_allowances || details.rewards || details.incentives || details.bonuses || details.total_incentives || p.incentives_total || p.incentives || p.bonuses || emp.incentives || 0);
               
               let d = Number(details.deductions_amount || 0) + 
@@ -155,11 +143,7 @@ export default function Payroll() {
       }
     };
     fetchData();
-  }, [currentUser, lang]);
-
-
-  // ------------------- Handlers -------------------
-  const handleCreateIncentive = () => {
+  }, [currentUser, lang]);  const handleCreateIncentive = () => {
     if (!newIncentive.user_id) {
       toast.error(lang === 'ar' ? "يرجى اختيار الموظف" : "Please select an employee");
       return;
@@ -183,16 +167,10 @@ export default function Payroll() {
         setNewDeduction({ user_id: 0, amount: 0, reason: "", date: new Date().toISOString().split("T")[0] });
       },
     });
-  };
-
-  // ------------------- Calculations -------------------
-  const totalBaseSalary = serverSummary?.base_salary || serverSummary?.total_salary || records.reduce((acc, r) => acc + (Number(r.baseSalary) || 0), 0);
+  };  const totalBaseSalary = serverSummary?.base_salary || serverSummary?.total_salary || records.reduce((acc, r) => acc + (Number(r.baseSalary) || 0), 0);
   const totalIncentives = serverSummary?.incentives || serverSummary?.total_incentives || incentives.reduce((acc, r) => acc + (Number(r.amount) || 0), 0);
   const totalDeductions = serverSummary?.deductions || serverSummary?.total_deductions || deductions.reduce((acc, r) => acc + (Number(r.amount) || 0), 0);
-  const totalNetSalary = serverSummary?.net_salary || serverSummary?.total_net_salary || records.reduce((acc, r) => acc + (Number(r.netSalary) || 0), 0);
-
-  // ------------------- History Pagination -------------------
-  const historyItems = useMemo(() => {
+  const totalNetSalary = serverSummary?.net_salary || serverSummary?.total_net_salary || records.reduce((acc, r) => acc + (Number(r.netSalary) || 0), 0);  const historyItems = useMemo(() => {
     const combined = [
       ...incentives.map(item => ({ ...item, type: 'incentive' as const })),
       ...deductions.map(item => ({ ...item, type: 'deduction' as const }))
@@ -450,10 +428,7 @@ export default function Payroll() {
             </div>
           )}
         </div>
-      )}
-
-      {/* Modal: Create Incentive */}
-      {showIncentiveModal && (
+      )}      {showIncentiveModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" dir={isRTL ? "rtl" : "ltr"}>
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-4">
@@ -546,10 +521,7 @@ export default function Payroll() {
             </div>
           </div>
         </div>
-      )}
-
-      {/* Modal: Create Deduction */}
-      {showDeductionModal && (
+      )}      {showDeductionModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" dir={isRTL ? "rtl" : "ltr"}>
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-4">

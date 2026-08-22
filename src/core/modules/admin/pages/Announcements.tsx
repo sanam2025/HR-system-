@@ -1,4 +1,3 @@
-// core/modules/Admin/pages/Announcements.tsx
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -9,10 +8,7 @@ import { AnnouncementsService } from "@/api/service/HrService/AnnouncementsServi
 import type {
   Announcement,
   CreateAnnouncementData,
-} from "@/api/service/HrService/Types/AnnouncementsService.types";
-
-// ─── helpers ─────────────────────────────────────────────────────────────────
-function fmtDate(d?: string) {
+} from "@/api/service/HrService/Types/AnnouncementsService.types";function fmtDate(d?: string) {
   if (!d) return "—";
   return new Date(d).toLocaleDateString("en-US", {
     month: "short", day: "numeric", year: "numeric",
@@ -24,10 +20,7 @@ const AUDIENCE_LABELS: Record<string, string> = {
   employees: "Employees",
   managers: "Managers",
   hr: "HR Department",
-};
-
-// ─── Modal ────────────────────────────────────────────────────────────────────
-interface ModalProps {
+};interface ModalProps {
   onClose: () => void;
   onSave: (d: CreateAnnouncementData) => Promise<void>;
   initial?: Announcement | null;
@@ -127,10 +120,7 @@ function AnnouncementModal({ onClose, onSave, initial, saving }: ModalProps) {
       </div>
     </div>
   );
-}
-
-// ─── Main Page ────────────────────────────────────────────────────────────────
-export default function Announcements() {
+}export default function Announcements() {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === "ar";
 
@@ -139,10 +129,7 @@ export default function Announcements() {
   const [error, setError]         = useState<string | null>(null);
   const [saving, setSaving]       = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [editing, setEditing]     = useState<Announcement | null>(null);
-
-  // ── Fetch ──
-  async function fetchAll() {
+  const [editing, setEditing]     = useState<Announcement | null>(null);  async function fetchAll() {
     try {
       setLoading(true);
       setError(null);
@@ -155,10 +142,7 @@ export default function Announcements() {
     }
   }
 
-  useEffect(() => { fetchAll(); }, []);
-
-  // ── Create ──
-  async function handleAdd(data: CreateAnnouncementData) {
+  useEffect(() => { fetchAll(); }, []);  async function handleAdd(data: CreateAnnouncementData) {
     setSaving(true);
     try {
       await AnnouncementsService.create(data);
@@ -167,10 +151,7 @@ export default function Announcements() {
     } catch {
       alert(isRtl ? "فشل الإنشاء" : "Failed to create announcement");
     } finally { setSaving(false); }
-  }
-
-  // ── Update ──
-  async function handleEdit(data: CreateAnnouncementData) {
+  }  async function handleEdit(data: CreateAnnouncementData) {
     if (!editing) return;
     setSaving(true);
     try {
@@ -181,10 +162,7 @@ export default function Announcements() {
     } catch {
       alert(isRtl ? "فشل التعديل" : "Failed to update announcement");
     } finally { setSaving(false); }
-  }
-
-  // ── Delete ──
-  async function handleDelete(id: number) {
+  }  async function handleDelete(id: number) {
     if (!confirm(isRtl ? "هل تريد حذف هذا التعميم؟" : "Delete this announcement?")) return;
     try {
       await AnnouncementsService.delete(id);
@@ -192,16 +170,10 @@ export default function Announcements() {
     } catch {
       alert(isRtl ? "فشل الحذف" : "Failed to delete announcement");
     }
-  }
-
-  // ── Stats ──
-  const total   = items.length;
+  }  const total   = items.length;
   const active  = items.filter(a => a.status === "active").length;
   const expired = items.filter(a => a.status === "expired").length;
-  const draft   = items.filter(a => a.status === "draft").length;
-
-  // ── Status badge ──
-  function statusBadge(status: string) {
+  const draft   = items.filter(a => a.status === "draft").length;  function statusBadge(status: string) {
     const map: Record<string, string> = {
       active:    "bg-emerald-50 text-emerald-600",
       scheduled: "bg-yellow-50 text-yellow-600",
@@ -222,9 +194,7 @@ export default function Announcements() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir={isRtl ? "rtl" : "ltr"}>
-      {/* ── Header ── */}
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={isRtl ? "rtl" : "ltr"}>      <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t("announcements")}</h1>
           <p className="text-gray-500 mt-1 text-sm">{t("manageAnnouncements")}</p>
@@ -236,10 +206,7 @@ export default function Announcements() {
           <Plus className="w-4 h-4" />
           {t("newAnnouncement")}
         </button>
-      </div>
-
-      {/* ── Stats ── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8">
+      </div>      <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8">
         {[
           { label: t("total"),       value: total,   color: "text-gray-900",    bg: "bg-blue-50 text-blue-600",    icon: <Megaphone className="w-5 h-5" /> },
           { label: t("active"),      value: active,  color: "text-emerald-600", bg: "bg-emerald-50 text-emerald-600", icon: <AlertCircle className="w-5 h-5" /> },
@@ -256,10 +223,7 @@ export default function Announcements() {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* ── List ── */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      </div>      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100">
           <h3 className="text-lg font-semibold text-gray-800">{t("allAnnouncements")}</h3>
           <p className="text-sm text-gray-400 mt-0.5">{items.length} {isRtl ? "تعميم" : "announcements"}</p>
@@ -326,10 +290,7 @@ export default function Announcements() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* ── Modal ── */}
-      {showModal && (
+      </div>      {showModal && (
         <AnnouncementModal
           onClose={() => { setShowModal(false); setEditing(null); }}
           onSave={editing ? handleEdit : handleAdd}

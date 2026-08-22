@@ -1,13 +1,9 @@
-// src/core/modules/HR/pages/ApplicantDetail.tsx
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Download, } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { apiClient } from '../../../../api/client';
-import Loading from '../../../../shared/components/Loading';
-
-//  تعريف الأنواع الخاصة بالمتقدم
-interface Skill {
+import Loading from '../../../../shared/components/Loading';interface Skill {
   id: number;
   name: string;
 }
@@ -42,10 +38,7 @@ export default function ApplicantDetail() {
 
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [downloading, setDownloading] = useState(false);
-
-  // جلب بيانات المتقدم
-  useEffect(() => {
+  const [downloading, setDownloading] = useState(false);  useEffect(() => {
     const fetchCandidate = async () => {
       try {
         const res = await apiClient.get(`/candidates/${candidateId}`);
@@ -58,18 +51,13 @@ export default function ApplicantDetail() {
       }
     };
     if (candidateId) fetchCandidate();
-  }, [candidateId]);
-
-  // دالة تحميل السيرة الذاتية (CV)
-  const handleDownloadCV = async () => {
+  }, [candidateId]);  const handleDownloadCV = async () => {
     if (!candidate?.cv_url) {
       toast.error('No CV available');
       return;
     }
     setDownloading(true);
-    try {
-      // فتح الرابط في نافذة جديدة للتحميل
-      window.open(candidate.cv_url, '_blank');
+    try {      window.open(candidate.cv_url, '_blank');
     } catch {
       toast.error('Failed to download CV');
     } finally {
@@ -89,9 +77,7 @@ export default function ApplicantDetail() {
         <ArrowLeft className="w-4 h-4" /> Back
       </button>
 
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        {/* رأس البطاقة */}
-        <div className="flex justify-between items-start mb-6">
+      <div className="bg-white rounded-xl shadow-sm p-6">        <div className="flex justify-between items-start mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{candidate.full_name}</h1>
             <p className="text-gray-500 text-sm">{candidate.email}</p>
@@ -106,24 +92,13 @@ export default function ApplicantDetail() {
               {downloading ? 'Downloading...' : 'Download CV'}
             </button>
           )}
-        </div>
-
-        {/* محتوى البطاقة */}
-        <div className="space-y-4">
-          {/* الخبرة */}
-          <div>
+        </div>        <div className="space-y-4">          <div>
             <h3 className="text-sm font-semibold text-gray-700">Experience</h3>
             <p className="text-gray-600">{candidate.experience} years</p>
-          </div>
-
-          {/* رسالة الغلاف */}
-          <div>
+          </div>          <div>
             <h3 className="text-sm font-semibold text-gray-700">Cover Letter</h3>
             <p className="text-gray-600">{candidate.cover_letter || 'No cover letter provided.'}</p>
-          </div>
-
-          {/* المهارات */}
-          <div>
+          </div>          <div>
             <h3 className="text-sm font-semibold text-gray-700">Skills</h3>
             <div className="flex flex-wrap gap-2">
               {candidate.skills?.map((skill: Skill) => (
@@ -135,18 +110,12 @@ export default function ApplicantDetail() {
                 </span>
               ))}
             </div>
-          </div>
-
-          {/* الحالة */}
-          <div>
+          </div>          <div>
             <h3 className="text-sm font-semibold text-gray-700">Status</h3>
             <span className="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">
               {candidate.status}
             </span>
-          </div>
-
-          {/* الوظيفة المتقدم لها */}
-          {candidate.job_posting && (
+          </div>          {candidate.job_posting && (
             <div className="border-t pt-4">
               <h3 className="text-sm font-semibold text-gray-700">Job Posting</h3>
               <p className="text-gray-600 font-medium">{candidate.job_posting.job_title}</p>

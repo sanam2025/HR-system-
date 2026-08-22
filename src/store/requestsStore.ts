@@ -5,10 +5,7 @@ interface RequestsState {
   leaveRequests: typeof mockLeaveRequests;
   overtimeRequests: typeof mockOvertimeRequests;
   updateLeaveRequestStatus: (id: number, status: string) => void;
-  updateOvertimeRequestStatus: (id: number, status: string) => void;
-  
-  // Stubs for Interviews
-  myInterviews: any[];
+  updateOvertimeRequestStatus: (id: number, status: string) => void;  myInterviews: any[];
   myInterviewsLoading: boolean;
   fetchMyInterviews: () => void;
   rateInterview: (id: number, rate: number, notes: string) => Promise<void>;

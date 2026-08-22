@@ -1,4 +1,3 @@
-// src/api/service/HrService/LeaveService.ts
 import { apiClient } from '../../client';
 
 export interface LeaveRequest {
@@ -21,31 +20,11 @@ export interface LeaveBalance {
   unpaid: number;
 }
 
-export const LeaveService = {
-  // ✅ جلب كل الطلبات
-  getAll: () => apiClient.get<{ data: LeaveRequest[] }>('/leaveRequests'),
-
-  // ✅ جلب تفاصيل طلب
-  getById: (id: number) => apiClient.get<{ data: LeaveRequest }>(`/leaveRequests/${id}`),
-
-  // ✅ موافقة على طلب
-  approve: (id: number) => apiClient.put(`/leave-requests/${id}/approve`),
-
-  // ✅ رفض طلب
-  reject: (id: number) => apiClient.put(`/leave-requests/${id}/reject`),
-
-  // ✅ رصيد إجازات موظف
-  getBalance: (employeeId: number) =>
-    apiClient.get<{ data: LeaveBalance }>(`/employee-leave/${employeeId}/balance`),
-
-  // ✅ طلبات قسم معين
-  getDepartmentRequests: (status?: string) =>
+export const LeaveService = {  getAll: () => apiClient.get<{ data: LeaveRequest[] }>('/leaveRequests'),  getById: (id: number) => apiClient.get<{ data: LeaveRequest }>(`/leaveRequests/${id}`),  approve: (id: number) => apiClient.put(`/leave-requests/${id}/approve`),  reject: (id: number) => apiClient.put(`/leave-requests/${id}/reject`),  getBalance: (employeeId: number) =>
+    apiClient.get<{ data: LeaveBalance }>(`/employee-leave/${employeeId}/balance`),  getDepartmentRequests: (status?: string) =>
     apiClient.get<{ data: LeaveRequest[] }>(
       `/department-leave-request${status ? `?status=${status}` : ''}`
-    ),
-
-  // ✅ كل طلبات الإجازات (مع فلترة)
-  getAllRequests: (from?: string, to?: string) => {
+    ),  getAllRequests: (from?: string, to?: string) => {
     let url = '/all-leave-request';
     const params = new URLSearchParams();
     if (from) params.append('from', from);

@@ -1,4 +1,3 @@
-// core/modules/HR/Components/Special_Components/ContractFormModal.tsx
 import React, { useState } from "react";
 import { X, Calendar, DollarSign, Clock, Gift, FileText } from "lucide-react";
 
@@ -34,9 +33,7 @@ export const ContractFormModal: React.FC<ContractFormModalProps> = ({
   position,
   onClose,
   onSubmit,
-}) => {
-  // إنشاء رقم العقد مرة واحدة عند فتح المودال
-  const [contractNumber] = useState(() => `CT-${Date.now()}`);
+}) => {  const [contractNumber] = useState(() => `CT-${Date.now()}`);
   
   const [formData, setFormData] = useState({
     startDate: "",

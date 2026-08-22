@@ -1,11 +1,8 @@
-// src/core/modules/HR/pages/Overtime/Overtime.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useMandatoryOvertime, useVoluntaryOvertime, useApproveMandatoryOvertime, useRejectMandatoryOvertime } from '../../hooks/useOvertime';
-import Loading from '../../../../../shared/components/Loading';
-//  استيراد نوع الطلب
-import type { OvertimeRequest } from '../../types/overtime.types';
+import Loading from '../../../../../shared/components/Loading';import type { OvertimeRequest } from '../../types/overtime.types';
 
 export default function Overtime() {
   const navigate = useNavigate();
@@ -78,9 +75,7 @@ export default function Overtime() {
                 <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
-              {/*  تصحيح النوع: إضافة (req: OvertimeRequest) */}
-              {(tab === 'mandatory' ? mandatory : voluntary).map((req: OvertimeRequest) => (
+            <tbody className="divide-y divide-gray-100">              {(tab === 'mandatory' ? mandatory : voluntary).map((req: OvertimeRequest) => (
                 <tr key={req.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">
                     {req.user?.full_name || `User #${req.user_id}`}

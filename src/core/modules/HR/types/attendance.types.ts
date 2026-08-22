@@ -1,4 +1,3 @@
-// core/modules/HR/types/attendance.types.ts
 
 export type AttendanceStatus = "present" | "late" | "absent" | "onLeave" | "earlyLeave";
 

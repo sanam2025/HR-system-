@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/HourlyLeaves/HourlyLeaveDetail.tsx
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, User, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { useHourlyLeaveRequest, useApproveHourlyLeave, useRejectHourlyLeave } from '../../hooks/useHourlyLeave';

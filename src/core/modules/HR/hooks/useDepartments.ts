@@ -1,9 +1,5 @@
-// src/core/modules/HR/hooks/useDepartments.ts
 import { useQuery } from '@tanstack/react-query';
-import { DepartmentsService } from '../../../../api/service/HrService/DepartmentsService';
-
-//  جلب الأقسام مع الموظفين
-export const useDepartmentsWithUsers = () => {
+import { DepartmentsService } from '../../../../api/service/HrService/DepartmentsService';export const useDepartmentsWithUsers = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['departments', 'withUsers'],
     queryFn: async () => {
@@ -18,10 +14,7 @@ export const useDepartmentsWithUsers = () => {
     error: error?.message || null,
     refetch,
   };
-};
-
-//  جلب كل الأقسام
-export const useDepartments = () => {
+};export const useDepartments = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['departments'],
     queryFn: async () => {
@@ -36,10 +29,7 @@ export const useDepartments = () => {
     error: error?.message || null,
     refetch,
   };
-};
-
-//  جلب قسم معين مع موظفيه (جديد)
-export const useDepartmentEmployees = (id: number) => {
+};export const useDepartmentEmployees = (id: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['department', id, 'employees'],
     queryFn: async () => {

@@ -1,4 +1,3 @@
-// src/core/modules/HR/hooks/useJobPostings.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { JobPostingsService } from '../../../../api/service/HrService/JobPostingsService';
@@ -28,10 +27,7 @@ const getErrorMessage = (err: unknown): string => {
     return apiError.message;
   }
   return 'An error occurred';
-};
-
-//  جلب جميع الوظائف
-export const useJobPostings = () => {
+};export const useJobPostings = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['job-postings'],
     queryFn: () => JobPostingsService.getAll(),
@@ -45,17 +41,12 @@ export const useJobPostings = () => {
     error: error?.message || null,
     refetch,
   };
-};
-
-//  جلب وظيفة واحدة
-export const useJobPosting = (jobId?: number) => {
+};export const useJobPosting = (jobId?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['jobPosting', jobId],
     queryFn: async () => {
       if (!jobId) return null;
-      const res = await JobPostingsService.getById(jobId);
-      // Fallback: If `res.data.data` exists, return it, else return `res.data`
-      return res.data?.data || res.data || null;
+      const res = await JobPostingsService.getById(jobId);      return res.data?.data || res.data || null;
     },
     enabled: !!jobId,
   });
@@ -66,10 +57,7 @@ export const useJobPosting = (jobId?: number) => {
     error: error?.message || null,
     refetch,
   };
-};
-
-//  تحديث وظيفة
-export const useUpdateJobPosting = () => {
+};export const useUpdateJobPosting = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -82,10 +70,7 @@ export const useUpdateJobPosting = () => {
     },
     onError: (err) => toast.error(getErrorMessage(err)),
   });
-};
-
-//  إغلاق وظيفة
-export const useCloseJobPosting = () => {
+};export const useCloseJobPosting = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -97,10 +82,7 @@ export const useCloseJobPosting = () => {
     },
     onError: (err) => toast.error(getErrorMessage(err)),
   });
-};
-
-//  حذف وظيفة
-export const useDeleteJobPosting = () => {
+};export const useDeleteJobPosting = () => {
   const queryClient = useQueryClient();
 
   return useMutation({

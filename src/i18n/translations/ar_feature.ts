@@ -1,6 +1,4 @@
-const ar = {
-  // ── Navigation ─
-  nav: {
+const ar = {  nav: {
     dashboard: 'لوحة التحكم',
     employees: 'الموظفون',
     tasks: 'المهام',
@@ -12,18 +10,12 @@ const ar = {
     interviews: 'المقابلات',
     announcements: 'التعميمات',
     mainMenu: 'القائمة الرئيسية',
-  },
-
-  // ── Common ──
-  common: {
+  },  common: {
     viewAll: 'عرض الكل',
     days: 'أيام',
     approve: 'موافقة',
     reject: 'رفض',
-  },
-
-  // ── Dashboard ──
-  dashboard: {
+  },  dashboard: {
     totalEmployees: 'إجمالي الموظفين',
     presentToday: 'حاضر اليوم',
     avgPerformance: 'متوسط الأداء',
@@ -43,10 +35,7 @@ const ar = {
     pendingOvertime: 'طلبات عمل إضافي معلقة',
     completedTasks: 'مهام مكتملة هذا الشهر',
     presentEmployees: 'موظفون حاضرون'
-  },
-
-  // ── Announcements ──
-  announcements: {
+  },  announcements: {
     title: 'إدارة التعميمات',
     subtitle: 'إنشاء ومتابعة التعميمات الخاصة بقسمك',
     createNew: 'إنشاء تعميم',
@@ -112,20 +101,13 @@ const ar = {
       active: 'نشط',
       expired: 'منتهي',
     }
-  },
-
-
-  // ── Sidebar / Topbar ──
-  layout: {
+  },  layout: {
     systemName: 'Masar HR',
     university: 'جامعة دمشق',
     managerRole: 'مدير القسم',
     userName: 'Ahmad Front',
     userAvatar: 'A',
-  },
-
-  // ── Tasks ──
-  tasks: {
+  },  tasks: {
     boardTitle: 'لوحة المهام',
     activeTasks: 'مهمة إجمالية',
     newTask: 'مهمة جديدة',
@@ -174,10 +156,7 @@ const ar = {
       medium: 'متوسطة',
       low: 'منخفضة'
     }
-  },
-
-  // ── Employees ──
-  employees: {
+  },  employees: {
     listTitle: 'قائمة الموظفين',
     employeesCount: 'موظف',
     searchPlaceholder: 'ابحث عن موظف...',
@@ -192,10 +171,7 @@ const ar = {
     tryChanging: 'حاول تغيير كلمة البحث أو الفلتر',
     tasks: 'مهام',
     leaves: 'إجازات'
-  },
-
-  // ── Employee Profile ──
-  employeeProfile: {
+  },  employeeProfile: {
     notFound: 'الموظف غير موجود',
     back: 'رجوع',
     backToList: 'العودة للقائمة',
@@ -213,10 +189,7 @@ const ar = {
     checkOut: '— خروج:',
     delay: 'تأخير',
     mins: 'دقيقة'
-  },
-
-  // ── Leaves ──
-  leaves: {
+  },  leaves: {
     title: 'الإجازات',
     pendingReview: 'طلبات معلقة بانتظار مراجعتك',
     pendingAttention: 'طلبات معلقة تحتاج لاهتمامك',
@@ -282,10 +255,7 @@ const ar = {
       approved: 'تمت الموافقة على الطلب بنجاح',
       rejected: 'تم رفض الطلب بنجاح'
     }
-  },
-
-  // ── Overtime ──
-  overtime: {
+  },  overtime: {
     title: 'طلبات العمل الإضافي',
     subtitle: 'طلبات معلقة',
     pendingRequests: 'طلبات معلقة',
@@ -323,10 +293,7 @@ const ar = {
       approved: 'تمت الموافقة على الطلب بنجاح',
       rejected: 'تم رفض الطلب بنجاح'
     }
-  },
-
-  // ── Attendance ──
-  attendance: {
+  },  attendance: {
     title: 'نظرة عامة على الحضور',
     subtitle: 'تتبع سجلات حضور الموظفين',
     stats: {
@@ -361,10 +328,7 @@ const ar = {
     },
     noRecords: 'لا توجد سجلات حضور',
     min: 'دقيقة'
-  },
-
-  // ── Evaluation ──
-  evaluation: {
+  },  evaluation: {
     title: 'التقييم الدوري',
     subtitle: 'تقييم شامل للأداء، الحضور، والسلوك',
     errorIncomplete: 'يرجى ملء جميع الحقول وتقييم جميع المعايير',
@@ -392,10 +356,7 @@ const ar = {
       notesPlaceholder: 'أضف ملاحظاتك التفصيلية حول أداء الموظف...',
       submit: 'إرسال التقييم لقسم الموارد البشرية'
     }
-  },
-
-  // ── Recruitment ──
-  recruitment: {
+  },  recruitment: {
     title: 'التوظيف',
     subtitle: 'إدارة الشواغر الوظيفية',
     tabVacancy: 'طلب شاغر وظيفي',

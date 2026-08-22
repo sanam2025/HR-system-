@@ -1,8 +1,5 @@
 import axios from 'axios';
-import { getAuthToken, useAuthStore } from '../store/authStore';
-
-// ── Base URL ─
-const BASE_URL = 'https://masarhr.alwaysdata.net/api/';
+import { getAuthToken, useAuthStore } from '../store/authStore';const BASE_URL = 'https://masarhr.alwaysdata.net/api/';
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -38,10 +35,7 @@ const apiClient = axios.create({
       return data;
     }
   ]
-});
-
-// ── Request Interceptor: أضف Bearer Token تلقائياً ───
-apiClient.interceptors.request.use(
+});apiClient.interceptors.request.use(
   (config) => {
     const token = getAuthToken();
     if (token) {
@@ -50,16 +44,10 @@ apiClient.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error),
-);
-
-// ── Response Interceptor: تعامل مع 401 ──
-apiClient.interceptors.response.use(
+);apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Token منتهي أو غير صالح — امسح التوكن وأعد للـ Login
-      // Token منتهي أو غير صالح — استخدم Zustand store للمسح
-      useAuthStore.getState().logout();
+    if (error.response?.status === 401) {      useAuthStore.getState().logout();
       console.warn('[API] Unauthorized — token cleared via authStore.');
     }
     return Promise.reject(error);

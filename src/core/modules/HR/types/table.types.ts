@@ -1,4 +1,3 @@
-// shared/types/table.types.ts
 import type { ReactNode } from 'react';
 
 /**

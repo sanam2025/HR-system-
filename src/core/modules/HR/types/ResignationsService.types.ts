@@ -1,4 +1,3 @@
-// src/api/service/HrService/Types/ResignationsService.types.ts
 export interface ResignationEmployee {
   id: number;
   full_name: string;

@@ -1,4 +1,3 @@
-// src/api/service/HrService/Types/PerformanceService.types.ts
 export interface PerformancePeriod {
   start: string;
   end: string;

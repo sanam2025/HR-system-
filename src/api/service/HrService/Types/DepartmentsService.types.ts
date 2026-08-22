@@ -1,4 +1,3 @@
-// src/api/service/HrService/Types/DepartmentsService.types.ts
 export interface Department {
   id: number;
   name: string;

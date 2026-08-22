@@ -1,4 +1,3 @@
-// src/api/service/HrService/Types/OfferService.types.ts
 export interface CreateOfferData {
   candidate_id: number;
   hour_price: number;

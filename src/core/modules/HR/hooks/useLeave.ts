@@ -1,15 +1,9 @@
-// src/core/modules/HR/hooks/useLeave.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { LeaveService } from '../../../../api/service/HrService/LeaveService';
-
-//  جلب كل الطلبات
-export const useLeaveRequests = () => {
+import { LeaveService } from '../../../../api/service/HrService/LeaveService';export const useLeaveRequests = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['/leaveRequests', 'all'],
-    queryFn: async () => {
-      // Use getAllRequests to fetch from /all-leave-request instead of /leaveRequests
-      const res = await LeaveService.getAllRequests();
+    queryFn: async () => {      const res = await LeaveService.getAllRequests();
       return res.data?.data || [];
     },
   });
@@ -20,10 +14,7 @@ export const useLeaveRequests = () => {
     error: error?.message || null,
     refetch,
   };
-};
-
-//  جلب تفاصيل طلب
-export const useLeaveRequest = (id?: number) => {
+};export const useLeaveRequest = (id?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['leave-request', id],
     queryFn: async () => {
@@ -40,10 +31,7 @@ export const useLeaveRequest = (id?: number) => {
     error: error?.message || null,
     refetch,
   };
-};
-
-//  موافقة على طلب
-export const useApproveLeave = () => {
+};export const useApproveLeave = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -56,10 +44,7 @@ export const useApproveLeave = () => {
       toast.error(err.message || 'Failed to approve leave');
     },
   });
-};
-
-//  رفض طلب
-export const useRejectLeave = () => {
+};export const useRejectLeave = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -72,10 +57,7 @@ export const useRejectLeave = () => {
       toast.error(err.message || 'Failed to reject leave');
     },
   });
-};
-
-//  رصيد إجازات موظف
-export const useLeaveBalance = (employeeId?: number) => {
+};export const useLeaveBalance = (employeeId?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['leave-balance', employeeId],
     queryFn: async () => {
@@ -92,10 +74,7 @@ export const useLeaveBalance = (employeeId?: number) => {
     error: error?.message || null,
     refetch,
   };
-};
-
-//  طلبات قسم معين
-export const useDepartmentLeaveRequests = (status?: string) => {
+};export const useDepartmentLeaveRequests = (status?: string) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['department-leave-requests', status],
     queryFn: async () => {
@@ -110,10 +89,7 @@ export const useDepartmentLeaveRequests = (status?: string) => {
     error: error?.message || null,
     refetch,
   };
-};
-
-//  كل طلبات الإجازات (مع فلترة)
-export const useAllLeaveRequests = (from?: string, to?: string) => {
+};export const useAllLeaveRequests = (from?: string, to?: string) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['all-leave-requests', from, to],
     queryFn: async () => {

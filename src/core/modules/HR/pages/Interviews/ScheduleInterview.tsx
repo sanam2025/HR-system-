@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Interviews/ScheduleInterview.tsx
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Calendar, MapPin } from 'lucide-react';
@@ -18,17 +17,11 @@ export const ScheduleInterview = () => {
   const jobId = jobIdFromParams || jobIdFromQuery;
   const jobIdNumber = jobId ? Number(jobId) : undefined;
   
-  const { scheduleInterview, isScheduling } = useInterviews(jobIdNumber);
-
-  //  candidate_id و interviewed_by تلقائي (مخفيين عن المستخدم)
-  const [form, setForm] = useState({
+  const { scheduleInterview, isScheduling } = useInterviews(jobIdNumber);  const [form, setForm] = useState({
     scheduled_at: '',
     location_type: 'on_site',
     location_details: '',
-  });
-
-  //  التحقق من يوم العطلة
-  const isWeekend = (date: string) => {
+  });  const isWeekend = (date: string) => {
     const day = new Date(date).getDay();
     return day === 5 || day === 6;
   };
@@ -55,10 +48,7 @@ export const ScheduleInterview = () => {
     if (isWeekend(form.scheduled_at)) {
       toast.error(lang === 'ar' ? 'لا يمكن تحديد مقابلات في عطلة نهاية الأسبوع (الجمعة، السبت)' : 'Interviews cannot be scheduled on weekends (Friday, Saturday)');
       return;
-    }
-    
-    //  البيانات مع candidate_id من الـ URL و interviewed_by تلقائي (4)
-    const data = {
+    }    const data = {
       candidate_id: Number(candidateIdFromUrl || 1),
       interviewed_by: 4, //  تلقائي
       scheduled_at: form.scheduled_at,
@@ -109,9 +99,7 @@ export const ScheduleInterview = () => {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/*  Candidate ID - مخفي */}
-            {candidateIdFromUrl && (
+          <form onSubmit={handleSubmit} className="space-y-6">            {candidateIdFromUrl && (
               <div className="hidden">
                 <input
                   type="number"
@@ -120,10 +108,7 @@ export const ScheduleInterview = () => {
                   readOnly
                 />
               </div>
-            )}
-
-            {/*  Interviewer ID - مخفي */}
-            <div className="hidden">
+            )}            <div className="hidden">
               <input
                 type="number"
                 name="interviewed_by"

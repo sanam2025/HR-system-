@@ -1,4 +1,3 @@
-// core/modules/HR/types/payroll.types.ts
 
 export type PayrollStatus = "paid" | "issued" | "draft" | "pending";
 

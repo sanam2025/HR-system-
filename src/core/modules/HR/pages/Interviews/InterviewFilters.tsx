@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Interviews/InterviewFilters.tsx
 import React from "react";
 import { Search } from "lucide-react";
 

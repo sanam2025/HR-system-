@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/JobPostings/JobPostingsStats.tsx
 
 import type { JobPosting } from "../../../../../api/service/HrService/Types/JobPostingsService.types";
 import { useLanguage } from '../../../../../i18n/translations/LanguageContext';

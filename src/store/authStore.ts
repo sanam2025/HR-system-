@@ -23,15 +23,11 @@ interface AuthState {
   user: AuthUser | null;
   hasHydrated: boolean;
   currentUser: Record<string, unknown> | null;
-
-  // New interface (used by employee pages)
   isAuthenticated: () => boolean;
   setSession: (token: string, user: AuthUser) => void;
   setUser: (user: AuthUser) => void;
   clearSession: () => void;
   setHasHydrated: (value: boolean) => void;
-
-  // Legacy interface (used by Login.tsx and other existing pages)
   setToken: (token: string) => void;
   setCurrentUser: (user: Record<string, unknown>) => void;
   logout: () => void;
@@ -44,8 +40,6 @@ const useAuthStoreDefault = create<AuthState>()(
       user: null,
       hasHydrated: false,
       currentUser: null,
-
-      // New interface
       isAuthenticated: () => Boolean(get().token),
       setSession: (token, user) => set({ token, user }),
       setUser: (user) => set({ user }),
@@ -56,11 +50,8 @@ const useAuthStoreDefault = create<AuthState>()(
         set({ token: null, user: null, currentUser: null });
       },
       setHasHydrated: (value) => set({ hasHydrated: value }),
-
-      // Legacy interface
       setToken: (token: string) => set({ token }),
       setCurrentUser: (user: Record<string, unknown>) => {
-        // Map legacy user shape to AuthUser shape for new pages
         const authUser: AuthUser = {
           id: Number(user.id ?? 0),
           fullName: String(user.name ?? user.fullName ?? user.full_name ?? ""),

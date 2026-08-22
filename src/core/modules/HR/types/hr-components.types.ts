@@ -1,4 +1,3 @@
-// core/modules/HR/types/hr-components.types.ts
 import  type{ Employee, EmployeeStatus } from './employee.types';
 import  type{ SelectOption } from '../types/select.types';
 

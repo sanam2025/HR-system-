@@ -1,4 +1,3 @@
-// src/core/modules/HR/Components/Special_Components/AnnouncementCard.tsx
 import React from 'react';
 import type { Announcement } from '../../../../../api/service/HrService/Types/AnnouncementsService.types';
 

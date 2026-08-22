@@ -49,7 +49,6 @@ export default function EmployeeResignation() {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* TOP/RIGHT SIDE: Submit request */}
         <article className="bg-white rounded-3xl p-6 sm:p-8 shadow-[0_2px_20px_rgb(0,0,0,0.04)] border border-gray-200 relative overflow-hidden transition-all h-fit">
           <div className="absolute top-0 start-0 w-2 h-full bg-green" />
           <header className="flex items-center gap-3 text-green font-bold text-xl mb-6 pb-4 border-b border-gray-200">
@@ -140,8 +139,6 @@ export default function EmployeeResignation() {
             </button>
           </form>
         </article>
-
-        {/* BOTTOM/LEFT SIDE: My Resignations list */}
         <article className="bg-white rounded-3xl p-6 sm:p-8 shadow-[0_2px_20px_rgb(0,0,0,0.04)] border border-gray-200 h-fit relative overflow-hidden">
           <div className="absolute top-0 start-0 w-2 h-full bg-gray-400" />
           <header className="flex items-center gap-3 text-gray-800 font-bold text-xl mb-6 pb-4 border-b border-gray-200">

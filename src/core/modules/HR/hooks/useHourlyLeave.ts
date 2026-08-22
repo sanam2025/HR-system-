@@ -1,10 +1,6 @@
-// src/core/modules/HR/hooks/useHourlyLeave.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { HourlyLeaveService } from '../../../../api/service/HrService/HourlyLeaveService';
-
-//  جلب كل الطلبات
-export const useHourlyLeaveRequests = () => {
+import { HourlyLeaveService } from '../../../../api/service/HrService/HourlyLeaveService';export const useHourlyLeaveRequests = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['hourly-leave-requests'],
     queryFn: async () => {
@@ -19,10 +15,7 @@ export const useHourlyLeaveRequests = () => {
     error: error?.message || null,
     refetch,
   };
-};
-
-//  جلب تفاصيل طلب
-export const useHourlyLeaveRequest = (id?: number) => {
+};export const useHourlyLeaveRequest = (id?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['hourly-leave-request', id],
     queryFn: async () => {
@@ -39,10 +32,7 @@ export const useHourlyLeaveRequest = (id?: number) => {
     error: error?.message || null,
     refetch,
   };
-};
-
-//  موافقة على طلب
-export const useApproveHourlyLeave = () => {
+};export const useApproveHourlyLeave = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -55,10 +45,7 @@ export const useApproveHourlyLeave = () => {
       toast.error(err.message || 'Failed to approve');
     },
   });
-};
-
-//  رفض طلب
-export const useRejectHourlyLeave = () => {
+};export const useRejectHourlyLeave = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -71,10 +58,7 @@ export const useRejectHourlyLeave = () => {
       toast.error(err.message || 'Failed to reject');
     },
   });
-};
-
-//  طلبات قسم معين
-export const useDepartmentHourlyLeaveRequests = (status?: string) => {
+};export const useDepartmentHourlyLeaveRequests = (status?: string) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['department-hourly-leave-requests', status],
     queryFn: async () => {
@@ -89,10 +73,7 @@ export const useDepartmentHourlyLeaveRequests = (status?: string) => {
     error: error?.message || null,
     refetch,
   };
-};
-
-//  كل طلبات القسم
-export const useAllDepartmentHourlyLeaveRequests = (depId?: number) => {
+};export const useAllDepartmentHourlyLeaveRequests = (depId?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['all-department-hourly-leave-requests', depId],
     queryFn: async () => {

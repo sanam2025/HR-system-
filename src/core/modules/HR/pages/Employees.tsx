@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Employees.tsx
 import { useNavigate } from 'react-router-dom';
 import { Users, Building2, ChevronRight } from 'lucide-react';
 import { useDepartmentsWithUsers } from '../hooks/useDepartments';

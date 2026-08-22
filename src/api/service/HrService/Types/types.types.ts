@@ -1,8 +1,3 @@
-// src/api/Types/types.types.ts
-
-// ========================================
-// أنواع الـ API العامة
-// ========================================
 
 export interface APIResponse<T> {
   success: boolean;
@@ -23,12 +18,7 @@ export interface APIResponseWithDataArray<T> {
   message: string;
   data: T[];
   status_code: number;
-}
-
-// ========================================
-// أنواع الـ Pagination
-// ========================================
-
+}
 export interface PaginationMeta {
   current_page: number;
   from: number | null;
@@ -45,12 +35,7 @@ export interface PaginationLinks {
   last: string;
   prev: string | null;
   next: string | null;
-}
-
-// ========================================
-// أنواع المستخدم
-// ========================================
-
+}
 export type UserRole = 'm' | 'h' | 'v' | null;
 export type UserStatus = 'active' | 'inactive' | 'pending';
 

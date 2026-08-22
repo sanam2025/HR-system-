@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Overtime/OvertimeDetail.tsx
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useOvertimeDetails } from '../../hooks/useOvertime';

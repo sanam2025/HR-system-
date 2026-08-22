@@ -4,18 +4,12 @@ import Dashboard from "../../core/modules/HR/pages/Dashboard";
 import Employees from "../../core/modules/HR/pages/Employees";
 import Recruitment from "../../core/modules/HR/pages/Recruitment/Recruitment";
 import Payroll from "../../core/modules/HR/pages/Payroll";
-import ApplicantDetail from "../../core/modules/HR/pages/ApplicantDetail";
-// import AllApplicants from "../../core/modules/HR/pages/AllApplicants";
-import Terminations from "../../core/modules/HR/pages/Terminations";
+import ApplicantDetail from "../../core/modules/HR/pages/ApplicantDetail";import Terminations from "../../core/modules/HR/pages/Terminations";
 import Attendance from "../../core/modules/HR/pages/Attendance/Attendance";
 import Leaves from "../../core/modules/HR/pages/Leaves/Leaves";
 import JobRequisitionDetail from "../../core/modules/HR/pages/Recruitment/JobRequisitionDetail";
 import Resignations from "../../core/modules/HR/pages/Resignations/Resignations";
-import Contracts from "../../core/modules/HR/pages/Contracts/Contracts";
-// import JobPostings from "../../core/modules/HR/pages/JobPostings";
-// import JobPostingDetail from "../../core/modules/HR/pages/JobPostingDetail";
-// import JobPostingForm from "../../core/modules/HR/pages/JobPostingForm";
-
+import Contracts from "../../core/modules/HR/pages/Contracts/Contracts";
 const route = createBrowserRouter([
   {
     path: "/Hr",
@@ -31,13 +25,7 @@ const route = createBrowserRouter([
       { path: "terminations", element: <Terminations /> },
       { path: "resignations", element: <Resignations /> },
       { path: "contracts", element: <Contracts /> },
-      { path: "recruitment/:id", element: <JobRequisitionDetail /> },
-      // { path: "job-postings", element: <JobPostings /> },
-      // { path: "job-postings/:id", element: <JobPostingDetail /> },
-      // { path: "job-postings/edit/:id", element: <JobPostingForm /> },
-      // ✅ مسار المتقدمين (يستقبل jobId)
-      // { path: "recruitment/applicants/:jobId", element: <AllApplicants /> 
-    ],
+      { path: "recruitment/:id", element: <JobRequisitionDetail /> },    ],
   },
 ]);
 

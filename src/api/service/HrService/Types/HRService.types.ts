@@ -1,5 +1,3 @@
-
-// src/api/Types/HRService.types.ts
 import type { UserStatus } from "./types.types";
 
 export type RecruitmentStatus = "approved" | "pending" | "rejected";

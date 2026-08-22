@@ -1,11 +1,3 @@
-// ==============================================================
-// ManagerAnnouncements — واجهة إدارة التعميمات للمدير
-// ==============================================================
-// الجدول يعرض: # | العنوان | الجمهور المستهدف | الحالة | الإجراءات
-// الإجراءات:  تعديل ✏️ / حذف 🗑️ / نشر فوري 📢 (للمجدلة فقط)
-// الفورم: مدمج فوق الجدول، يختفي تلقائياً عند الإلغاء
-// الجمهور: مخفي للمدير (تلقائي = قسمه)
-// ==============================================================
 
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Send, Loader2, Megaphone, ClipboardList } from 'lucide-react';
@@ -15,33 +7,20 @@ import { useQuery } from '@tanstack/react-query';
 import { AnnouncementsService } from '../../../api/service/HrService/AnnouncementsService';
 import type { Announcement, Priority, AnnouncementStatus } from '../../../api/service/HrService/Types/AnnouncementsService.types';
 import { useAuthStore } from '../../../store/authStore';
-import { useDepartments } from '../../modules/HR/hooks/useDepartments';
-
-// ── Helpers ─────────────────────────────────────────────────
-
+import { useDepartments } from '../../modules/HR/hooks/useDepartments';
 const STATUS_STYLE: Record<AnnouncementStatus, string> = {
   draft: 'bg-gray-100    text-gray-500',
   scheduled: 'bg-purple-50   text-purple-600',
   active: 'bg-green-50    text-green-600',
   expired: 'bg-orange-50   text-orange-500',
-};
-
-
-
-// datetime-local  ←→  ISO helpers
-const toInput = (iso?: string | null) => {
+};const toInput = (iso?: string | null) => {
   if (!iso) return '';
   const d = new Date(iso);
   d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
   return d.toISOString().slice(0, 16);
-};
-// adds buffer minutes to a date
-const addMinutes = (date: Date, mins: number) => new Date(date.getTime() + mins * 60000);
+};const addMinutes = (date: Date, mins: number) => new Date(date.getTime() + mins * 60000);
 const nowInput = () => toInput(addMinutes(new Date(), 2).toISOString());
-const fromInput = (v: string) => new Date(v).toISOString();
-
-// ── Form component ───────────────────────────────────────────
-
+const fromInput = (v: string) => new Date(v).toISOString();
 interface FormValues {
   title: string;
   content: string;
@@ -81,9 +60,7 @@ function AnnouncementForm({ initial, onSave, onCancel }: AnnouncementFormProps) 
   const [saving, setSaving] = useState(false);
   const { departments } = useDepartments();
 
-  const set = (k: keyof FormValues, v: any) => setForm(p => ({ ...p, [k]: v }));
-  // minimum datetime = now + 1 minute
-  const minDatetime = toInput(addMinutes(new Date(), 1).toISOString());
+  const set = (k: keyof FormValues, v: any) => setForm(p => ({ ...p, [k]: v }));  const minDatetime = toInput(addMinutes(new Date(), 1).toISOString());
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,10 +81,7 @@ function AnnouncementForm({ initial, onSave, onCancel }: AnnouncementFormProps) 
       <h3 className="font-bold text-dark text-lg flex items-center gap-2">
         <ClipboardList size={20} className="text-[#6B6358]" />
         {initial ? t.announcements.form.editTitle : t.announcements.form.createTitle}
-      </h3>
-
-      {/* العنوان */}
-      <div>
+      </h3>      <div>
         <label className="form-label">{t.announcements.form.titleLabel} <span className="text-red-500">*</span></label>
         <input
           className="form-input"
@@ -115,10 +89,7 @@ function AnnouncementForm({ initial, onSave, onCancel }: AnnouncementFormProps) 
           onChange={e => set('title', e.target.value)}
           required
         />
-      </div>
-
-      {/* النص */}
-      <div>
+      </div>      <div>
         <label className="form-label">{t.announcements.form.bodyLabel} <span className="text-red-500">*</span></label>
         <textarea
           className="form-input resize-none h-24"
@@ -126,10 +97,7 @@ function AnnouncementForm({ initial, onSave, onCancel }: AnnouncementFormProps) 
           onChange={e => set('content', e.target.value)}
           required
         />
-      </div>
-
-      {/* الأولوية + التواريخ */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      </div>      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="form-label">{t.announcements.form.priorityLabel}</label>
           <select
@@ -164,12 +132,7 @@ function AnnouncementForm({ initial, onSave, onCancel }: AnnouncementFormProps) 
             required
           />
         </div>
-      </div>
-
-
-
-      {/* أزرار */}
-      <div className="flex items-center gap-3 pt-1">
+      </div>      <div className="flex items-center gap-3 pt-1">
         <button
           type="submit"
           disabled={saving}
@@ -188,10 +151,7 @@ function AnnouncementForm({ initial, onSave, onCancel }: AnnouncementFormProps) 
       </div>
     </form>
   );
-}
-
-// ── Main page ────────────────────────────────────────────────
-
+}
 export default function ManagerAnnouncements() {
   const { t, lang } = useLanguage();
   const { currentUser } = useAuthStore();
@@ -201,10 +161,7 @@ export default function ManagerAnnouncements() {
   const [loading, setLoading] = useState(true);
   const [showNew, setShowNew] = useState(false);
   const [editing, setEditing] = useState<Announcement | null>(null);
-  const [deleting, setDeleting] = useState<Announcement | null>(null);
-
-  // ── data ──
-  const fetchAll = async () => {
+  const [deleting, setDeleting] = useState<Announcement | null>(null);  const fetchAll = async () => {
     setLoading(true);
     try {
       const res = await AnnouncementsService.getAll();
@@ -216,13 +173,8 @@ export default function ManagerAnnouncements() {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchAll(); }, []);
-
-  // ── handlers ──
-  const handleCreate = async (f: FormValues) => {
-    const starts = fromInput(f.startsAt);
-    // Remove the validation that it must be in the future, as it will be a draft
-    const status: AnnouncementStatus = 'draft';
+  useEffect(() => { fetchAll(); }, []);  const handleCreate = async (f: FormValues) => {
+    const starts = fromInput(f.startsAt);    const status: AnnouncementStatus = 'draft';
     try {
       await AnnouncementsService.create({
         title: f.title,
@@ -309,9 +261,7 @@ export default function ManagerAnnouncements() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* ── Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6">      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-extrabold text-dark">{t.announcements.title}</h2>
           <p className="text-sm text-brown mt-1">{t.announcements.subtitle}</p>
@@ -325,28 +275,19 @@ export default function ManagerAnnouncements() {
             {t.announcements.createNew}
           </button>
         )}
-      </div>
-
-      {/* ── فورم الإنشاء ── */}
-      {showNew && (
+      </div>      {showNew && (
         <AnnouncementForm
           onSave={handleCreate}
           onCancel={() => setShowNew(false)}
         />
-      )}
-
-      {/* ── فورم التعديل ── */}
-      {editing && (
+      )}      {editing && (
         <AnnouncementForm
           key={editing.id}
           initial={editing}
           onSave={handleUpdate}
           onCancel={() => setEditing(null)}
         />
-      )}
-
-      {/* ── تأكيد الحذف ── */}
-      {deleting && (
+      )}      {deleting && (
         <div className="bg-red-50 border border-red-100 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h4 className="font-bold text-red-800 text-sm">{t.announcements.deleteConfirm.title}</h4>
@@ -361,13 +302,7 @@ export default function ManagerAnnouncements() {
             </button>
           </div>
         </div>
-      )}
-
-      {/* ── الجدول ── */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden">
-
-        {/* رأس الجدول-كارد */}
-        <div className="flex items-center gap-2 px-6 py-4 border-b border-gray-100">
+      )}      <div className="bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden">        <div className="flex items-center gap-2 px-6 py-4 border-b border-gray-100">
           <Megaphone size={18} className="text-[#6B6358]" />
           <span className="font-bold text-dark">{t.announcements.list.title}</span>
           {!loading && (
@@ -375,10 +310,7 @@ export default function ManagerAnnouncements() {
               {list.length}
             </span>
           )}
-        </div>
-
-        {/* حالة التحميل */}
-        {loading ? (
+        </div>        {loading ? (
           <div className="flex items-center justify-center py-16 text-gray-400 gap-3">
             <Loader2 size={24} className="animate-spin" />
             <span className="text-sm">{t.announcements.list.loading}</span>
@@ -410,42 +342,24 @@ export default function ManagerAnnouncements() {
               <tbody className="divide-y divide-gray-50">
                 {list.map((ann, idx) => (
                   <tr key={ann.id} className="hover:bg-gray-50/40 transition-colors">
-                    <td className="px-5 py-3.5 text-gray-400 font-medium text-start">{idx + 1}</td>
-
-                    {/* العنوان + النص المختصر */}
-                    <td className="px-5 py-3.5 max-w-[200px] text-start">
+                    <td className="px-5 py-3.5 text-gray-400 font-medium text-start">{idx + 1}</td>                    <td className="px-5 py-3.5 max-w-[200px] text-start">
                       <p className="font-semibold text-dark leading-snug truncate text-start" title={ann.title} dir="auto">
                         {ann.title.length > 20 ? ann.title.substring(0, 20) + '...' : ann.title}
                       </p>
                       <p className="text-xs text-brown truncate mt-0.5 text-start" title={ann.content} dir="auto">{ann.content}</p>
-                    </td>
-
-                    {/* الجمهور */}
-                    <td className="px-5 py-3.5 text-start">
+                    </td>                    <td className="px-5 py-3.5 text-start">
                       <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full font-medium">
                         {t.announcements.audiences[(ann.target_audience || ann.audience_type) as keyof typeof t.announcements.audiences] ?? ann.target_audience ?? ann.audience_type}
                       </span>
-                    </td>
-
-                    {/* الأولوية */}
-                    <td className="px-5 py-3.5 text-xs text-brown font-medium text-start">
+                    </td>                    <td className="px-5 py-3.5 text-xs text-brown font-medium text-start">
                       {(t.announcements.priorities as any)[ann.priority] ?? ann.priority}
-                    </td>
-
-                    {/* الحالة */}
-                    <td className="px-5 py-3.5 text-start">
+                    </td>                    <td className="px-5 py-3.5 text-start">
                       <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLE[ann.status]}`}>
                         {t.announcements.statuses[ann.status as keyof typeof t.announcements.statuses]}
                       </span>
-                    </td>
-
-                    {/* Date */}
-                    <td className="px-5 py-3.5 text-xs text-brown text-start">
+                    </td>                    <td className="px-5 py-3.5 text-xs text-brown text-start">
                       {formatDate(ann.starts_at)}
-                    </td>
-
-                    {/* Actions */}
-                    <td className="px-5 py-3.5 text-start">
+                    </td>                    <td className="px-5 py-3.5 text-start">
                       <div className={`flex items-center gap-1.5 ${lang === 'ar' ? 'justify-end' : 'justify-start'}`}>
                         {ann.status === 'draft' && (
                           <>

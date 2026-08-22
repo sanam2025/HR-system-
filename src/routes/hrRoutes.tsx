@@ -31,10 +31,7 @@ const PerformanceDetail = React.lazy(() => import('@/core/modules/HR/pages/Perfo
 const OvertimeDetail = React.lazy(() => import('@/core/modules/HR/pages/Overtime/OvertimeDetail'));
 const LeaveDetail = React.lazy(() => import('@/core/modules/HR/pages/Leaves/LeaveDetail').then(module => ({ default: module.LeaveDetail })));
 const HourlyLeaveDetail = React.lazy(() => import('@/core/modules/HR/pages/HourlyLeaves/HourlyLeaveDetail').then(module => ({ default: module.HourlyLeaveDetail })));
-const UnifiedEmployeeProfile = React.lazy(() => import('@/core/pages/manager/components/EmployeeProfile'));
-
-// === المكوّنات المشتركة مع Manager/Admin (نفس الكود - ربط حقيقي) ===
-const LeaveRequests = React.lazy(() => import('@/core/pages/Leaves/LeaveRequests'));
+const UnifiedEmployeeProfile = React.lazy(() => import('@/core/pages/manager/components/EmployeeProfile'));const LeaveRequests = React.lazy(() => import('@/core/pages/Leaves/LeaveRequests'));
 const OvertimeRequests = React.lazy(() => import('@/core/pages/Leaves/OvertimeRequests'));
 const AttendanceView = React.lazy(() => import('@/core/pages/Attendance/AttendanceView'));
 const PeriodicEvaluation = React.lazy(() => import('@/core/pages/Evaluation/PeriodicEvaluation'));
@@ -64,45 +61,18 @@ export const hrRoutes = {
     { path: "job-postings/edit/:id", element: <SuspenseWrapper><JobPostingForm /></SuspenseWrapper> },
     { path: "all-applicants", element: <SuspenseWrapper><AllApplicants /></SuspenseWrapper> },
     { path: "recruitment/applicants/:jobId", element: <SuspenseWrapper><AllApplicants /></SuspenseWrapper> },
-    { path: "recruitment/applicant/:id", element: <SuspenseWrapper><ApplicantDetail /></SuspenseWrapper> },
-
-    // === الإجازات — نفس مكوّن المدير الكامل ===
-    { path: "Leaves", element: <SuspenseWrapper><LeaveRequests /></SuspenseWrapper> },
+    { path: "recruitment/applicant/:id", element: <SuspenseWrapper><ApplicantDetail /></SuspenseWrapper> },    { path: "Leaves", element: <SuspenseWrapper><LeaveRequests /></SuspenseWrapper> },
     { path: "Leaves/:id", element: <SuspenseWrapper><LeaveDetail /></SuspenseWrapper> },
     { path: "hourly-leaves", element: <SuspenseWrapper><LeaveRequests /></SuspenseWrapper> },
-    { path: "hourly-leaves/:id", element: <SuspenseWrapper><HourlyLeaveDetail /></SuspenseWrapper> },
-
-    // === الأوفرتايم — نفس مكوّن المدير الكامل ===
-    { path: "overtime", element: <SuspenseWrapper><OvertimeRequests /></SuspenseWrapper> },
-    { path: "overtime/:id", element: <SuspenseWrapper><OvertimeDetail /></SuspenseWrapper> },
-
-    // === الحضور — نفس مكوّن المدير الكامل ===
-    { path: "attendance", element: <SuspenseWrapper><AttendanceView /></SuspenseWrapper> },
-
-    // === الأداء — نفس مكوّن المدير الكامل ===
-    { path: "performance", element: <SuspenseWrapper><PeriodicEvaluation /></SuspenseWrapper> },
-    { path: "performance/:id", element: <SuspenseWrapper><PerformanceDetail /></SuspenseWrapper> },
-
-    // === المهام — نفس مكوّن المدير ===
-    { path: "tasks", element: <SuspenseWrapper><TasksBoard /></SuspenseWrapper> },
-
-    // === التوظيف والمقابلات ===
-    { path: "job-postings/:jobId/interviews", element: <SuspenseWrapper><Interviews /></SuspenseWrapper> },
+    { path: "hourly-leaves/:id", element: <SuspenseWrapper><HourlyLeaveDetail /></SuspenseWrapper> },    { path: "overtime", element: <SuspenseWrapper><OvertimeRequests /></SuspenseWrapper> },
+    { path: "overtime/:id", element: <SuspenseWrapper><OvertimeDetail /></SuspenseWrapper> },    { path: "attendance", element: <SuspenseWrapper><AttendanceView /></SuspenseWrapper> },    { path: "performance", element: <SuspenseWrapper><PeriodicEvaluation /></SuspenseWrapper> },
+    { path: "performance/:id", element: <SuspenseWrapper><PerformanceDetail /></SuspenseWrapper> },    { path: "tasks", element: <SuspenseWrapper><TasksBoard /></SuspenseWrapper> },    { path: "job-postings/:jobId/interviews", element: <SuspenseWrapper><Interviews /></SuspenseWrapper> },
     { path: "job-postings/:jobId/interviews/schedule", element: <SuspenseWrapper><ScheduleInterview /></SuspenseWrapper> },
-    { path: "interviews/:id", element: <div>Interview Details - Coming Soon</div> },
-
-    // === العروض ===
-    { path: "offers", element: <SuspenseWrapper><Offers /></SuspenseWrapper> },
+    { path: "interviews/:id", element: <div>Interview Details - Coming Soon</div> },    { path: "offers", element: <SuspenseWrapper><Offers /></SuspenseWrapper> },
     { path: "job-postings/:jobId/offers", element: <SuspenseWrapper><Offers /></SuspenseWrapper> },
-    { path: "job-postings/:jobId/offers/send", element: <SuspenseWrapper><SendOffer /></SuspenseWrapper> },
-
-    // === الإعلانات والشكاوى ===
-    { path: "announcements", element: <SuspenseWrapper><Announcements /></SuspenseWrapper> },
+    { path: "job-postings/:jobId/offers/send", element: <SuspenseWrapper><SendOffer /></SuspenseWrapper> },    { path: "announcements", element: <SuspenseWrapper><Announcements /></SuspenseWrapper> },
     { path: "complaints", element: <SuspenseWrapper><Complaints /></SuspenseWrapper> },
-    { path: "complaints/:id", element: <SuspenseWrapper><ComplaintDetail /></SuspenseWrapper> },
-
-    // === الموظفون ===
-    { path: "employee/:id", element: <SuspenseWrapper><UnifiedEmployeeProfile /></SuspenseWrapper> },
+    { path: "complaints/:id", element: <SuspenseWrapper><ComplaintDetail /></SuspenseWrapper> },    { path: "employee/:id", element: <SuspenseWrapper><UnifiedEmployeeProfile /></SuspenseWrapper> },
     { path: "employees/:id", element: <SuspenseWrapper><UnifiedEmployeeProfile /></SuspenseWrapper> },
     { path: "department/:id", element: <SuspenseWrapper><DepartmentDetail /></SuspenseWrapper> },
   ],

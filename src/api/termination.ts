@@ -1,7 +1,4 @@
-﻿import apiClient from './axios';
-
-// ── Types ──
-
+﻿import apiClient from './axios';
 export interface TerminationRequest {
   id: number;
   user_id: number;
@@ -24,54 +21,29 @@ export interface TerminationRequest {
 
 export interface ApproveRejectPayload {
   decision_reason?: string;
-}
-
-// ── API Functions ──
-
-export const terminationApi = {
-  // Get all termination requests (For Manager / HR)
-  getTerminationRequests: async (): Promise<TerminationRequest[]> => {
-    const response = await apiClient.get('/termination-requests');
-    // Assuming backend wraps in { data: ... } or returns array directly
-    return response.data?.data || response.data || [];
-  },
-
-  // Get terminations created by the logged in manager
-  getMyCreatedTerminations: async (): Promise<TerminationRequest[]> => {
+}
+export const terminationApi = {  getTerminationRequests: async (): Promise<TerminationRequest[]> => {
+    const response = await apiClient.get('/termination-requests');    return response.data?.data || response.data || [];
+  },  getMyCreatedTerminations: async (): Promise<TerminationRequest[]> => {
     const response = await apiClient.get('/my-termination-requests');
     return response.data?.data || response.data || [];
-  },
-
-  // Get specific termination details
-  getTermination: async (id: number): Promise<TerminationRequest> => {
+  },  getTermination: async (id: number): Promise<TerminationRequest> => {
     const response = await apiClient.get('/termination-requests/' + id);
     return response.data?.data || response.data;
-  },
-
-  // Store a new termination request
-  storeTerminationRequest: async (formData: FormData): Promise<any> => {
+  },  storeTerminationRequest: async (formData: FormData): Promise<any> => {
     const response = await apiClient.post('/store-termination', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
     return response.data;
-  },
-
-  // Approve a termination request
-  approveTermination: async (id: number, payload: ApproveRejectPayload): Promise<any> => {
+  },  approveTermination: async (id: number, payload: ApproveRejectPayload): Promise<any> => {
     const response = await apiClient.put('/approve/' + id + '/termination', payload);
     return response.data;
-  },
-
-  // Reject a termination request
-  rejectTermination: async (id: number, payload: ApproveRejectPayload): Promise<any> => {
+  },  rejectTermination: async (id: number, payload: ApproveRejectPayload): Promise<any> => {
     const response = await apiClient.put('/reject/' + id + '/termination', payload);
     return response.data;
-  },
-
-  // Delete a termination request
-  deleteTermination: async (id: number): Promise<any> => {
+  },  deleteTermination: async (id: number): Promise<any> => {
     const response = await apiClient.delete('/termination-requests/' + id);
     return response.data;
   }

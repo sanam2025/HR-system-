@@ -1,11 +1,8 @@
-// src/core/modules/HR/hooks/useResignations.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { ResignationsService } from '../../../../api/service/HrService/ResignationsService';
 import { AxiosError } from 'axios';
-import type { Resignation } from '../types/ResignationsService.types';
-//  إضافة استيراد النوع
-
+import type { Resignation } from '../types/ResignationsService.types';
 export const useResignations = (type?: 'with_notice' | 'immediate') => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['resignations', type],

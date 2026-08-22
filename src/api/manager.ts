@@ -1,7 +1,4 @@
-import apiClient from './axios';
-
-// ── 1. إدارة الموظفين والملفات (Employees & Profiles) ──
-
+import apiClient from './axios';
 /**
  * استعراض موظفي القسم الخاص بالمدير
  */
@@ -115,23 +112,16 @@ export async function getMyProfile() {
  * حفظ الملف الشخصي للمدير (إنشاء إذا لم يكن موجوداً، أو تعديل إذا كان موجوداً)
  */
 export async function saveMyProfile(id: number | null | undefined, data: FormData) {
-  if (id) {
-    // تعديل ملف موجود
-    const response = await apiClient.post(`profiles/${id}?_method=PUT`, data, {
+  if (id) {    const response = await apiClient.post(`profiles/${id}?_method=PUT`, data, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
-  } else {
-    // إنشاء ملف جديد
-    const response = await apiClient.post(`profiles`, data, {
+  } else {    const response = await apiClient.post(`profiles`, data, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
   }
-}
-
-// ── 2. متابعة الحضور والانصراف للقسم (Attendance) ──
-
+}
 /**
  * تحليل تفصيلي لحضور اليوم الخاص بقسم المدير
  */
@@ -171,10 +161,7 @@ export async function getMyMonthlyAttendance() {
   const response = await apiClient.get('my-monthly-attendance');
   const raw = response.data?.data || response.data;
   return Array.isArray(raw) ? raw : [];
-}
-
-// ── 3. طلبات الإجازات (Leave Requests) ──
-
+}
 /**
  * عرض طلبات إجازة القسم
  */
@@ -290,10 +277,7 @@ export async function submitLeaveRequest(data: { start_date: string; type: strin
 export async function getMyLeaveBalance() {
   const response = await apiClient.get('my-leave-balance');
   return response.data?.data || response.data;
-}
-
-// ── 4. طلبات الإجازات بالساعة (Hourly Leave Requests / المغادرات) ──
-
+}
 /**
  * عرض طلبات المغادرة (بالساعة) للقسم
  */
@@ -394,10 +378,7 @@ export async function submitHourlyLeaveRequest(data: { date: string; start_time:
     headers: { 'Content-Type': 'multipart/form-data' }
   });
   return response.data;
-}
-
-// ── 5. تسجيل الحضور والانصراف (Check-in/out) ──
-
+}
 /**
  * Helper to get current location
  */
@@ -433,10 +414,7 @@ export async function submitCheckOut(coords?: { latitude: number; longitude: num
     coords = await getCurrentLocation();
   }
   return (await apiClient.put('check-out', coords)).data;
-}
-
-// ── 6. الإشعارات (Notifications) ──
-
+}
 /**
  * جلب جميع إشعارات المستخدم
  */
@@ -453,20 +431,14 @@ export async function getMyNotifications(): Promise<any[]> {
  */
 export async function markNotificationAsRead(id: number): Promise<void> {
   try { await apiClient.post('notifications/' + id + '/read'); } catch {}
-}
-
-// ── 7. العطل الرسمية (Holidays) ──
-
+}
 /**
  * جلب قائمة العطل الرسمية
  */
 export async function getHolidays() {
   const response = await apiClient.get('holidays');
   return response.data?.data || response.data;
-}
-
-// ── 8. العمل الإضافي (Overtime) ──
-
+}
 /**
  * جلب طلبات العمل الإضافي لجميع موظفي القسم (التطوعية)
  */
@@ -561,10 +533,7 @@ export async function createEmployeeOvertime(data: { date: string; start_time: s
 export async function deleteOvertimeRequest(id: number) {
   const response = await apiClient.delete(`delete-overtime/${id}/request`);
   return response.data;
-}
-
-// ── 9. إحصائيات لوحة التحكم والمهام (Dashboard Stats & Tasks) ──
-
+}
 /**
  * إحصائيات أعداد الموظفين والمدراء
  */

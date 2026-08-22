@@ -17,8 +17,6 @@ import { ApiError } from "../../../../lib/http/ApiError";
 import { isSameCalendarDay } from "../../../../lib/date";
 import type { AttendanceRecord } from "../../../../api/models";
 
-// ─── small helpers ───────────────────────────────────────────────────────────
-
 function StatusDot({ color }: { color: "green" | "yellow" | "red" | "gray" }) {
   const cls =
     color === "green" ? "bg-green-500" :
@@ -85,8 +83,6 @@ function EmptyState({ text }: { text: string }) {
 function ErrorState({ msg }: { msg: string }) {
   return <p className="text-sm text-red-500 flex items-center gap-1.5"><AlertCircle size={14} />{msg}</p>;
 }
-
-// ─── Attendance summary ───────────────────────────────────────────────────────
 function AttendanceSummary() {
   const { t, lang } = useLanguage();
   const monthly = useMyMonthlyAttendance();
@@ -120,8 +116,6 @@ function AttendanceSummary() {
     </div>
   );
 }
-
-// ─── Tasks summary ────────────────────────────────────────────────────────────
 function TasksSummary() {
   const { t, lang } = useLanguage();
   const userId = useAuthStore((s) => s.user?.id);
@@ -148,8 +142,6 @@ function TasksSummary() {
     </div>
   );
 }
-
-// ─── Announcements summary ────────────────────────────────────────────────────
 function AnnouncementsSummary() {
   const { t, lang } = useLanguage();
   const q = useActiveAnnouncements();
@@ -170,8 +162,6 @@ function AnnouncementsSummary() {
     </ul>
   );
 }
-
-// ─── Finance summary ──────────────────────────────────────────────────────────
 function FinanceSummary() {
   const { t, lang } = useLanguage();
   const payslips = useMyPayslips();
@@ -210,8 +200,6 @@ function FinanceSummary() {
     </div>
   );
 }
-
-// ─── Complaints summary ───────────────────────────────────────────────────────
 function ComplaintsSummary() {
   const { t, lang } = useLanguage();
   const q = useMyComplaints();
@@ -241,8 +229,6 @@ function ComplaintsSummary() {
     </div>
   );
 }
-
-// ─── Leave summary ────────────────────────────────────────────────────────────
 function LeaveSummary() {
   const { t, lang } = useLanguage();
   const q = useMyLeaveRequests();
@@ -264,8 +250,6 @@ function LeaveSummary() {
     </div>
   );
 }
-
-// ─── Main Dashboard ───────────────────────────────────────────────────────────
 export default function EmployeeDashboard() {
   const { t, lang } = useLanguage();
   const user = useAuthStore((s) => s.user);
@@ -280,16 +264,11 @@ export default function EmployeeDashboard() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <h1 className="text-xl sm:text-2xl font-bold text-dark">{greeting}</h1>
         <span className="text-sm text-gray-400 font-medium">{date}</span>
       </div>
-
-      {/* Grid of summary cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-
-        {/* Attendance */}
         <SectionCard
           icon={<CalendarCheck size={18} />}
           title={t.nav?.attendance || "Attendance"}
@@ -298,8 +277,6 @@ export default function EmployeeDashboard() {
         >
           <AttendanceSummary />
         </SectionCard>
-
-        {/* Tasks */}
         <SectionCard
           icon={<ClipboardList size={18} />}
           title={t.nav?.tasks || "Tasks"}
@@ -308,8 +285,6 @@ export default function EmployeeDashboard() {
         >
           <TasksSummary />
         </SectionCard>
-
-        {/* Announcements */}
         <SectionCard
           icon={<Megaphone size={18} />}
           title={t.nav?.announcements || "Announcements"}
@@ -317,8 +292,6 @@ export default function EmployeeDashboard() {
         >
           <AnnouncementsSummary />
         </SectionCard>
-
-        {/* Leave Requests */}
         <SectionCard
           icon={<FileText size={18} />}
           title={t.nav?.leaves || "Leave Requests"}
@@ -327,8 +300,6 @@ export default function EmployeeDashboard() {
         >
           <LeaveSummary />
         </SectionCard>
-
-        {/* Finance */}
         <SectionCard
           icon={<DollarSign size={18} />}
           title={t.dashboard?.finance || "Finance"}
@@ -337,8 +308,6 @@ export default function EmployeeDashboard() {
         >
           <FinanceSummary />
         </SectionCard>
-
-        {/* Complaints */}
         <SectionCard
           icon={<MessageSquareWarning size={18} />}
           title={t.dashboard?.complaints || "Complaints"}

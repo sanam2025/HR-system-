@@ -44,7 +44,6 @@ function ProfileAvatar({ fullName, pictureUrl, isEditing, onPictureChange, onPic
       aria-label={`${fullName}'s avatar`}
     >
       {showImage ? (
-        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={pictureUrl}
           alt={`${fullName} picture`}
@@ -192,9 +191,6 @@ export function ProfileForm({
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (requirePicture) return; // Prevent if picture is missing and required
-    
-    // The backend strictly requires a numeric phone number. If we removed it from the UI,
-    // we must send the existing one, or a valid dummy if none exists, to avoid 500/422 errors.
     const validPhone = initialValues?.phone_number ? initialValues.phone_number : "0000000000";
 
     onSubmit({
@@ -311,8 +307,6 @@ export function DocumentsCard({
   const handleViewUploaded = async (docType: string) => {
     try {
       const { httpClient } = await import("../../../../../lib/http/client");
-      
-      // 1. Fetch all documents for this employee to find the numeric ID
       const docsRes = await httpClient.get('/my/documents');
       const docs = Array.isArray(docsRes.data) ? docsRes.data : docsRes.data?.data || [];
       const targetDoc = docs.find((d: any) => d.type === docType);
@@ -320,8 +314,6 @@ export function DocumentsCard({
       if (!targetDoc) {
         throw new Error("Document not found in the backend records.");
       }
-
-      // 2. Fetch the actual file blob using the numeric ID
       const res = await httpClient.get(`/my-documents/${targetDoc.id}/download`, { responseType: 'blob' });
       
       const blobUrl = URL.createObjectURL(res.data as any);
@@ -329,7 +321,6 @@ export function DocumentsCard({
       setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
     } catch (err: any) {
       console.error("Error fetching document:", err);
-      // We can use a dynamic import for toast if it's not imported at top level
       import("react-hot-toast").then(({ default: toast }) => {
         toast.error("حدث خطأ أثناء فتح الملف. تأكد من توفر الملف على السيرفر.");
       });
@@ -548,10 +539,6 @@ export function EmploymentStatusCard({
   managerName,
 }: {
   contract: Contract | undefined | null;
-  // CONFIRMED via live backend testing: `GET /profiles` includes a
-  // `manager` field (the manager's name) — this used to be flagged as
-  // unavailable, but it just lives on the profile response, not the
-  // contract one.
   managerName?: string | null;
 }) {
   return (

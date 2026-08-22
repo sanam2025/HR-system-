@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/ApplicantDetail/ApplicantSkills.tsx
 import type { Candidate } from "../../../../../api/service/HrService/Types/CandidatesService.types";
 
 interface ApplicantSkillsProps {

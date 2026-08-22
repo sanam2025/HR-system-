@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Interviews/InterviewCard.tsx
 import React from "react";
 import {
   Calendar,
@@ -58,10 +57,7 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
       default:
         return <MapPin className="w-4 h-4" />;
     }
-  };
-
-  //  دالة لعرض أيقونة الترتيب
-  const getRankIcon = (rank?: number) => {
+  };  const getRankIcon = (rank?: number) => {
     if (!rank) return null;
     switch (rank) {
       case 1:
@@ -93,9 +89,7 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
           </div>
           <div className="ml-3">
             <p className="text-sm font-medium text-gray-900">{candidateName}</p>
-            <p className="text-xs text-gray-500">{candidateEmail}</p>
-            {/*  عرض الرتبة بجانب الاسم */}
-            {interview.rank && (
+            <p className="text-xs text-gray-500">{candidateEmail}</p>            {interview.rank && (
               <div className="flex items-center gap-1 mt-0.5">
                 {getRankIcon(interview.rank)}
                 <span className="text-xs font-medium text-gray-600">
@@ -148,9 +142,7 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
               <span className="text-yellow-500"></span>
               Rate: {interview.rate}/10
             </div>
-          )}
-          {/*  عرض الرتبة هنا أيضاً */}
-          {interview.rank && (
+          )}          {interview.rank && (
             <div className="text-xs text-gray-500 flex items-center gap-1">
               {getRankIcon(interview.rank)}
               <span>Rank: #{interview.rank}</span>

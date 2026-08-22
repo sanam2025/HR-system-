@@ -1,4 +1,3 @@
-// core/modules/HR/pages/Dashboard.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../../../i18n/translations/LanguageContext";
@@ -29,10 +28,7 @@ import {
   PieChart,
   Pie,
   Cell,
-} from "recharts";
-
-// ============= Data (Static) =============
-
+} from "recharts";
 const statsData = {
   totalEmployees: 248,
   newHires: 12,
@@ -58,10 +54,7 @@ const recentAnnouncements = [
   { title: "Company Meeting", date: "Mar 15, 2026", priority: "High" },
   { title: "Holiday Schedule", date: "Mar 10, 2026", priority: "Medium" },
   { title: "New Policy Update", date: "Mar 8, 2026", priority: "High" },
-];
-
-// Chart Data
-const monthlyHiresData = [
+];const monthlyHiresData = [
   { month: "Oct", hires: 8 },
   { month: "Nov", hires: 12 },
   { month: "Dec", hires: 6 },
@@ -82,16 +75,10 @@ const employeeStatusData = [
   { name: "Active", value: 85, color: "#10b981" },
   { name: "On Leave", value: 10, color: "#f59e0b" },
   { name: "Inactive", value: 5, color: "#ef4444" },
-];
-
-// ============= Main Component =============
-
+];
 export default function Dashboard() {
   const { t, lang } = useLanguage();
-  const navigate = useNavigate();
-
-  // Navigation functions
-  const goToEmployees = () => navigate("/Hr/employees");
+  const navigate = useNavigate();  const goToEmployees = () => navigate("/Hr/employees");
   const goToLeaves = () => navigate("/Hr/leaves");
   const goToComplaints = () => navigate("/Hr/complaints");
   const goToAttendance = () => navigate("/Hr/attendance");
@@ -99,21 +86,14 @@ export default function Dashboard() {
   const goToReports = () => navigate("/Hr/reports");
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Header */}
-      <div className="mb-8">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>      <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">
           {t.adminDashboard?.welcome || 'Welcome Back, Admin'}
         </h1>
         <p className="text-gray-500 mt-1 text-sm">
           {t.adminDashboard?.subtitle || 'Here is what is happening across your organization today.'}
         </p>
-      </div>
-
-      {/* Stats Grid - Row 1 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
-        {/* {t('totalEmployees')} - Blue */}
-        <div
+      </div>      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">        <div
           onClick={goToEmployees}
           className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all cursor-pointer hover:scale-[1.02]"
         >
@@ -126,10 +106,7 @@ export default function Dashboard() {
               <Users className="w-5 h-5" />
             </div>
           </div>
-        </div>
-
-        {/* New Hires - Green */}
-        <div
+        </div>        <div
           onClick={goToEmployees}
           className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all cursor-pointer hover:scale-[1.02]"
         >
@@ -142,10 +119,7 @@ export default function Dashboard() {
               <UserPlus className="w-5 h-5" />
             </div>
           </div>
-        </div>
-
-        {/* Payroll Cost - Purple */}
-        <div
+        </div>        <div
           onClick={goToPayroll}
           className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all cursor-pointer hover:scale-[1.02]"
         >
@@ -158,10 +132,7 @@ export default function Dashboard() {
               <DollarSign className="w-5 h-5" />
             </div>
           </div>
-        </div>
-
-        {/* {t('attendanceRate')} - Teal */}
-        <div
+        </div>        <div
           onClick={goToAttendance}
           className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all cursor-pointer hover:scale-[1.02]"
         >
@@ -175,12 +146,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Stats Grid - Row 2 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-        {/* {t('pendingComplaints')} - Red */}
-        <div
+      </div>      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">        <div
           onClick={goToComplaints}
           className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all cursor-pointer hover:scale-[1.02]"
         >
@@ -193,10 +159,7 @@ export default function Dashboard() {
               <AlertCircle className="w-5 h-5" />
             </div>
           </div>
-        </div>
-
-        {/* {t('departments')} - Indigo */}
-        <div
+        </div>        <div
           onClick={goToEmployees}
           className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all cursor-pointer hover:scale-[1.02]"
         >
@@ -209,10 +172,7 @@ export default function Dashboard() {
               <Briefcase className="w-5 h-5" />
             </div>
           </div>
-        </div>
-
-        {/* Avg Rating - Yellow */}
-        <div
+        </div>        <div
           onClick={goToReports}
           className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all cursor-pointer hover:scale-[1.02]"
         >
@@ -225,10 +185,7 @@ export default function Dashboard() {
               <Award className="w-5 h-5" />
             </div>
           </div>
-        </div>
-
-        {/* On-Time Rate - Cyan */}
-        <div
+        </div>        <div
           onClick={goToAttendance}
           className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all cursor-pointer hover:scale-[1.02]"
         >
@@ -242,12 +199,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* Monthly Hires - Bar Chart */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      </div>      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-800">
               {t.adminDashboard?.monthlyNewHires || 'Monthly New Hires'}
@@ -263,10 +215,7 @@ export default function Dashboard() {
               <Bar dataKey="hires" fill="#3b82f6" radius={[8, 8, 0, 0]} />
             </ReBarChart>
           </ResponsiveContainer>
-        </div>
-
-        {/* Attendance Trend - Line Chart */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        </div>        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-800">
               {t.adminDashboard?.weeklyAttendanceTrend || 'Weekly Attendance Trend'}
@@ -297,10 +246,7 @@ export default function Dashboard() {
             </LineChart>
           </ResponsiveContainer>
         </div>
-      </div>
-
-      {/* Employee Status - Pie Chart (Circle) & {t('leaveRequests')} */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      </div>      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-800">
@@ -348,10 +294,7 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
-        </div>
-
-        {/* {t('leaveRequests')} Section */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        </div>        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
             <h3 className="text-lg font-semibold text-gray-800">
               {t.adminDashboard?.leaveRequests || 'Leave Requests'}
@@ -380,10 +323,7 @@ export default function Dashboard() {
             ))}
           </div>
         </div>
-      </div>
-
-      {/* {t('recentAnnouncements')} */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      </div>      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100">
           <div className="flex items-center gap-2">
             <Megaphone className="w-5 h-5 text-blue-500" />

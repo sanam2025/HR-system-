@@ -16,9 +16,7 @@ export default function LeaveFilters({
 }: LeaveFiltersProps) {
   const { t } = useLanguage();
   return (
-    <div className="bg-white rounded-xl shadow-sm p-4 mb-6 flex flex-wrap gap-4">
-      {/* تصفية حسب الحالة */}
-      <div className="flex-1 min-w-[150px]">
+    <div className="bg-white rounded-xl shadow-sm p-4 mb-6 flex flex-wrap gap-4">      <div className="flex-1 min-w-[150px]">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           {t.hrLeaves?.table?.status || 'Status'}
         </label>
@@ -32,10 +30,7 @@ export default function LeaveFilters({
           <option value="approved">{t.hrLeaves?.statusApproved || 'Approved'}</option>
           <option value="rejected">{t.hrLeaves?.statusRejected || 'Rejected'}</option>
         </select>
-      </div>
-
-      {/* تصفية حسب النوع */}
-      <div className="flex-1 min-w-[150px]">
+      </div>      <div className="flex-1 min-w-[150px]">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           {t.hrLeaves?.table?.type || 'Type'}
         </label>

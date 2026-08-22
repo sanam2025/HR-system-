@@ -1,4 +1,3 @@
-// core/modules/HR/components/EmployeeFilters.tsx
 import React from 'react';
 
 interface SelectOption {

@@ -1,4 +1,3 @@
-// core/modules/HR/Components/Special_Components/AcceptedCandidateRow.tsx
 import React from "react";
 import { Send, Briefcase, CheckCircle, XCircle, Clock, Eye } from "lucide-react";
 import type { AcceptedCandidate, OfferStatus } from "../../types/acceptedCandidates.types";

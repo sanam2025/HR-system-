@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Contracts/Contracts.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Download, Eye, X, FileText } from 'lucide-react';

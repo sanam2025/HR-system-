@@ -12,7 +12,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
   const location = useLocation();
 
   if (!token || !currentUser) {
-    // Not logged in, redirect to login page with the return url
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
@@ -21,7 +20,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
   const hasAccess = allowedRoles.some(role => userRole.includes(role.toLowerCase()));
 
   if (!hasAccess) {
-    // Role not authorized, redirect to their home page
     if (userRole.includes('admin') || userRole.includes('ceo')) {
       return <Navigate to="/admin" replace />;
     } else if (userRole.includes('hr')) {

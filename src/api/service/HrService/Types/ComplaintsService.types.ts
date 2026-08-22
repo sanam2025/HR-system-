@@ -1,4 +1,3 @@
-// src/api/service/HrService/Types/ComplaintsService.types.ts
 
 export interface ComplaintUser {
   id: number;
@@ -11,9 +10,7 @@ export interface Complaint {
   description: string;
   status: 'under_review' | 'resolved' | 'rejected' | 'pending';
   complainant_id: number;
-  against_id: number;
-  // ✅ إضافة الحقول الناقصة
-  author?: ComplaintUser;
+  against_id: number;  author?: ComplaintUser;
   subject?: ComplaintUser;
   hr_note?: string;
   created_at: string;

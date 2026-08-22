@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/HourlyLeaves/HourlyLeaves.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, Clock } from 'lucide-react';

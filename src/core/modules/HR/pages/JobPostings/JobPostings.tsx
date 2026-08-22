@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/JobPostings/JobPostings.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import JobPostingsStats from './JobPostingsStats';

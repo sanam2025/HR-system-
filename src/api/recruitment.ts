@@ -17,13 +17,8 @@ export interface CandidateRankingPayload {
     interview_id: number;
     rank: number;
   }[];
-}
-
-// ── طلبات التوظيف (Job Requisitions) ──
-
-export async function getJobRequisitions() {
-  // يرجع طلبات التوظيف الخاصة بالمدير (كلها أو المعتمدة)
-  const response = await apiClient.get('job-requisitions');
+}
+export async function getJobRequisitions() {  const response = await apiClient.get('job-requisitions');
   return response.data;
 }
 
@@ -55,41 +50,26 @@ export async function updateJobRequisition(id: number, data: Partial<JobRequisit
 export async function deleteJobRequisition(id: number) {
   const response = await apiClient.delete(`job-requisitions/${id}`);
   return response.data;
-}
-
-// ── المقابلات والمرشحين (Interviews & Candidates) ──
-
+}
 export async function getMyInterviews() {
   const response = await apiClient.get('my-interviews');
-  const raw = response.data;
-  // API returns { data: [...] }
-  if (Array.isArray(raw)) return raw;
+  const raw = response.data;  if (Array.isArray(raw)) return raw;
   if (Array.isArray(raw?.data)) return raw.data;
   return [];
 }
 
-export async function getInterviewCandidates(jobPostingId: number) {
-  // المدير يجلب مقابلاته الخاصة ثم يفلتر حسب الوظيفة
-  const response = await apiClient.get('my-interviews');
+export async function getInterviewCandidates(jobPostingId: number) {  const response = await apiClient.get('my-interviews');
   const allInterviews = Array.isArray(response.data)
     ? response.data
-    : (response.data?.data || []);
-
-  // فلتر حسب job_posting_id إذا كان متوفراً في الـ response
-  const filtered = allInterviews.filter((iv: any) =>
+    : (response.data?.data || []);  const filtered = allInterviews.filter((iv: any) =>
     iv.job_posting_id === jobPostingId ||
     iv.job_posting?.id === jobPostingId ||
     iv.jobPostingId === jobPostingId
-  );
-
-  // إذا ما في فلتر ناجح، ارجع الكل (fallback للمرشحين العامين)
-  return filtered.length > 0 ? filtered : allInterviews;
+  );  return filtered.length > 0 ? filtered : allInterviews;
 }
 
 
-export async function submitInterviewResult(interviewId: number, data: CandidateResultPayload) {
-  // تحديث نتيجة المقابلة (تقييم المرشح)
-  const response = await apiClient.patch(`interviews/${interviewId}/result`, data);
+export async function submitInterviewResult(interviewId: number, data: CandidateResultPayload) {  const response = await apiClient.patch(`interviews/${interviewId}/result`, data);
   return response.data;
 }
 
@@ -98,8 +78,6 @@ export async function cancelInterview(interviewId: number) {
   return response.data;
 }
 
-export async function submitCandidatesRanking(jobPostingId: number, data: CandidateRankingPayload) {
-  // تقديم ترتيب المرشحين
-  const response = await apiClient.post(`job-postings/${jobPostingId}/interviews/ranking`, data);
+export async function submitCandidatesRanking(jobPostingId: number, data: CandidateRankingPayload) {  const response = await apiClient.post(`job-postings/${jobPostingId}/interviews/ranking`, data);
   return response.data;
 }

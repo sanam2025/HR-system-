@@ -1,4 +1,3 @@
-// core/modules/HR/Components/Special_Components/ContractRenewalModal.tsx
 import React, { useState } from "react";
 import { X, Calendar, DollarSign, Send } from "lucide-react";
 import type { EmployeeContract } from "../../types/contract.types";

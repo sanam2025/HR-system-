@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Offers/SendOffer.tsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, DollarSign, Calendar, Clock } from "lucide-react";
@@ -82,16 +81,8 @@ export const SendOffer = () => {
       working_hours_per_day: Number(form.working_hours_per_day),
     };
 
-    console.log(" Sending offer:", data);
-
-    //  1. أغلق الفورم فوراً (ارجع للصفحة السابقة)
-    navigate(-1);
-
-    //  2. أرسل الطلب في الخلفية
-    sendOffer(data, {
-      onSuccess: () => {
-        //  3. بعد نجاح الطلب، طلع الأليرت فقط
-        toast.success(t.hrOffers?.toasts?.offerSent || "Offer sent successfully!");
+    console.log(" Sending offer:", data);    navigate(-1);    sendOffer(data, {
+      onSuccess: () => {        toast.success(t.hrOffers?.toasts?.offerSent || "Offer sent successfully!");
       },
       onError: (err: unknown) => {
         console.error(" Send offer error:", err);

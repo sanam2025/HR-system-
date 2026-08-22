@@ -1,14 +1,9 @@
-// واجهة عرض التعميمات النشطة — تُوضع في أعلى الـ Dashboard
-// تظهر تعميم واحد فقط (الأهم أولاً)، ويمكن إخفاؤه
 
 import { useState, useEffect } from 'react';
 import { AlertTriangle, Bell, Info, X } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { AnnouncementsService } from '../../../../api/service/HrService/AnnouncementsService';
-import { useLanguage } from '../../../../i18n/translations/LanguageContext';
-
-// أيقونة + ألوان حسب الأولوية (تدعم قيم الباك إند: high/medium/low)
-const PRIORITY_CONFIG: Record<string, {
+import { useLanguage } from '../../../../i18n/translations/LanguageContext';const PRIORITY_CONFIG: Record<string, {
   icon: typeof AlertTriangle;
   card: string;
   badge: string;
@@ -69,10 +64,7 @@ const PRIORITY_CONFIG: Record<string, {
 const DEFAULT_CFG = { ...PRIORITY_CONFIG.low, weight: 0 };
 
 export default function ActiveAnnouncements() {
-  const { t, lang } = useLanguage();
-
-  // حالة الإعلانات التي تم إخفاؤها محلياً
-  const [dismissedIds, setDismissedIds] = useState<number[]>(() => {
+  const { t, lang } = useLanguage();  const [dismissedIds, setDismissedIds] = useState<number[]>(() => {
     const saved = localStorage.getItem('dismissed_announcements');
     return saved ? JSON.parse(saved) : [];
   });
@@ -81,10 +73,7 @@ export default function ActiveAnnouncements() {
     const newDismissed = [...dismissedIds, id];
     setDismissedIds(newDismissed);
     localStorage.setItem('dismissed_announcements', JSON.stringify(newDismissed));
-  };
-
-  // جلب التعميمات النشطة من الـ API الحقيقي
-  const { data, isLoading } = useQuery({
+  };  const { data, isLoading } = useQuery({
     queryKey: ['active-announcements'],
     queryFn:  () => AnnouncementsService.getActive(),
     refetchInterval: 60_000, // تحديث كل دقيقة
@@ -92,21 +81,13 @@ export default function ActiveAnnouncements() {
   });
 
   const rawList = data?.data?.data ?? data?.data ?? [];
-  let list = Array.isArray(rawList) ? rawList : [];
-
-  // فلترة الإعلانات المحذوفة محلياً ثم ترتيبها حسب الأولوية
-  list = list
+  let list = Array.isArray(rawList) ? rawList : [];  list = list
     .filter((a: any) => !dismissedIds.includes(a.id))
     .sort((a: any, b: any) => {
       const weightA = PRIORITY_CONFIG[a.priority]?.weight ?? 0;
-      const weightB = PRIORITY_CONFIG[b.priority]?.weight ?? 0;
-      // ترتيب تنازلي: الأهم أولاً، ثم الأحدث
-      if (weightA !== weightB) return weightB - weightA;
+      const weightB = PRIORITY_CONFIG[b.priority]?.weight ?? 0;      if (weightA !== weightB) return weightB - weightA;
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    });
-
-  // القسم يختفي كاملاً إذا لا يوجد تعميمات أو لا يزال يُحمَّل
-  if (isLoading || list.length === 0) return null;
+    });  if (isLoading || list.length === 0) return null;
 
   return (
     <div className="space-y-4 mb-4">
@@ -127,27 +108,18 @@ export default function ActiveAnnouncements() {
             <div
               key={ann.id}
               className={`flex flex-col justify-between rounded-2xl border p-4 relative ${cfg.card} shadow-sm hover:shadow-md transition-shadow`}
-            >
-              {/* زر الإخفاء */}
-              <button 
+            >              <button 
                 onClick={() => handleDismiss(ann.id)}
                 className="absolute top-4 right-4 rtl:left-4 rtl:right-auto p-1 rounded-full hover:bg-black/5 transition-colors"
                 title={lang === 'ar' ? 'إخفاء' : 'Dismiss'}
               >
                 <X size={16} className="opacity-70" />
-              </button>
-
-              {/* المحتوى */}
-              <div className="flex gap-3">
-                {/* أيقونة الأولوية */}
-                <div className="shrink-0 mt-0.5">
+              </button>              <div className="flex gap-3">                <div className="shrink-0 mt-0.5">
                   <Icon size={20} />
                 </div>
 
                 <div className="flex-1 min-w-0 pr-6 rtl:pr-0 rtl:pl-6">
-                  <div className="flex flex-wrap items-center gap-2 mb-1">
-                    {/* شارة الأولوية */}
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${cfg.badge}`}>
+                  <div className="flex flex-wrap items-center gap-2 mb-1">                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${cfg.badge}`}>
                       {(t.announcements.priorities as any)[ann.priority] ?? ann.priority}
                     </span>
                     <h3 className="text-sm font-bold truncate">{ann.title}</h3>

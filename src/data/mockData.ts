@@ -1,4 +1,3 @@
-// ── Mock data for MANAGER section ──
 
 export const mockEmployees = [
   { id: 1, name: 'أحمد محمد الصالح', nameEn: 'Ahmed Mohamed Al-Saleh', title: 'مطور واجهات أمامية', titleEn: 'Frontend Developer', avatar: 'أ', avgRating: 4.5, todayStatus: 'حاضر', leaveBalance: 14, tasksCount: 3, phone: '0912345678', email: 'ahmed@hr.com', joinDate: '2022-01-15', department: 'قسم تقنية المعلومات', departmentEn: 'IT Department' },

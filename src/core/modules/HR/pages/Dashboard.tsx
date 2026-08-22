@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Dashboard.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -18,10 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import { PayrollsService } from '../../../../api/service/HrService/PayrollsService';
 import { useAllLeaveRequests } from '../hooks/useLeave';
 import { EmployeesService } from '../../../../api/service/HrService/EmployeesService';
-import { AttendanceService } from '../../../../api/service/HrService/AttendanceService';
-
-//  استيراد أنواع الأقسام والموظفين
-import type { Department, Employee } from '../../../../api/service/HrService/Types/DepartmentsService.types';
+import { AttendanceService } from '../../../../api/service/HrService/AttendanceService';import type { Department, Employee } from '../../../../api/service/HrService/Types/DepartmentsService.types';
 
 const STATS_DATA = {
   totalEmployees: 0,
@@ -50,10 +46,7 @@ export default function Dashboard() {
     isLoading: announcementsLoading,
     refetch,
     error: announcementsError
-  } = useActiveAnnouncements({ status: 'active' });
-
-  //  تعريف نوع المصفوفة بشكل صريح
-  const {
+  } = useActiveAnnouncements({ status: 'active' });  const {
     departments: departmentsWithUsers,
     isLoading: departmentsLoading,
     error: departmentsError
@@ -126,10 +119,7 @@ export default function Dashboard() {
     };
   });
 
-  const createAnnouncement = useCreateAnnouncement();
-
-  //  استخدام حقول الـ UI فقط، وسنقوم ببناء الـ Payload عند الإرسال
-  const [formData, setFormData] = useState({
+  const createAnnouncement = useCreateAnnouncement();  const [formData, setFormData] = useState({
     title: '',
     content: '',
     target_audience: 'all',
@@ -193,19 +183,14 @@ export default function Dashboard() {
       toast.error('Please fill in title and content');
       return;
     }
-    try {
-      //  بناء Payload مخصص للباك إند دون تغيير الـ Types
-      const payload = {
+    try {      const payload = {
         title: formData.title,
         content: formData.content,
         target_audience: formData.target_audience,
         priority: formData.priority,
         starts_at: formData.starts_at,
         expires_at: formData.expires_at || null,
-      };
-
-      //  إرسال الـ payload وتجاوز TypeScript بأمان
-      await createAnnouncement.mutateAsync(payload as unknown as CreateAnnouncementData);
+      };      await createAnnouncement.mutateAsync(payload as unknown as CreateAnnouncementData);
 
       setShowForm(false);
       setFormData({
@@ -240,15 +225,10 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Header */}
-      <div className="mb-6 sm:mb-8">
+    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>      <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl font-bold text-gray-900">{t.hrDashboard?.welcomeTitle || 'Welcome to HR Dashboard'}</h1>
         <p className="text-gray-500 mt-1 text-sm">{t.hrDashboard?.welcomeSubtitle || 'Overview of employee performance and statistics.'}</p>
-      </div>
-
-      {/* Announcements Section */}
-      <div className="mb-8">
+      </div>      <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Megaphone className="w-5 h-5 text-blue-500" />
@@ -275,10 +255,7 @@ export default function Dashboard() {
             </div>
           )
         )}
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 mb-8">
+      </div>      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 mb-8">
         {STATS_CONFIG.map(({ key, title, icon: Icon, color, path }) => (
           <StatCard
             key={key}
@@ -289,10 +266,7 @@ export default function Dashboard() {
             onClick={handleNavigate(path)}
           />
         ))}
-      </div>
-
-      {/* Departments Section */}
-      {hasDepartments && (
+      </div>      {hasDepartments && (
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
             <Building2 className="w-5 h-5 text-purple-500" />
@@ -351,10 +325,7 @@ export default function Dashboard() {
             ))}
           </div>
         </div>
-      )}
-
-      {/* Department Employees Modal */}
-      {selectedDepartment && (
+      )}      {selectedDepartment && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden">
             <div className="flex justify-between items-center p-5 border-b border-gray-100">
@@ -372,9 +343,7 @@ export default function Dashboard() {
             <div className="p-5 overflow-y-auto">
               {(() => {
                 const managerId = selectedDepartment.manager_id;
-                const emps = selectedDepartment.employees || [];
-                // Sort to put manager at the top
-                const sortedEmps = [...emps].sort((a, b) => {
+                const emps = selectedDepartment.employees || [];                const sortedEmps = [...emps].sort((a, b) => {
                   if (a.id === managerId) return -1;
                   if (b.id === managerId) return 1;
                   return 0;

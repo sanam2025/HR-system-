@@ -1,4 +1,3 @@
-// src/core/modules/HR/hooks/useCandidates.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { CandidatesService } from '../../../../api/service/HrService/CandidatesService';

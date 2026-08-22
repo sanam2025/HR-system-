@@ -9,7 +9,6 @@ export const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       retry: (failureCount, error) => {
         const apiError = error instanceof ApiError ? error : ApiError.from(error);
-        // Never retry a request that failed for a reason a retry can't fix.
         if (
           apiError.isValidation ||
           apiError.isUnauthenticated ||

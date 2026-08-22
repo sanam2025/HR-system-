@@ -1,4 +1,3 @@
-// core/modules/HR/types/termination.types.ts
 
 export type TerminationType = "termination" | "contractEnd" | "resignation" | "retirement";
 export type TerminationStatus = "draft" | "submitted" | "approved" | "processed" | "completed";

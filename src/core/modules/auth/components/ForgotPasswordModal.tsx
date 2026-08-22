@@ -24,7 +24,6 @@ export default function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordM
     setIsLoading(true);
     try {
       const response = await apiClient.post('forgot-password', { email });
-      // Show success message from backend or default one
       toast.success(response.data?.message || 'Password reset link sent successfully');
       onClose();
       setEmail('');

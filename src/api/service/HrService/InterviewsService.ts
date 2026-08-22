@@ -1,8 +1,4 @@
-// src/api/service/HrService/InterviewsService.ts
-import { apiClient } from '../../client';
-
-// ✅ تعريف أنواع البيانات للإرسال
-export interface CreateInterviewData {
+import { apiClient } from '../../client';export interface CreateInterviewData {
   candidate_id: number;
   interviewed_by: number;
   scheduled_at: string;
@@ -15,28 +11,5 @@ export interface UpdateInterviewResultData {
   note?: string;
 }
 
-export const InterviewsService = {
-  // جلب كل المقابلات لوظيفة معينة
-  getAll: (jobId: number) => apiClient.get(`/job-postings/${jobId}/interviews`),
-  
-  // جلب الترتيب حسب التقييم (Ranked by rate)
-  getRankedByRate: (jobId: number) => apiClient.get(`/job-postings/${jobId}/interviews/ranked-by-rate`),
-
-  // جلب تفاصيل مقابلة معينة
-  getById: (id: number) => apiClient.get(`/interviews/${id}`),
-
-  // جدولة مقابلة جديدة
-  create: (jobId: number, data: CreateInterviewData) => apiClient.post(`/job-postings/${jobId}/interviews`, data),
-
-  // إلغاء مقابلة
-  cancel: (id: number) => apiClient.patch(`/interviews/${id}/cancel`),
-
-  // تحديث نتيجة المقابلة
-  updateResult: (id: number, data: UpdateInterviewResultData) => apiClient.patch(`/interviews/${id}/result`, data),
-
-  // submit ranking
-  submitRanking: (jobId: number, data: any) => apiClient.post(`/job-postings/${jobId}/interviews/ranking`, data),
-
-  // get ranking
-  getRanking: (jobId: number) => apiClient.get(`/job-postings/${jobId}/interviews/ranking`),
+export const InterviewsService = {  getAll: (jobId: number) => apiClient.get(`/job-postings/${jobId}/interviews`),  getRankedByRate: (jobId: number) => apiClient.get(`/job-postings/${jobId}/interviews/ranked-by-rate`),  getById: (id: number) => apiClient.get(`/interviews/${id}`),  create: (jobId: number, data: CreateInterviewData) => apiClient.post(`/job-postings/${jobId}/interviews`, data),  cancel: (id: number) => apiClient.patch(`/interviews/${id}/cancel`),  updateResult: (id: number, data: UpdateInterviewResultData) => apiClient.patch(`/interviews/${id}/result`, data),  submitRanking: (jobId: number, data: any) => apiClient.post(`/job-postings/${jobId}/interviews/ranking`, data),  getRanking: (jobId: number) => apiClient.get(`/job-postings/${jobId}/interviews/ranking`),
 };

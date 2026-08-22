@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Recruitment/Recruitment.tsx
 import { useEffect, useState } from "react";
 import { useJobRequisitions } from "../../hooks/useJobRequisitions";
 import RecruitmentCard from "./RecruitmentCard";

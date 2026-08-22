@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Interviews/InterviewStats.tsx
 import React from 'react';
 import { Calendar, CheckCircle, XCircle, Clock } from 'lucide-react';
 

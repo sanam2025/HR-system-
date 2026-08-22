@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Leaves/Leaves.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, FileText } from 'lucide-react';
@@ -13,25 +12,13 @@ export const Leaves = () => {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
-  const { t, lang } = useLanguage();
-
-  //  جلب طلبات الإجازات
-  const { requests, isLoading, refetch } = useLeaveRequests();
-  
-  //  هوك الموافقة والرفض
-  const approveMutation = useApproveLeave();
-  const rejectMutation = useRejectLeave();
-
-  //  حساب الإحصائيات
-  const stats = {
+  const { t, lang } = useLanguage();  const { requests, isLoading, refetch } = useLeaveRequests();  const approveMutation = useApproveLeave();
+  const rejectMutation = useRejectLeave();  const stats = {
     total: requests.length,
     pending: requests.filter((r) => r.status === 'pending').length,
     approved: requests.filter((r) => r.status === 'approved').length,
     rejected: requests.filter((r) => r.status === 'rejected').length,
-  };
-
-  //  فلترة الطلبات (حذف البحث بالاسم واعتماد الفلترة بالحالة والنوع فقط)
-  const filtered = requests.filter((request) => {
+  };  const filtered = requests.filter((request) => {
     const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
     const matchesType = typeFilter === 'all' || request.type === typeFilter;
     return matchesStatus && matchesType;
@@ -46,9 +33,7 @@ export const Leaves = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <button
             onClick={() => navigate('/Hr')}
@@ -66,21 +51,12 @@ export const Leaves = () => {
           <RefreshCw className={`w-4 h-4 ${lang === 'ar' ? 'rotate-180' : ''}`} />
           {t.hrLeaves?.refresh || 'Refresh'}
         </button>
-      </div>
-
-      {/* Stats */}
-      <LeaveStats stats={stats} />
-
-      {/* Filters (حذفنا searchTerm) */}
-      <LeaveFilters
+      </div>      <LeaveStats stats={stats} />      <LeaveFilters
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
         typeFilter={typeFilter}
         setTypeFilter={setTypeFilter}
-      />
-
-      {/* Records Table */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      />      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
           <h3 className="text-lg font-semibold text-gray-800">
             {t.hrLeaves?.title || 'Leave Requests'} ({filtered.length})

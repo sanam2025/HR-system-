@@ -60,7 +60,6 @@ export default function EditProfileModal({ isOpen, onClose, profileId, initialDa
     if (birthDate) formData.append('birth_date', birthDate);
     if (gender) formData.append('gender', gender);
     if (picture) formData.append('picture', picture);
-    // Backend requires phone_number to be exactly 10 digits, and crashes if missing
     let phoneToSend = '0000000000';
     if (initialData.phone) {
       const digitsOnly = initialData.phone.replace(/\D/g, '');

@@ -18,19 +18,14 @@ export default function EmployeesList() {
       try {
         setLoading(true);
         const res = await getManagerEmployees();
-        const data = Array.isArray(res) ? res : (res?.data || []);
-        
-        // Map API data to the format expected by the UI
-        const mappedData = data.map((emp: any) => ({
+        const data = Array.isArray(res) ? res : (res?.data || []);        const mappedData = data.map((emp: any) => ({
           id: emp.id,
           profile_id: emp.profile_id,
           name: emp.name,
           title: emp.title || 'موظف', // Fallback if API doesn't provide title
           department: emp.department || 'القسم',
           email: emp.email,
-          avatar: emp.name ? emp.name.charAt(0).toUpperCase() : 'م',
-          // Backend doesn't provide todayStatus or avgRating in this API yet, so we use placeholders
-          todayStatus: 'حاضر', 
+          avatar: emp.name ? emp.name.charAt(0).toUpperCase() : 'م',          todayStatus: 'حاضر', 
           avgRating: '0.0'
         }));
         setEmployees(mappedData);
@@ -66,17 +61,12 @@ export default function EmployeesList() {
   });
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6">      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-extrabold text-dark">{t.employees.listTitle}</h2>
           <p className="text-sm text-brown mt-1">{employees.length} {t.employees.employeesCount}</p>
         </div>
-      </div>
-
-      {/* Search + Filter */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      </div>      <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex items-center gap-2 flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2.5 focus-within:border-green focus-within:ring-2 focus-within:ring-green/10 transition-all">
           <Search size={16} className="text-gray-400 flex-shrink-0" />
           <input
@@ -102,10 +92,7 @@ export default function EmployeesList() {
             </button>
           ))}
         </div>
-      </div>
-
-      {/* Grid */}
-      {loading ? (
+      </div>      {loading ? (
         <div className="flex justify-center items-center py-20 text-green">
           <Loader2 className="w-8 h-8 animate-spin" />
         </div>

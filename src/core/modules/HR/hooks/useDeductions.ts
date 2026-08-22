@@ -1,4 +1,3 @@
-// src/core/modules/HR/hooks/useDeductions.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { DeductionsService } from '../../../../api/service/HrService/DeductionsService';
@@ -8,9 +7,7 @@ export const useDeductions = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['deductions'],
     queryFn: async () => {
-      const res = await DeductionsService.getAll();
-      //  إرجاع البيانات مباشرة بدون استخدام as
-      return res.data?.data || [];
+      const res = await DeductionsService.getAll();      return res.data?.data || [];
     },
   });
 

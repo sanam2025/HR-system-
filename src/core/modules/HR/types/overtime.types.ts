@@ -1,4 +1,3 @@
-// src/core/modules/HR/types/overtime.types.ts
 export interface OvertimeRequest {
   id: number;
   user_id: number;

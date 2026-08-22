@@ -23,41 +23,26 @@ export default function OvertimeRequests() {
 
   const [activeTab, setActiveTab] = useState<'department' | 'myCreated' | 'myOwn'>('department');
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showMyOvertimeModal, setShowMyOvertimeModal] = useState(false);
-
-  // Manager Employees for assigning overtime
-  const { data: employees = [] } = useQuery({
+  const [showMyOvertimeModal, setShowMyOvertimeModal] = useState(false);  const { data: employees = [] } = useQuery({
     queryKey: ['manager-employees'],
     queryFn: getManagerEmployees,
     enabled: showCreateModal
-  });
-
-  // Department Requests Query
-  const { data: rawDeptRequests = [], isLoading: isDeptLoading } = useQuery({
+  });  const { data: rawDeptRequests = [], isLoading: isDeptLoading } = useQuery({
     queryKey: ['department-overtime-requests'],
     queryFn: getDepartmentOvertimeRequests,
     enabled: !isHr
-  });
-
-  // HR Mandatory Overtime Query
-  const { data: rawMandatoryOvertimes = [], isLoading: isMandatoryLoading } = useQuery({
+  });  const { data: rawMandatoryOvertimes = [], isLoading: isMandatoryLoading } = useQuery({
     queryKey: ['hr-mandatory-overtimes'],
     queryFn: async () => {
       const res = await OvertimeService.getMandatory();
       return res.data;
     },
     enabled: isHr
-  });
-
-  // Manager Created Overtimes Query
-  const { data: rawCreatedOvertimes = [], isLoading: isCreatedLoading } = useQuery({
+  });  const { data: rawCreatedOvertimes = [], isLoading: isCreatedLoading } = useQuery({
     queryKey: ['my-created-overtimes'],
     queryFn: getMyCreatedOvertimesManager,
     enabled: activeTab === 'myCreated'
-  });
-
-  // My Own Overtimes Query
-  const { data: rawMyOvertimes = [], isLoading: isMyOwnLoading } = useQuery({
+  });  const { data: rawMyOvertimes = [], isLoading: isMyOwnLoading } = useQuery({
     queryKey: ['my-own-overtimes'],
     queryFn: getMyOvertimes,
     enabled: activeTab === 'myOwn'
@@ -70,10 +55,7 @@ export default function OvertimeRequests() {
 
   const pendingCount = safeDeptRequests.filter((r: any) => r.status === 'pending' || r.status === 'معلقة').length;
 
-  const currentDeptLoading = isHr ? isMandatoryLoading : isDeptLoading;
-
-  // Mutations
-  const approveMutation = useMutation({
+  const currentDeptLoading = isHr ? isMandatoryLoading : isDeptLoading;  const approveMutation = useMutation({
     mutationFn: async (id: number) => {
       if (isHr) return OvertimeService.approveMandatory(id);
       return approveOvertimeRequest(id);
@@ -109,22 +91,22 @@ export default function OvertimeRequests() {
   const translateOvertimeError = (err: any): string => {
     const msg: string = err?.response?.data?.message || err?.response?.data?.error || err?.message || '';
     if (msg.includes('cannot be deleted because it has already been processed') || msg.includes('cannot be deleted')) {
-      return 'لا يمكن حذف طلب العمل الإضافي لأنه تم معالجته أو قبوله مسبقاً ⚠️';
+      return lang === 'ar' ? 'لا يمكن حذف طلب العمل الإضافي لأنه تم معالجته أو قبوله مسبقاً ⚠️' : 'Cannot delete overtime request because it has already been processed ⚠️';
     }
     if (msg.includes('before the official checkout time')) {
-      return 'لا يمكن أن يبدأ العمل الإضافي قبل نهاية وقت الدوام الرسمي (مثلاً يجب أن يبدأ بعد 04:00 أو 05:00 مساءً)';
+      return lang === 'ar' ? 'لا يمكن أن يبدأ العمل الإضافي قبل نهاية وقت الدوام الرسمي (مثلاً يجب أن يبدأ بعد 04:00 أو 05:00 مساءً)' : 'Overtime cannot start before official checkout time';
     }
     if (msg.includes('end time must be after') || msg.includes('after start_time')) {
-      return 'يجب أن يكون وقت النهاية بعد وقت بداية العمل الإضافي';
+      return lang === 'ar' ? 'يجب أن يكون وقت النهاية بعد وقت بداية العمل الإضافي' : 'End time must be after start time';
     }
     if (msg.includes('already exists') || msg.includes('overlap')) {
-      return 'يوجد تكليف عمل إضافي مسبقاً في هذا التاريخ والتوقيت';
+      return lang === 'ar' ? 'يوجد تكليف عمل إضافي مسبقاً في هذا التاريخ والتوقيت' : 'Overtime already exists on this date and time';
     }
     if (msg.includes('Unauthorized') || msg.includes('Unauthenticated')) {
-      return 'غير مصرح للقيام بهذا الإجراء ⚠️';
+      return lang === 'ar' ? 'غير مصرح للقيام بهذا الإجراء ⚠️' : 'Unauthorized to perform this action ⚠️';
     }
     if (msg) return msg;
-    return 'حدث خطأ أثناء إجراء العملية';
+    return lang === 'ar' ? 'حدث خطأ أثناء إجراء العملية' : 'An error occurred during the operation';
   };
 
   const deleteMutation = useMutation({
@@ -133,7 +115,7 @@ export default function OvertimeRequests() {
       queryClient.invalidateQueries({ queryKey: ['department-overtime-requests'] });
       queryClient.invalidateQueries({ queryKey: ['my-created-overtimes'] });
       queryClient.invalidateQueries({ queryKey: ['my-own-overtimes'] });
-      toast.success('تم حذف طلب العمل الإضافي بنجاح ✅');
+      toast.success(lang === 'ar' ? 'تم حذف طلب العمل الإضافي بنجاح ✅' : 'Overtime request deleted successfully ✅');
       setDeletingId(null);
       setCardErrors(prev => ({ ...prev, [variables]: '' }));
     },
@@ -142,32 +124,26 @@ export default function OvertimeRequests() {
       setCardErrors(prev => ({ ...prev, [variables]: translated }));
       setDeletingId(null);
     }
-  });
-
-  // Assign Overtime Form
-  const todayStr = new Date().toISOString().split('T')[0];
+  });  const todayStr = new Date().toISOString().split('T')[0];
   const [managerForm, setManagerForm] = useState({ user_id: '', date: todayStr, start_time: '17:00', end_time: '19:00', notes: '' });
   const createManagerMutation = useMutation({
     mutationFn: createManagerOvertime,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['department-overtime-requests'] });
       queryClient.invalidateQueries({ queryKey: ['my-created-overtimes'] });
-      toast.success('تم تكليف الموظف بالعمل الإضافي بنجاح ✅');
+      toast.success(lang === 'ar' ? 'تم تكليف الموظف بالعمل الإضافي بنجاح ✅' : 'Employee assigned overtime successfully ✅');
       setShowCreateModal(false);
       setManagerForm({ user_id: '', date: todayStr, start_time: '17:00', end_time: '19:00', notes: '' });
     },
     onError: (err: any) => {
       toast.error(translateOvertimeError(err), { duration: 6000 });
     }
-  });
-
-  // Personal Overtime Form
-  const [myOwnForm, setMyOwnForm] = useState({ date: todayStr, start_time: '17:00', end_time: '19:00', notes: '' });
+  });  const [myOwnForm, setMyOwnForm] = useState({ date: todayStr, start_time: '17:00', end_time: '19:00', notes: '' });
   const createMyOwnMutation = useMutation({
     mutationFn: createEmployeeOvertime,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-own-overtimes'] });
-      toast.success('تم تقديم طلب العمل الإضافي بنجاح ✅');
+      toast.success(lang === 'ar' ? 'تم تقديم طلب العمل الإضافي بنجاح ✅' : 'Overtime request submitted successfully ✅');
       setShowMyOvertimeModal(false);
       setMyOwnForm({ date: todayStr, start_time: '17:00', end_time: '19:00', notes: '' });
     },
@@ -191,17 +167,11 @@ export default function OvertimeRequests() {
     }
     if (isRejected) {
       return <span className="text-xs font-semibold px-2.5 py-1 rounded-full border bg-red-50 text-red-600 border-red-200">{ov.status?.rejected || 'Rejected'}</span>;
-    }
-    // Default to pending
-    return <span className="text-xs font-semibold px-2.5 py-1 rounded-full border bg-yellow-50 text-yellow-700 border-yellow-200">{ov.status?.pending || 'Pending'}</span>;
+    }    return <span className="text-xs font-semibold px-2.5 py-1 rounded-full border bg-yellow-50 text-yellow-700 border-yellow-200">{ov.status?.pending || 'Pending'}</span>;
   };
 
   return (
-    <div className="space-y-6">
-      
-
-      {/* Header & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6">      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-extrabold text-dark">{ov.title || 'Overtime Management'}</h2>
           <p className="text-sm text-brown mt-1">{ov.subtitle || 'Track and assign overtime hours for department employees'}</p>
@@ -218,10 +188,7 @@ export default function OvertimeRequests() {
             </button>
           )}
         </div>
-      </div>
-
-      {/* Main Tabs */}
-      <div className="flex border-b border-gray-200 gap-2">
+      </div>      <div className="flex border-b border-gray-200 gap-2">
         <button
           onClick={() => setActiveTab('department')}
           className={`pb-3 px-4 font-bold text-sm border-b-2 transition-all flex items-center gap-2 ${
@@ -253,10 +220,7 @@ export default function OvertimeRequests() {
             {ov.mainTabs?.myOwn || 'My Personal Overtimes'}
           </button>
         )}
-      </div>
-
-      {/* Tab 1: Department Requests */}
-      {activeTab === 'department' && (
+      </div>      {activeTab === 'department' && (
         <div className="space-y-4">
           {pendingCount > 0 && (
             <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl px-4 py-2.5 text-sm font-semibold">
@@ -274,7 +238,7 @@ export default function OvertimeRequests() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {safeDeptRequests.map((req: any) => {
-                const name = req.user?.full_name || req.user?.name || req.requested_by?.full_name || req.employee?.user?.full_name || req.employee?.user?.name || req.employee?.name || req.employeeName || (lang === 'ar' ? 'موظف' : 'Employee');
+                const name = req.name || req.employee?.user?.full_name || req.employee?.user?.name || req.user?.full_name || req.user?.name || req.employee?.full_name || req.employee?.name || req.employee_name || req.user_name || req.employeeName || req.requested_by?.full_name || req.requested_by?.name || (lang === 'ar' ? 'موظف' : 'Employee');
                 const date = req.date || req.created_at?.slice(0, 10) || '—';
                 const startTime = req.start_time || req.startTime || '—';
                 const endTime = req.end_time || req.endTime || '—';
@@ -339,10 +303,7 @@ export default function OvertimeRequests() {
             </div>
           )}
         </div>
-      )}
-
-      {/* Tab 2: My Created Overtimes */}
-      {activeTab === 'myCreated' && (
+      )}      {activeTab === 'myCreated' && (
         <div className="space-y-4">
           {isCreatedLoading ? (
             <div className="text-center py-16"><Loader2 className="animate-spin text-green mx-auto" size={32} /></div>
@@ -354,7 +315,7 @@ export default function OvertimeRequests() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {safeCreatedOvertimes.map((req: any) => {
-                const name = req.user?.full_name || req.user?.name || req.requested_by?.full_name || req.employee?.full_name || req.employee?.name || (ov.card?.employeeFallback || (lang === 'ar' ? `موظف #${req.id}` : `Employee #${req.id}`)).replace('{id}', req.user_id || req.id);
+                const name = req.name || req.employee?.user?.full_name || req.employee?.user?.name || req.user?.full_name || req.user?.name || req.employee?.full_name || req.employee?.name || req.employee_name || req.user_name || req.employeeName || req.requested_by?.full_name || req.requested_by?.name || (ov.card?.employeeFallback || (lang === 'ar' ? `موظف #${req.id}` : `Employee #${req.id}`)).replace('{id}', req.user_id || req.id);
                 return (
                   <div key={req.id} className="bg-white rounded-2xl border border-gray-100 shadow-card p-5 flex flex-col justify-between">
                     <div>
@@ -417,10 +378,7 @@ export default function OvertimeRequests() {
             </div>
           )}
         </div>
-      )}
-
-      {/* Tab 3: My Own Overtimes */}
-      {activeTab === 'myOwn' && (
+      )}      {activeTab === 'myOwn' && (
         <div className="space-y-4">
           <div className="flex justify-end">
             <button
@@ -456,10 +414,7 @@ export default function OvertimeRequests() {
             </div>
           )}
         </div>
-      )}
-
-      {/* Modal 1: Assign Manager Overtime to Employee */}
-      {showCreateModal && (
+      )}      {showCreateModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-modal max-w-md w-full p-6 animate-slide-up">
             <h3 className="font-bold text-dark text-lg border-b border-gray-100 pb-3 mb-4">{ov.form?.assignTitle || 'Assign Employee to Overtime'}</h3>
@@ -560,10 +515,7 @@ export default function OvertimeRequests() {
             </form>
           </div>
         </div>
-      )}
-
-      {/* Modal 2: Create Personal Employee Overtime */}
-      {showMyOvertimeModal && (
+      )}      {showMyOvertimeModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-modal max-w-md w-full p-6 animate-slide-up">
             <h3 className="font-bold text-dark text-lg border-b border-gray-100 pb-3 mb-4">{ov.form?.personalTitle || 'Personal Overtime Request'}</h3>

@@ -22,10 +22,7 @@ export default function CreateTerminationModal({ isOpen, onClose, onSubmit, isSu
   const [date, setDate] = useState('');
   const [reason, setReason] = useState('');
   const [compensationAmount, setCompensationAmount] = useState('');
-  const [document, setDocument] = useState<File | null>(null);
-
-  // Fetch employees to select (only if propEmployees is not provided)
-  const { data: fetchedEmployees = [] } = useQuery({
+  const [document, setDocument] = useState<File | null>(null);  const { data: fetchedEmployees = [] } = useQuery({
     queryKey: ['managerEmployees'],
     queryFn: getManagerEmployees,
     enabled: !propEmployees
@@ -74,10 +71,7 @@ export default function CreateTerminationModal({ isOpen, onClose, onSubmit, isSu
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto custom-scrollbar flex-1">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            {/* Employee */}
-            <div className="col-span-1 md:col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">            <div className="col-span-1 md:col-span-2">
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">{tr.form.employee} <span className="text-red-500">*</span></label>
               <select
                 value={userId}
@@ -92,10 +86,7 @@ export default function CreateTerminationModal({ isOpen, onClose, onSubmit, isSu
                   </option>
                 ))}
               </select>
-            </div>
-
-            {/* Type */}
-            <div>
+            </div>            <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">{tr.form.type} <span className="text-red-500">*</span></label>
               <select
                 value={type}
@@ -106,10 +97,7 @@ export default function CreateTerminationModal({ isOpen, onClose, onSubmit, isSu
                 <option value="immediate">{tr.types.immediate}</option>
                 <option value="standard">{tr.types.standard}</option>
               </select>
-            </div>
-
-            {/* Subtype */}
-            {type === 'immediate' && (
+            </div>            {type === 'immediate' && (
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">{tr.form.subtype} <span className="text-red-500">*</span></label>
                 <select
@@ -123,10 +111,7 @@ export default function CreateTerminationModal({ isOpen, onClose, onSubmit, isSu
                   <option value="mutual_agreement">{tr.subtypes.mutual_agreement}</option>
                 </select>
               </div>
-            )}
-
-            {/* Date */}
-            <div>
+            )}            <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">{tr.form.date} <span className="text-red-500">*</span></label>
               <div className="relative">
                 <input
@@ -137,10 +122,7 @@ export default function CreateTerminationModal({ isOpen, onClose, onSubmit, isSu
                   className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green/20 focus:border-green outline-none transition-all"
                 />
               </div>
-            </div>
-
-            {/* Document */}
-            <div>
+            </div>            <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">{tr.form.documents}</label>
               <div className="relative w-full">
                 <input
@@ -157,10 +139,7 @@ export default function CreateTerminationModal({ isOpen, onClose, onSubmit, isSu
                   <Upload size={18} className="text-gray-400" />
                 </label>
               </div>
-            </div>
-
-            {/* Compensation Amount */}
-            {type === 'immediate' && (subtype === 'company_composition' || subtype === 'mutual_agreement') && (
+            </div>            {type === 'immediate' && (subtype === 'company_composition' || subtype === 'mutual_agreement') && (
               <div className="col-span-1 md:col-span-2">
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">{tr.form.compensationAmount} <span className="text-red-500">*</span></label>
                 <input
@@ -174,10 +153,7 @@ export default function CreateTerminationModal({ isOpen, onClose, onSubmit, isSu
                   placeholder="0.00"
                 />
               </div>
-            )}
-
-            {/* Legal Reason */}
-            {type === 'immediate' && subtype === 'misconduct' && (
+            )}            {type === 'immediate' && subtype === 'misconduct' && (
               <div className="col-span-1 md:col-span-2">
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">{tr.form.reason} <span className="text-red-500">*</span></label>
                 <textarea
@@ -190,10 +166,7 @@ export default function CreateTerminationModal({ isOpen, onClose, onSubmit, isSu
                 />
               </div>
             )}
-          </div>
-
-          {/* Actions */}
-          <div className="mt-8 pt-5 border-t border-gray-100 flex gap-3 justify-end">
+          </div>          <div className="mt-8 pt-5 border-t border-gray-100 flex gap-3 justify-end">
             <button
               type="button"
               onClick={onClose}

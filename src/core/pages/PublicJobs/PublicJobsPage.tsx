@@ -7,10 +7,7 @@ import {
   CheckCircle2, XCircle, CalendarDays,
   ExternalLink, Send, X, User, Mail, Phone, FileText,
   Loader2, Globe, Upload
-} from 'lucide-react';
-
-// ── i18n (self-contained, no LanguageProvider dependency) ──
-type Lang = 'ar' | 'en';
+} from 'lucide-react';type Lang = 'ar' | 'en';
 
 const TEXTS = {
   ar: {
@@ -122,10 +119,7 @@ const TEXTS = {
     typePartTime: 'Part Time',
     typeRemote: 'Remote',
   },
-} satisfies Record<Lang, object>;
-
-// ── Types ────────────────────────────────────────────────
-interface Job {
+} satisfies Record<Lang, object>;interface Job {
   id: number;
   job_title: string;
   description: string;
@@ -142,10 +136,7 @@ const TYPE_COLORS: Record<string, string> = {
   partTime: 'bg-purple-50 text-purple-700 border-purple-100',
   remote: 'bg-emerald-50 text-emerald-700 border-emerald-100',
   default: 'bg-gray-50 text-gray-700 border-gray-100'
-};
-
-// ── Apply Modal ──────────────────────────────────────────
-function ApplyModal({
+};function ApplyModal({
   job, lang, onClose,
 }: {
   job: Job;
@@ -178,9 +169,7 @@ function ApplyModal({
     formData.append('email', form.email);
     formData.append('phone', form.phone);
     if (form.coverLetter) formData.append('cover_letter', form.coverLetter);
-    formData.append('cv', form.cv);
-    // Include dummy or default values if required by backend
-    formData.append('experience', '1');
+    formData.append('cv', form.cv);    formData.append('experience', '1');
     formData.append('skill_ids[]', '1');
 
     setErrorMsg('');
@@ -198,9 +187,7 @@ function ApplyModal({
       <div
         dir={dir}
         className="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-2xl shadow-modal animate-slide-up overflow-hidden max-h-[92vh] flex flex-col"
-      >
-        {/* Header */}
-        <div className="px-5 py-4 border-b border-gray-100 flex items-start justify-between flex-shrink-0">
+      >        <div className="px-5 py-4 border-b border-gray-100 flex items-start justify-between flex-shrink-0">
           <div>
             <h3 className="font-extrabold text-[#4A4E4A] text-base sm:text-lg">{tx.modalTitle}</h3>
             <p className="text-xs sm:text-sm text-[#6B6358] mt-0.5">
@@ -229,9 +216,7 @@ function ApplyModal({
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto flex-1">
-            {/* Name */}
-            <div>
+          <form onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto flex-1">            <div>
               <label className="form-label flex items-center gap-1.5">
                 <User size={11} /> {tx.nameLabel} <span className="text-red-500">{tx.required}</span>
               </label>
@@ -242,9 +227,7 @@ function ApplyModal({
                 onChange={e => setForm({ ...form, name: e.target.value })}
                 required
               />
-            </div>
-            {/* Email */}
-            <div>
+            </div>            <div>
               <label className="form-label flex items-center gap-1.5">
                 <Mail size={11} /> {tx.emailLabel} <span className="text-red-500">{tx.required}</span>
               </label>
@@ -257,9 +240,7 @@ function ApplyModal({
                 onChange={e => setForm({ ...form, email: e.target.value })}
                 required
               />
-            </div>
-            {/* Phone */}
-            <div>
+            </div>            <div>
               <label className="form-label flex items-center gap-1.5">
                 <Phone size={11} /> {tx.phoneLabel} <span className="text-red-500">{tx.required}</span>
               </label>
@@ -272,9 +253,7 @@ function ApplyModal({
                 onChange={e => setForm({ ...form, phone: e.target.value })}
                 required
               />
-            </div>
-            {/* CV Upload */}
-            <div>
+            </div>            <div>
               <label className="form-label flex items-center gap-1.5 mb-1.5">
                 <FileText size={11} /> {tx.cvLabel} <span className="text-red-500">{tx.required}</span>
               </label>
@@ -302,9 +281,7 @@ function ApplyModal({
                   )}
                 </div>
               </div>
-            </div>
-            {/* Cover Letter */}
-            <div>
+            </div>            <div>
               <label className="form-label flex items-center gap-1.5">
                 <FileText size={11} /> {tx.coverLabel}
               </label>
@@ -319,9 +296,7 @@ function ApplyModal({
               <div className="text-red-600 bg-red-50 p-3 rounded-lg text-xs font-semibold text-center border border-red-100">
                 {errorMsg}
               </div>
-            )}
-            {/* Submit */}
-            <button
+            )}            <button
               type="submit"
               disabled={isSubmitting}
               className="btn btn-primary w-full py-2.5 sm:py-3 flex justify-center mt-2 sm:mt-4 text-sm"
@@ -337,20 +312,14 @@ function ApplyModal({
       </div>
     </div>
   );
-}
-
-// ── Job Card ─────────────────────────────────────────────
-function JobCard({
+}function JobCard({
   job: initialJob, lang, onApply,
 }: {
   job: Job;
   lang: Lang;
   onApply: (job: Job) => void;
 }) {
-  const tx = TEXTS[lang];
-  
-  // Fetch detailed job data to get skills, experience, etc.
-  const { data: detailedJobResponse } = useQuery({
+  const tx = TEXTS[lang];  const { data: detailedJobResponse } = useQuery({
     queryKey: ['publicJobDetail', initialJob.id],
     queryFn: async () => {
       const res = await apiClient.get(`job-postings/${initialJob.id}`);
@@ -370,11 +339,7 @@ function JobCard({
           ? 'border-gray-100 hover:shadow-card-hover hover:-translate-y-0.5'
           : 'border-gray-100 opacity-70'
         }`}
-    >
-      {/* Card Body */}
-      <div className="p-4 sm:p-5 flex-1 flex flex-col">
-        {/* Header */}
-        <div className="flex justify-between items-start gap-4 mb-3 sm:mb-4">
+    >      <div className="p-4 sm:p-5 flex-1 flex flex-col">        <div className="flex justify-between items-start gap-4 mb-3 sm:mb-4">
           <div>
             <h3 className="font-extrabold text-[#4A4E4A] text-sm sm:text-base leading-tight mb-1">
               {job.job_title}
@@ -389,15 +354,9 @@ function JobCard({
               <CheckCircle2 size={10} /> {tx.available}
             </span>
           )}
-        </div>
-
-        {/* Description */}
-        <p className="text-xs sm:text-sm text-[#6B6358] leading-relaxed mb-3 line-clamp-3">
+        </div>        <p className="text-xs sm:text-sm text-[#6B6358] leading-relaxed mb-3 line-clamp-3">
           {job.description}
-        </p>
-
-        {/* Requirements */}
-        {job.skills && job.skills.length > 0 && (
+        </p>        {job.skills && job.skills.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-3 sm:mb-4">
             {job.skills.map((req: string) => (
               <span
@@ -408,10 +367,7 @@ function JobCard({
               </span>
             ))}
           </div>
-        )}
-
-        {/* Meta row */}
-        <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-[#6B6358] mt-auto">
+        )}        <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-[#6B6358] mt-auto">
           <span className={`flex items-center gap-1 border rounded-full px-2 py-0.5 text-[10px] sm:text-xs ${TYPE_COLORS[job.type || 'default'] || TYPE_COLORS.default}`}>
             <Clock size={10} /> {typeLabel || tx.typeFullTime}
           </span>
@@ -428,10 +384,7 @@ function JobCard({
           )}
         </div>
 
-      </div>
-
-      {/* Card Footer */}
-      <div className="px-4 sm:px-5 pb-4 sm:pb-5 flex items-center gap-2">
+      </div>      <div className="px-4 sm:px-5 pb-4 sm:pb-5 flex items-center gap-2">
         {job.status === 'open' ? (
           <button
             onClick={() => onApply(job)}
@@ -447,10 +400,7 @@ function JobCard({
       </div>
     </div>
   );
-}
-
-// ── Main Page ────────────────────────────────────────────
-export default function PublicJobsPage() {
+}export default function PublicJobsPage() {
   const [lang, setLang] = useState<Lang>(() => {
     const stored = localStorage.getItem('public_lang');
     return stored === 'en' ? 'en' : 'ar';
@@ -492,12 +442,8 @@ export default function PublicJobsPage() {
       dir={dir}
       className="min-h-screen"
       style={{ background: '#f1f5f9', fontFamily: tx.font }}
-    >
-      {/* ── Top Nav ─── */}
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-3">
-          {/* Brand */}
-          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+    >      <nav className="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-3">          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#4A7C59] flex items-center justify-center flex-shrink-0">
               <span className="text-white text-base sm:text-lg">🏢</span>
             </div>
@@ -505,12 +451,7 @@ export default function PublicJobsPage() {
               <p className="font-extrabold text-[#4A4E4A] text-xs sm:text-sm leading-tight truncate">{tx.brand}</p>
               <p className="text-[10px] text-[#6B6358] hidden sm:block">{tx.portal}</p>
             </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Language Toggle */}
-            <button
+          </div>          <div className="flex items-center gap-2 flex-shrink-0">            <button
               onClick={toggleLang}
               title={lang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'}
               className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-gray-200 bg-white text-xs font-semibold text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-all shadow-sm cursor-pointer duration-200 h-8 sm:h-9"
@@ -518,9 +459,7 @@ export default function PublicJobsPage() {
               <span className={lang === 'en' ? 'text-[#4A7C59] font-bold' : 'text-gray-400'}>EN</span>
               <span className="text-gray-300 font-normal">|</span>
               <span className={`font-tajawal text-[13px] leading-none ${lang === 'ar' ? 'text-[#4A7C59] font-bold' : 'text-gray-400'}`}>ع</span>
-            </button>
-            {/* Login */}
-            <a
+            </button>            <a
               href="/login"
               className="btn btn-primary text-xs gap-1.5 px-3 sm:px-5"
             >
@@ -530,15 +469,10 @@ export default function PublicJobsPage() {
             </a>
           </div>
         </div>
-      </nav>
-
-      {/* ── Hero ─── */}
-      <div
+      </nav>      <div
         className="relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #4A7C59 0%, #3a6347 50%, #2e4f38 100%)' }}
-      >
-        {/* Decorative blobs */}
-        <div
+      >        <div
           className="absolute top-0 end-0 w-48 h-48 sm:w-96 sm:h-96 rounded-full opacity-10 pointer-events-none"
           style={{ background: '#C4A66A', transform: 'translate(30%, -30%)' }}
         />
@@ -554,10 +488,7 @@ export default function PublicJobsPage() {
           </h1>
           <p className="text-white/80 text-sm sm:text-base mb-7 sm:mb-8 max-w-xl mx-auto leading-relaxed px-2">
             {tx.hero2}
-          </p>
-
-          {/* Search */}
-          <div className="relative max-w-lg mx-auto px-2 sm:px-0">
+          </p>          <div className="relative max-w-lg mx-auto px-2 sm:px-0">
             <Search
               size={16}
               className={`absolute top-1/2 -translate-y-1/2 text-[#6B6358] ${dir === 'rtl' ? 'right-5' : 'left-5'}`}
@@ -573,22 +504,13 @@ export default function PublicJobsPage() {
 
 
         </div>
-      </div>
-
-      {/* ── Content ─── */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-7 sm:py-10">
-
-        {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-5 sm:mb-6">
+      </div>      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-7 sm:py-10">        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-5 sm:mb-6">
           <div>
             <h2 className="font-extrabold text-[#4A4E4A] text-lg sm:text-xl">{tx.sectionTitle}</h2>
             <p className="text-xs sm:text-sm text-[#6B6358] mt-0.5">
               {tx.results(filtered.length, search)}
             </p>
-          </div>
-
-          {/* Filter Tabs */}
-          <div className="flex gap-1.5 bg-white border border-gray-200 p-1 rounded-xl shadow-sm self-start sm:self-auto">
+          </div>          <div className="flex gap-1.5 bg-white border border-gray-200 p-1 rounded-xl shadow-sm self-start sm:self-auto">
             {([
               { key: 'all' as const, label: tx.filterAll },
               { key: 'available' as const, label: tx.filterOpen },
@@ -606,10 +528,7 @@ export default function PublicJobsPage() {
               </button>
             ))}
           </div>
-        </div>
-
-        {/* Grid */}
-        {isLoading ? (
+        </div>        {isLoading ? (
           <div className="text-center py-16 sm:py-20 text-[#6B6358] flex flex-col items-center">
             <Loader2 size={32} className="animate-spin mb-3 text-[#4A7C59]" />
             <p>Loading jobs...</p>
@@ -632,10 +551,7 @@ export default function PublicJobsPage() {
               <JobCard key={job.id} job={job} lang={lang} onApply={setApplyJob} />
             ))}
           </div>
-        )}
-
-        {/* Footer */}
-        <div className="mt-10 sm:mt-12 text-center border-t border-gray-200 pt-6 sm:pt-8">
+        )}        <div className="mt-10 sm:mt-12 text-center border-t border-gray-200 pt-6 sm:pt-8">
           <p className="text-xs text-[#6B6358]">
             {tx.footerEmployee}{' '}
             <a href="/login" className="text-[#4A7C59] font-bold hover:underline">
@@ -644,10 +560,7 @@ export default function PublicJobsPage() {
           </p>
           <p className="text-xs text-gray-400 mt-1">{tx.footerNote}</p>
         </div>
-      </div>
-
-      {/* Apply Modal */}
-      {applyJob && (
+      </div>      {applyJob && (
         <ApplyModal job={applyJob} lang={lang} onClose={() => setApplyJob(null)} />
       )}
     </div>

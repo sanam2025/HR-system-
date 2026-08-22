@@ -1,16 +1,10 @@
-// ==============================================================
-// ManagerProfile — الملف الشخصي للمدير مع إمكانية التعديل
-// ==============================================================
 
 import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { User, Mail, Phone, Building2, Calendar, Edit2, Save, X, Camera, Loader2, BadgeCheck, MapPin, User2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
-import { getMyProfile, saveMyProfile } from '../../../api/manager';
-
-// ── helpers ──────────────────────────────────────────────────
-
+import { getMyProfile, saveMyProfile } from '../../../api/manager';
 function InfoRow({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
   return (
     <div className="flex items-start gap-3 py-3 border-b border-gray-50 last:border-0">
@@ -23,10 +17,7 @@ function InfoRow({ icon: Icon, label, value }: { icon: any; label: string; value
       </div>
     </div>
   );
-}
-
-// ── main ─────────────────────────────────────────────────────
-
+}
 export default function ManagerProfile() {
   const { lang } = useLanguage();
   const qc = useQueryClient();
@@ -41,17 +32,11 @@ export default function ManagerProfile() {
     birth_date: '', gender: '', hiring_date: '', department: '',
   });
 
-  const ar = lang === 'ar';
-
-  // ── fetch profile ──
-  const { data: profile, isLoading } = useQuery({
+  const ar = lang === 'ar';  const { data: profile, isLoading } = useQuery({
     queryKey: ['my-profile'],
     queryFn: getMyProfile,
     retry: false,
-  });
-
-  // تعبئة الفورم عند تحميل البيانات
-  useEffect(() => {
+  });  useEffect(() => {
     if (profile) {
       setForm({
         phone_number: profile.phone_number || '',
@@ -63,10 +48,7 @@ export default function ManagerProfile() {
         department: profile.department || '',
       });
     }
-  }, [profile]);
-
-  // ── mutation ──
-  const mutation = useMutation({
+  }, [profile]);  const mutation = useMutation({
     mutationFn: (fd: FormData) => saveMyProfile(profile?.id || null, fd),
     onSuccess: () => {
       toast.success(ar ? 'تم حفظ الملف الشخصي بنجاح ✅' : 'Profile saved successfully ✅');
@@ -79,10 +61,7 @@ export default function ManagerProfile() {
       const msg = err?.response?.data?.message || err?.response?.data?.error || (ar ? 'حدث خطأ أثناء الحفظ' : 'Failed to save changes');
       toast.error(msg);
     },
-  });
-
-  // ── handlers ──
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  });  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setAvatarFile(file);
@@ -118,20 +97,14 @@ export default function ManagerProfile() {
         department: profile.department || '',
       });
     }
-  };
-
-  // ── loading ──
-  if (isLoading) {
+  };  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64 text-gray-400 gap-3">
         <Loader2 size={24} className="animate-spin" />
         <span>{ar ? 'جاري التحميل...' : 'Loading...'}</span>
       </div>
     );
-  }
-
-  // ── استخراج البيانات من الـ API بالحقول الصحيحة ──
-  const displayName = profile?.user_name || (ar ? 'المدير' : 'Manager');
+  }  const displayName = profile?.user_name || (ar ? 'المدير' : 'Manager');
   const displayEmail = profile?.user_email || '';
   const displayPhone = profile?.phone_number || '';
   const displayDept = profile?.department || '';
@@ -143,11 +116,7 @@ export default function ManagerProfile() {
   const initials = displayName.charAt(0).toUpperCase();
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
-      
-
-      {/* ── Header ── */}
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 max-w-3xl mx-auto">      <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-extrabold text-dark">{ar ? 'الملف الشخصي' : 'My Profile'}</h2>
           <p className="text-sm text-brown mt-1">{ar ? 'عرض وتعديل معلوماتك الشخصية' : 'View and edit your personal information'}</p>
@@ -176,20 +145,8 @@ export default function ManagerProfile() {
             </button>
           </div>
         )}
-      </div>
-
-      {/* ── Profile Card ── */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden">
-
-        {/* Cover gradient */}
-        <div className="h-32 bg-gradient-to-r from-green/20 via-green/10 to-transparent" />
-
-        {/* Avatar + name */}
-        <div className="px-6 pb-6 -mt-24">
-          <div className="flex flex-col sm:flex-row sm:items-end gap-5">
-
-            {/* Avatar */}
-            <div className="relative flex-none w-[144px] h-[144px]">
+      </div>      <div className="bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden">        <div className="h-32 bg-gradient-to-r from-green/20 via-green/10 to-transparent" />        <div className="px-6 pb-6 -mt-24">
+          <div className="flex flex-col sm:flex-row sm:items-end gap-5">            <div className="relative flex-none w-[144px] h-[144px]">
               {displayPicture ? (
                 <img 
                   src={displayPicture} 
@@ -213,10 +170,7 @@ export default function ManagerProfile() {
                   <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
                 </>
               )}
-            </div>
-
-            {/* Name + role */}
-            <div className="flex-1 pb-1">
+            </div>            <div className="flex-1 pb-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-xl font-extrabold text-dark">{displayName}</h3>
                 <span className="flex items-center gap-1 text-xs bg-green/10 text-green px-2.5 py-0.5 rounded-full font-semibold">
@@ -231,10 +185,7 @@ export default function ManagerProfile() {
                 </p>
               )}
             </div>
-          </div>
-
-          {/* Bio */}
-          {editing ? (
+          </div>          {editing ? (
             <div className="mt-4">
               <label className="form-label">{ar ? 'نبذة شخصية' : 'Bio'}</label>
               <textarea
@@ -252,19 +203,14 @@ export default function ManagerProfile() {
             )
           )}
         </div>
-      </div>
-
-      {/* ── Info Section ── */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-6">
+      </div>      <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-6">
         <h4 className="font-bold text-dark mb-4 flex items-center gap-2">
           <User size={16} className="text-green" />
           {ar ? 'المعلومات الشخصية' : 'Personal Information'}
         </h4>
 
         {editing ? (
-          <div className="space-y-4">
-            {/* Email — read only */}
-            <div>
+          <div className="space-y-4">            <div>
               <label className="form-label">{ar ? 'البريد الإلكتروني' : 'Email'}</label>
               <input className="form-input bg-gray-50 cursor-not-allowed" value={displayEmail} disabled />
               <p className="text-xs text-gray-400 mt-1">{ar ? 'لا يمكن تغيير البريد الإلكتروني' : 'Email cannot be changed'}</p>
@@ -314,10 +260,7 @@ export default function ManagerProfile() {
             <InfoRow icon={MapPin} label={ar ? 'العنوان' : 'Address'} value={displayAddr} />
           </div>
         )}
-      </div>
-
-      {/* ── Image Modal ── */}
-      {isImageModalOpen && displayPicture && (
+      </div>      {isImageModalOpen && displayPicture && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
           onClick={() => setIsImageModalOpen(false)}

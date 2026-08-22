@@ -34,8 +34,6 @@ export default function TerminationTable({ role }: TerminationTableProps) {
     queryFn: () => terminationApi.getTermination(detailsId!),
     enabled: !!detailsId
   });
-
-  // Fetch queries
   const { data: allRequests = [], isLoading: isLoadingAll } = useQuery({
     queryKey: ['terminationRequests'],
     queryFn: terminationApi.getTerminationRequests
@@ -59,8 +57,6 @@ export default function TerminationTable({ role }: TerminationTableProps) {
     },
     enabled: role !== 'admin'
   });
-
-  // Mutations
   const createMutation = useMutation({
     mutationFn: terminationApi.storeTerminationRequest,
     onSuccess: () => {
@@ -153,9 +149,6 @@ export default function TerminationTable({ role }: TerminationTableProps) {
 
   return (
     <div className="space-y-6" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      
-
-      {/* Header */}
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -174,8 +167,6 @@ export default function TerminationTable({ role }: TerminationTableProps) {
           </button>
         )}
       </div>
-
-      {/* Toolbar */}
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex bg-gray-50 p-1 rounded-xl w-full md:w-auto">
           <button
@@ -209,8 +200,6 @@ export default function TerminationTable({ role }: TerminationTableProps) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
         </div>
       </div>
-
-      {/* Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
@@ -335,7 +324,6 @@ export default function TerminationTable({ role }: TerminationTableProps) {
                           {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                         </td>
                       </tr>
-                      {/* Expanded Row for Approval Progress */}
                       {isExpanded && req.approvals && req.approvals.length > 0 && (
                         <tr className="bg-gray-50/30">
                           <td colSpan={7} className="px-6 py-6 border-b border-gray-100">
@@ -400,8 +388,6 @@ export default function TerminationTable({ role }: TerminationTableProps) {
           employees={employees}
         />
       )}
-
-      {/* Action Modal (Approve/Reject/Delete) */}
       {actionModal.isOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl p-6" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
@@ -450,8 +436,6 @@ export default function TerminationTable({ role }: TerminationTableProps) {
           </div>
         </div>
       )}
-
-      {/* Details Modal */}
       {detailsId && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
@@ -475,7 +459,6 @@ export default function TerminationTable({ role }: TerminationTableProps) {
                 </div>
               ) : terminationDetails ? (
                 <div className="space-y-6">
-                  {/* Basic Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                       <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">{tr.columns.employee}</p>
@@ -497,8 +480,6 @@ export default function TerminationTable({ role }: TerminationTableProps) {
                       <p className="font-medium text-gray-900">{(tr.subtypes as any)[terminationDetails.subtype as keyof typeof tr.subtypes] || terminationDetails.subtype}</p>
                     </div>
                   </div>
-
-                  {/* Reasons & Docs */}
                   {terminationDetails.legal_reason && (
                     <div>
                       <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">

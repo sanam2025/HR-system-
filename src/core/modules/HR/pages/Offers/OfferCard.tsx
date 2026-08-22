@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Offers/OfferCard.tsx
 import type { Offer } from '../../../../../api/service/HrService/OfferService';
 import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
 

@@ -1,6 +1,4 @@
-const en = {
-  // ── Navigation ─
-  nav: {
+const en = {  nav: {
     dashboard: 'Dashboard',
     employees: 'Employees',
     tasks: 'Tasks',
@@ -12,18 +10,12 @@ const en = {
     interviews: 'Interviews',
     announcements: 'Announcements',
     mainMenu: 'Main Menu',
-  },
-
-  // ── Common ──
-  common: {
+  },  common: {
     viewAll: 'View All',
     days: 'Days',
     approve: 'Approve',
     reject: 'Reject',
-  },
-
-  // ── Dashboard ──
-  dashboard: {
+  },  dashboard: {
     totalEmployees: 'Total Employees',
     presentToday: 'Present Today',
     avgPerformance: 'Avg Performance',
@@ -43,10 +35,7 @@ const en = {
     pendingOvertime: 'Pending Overtime',
     completedTasks: 'Completed Tasks',
     presentEmployees: 'Present Employees'
-  },
-
-  // ── Announcements ──
-  announcements: {
+  },  announcements: {
     title: 'Announcements Management',
     subtitle: 'Create and track announcements for your department',
     createNew: 'Create Announcement',
@@ -112,19 +101,13 @@ const en = {
       active: 'Active',
       expired: 'Expired',
     }
-  },
-
-  // ── Sidebar / Topbar ─
-  layout: {
+  },  layout: {
     systemName: 'Masar HR',
     university: 'University of Damascus',
     managerRole: 'Department Manager',
     userName: 'Ahmad Front',
     userAvatar: 'A',
-  },
-
-  // ── Tasks ──
-  tasks: {
+  },  tasks: {
     boardTitle: 'Tasks Board',
     activeTasks: 'total tasks',
     newTask: 'New Task',
@@ -173,10 +156,7 @@ const en = {
       medium: 'Medium',
       low: 'Low'
     }
-  },
-
-  // ── Employees ──
-  employees: {
+  },  employees: {
     listTitle: 'Employee List',
     employeesCount: 'employees',
     searchPlaceholder: 'Search for an employee...',
@@ -191,10 +171,7 @@ const en = {
     tryChanging: 'Try changing the search query or filter',
     tasks: 'Tasks',
     leaves: 'Leaves'
-  },
-
-  // ── Employee Profile ──
-  employeeProfile: {
+  },  employeeProfile: {
     notFound: 'Employee not found',
     back: 'Back',
     backToList: 'Back to List',
@@ -212,10 +189,7 @@ const en = {
     checkOut: '— Check-Out:',
     delay: 'Delay',
     mins: 'mins'
-  },
-
-  // ── Leaves ──
-  leaves: {
+  },  leaves: {
     title: 'Leaves',
     pendingReview: 'pending requests awaiting your review',
     pendingAttention: 'pending requests need attention',
@@ -285,10 +259,7 @@ const en = {
       approved: 'Request approved successfully',
       rejected: 'Request rejected successfully'
     }
-  },
-
-  // ── Overtime ──
-  overtime: {
+  },  overtime: {
     title: 'Overtime Requests',
     subtitle: 'pending requests',
     pendingRequests: 'pending requests',
@@ -326,10 +297,7 @@ const en = {
       approved: 'Request approved successfully',
       rejected: 'Request rejected successfully'
     }
-  },
-
-  // ── Attendance ──
-  attendance: {
+  },  attendance: {
     title: 'Attendance Overview',
     subtitle: 'Track employee attendance records',
     stats: {
@@ -364,10 +332,7 @@ const en = {
     },
     noRecords: 'No attendance records found',
     min: 'min'
-  },
-
-  // ── Evaluation ──
-  evaluation: {
+  },  evaluation: {
     title: 'Periodic Evaluation',
     subtitle: 'Comprehensive evaluation of performance, attendance, and behavior',
     errorIncomplete: 'Please fill in all fields and rate all criteria',
@@ -395,10 +360,7 @@ const en = {
       notesPlaceholder: 'Add your detailed notes about the employee\'s performance...',
       submit: 'Submit Evaluation to HR'
     }
-  },
-
-  // ── Recruitment ──
-  recruitment: {
+  },  recruitment: {
     title: 'Recruitment & Candidates',
     subtitle: 'Manage job vacancies and evaluate candidates',
     tabVacancy: 'Job Vacancy Request',

@@ -1,10 +1,7 @@
 import React from 'react';
 import { SuspenseWrapper } from './SuspenseWrapper';
 import AdminLayout from "../shared/layouts/AdminLayout";
-import { ProtectedRoute } from './ProtectedRoute';
-
-// ── Admin pages (new AdminBranch structure) ──
-const DashboardAdmin = React.lazy(() => import('@/core/modules/admin/pages/Dashboard/Dashboard'));
+import { ProtectedRoute } from './ProtectedRoute';const DashboardAdmin = React.lazy(() => import('@/core/modules/admin/pages/Dashboard/Dashboard'));
 const SystemSettings = React.lazy(() => import('@/core/modules/admin/pages/settings/SystemSettings'));
 const AdminAnnouncements = React.lazy(() => import('@/core/modules/admin/pages/Announcements/Announcements'));
 const OrganizationlStructure = React.lazy(() => import('@/core/modules/admin/pages/Organization/OrganizationlStructure'));

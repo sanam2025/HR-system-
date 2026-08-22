@@ -1,10 +1,6 @@
-// src/core/modules/HR/hooks/useInterviews.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { InterviewsService } from '../../../../api/service/HrService/InterviewsService';
-
-//  بدون interviewed_by (يتم تعيينه تلقائياً من السيرفر)
-interface ScheduleData {
+import { InterviewsService } from '../../../../api/service/HrService/InterviewsService';interface ScheduleData {
   candidate_id: number;
   scheduled_at: string;
   location_type: string;

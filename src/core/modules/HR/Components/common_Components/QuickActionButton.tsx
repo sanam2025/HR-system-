@@ -1,4 +1,3 @@
-// core/modules/HR/components/QuickActionButton.tsx
 import React from "react";
 import { ChevronLeft } from "lucide-react";
 

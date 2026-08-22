@@ -18,9 +18,6 @@ export async function listTasks(
     });
     return unwrapPaginated<Task>(response);
   } catch (error) {
-    // Same "empty list comes back as 404" backend quirk confirmed on
-    // my-payslips (see getListOrEmpty in lib/http/client.ts) — apply the
-    // same tolerance here so a user with zero tasks doesn't see an error.
     if (ApiError.from(error).kind === "not_found") return EMPTY_PAGE;
     throw error;
   }

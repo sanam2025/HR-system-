@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/JobPostings/JobPostingsFilters.tsx
 import { Search, RefreshCw } from "lucide-react";
 import { useLanguage } from '../../../../../i18n/translations/LanguageContext';
 

@@ -1,4 +1,3 @@
-// src/api/Types/CandidatesService.types.ts
 import type { APIResponseWithData, APIResponseWithDataArray } from "./types.types";
 
 export type CandidateStatus = 'pending' | 'reviewed' | 'interview' | 'accepted' | 'rejected';

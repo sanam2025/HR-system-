@@ -1,4 +1,3 @@
-// core/modules/HR/Components/Special_Components/TerminationRequestRow.tsx
 import React from "react";
 import { Eye, FileText, CheckCircle } from "lucide-react";
 import type { TerminationRequest } from "../../types/termination.types";

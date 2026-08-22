@@ -26,10 +26,7 @@ export default function AppLayout({
   const location = useLocation();
   const { dir } = useLanguage();
   const currentUser = useAuthStore(state => state.currentUser);
-  const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth > 1024);
-
-  // Close sidebar automatically on route change on mobile
-  useEffect(() => {
+  const [sidebarOpen, setSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth > 1024);  useEffect(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       setSidebarOpen(false);
     }

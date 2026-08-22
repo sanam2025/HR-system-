@@ -1,14 +1,10 @@
-// core/modules/HR/pages/Contracts.tsx
 import React, { useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { Plus } from "lucide-react";
 import ContractTableRow from "../Components/Special_Components/ContractTableRow";
 import ContractFormModal from "../Components/Special_Components/ContractFormModal";
 import ContractRenewalModal from "../Components/Special_Components/ContractRenewalModal";
-import type { EmployeeContract } from "../types/contract.types";
-
-// ============= DATA =============
-const INITIAL_CONTRACTS: EmployeeContract[] = [
+import type { EmployeeContract } from "../types/contract.types";const INITIAL_CONTRACTS: EmployeeContract[] = [
   {
     id: "1",
     employeeId: "EMP001",
@@ -68,10 +64,7 @@ const COLUMNS_KEYS = [
   { key: "salary", label: "Salary" },
   { key: "status", label: "Status" },
   { key: "actions", label: "Actions" },
-];
-
-// ============= Types =============
-interface CreateContractData {
+];interface CreateContractData {
   contractNumber: string;
   startDate: string;
   endDate: string;
@@ -93,10 +86,7 @@ interface RenewalData {
   newEndDate: string;
   newSalary?: number;
   renewalReason: string;
-}
-
-// ============= MAIN =============
-export default function Contracts() {
+}export default function Contracts() {
   const { t } = useTranslation();
   const [contracts, setContracts] =
     useState<EmployeeContract[]>(INITIAL_CONTRACTS);
@@ -193,10 +183,7 @@ export default function Contracts() {
         >
           <Plus className="w-4 h-4" /> {t('newContract') || 'New Contract'}
         </button>
-      </div>
-
-      {/* Contracts Table - بدون border نهائياً */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      </div>      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">

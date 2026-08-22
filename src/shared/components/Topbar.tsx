@@ -34,15 +34,9 @@ export default function Topbar({
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(query), 300);
     return () => clearTimeout(timer);
-  }, [query]);
-
-  // Notifications state
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  }, [query]);  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [activeMobileNotif, setActiveMobileNotif] = useState<any | null>(null);
-  const [dismissedNotifIds, setDismissedNotifIds] = useState<string[]>([]);
-
-  // Persist viewed notifications to localStorage to ensure they don't repeat
-  const [viewedNotifIds, setViewedNotifIds] = useState<string[]>(() => {
+  const [dismissedNotifIds, setDismissedNotifIds] = useState<string[]>([]);  const [viewedNotifIds, setViewedNotifIds] = useState<string[]>(() => {
     try {
       const stored = localStorage.getItem('viewedNotifIds');
       return stored ? JSON.parse(stored) : [];
@@ -70,10 +64,7 @@ export default function Topbar({
     const isBackendRead = n.is_read || n.read_at;
     const isLocalRead = viewedNotifIds.includes(String(n.id));
     return !isBackendRead && !isLocalRead;
-  }).length;
-
-  // Mark notifications as read when dropdown opens
-  useEffect(() => {
+  }).length;  useEffect(() => {
     if (notificationsOpen) {
       const idsToMark = displayNotifications
         .filter((n: any) => !(n.is_read || n.read_at))
@@ -95,19 +86,14 @@ export default function Topbar({
         queryClient.invalidateQueries({ queryKey: ['notifications'] });
       }
     }
-  }, [notificationsOpen, displayNotifications, viewedNotifIds, queryClient]);
-
-  // Trigger mobile notification popups when unread notifications exist
-  useEffect(() => {
+  }, [notificationsOpen, displayNotifications, viewedNotifIds, queryClient]);  useEffect(() => {
     const unreadLocal = displayNotifications.filter((n: any) => {
       const isBackendRead = n.is_read || n.read_at;
       const isLocalRead = viewedNotifIds.includes(String(n.id));
       return !isBackendRead && !isLocalRead;
     });
     
-    if (unreadLocal.length > 0) {
-      // Find the first unread notification that hasn't been dismissed
-      const toShow = unreadLocal.find((n: any) => !dismissedNotifIds.includes(n.id));
+    if (unreadLocal.length > 0) {      const toShow = unreadLocal.find((n: any) => !dismissedNotifIds.includes(n.id));
       setActiveMobileNotif(toShow || null);
     } else {
       setActiveMobileNotif(null);
@@ -128,9 +114,7 @@ export default function Topbar({
 
   const getNotificationRoute = (n: any): string => {
     const text = `${n.type || ''} ${n.title || ''} ${n.message || ''} ${n.data?.type || ''} ${n.data?.message || ''}`.toLowerCase();
-    let basePath = window.location.pathname.split('/')[1] || 'manager';
-    // ensure case matching if needed
-    if (basePath.toLowerCase() === 'hr') basePath = 'Hr';
+    let basePath = window.location.pathname.split('/')[1] || 'manager';    if (basePath.toLowerCase() === 'hr') basePath = 'Hr';
 
     if (text.includes('leave') || text.includes('إجازة') || text.includes('مغادرة')) {
       if (basePath === 'employee') return '/employee/attendance';
@@ -174,10 +158,7 @@ export default function Topbar({
     dismissMobileNotif(n.id);
     const targetPath = getNotificationRoute(n);
     navigate(targetPath);
-  };
-
-  // ── Check-in state: local + API-backed init (3-state logic for 1 check per day) ──
-  const [attendanceStatus, setAttendanceStatus] = useState<'not_checked_in' | 'checked_in' | 'completed'>(() => {
+  };  const [attendanceStatus, setAttendanceStatus] = useState<'not_checked_in' | 'checked_in' | 'completed'>(() => {
     const savedDate = localStorage.getItem('attendanceStatusDate');
     const todayStr = new Date().toISOString().split('T')[0];
     if (savedDate === todayStr) {
@@ -192,24 +173,15 @@ export default function Topbar({
     const todayStr = new Date().toISOString().split('T')[0];
     setAttendanceStatus(status);
     localStorage.setItem('attendanceStatus', status);
-    localStorage.setItem('attendanceStatusDate', todayStr);
-    // keep legacy isCheckedIn synced
-    localStorage.setItem('isCheckedIn', status === 'checked_in' ? 'true' : 'false');
-  };
-
-  // Initialize from API on mount (source of truth)
-  useEffect(() => {
+    localStorage.setItem('attendanceStatusDate', todayStr);    localStorage.setItem('isCheckedIn', status === 'checked_in' ? 'true' : 'false');
+  };  useEffect(() => {
     getMyMonthlyAttendance().then((data: any[]) => {
       if (!Array.isArray(data)) return;
       const todayStr = new Date().toISOString().split('T')[0];
       const todayRec = data.find((r: any) =>
         (r.date || r.check_date || r.created_at?.split('T')[0]) === todayStr
       );
-      if (!todayRec) {
-        // Do not overwrite with 'not_checked_in' if it's missing, because 
-        // localStorage already correctly handles the daily reset.
-        // The API might be cached or missing the record temporarily.
-        return;
+      if (!todayRec) {        return;
       }
       if (todayRec.check_in && todayRec.check_out) {
         updateAttendanceState('completed');
@@ -248,19 +220,13 @@ export default function Topbar({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
-  const notifRef = useRef<HTMLDivElement>(null);
-
-  // Close on Escape
-  useEffect(() => {
+  const notifRef = useRef<HTMLDivElement>(null);  useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') { closeSearch(); setProfileOpen(false); setNotificationsOpen(false); }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, []);
-
-  // Close profile and notif dropdowns on outside click
-  useEffect(() => {
+  }, []);  useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
         setProfileOpen(false);
@@ -271,10 +237,7 @@ export default function Topbar({
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  // Focus input when opened
-  useEffect(() => {
+  }, []);  useEffect(() => {
     if (searchOpen) setTimeout(() => inputRef.current?.focus(), 50);
   }, [searchOpen]);
 
@@ -316,9 +279,7 @@ export default function Topbar({
 
   return (
     <>
-      <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-[60]">
-        {/* Left section: Hamburger & Title */}
-        <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+      <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-[60]">        <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
           <button
             onClick={onToggleSidebar}
             className="p-2 flex-shrink-0 rounded-xl hover:bg-gray-50 transition-colors text-dark/60 hover:text-dark"
@@ -326,21 +287,13 @@ export default function Topbar({
             <Menu size={20} />
           </button>
           <h1 className="text-base sm:text-lg font-bold text-dark truncate min-w-0 flex-shrink pr-2">{title}</h1>
-        </div>
-
-        {/* Right section: Search, Language, Avatar */}
-        <div className="flex items-center gap-1.5 sm:gap-4 flex-shrink-0">
-          {/* Search button */}
-          <button
+        </div>        <div className="flex items-center gap-1.5 sm:gap-4 flex-shrink-0">          <button
             onClick={openSearch}
             className="p-2 rounded-full hover:bg-green/10 text-gray-400 hover:text-green transition-all duration-200"
             title={lang === 'ar' ? 'بحث' : 'Search'}
           >
             <Search size={18} />
-          </button>
-
-          {/* Public Jobs Link */}
-          <a
+          </button>          <a
             href="/careers"
             target="_blank"
             rel="noopener noreferrer"
@@ -349,10 +302,7 @@ export default function Topbar({
           >
             <Briefcase size={14} />
             <span className="hidden sm:inline">{lang === 'ar' ? 'الوظائف' : 'Careers'}</span>
-          </a>
-
-          {/* Check-in / Check-out Buttons (1 per day logic) */}
-          <div className="flex items-center gap-2">
+          </a>          <div className="flex items-center gap-2">
             {attendanceStatus === 'not_checked_in' && (
               <button
                 onClick={async () => {
@@ -441,10 +391,7 @@ export default function Topbar({
                 <span className="hidden sm:inline">{lang === 'ar' ? 'اكتمل اليوم' : 'Day Completed'}</span>
               </button>
             )}
-          </div>
-
-          {/* Language Switcher Pill */}
-          <button
+          </div>          <button
             onClick={toggleLang}
             title={lang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'}
             className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-gray-200 bg-white text-xs font-semibold text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-all shadow-sm cursor-pointer duration-200"
@@ -452,10 +399,7 @@ export default function Topbar({
             <span className={lang === 'en' ? 'text-green-700 font-bold' : 'text-gray-400'}>EN</span>
             <span className="text-gray-300 font-normal">|</span>
             <span className={`text-[13px] leading-none ${lang === 'ar' ? 'text-green-700 font-bold' : 'text-gray-400'}`}>ع</span>
-          </button>
-
-          {/* Notifications Dropdown */}
-          {hasNotifications && (
+          </button>          {hasNotifications && (
             <div className="relative" ref={notifRef}>
               <button
                 onClick={() => setNotificationsOpen(p => !p)}
@@ -491,10 +435,7 @@ export default function Topbar({
                         {displayNotifications.map((n: any) => {
                           const isBackendRead = n.is_read || n.read_at;
                           const isLocalRead = viewedNotifIds.includes(String(n.id));
-                          const isUnread = !isBackendRead && !isLocalRead;
-
-                          // استخراج النص حسب نوع الإشعار
-                          let title = n.title || n.message || n.body || n.content || (lang === 'ar' ? 'إشعار نظام' : 'System Notification');
+                          const isUnread = !isBackendRead && !isLocalRead;                          let title = n.title || n.message || n.body || n.content || (lang === 'ar' ? 'إشعار نظام' : 'System Notification');
                           let subtitle = '';
                           let extraInfo = '';
                           let icon = '🔔';
@@ -522,9 +463,7 @@ export default function Topbar({
                               key={n.id}
                               onClick={() => handleNotificationClick(n)}
                               className={`p-4 border-b border-gray-50 cursor-pointer transition-colors hover:bg-gray-50 flex gap-3 ${isUnread ? 'bg-blue-50/30' : ''}`}
-                            >
-                              {/* أيقونة نوع الإشعار */}
-                              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-base">
+                            >                              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-base">
                                 {icon}
                               </div>
                               <div className="flex-1 min-w-0">
@@ -545,10 +484,7 @@ export default function Topbar({
                 </div>
               )}
             </div>
-          )}
-
-          {/* User Avatar + Dropdown */}
-          <div className="relative" ref={profileRef}>
+          )}          <div className="relative" ref={profileRef}>
             <button
               onClick={() => setProfileOpen(p => !p)}
               className="w-8 h-8 rounded-full bg-[#3d7055] hover:bg-[#2d5440] flex items-center justify-center text-white font-bold text-sm cursor-pointer transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-green/20"
@@ -559,9 +495,7 @@ export default function Topbar({
             {profileOpen && (
               <div
                 className="absolute end-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-[300] animate-slide-down"
-              >
-                {/* User Info */}
-                <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
+              >                <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-[#3d7055] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                       {user.avatar}
@@ -571,10 +505,7 @@ export default function Topbar({
                       <p className="text-[11px] text-gray-400 truncate">{user.role || (lang === 'ar' ? 'مستخدم' : 'User')}</p>
                     </div>
                   </div>
-                </div>
-
-                {/* Menu Items */}
-                <div className="py-1.5">
+                </div>                <div className="py-1.5">
                   <button
                     onClick={() => {
                       const basePath = window.location.pathname.split('/')[1] || 'admin';
@@ -601,10 +532,7 @@ export default function Topbar({
             )}
           </div>
         </div>
-      </header>
-
-      {/* Search Overlay */}
-      {searchOpen && (
+      </header>      {searchOpen && (
         <div
           className="fixed inset-0 z-[200] flex items-start justify-center pt-24"
           style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(4px)' }}
@@ -613,9 +541,7 @@ export default function Topbar({
           <div
             className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-slide-down"
             onClick={e => e.stopPropagation()}
-          >
-            {/* Search Input */}
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
+          >            <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
               <Search size={18} className="text-green flex-shrink-0" />
               <input
                 ref={inputRef}
@@ -629,13 +555,7 @@ export default function Topbar({
               <button onClick={closeSearch} className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
                 <X size={16} />
               </button>
-            </div>
-
-            {/* Results */}
-            <div className="max-h-96 overflow-y-auto py-2">
-
-              {/* Pages */}
-              {matchedPages.length > 0 && (
+            </div>            <div className="max-h-96 overflow-y-auto py-2">              {matchedPages.length > 0 && (
                 <div>
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-4 py-2">
                     {lang === 'ar' ? 'الصفحات' : 'Pages'}
@@ -655,10 +575,7 @@ export default function Topbar({
                     </button>
                   ))}
                 </div>
-              )}
-
-              {/* Employees */}
-              {isSearchLoading ? (
+              )}              {isSearchLoading ? (
                 <div className="py-6 flex justify-center"><div className="w-6 h-6 border-2 border-green border-t-transparent rounded-full animate-spin"></div></div>
               ) : matchedEmployees.length > 0 ? (
                 <div className="mt-1">
@@ -685,27 +602,18 @@ export default function Topbar({
                     </button>
                   ))}
                 </div>
-              ) : null}
-
-              {/* No results */}
-              {matchedPages.length === 0 && matchedEmployees.length === 0 && (
+              ) : null}              {matchedPages.length === 0 && matchedEmployees.length === 0 && (
                 <div className="py-10 text-center text-gray-400 text-sm">
                   {lang === 'ar' ? 'لا توجد نتائج' : 'No results found'}
                 </div>
               )}
-            </div>
-
-            {/* Footer hint */}
-            <div className="px-4 py-2.5 border-t border-gray-50 flex items-center gap-2">
+            </div>            <div className="px-4 py-2.5 border-t border-gray-50 flex items-center gap-2">
               <kbd className="text-[10px] bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded font-mono">ESC</kbd>
               <span className="text-[10px] text-gray-400">{lang === 'ar' ? 'للإغلاق' : 'to close'}</span>
             </div>
           </div>
         </div>
-      )}
-
-      {/* Mobile Push Notification Popup Banner */}
-      {activeMobileNotif && (
+      )}      {activeMobileNotif && (
         <div className="fixed top-4 start-4 sm:start-auto end-4 z-[9999] max-w-sm w-[92%] sm:w-84 bg-white/95 backdrop-blur-md border border-gray-100/80 rounded-2xl shadow-[0_12px_35px_rgba(0,0,0,0.15)] p-4 transition-all duration-300 animate-slide-down">
           <div className="flex items-start gap-3">
             <div

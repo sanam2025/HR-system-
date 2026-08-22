@@ -1,4 +1,3 @@
-// src/shared/components/LanguageSwitcher.tsx
 import { Globe } from 'lucide-react';
 import { useLanguage } from '../../i18n/translations/LanguageContext';
 

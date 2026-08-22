@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Attendance/Attendance.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, Users } from 'lucide-react';
@@ -15,42 +14,24 @@ export const Attendance = () => {
   const navigate = useNavigate();
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
-  const [isFiltered, setIsFiltered] = useState(false);
-
-  //  جلب حضور اليوم
-  const { records: todayRecords, isLoading: todayLoading, refetch: refetchToday } = useTodayAttendance();
-
-  //  جلب تحليل الحضور
-  const { stats, isLoading: analysisLoading, refetch: refetchAnalysis } = useAttendanceAnalysis();
-
-  //  جلب الحضور المفلتر
-  const { records: filteredRecords, isLoading: filterLoading, refetch: refetchFiltered } = useFilteredAttendance(
+  const [isFiltered, setIsFiltered] = useState(false);  const { records: todayRecords, isLoading: todayLoading, refetch: refetchToday } = useTodayAttendance();  const { stats, isLoading: analysisLoading, refetch: refetchAnalysis } = useAttendanceAnalysis();  const { records: filteredRecords, isLoading: filterLoading, refetch: refetchFiltered } = useFilteredAttendance(
     fromDate,
     toDate
-  );
-
-  //  معالج الفلترة
-  const handleFilter = () => {
+  );  const handleFilter = () => {
     if (!fromDate || !toDate) {
       toast.error(t.hrAttendance?.requireDatesMsg || 'Please select both from and to dates');
       return;
     }
     setIsFiltered(true);
     refetchFiltered();
-  };
-
-  //  معالج التحديث
-  const handleRefresh = () => {
+  };  const handleRefresh = () => {
     refetchToday();
     refetchAnalysis();
     setIsFiltered(false);
     setFromDate('');
     setToDate('');
     toast.success(t.hrAttendance?.refreshedMsg || 'Refreshed');
-  };
-
-  //  عرض البيانات
-  const records = isFiltered ? filteredRecords : todayRecords;
+  };  const records = isFiltered ? filteredRecords : todayRecords;
 
   const isLoading = todayLoading || analysisLoading || filterLoading;
 
@@ -63,9 +44,7 @@ export const Attendance = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <button
             onClick={() => navigate('/Hr')}
@@ -84,23 +63,14 @@ export const Attendance = () => {
           <RefreshCw className="w-4 h-4" />
           {t.hrAttendance?.refresh || 'Refresh'}
         </button>
-      </div>
-
-      {/* Stats */}
-      <AttendanceStats stats={stats} />
-
-      {/* Filters */}
-      <AttendanceFilters
+      </div>      <AttendanceStats stats={stats} />      <AttendanceFilters
         fromDate={fromDate}
         setFromDate={setFromDate}
         toDate={toDate}
         setToDate={setToDate}
         onFilter={handleFilter}
         isLoading={filterLoading}
-      />
-
-      {/* Records Table */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      />      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
           <h3 className="text-lg font-semibold text-gray-800">
             {t.hrAttendance?.recordsTitle || 'Attendance Records'} ({records.length})

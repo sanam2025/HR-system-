@@ -1,20 +1,14 @@
-// src/core/modules/HR/hooks/useOvertime.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { OvertimeService } from '../../../../api/service/HrService/OvertimeService';
-import { AxiosError } from 'axios';
-
-// --- Queries ---
-export const useMandatoryOvertime = () => {
+import { AxiosError } from 'axios';export const useMandatoryOvertime = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['mandatory-overtime'],
     queryFn: async () => {
       const res = await OvertimeService.getMandatory();
       return res.data?.data || [];
     },
-  });
-  //  نضمن أن البيانات دائماً مصفوفة
-  return { requests: data || [], isLoading, error: error?.message, refetch };
+  });  return { requests: data || [], isLoading, error: error?.message, refetch };
 };
 
 export const useVoluntaryOvertime = () => {
@@ -24,9 +18,7 @@ export const useVoluntaryOvertime = () => {
       const res = await OvertimeService.getVoluntary();
       return res.data?.data || [];
     },
-  });
-  //  نضمن أن البيانات دائماً مصفوفة
-  return { requests: data || [], isLoading, error: error?.message, refetch };
+  });  return { requests: data || [], isLoading, error: error?.message, refetch };
 };
 
 export const useDepartmentOvertime = () => {
@@ -36,9 +28,7 @@ export const useDepartmentOvertime = () => {
       const res = await OvertimeService.getDepartmentOvertime();
       return res.data?.data || [];
     },
-  });
-  //  نضمن أن البيانات دائماً مصفوفة
-  return { requests: data || [], isLoading, error: error?.message, refetch };
+  });  return { requests: data || [], isLoading, error: error?.message, refetch };
 };
 
 export const useOvertimeDetails = (id: number) => {
@@ -51,10 +41,7 @@ export const useOvertimeDetails = (id: number) => {
     enabled: !!id,
   });
   return { request: data, isLoading, error: error?.message, refetch };
-};
-
-// --- Mutations ---
-export const useApproveMandatoryOvertime = () => {
+};export const useApproveMandatoryOvertime = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => OvertimeService.approveMandatory(id),

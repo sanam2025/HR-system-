@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/JobPostings/JobPostingDetail.tsx
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Users, Calendar, X } from 'lucide-react';
 import { useJobPosting } from '../../hooks/useJobPostings';
@@ -166,10 +165,7 @@ export default function JobPostingDetail() {
             </tbody>
           </table>
         )}
-      </div>
-
-      {/*  الفورم المحسن */}
-      {showScheduleForm && (
+      </div>      {showScheduleForm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-4">

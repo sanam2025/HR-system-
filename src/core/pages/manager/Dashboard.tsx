@@ -15,10 +15,7 @@ import {
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
 import type { LucideIcon } from 'lucide-react';
 import { TASK_STATUS_COLORS, TASK_STATUS_EN, CHART_MONTHS_EN } from '../../constants';
-import ActiveAnnouncements from '../Announcements/components/ActiveAnnouncements';
-
-// ── Sub-components ──
-
+import ActiveAnnouncements from '../Announcements/components/ActiveAnnouncements';
 interface StatCardProps {
   icon: LucideIcon;
   label: string;
@@ -41,62 +38,35 @@ function StatCard({ icon: Icon, label, value, sub, iconBg, iconColor }: StatCard
       </div>
     </div>
   );
-}
-
-// ── Page ──
-
+}
 export default function Dashboard() {
   const navigate = useNavigate();
   const { t, isRTL, lang } = useLanguage();
   const d = t.dashboard;
-  const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
-
-  // 1. Users count (GET users/count)
-  const { data: usersCountData } = useQuery({
+  const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;  const { data: usersCountData } = useQuery({
     queryKey: ['users-count'],
     queryFn: getUsersCount,
-  });
-
-  // 2. Attendance Analysis Today (GET attendance-today-analysis)
-  const { data: attendanceAnalysisData } = useQuery({
+  });  const { data: attendanceAnalysisData } = useQuery({
     queryKey: ['attendance-today-analysis'],
     queryFn: getAttendanceTodayAnalysis,
-  });
-
-  // 3. Department Performance (GET department/performance)
-  const { data: deptPerformanceData } = useQuery({
+  });  const { data: deptPerformanceData } = useQuery({
     queryKey: ['department-performance'],
     queryFn: getDepartmentPerformance,
-  });
-
-  // 4. Completed Tasks This Month (GET counttasks/completed-count-this-month)
-  const { data: completedTasksData } = useQuery({
+  });  const { data: completedTasksData } = useQuery({
     queryKey: ['completed-tasks-count'],
     queryFn: getCompletedTasksCountThisMonth,
     retry: false,          // الـ endpoint غير موجود بعد — لا تعيد المحاولة
     throwOnError: false,   // لا تُظهر خطأ في الواجهة
-  });
-
-  // 5. Tasks (GET tasks)
-  const { data: rawTasks = [], isLoading: loadingTasks } = useQuery({
+  });  const { data: rawTasks = [], isLoading: loadingTasks } = useQuery({
     queryKey: ['manager-tasks'],
     queryFn: getTasks,
-  });
-
-  // 6. Pending Leaves (GET department-leave-request)
-  const { data: rawLeaves = [], isLoading: loadingLeaves } = useQuery({
+  });  const { data: rawLeaves = [], isLoading: loadingLeaves } = useQuery({
     queryKey: ['department-pending-leaves'],
     queryFn: () => getDepartmentLeaveRequests() // Fetch all to filter locally safely
-  });
-
-  // 7. Department Overtime Requests (GET my-department-overtime)
-  const { data: rawOvertimes = [] } = useQuery({
+  });  const { data: rawOvertimes = [] } = useQuery({
     queryKey: ['department-overtime-requests'],
     queryFn: getDepartmentOvertimeRequests,
-  });
-
-  // Helper to extract nested counts
-  const extractCount = (obj: any, keys: string[]) => {
+  });  const extractCount = (obj: any, keys: string[]) => {
     if (obj == null) return 0;
     if (typeof obj === 'number') return obj;
     const unwrapped = obj.data?.data ?? obj.data ?? obj;
@@ -106,10 +76,7 @@ export default function Dashboard() {
       }
     }
     return 0;
-  };
-
-  // Process numbers & stats safely
-  const totalEmployees = extractCount(usersCountData, ['employees_count', 'employees', 'total_employees', 'count']);
+  };  const totalEmployees = extractCount(usersCountData, ['employees_count', 'employees', 'total_employees', 'count']);
   const presentToday = extractCount(attendanceAnalysisData, ['present_today', 'presentCount', 'present']);
   const attendanceRate = extractCount(attendanceAnalysisData, ['attendance_rate', 'rate', 'percentage']);
 
@@ -158,9 +125,7 @@ export default function Dashboard() {
     status: tk.status || 'قيد الانتظار',
   }));
 
-  const pendingTasksCount = activeTasks.filter((tk: any) => tk.status !== 'مكتملة' && tk.status !== 'completed').length;
-  // Map performance chart data
-  const rawChart = Array.isArray(deptPerformanceData)
+  const pendingTasksCount = activeTasks.filter((tk: any) => tk.status !== 'مكتملة' && tk.status !== 'completed').length;  const rawChart = Array.isArray(deptPerformanceData)
     ? deptPerformanceData
     : (Array.isArray(deptPerformanceData?.data) ? deptPerformanceData.data : (Array.isArray(deptPerformanceData?.monthly) ? deptPerformanceData.monthly : null));
 
@@ -170,10 +135,7 @@ export default function Dashboard() {
         avgRating: row.score ?? row.avgRating ?? row.rating ?? 0,
         attendance: row.attendance ?? row.attendance_rate ?? 0,
       }))
-    : [];
-
-  // احسب متوسط الأداء من بيانات الأرباع إن وجدت
-  const avgPerformance = (() => {
+    : [];  const avgPerformance = (() => {
     if (rawChart && rawChart.length > 0) {
       const scores = rawChart.map((r: any) => r.score ?? r.avgRating ?? r.rating ?? 0).filter((s: number) => s > 0);
       if (scores.length > 0) {
@@ -185,22 +147,12 @@ export default function Dashboard() {
   })();
 
   return (
-    <div className="space-y-6">
-      {/* ── التعميمات النشطة — تختفي إذا لم يوجد تعميمات ── */}
-      <ActiveAnnouncements />
-
-      {/* ── Stat Cards ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="space-y-6">      <ActiveAnnouncements />      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard icon={CheckSquare} label={d.pendingTasks} value={pendingTasksCount} sub={`${completedTasksThisMonth} ${d.completedThisMonth}`} iconBg="bg-red-50" iconColor="text-red-500" />
         <StatCard icon={Calendar} label={d.attendanceRate} value={`${attendanceRate}%`} sub={d.thisMonth} iconBg="bg-brown/10" iconColor="text-brown" />
         <StatCard icon={TrendingUp} label={d.avgPerformance} value={`★${avgPerformance}`} sub={d.outOf} iconBg="bg-gold/10" iconColor="text-gold" />
         <StatCard icon={Users} label={d.totalEmployees} value={totalEmployees} sub={`${presentToday} ${d.presentToday}`} iconBg="bg-green/10" iconColor="text-green" />
-      </div>
-
-      {/* ── Charts ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Performance */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-card">
+      </div>      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-card">
           <h2 className="font-bold text-dark text-base mb-5">{d.performanceChart}</h2>
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={chartData}>
@@ -221,10 +173,7 @@ export default function Dashboard() {
               <Area type="monotone" dataKey="avgRating" name={d.avgRating} stroke="#4A7C59" fill="url(#gGreen)" strokeWidth={2} dot={{ r: 4, fill: '#4A7C59' }} />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
-
-        {/* Attendance */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-card">
+        </div>        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-card">
           <h2 className="font-bold text-dark text-base mb-5">{d.attendanceChart}</h2>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={chartData}>
@@ -240,12 +189,7 @@ export default function Dashboard() {
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
-
-      {/* ── Lists ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Pending Tasks */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-card">
+      </div>      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">        <div className="bg-white rounded-2xl border border-gray-100 shadow-card">
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <h2 className="font-bold text-dark">{d.pendingTasksList}</h2>
             <button onClick={() => navigate('/manager/tasks')} className="text-green text-sm font-semibold flex items-center gap-1 hover:underline">
@@ -271,10 +215,7 @@ export default function Dashboard() {
               ))
             )}
           </div>
-        </div>
-
-        {/* Pending Leaves */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-card">
+        </div>        <div className="bg-white rounded-2xl border border-gray-100 shadow-card">
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <h2 className="font-bold text-dark">{d.pendingLeavesList}</h2>
             <button onClick={() => navigate('/manager/leaves')} className="text-green text-sm font-semibold flex items-center gap-1 hover:underline">
@@ -301,10 +242,7 @@ export default function Dashboard() {
             )}
           </div>
         </div>
-      </div>
-
-      {/* ── Quick Stats ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      </div>      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <button
           onClick={() => navigate('/manager/leaves')}
           className="rounded-2xl p-4 text-right w-full transition-all hover:shadow-md hover:-translate-y-0.5 text-yellow-600 bg-yellow-50"

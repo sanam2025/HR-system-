@@ -1,9 +1,6 @@
-import apiClient from './axios';
-
-// ── Types ──
-
+import apiClient from './axios';
 export interface SubmitAssessmentPayload {
-  behavioral_rating: 'excellent' | 'good' | 'average' | 'poor';
+  behavioral_rating?: 'excellent' | 'good' | 'average' | 'poor';
   manager_notes: string;
   next_quarter_goals?: string[];
 }
@@ -43,10 +40,7 @@ export interface Evaluation {
   hr_reviewer?: any;
   created_at?: string;
   updated_at?: string;
-}
-
-// ── API Functions ──
-
+}
 /**
  * جلب جميع التقييمات (للمدير)
  */
@@ -93,6 +87,14 @@ export async function submitAssessment(evaluationId: number, data: SubmitAssessm
 }
 
 /**
+ * إرسال ملاحظات الموارد البشرية (من صلاحية HR)
+ */
+export async function submitHrNotes(evaluationId: number, hrNotes: string) {
+  const response = await apiClient.post(`evaluations/${evaluationId}/hr-approve`, { hr_notes: hrNotes });
+  return response.data;
+}
+
+/**
  * جلب أداء القسم
  */
 export async function getDepartmentPerformance() {
@@ -103,10 +105,7 @@ export async function getDepartmentPerformance() {
       if (Array.isArray(raw.performance)) raw = raw.performance;
       else if (Array.isArray(raw.items)) raw = raw.items;
     }
-    const arr = Array.isArray(raw) ? raw : [];
-    
-    // Fallback if empty
-    if (arr.length === 0) {
+    const arr = Array.isArray(raw) ? raw : [];    if (arr.length === 0) {
       return [
         { employee: { name: 'أحمد محمود', title: 'مطور واجهات' }, average_score: 92 },
         { employee: { name: 'سارة خالد', title: 'مصممة تجربة المستخدم' }, average_score: 85 },

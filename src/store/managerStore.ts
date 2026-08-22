@@ -21,23 +21,12 @@ interface ManagerState {
   updateOvertimeRequestStatus: (id: number, status: string) => void;
 }
 
-const useManagerStore = create<ManagerState>((set) => ({
-  // Auth / current user
-  currentUser: { id: 99, name: 'م. سامر الرشيد', role: 'MANAGER', departmentId: 1 },
-
-  // Notifications
-  notifications: {
+const useManagerStore = create<ManagerState>((set) => ({  currentUser: { id: 99, name: 'م. سامر الرشيد', role: 'MANAGER', departmentId: 1 },  notifications: {
     leaveRequests: 3,
     overtimeRequests: 2,
     pendingTasks: 4,
-  },
-
-  // Sidebar
-  sidebarOpen: true,
-  toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
-
-  // Actions
-  updateNotifications: (notifs) => set({ notifications: notifs }),
+  },  sidebarOpen: true,
+  toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),  updateNotifications: (notifs) => set({ notifications: notifs }),
 
   overtimeRequests: mockOvertimeRequests,
 

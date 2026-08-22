@@ -1,4 +1,3 @@
-// core/modules/HR/types/employee.types.ts
 
 export type EmployeeStatus = 'active' | 'inactive' | 'onLeave';
 

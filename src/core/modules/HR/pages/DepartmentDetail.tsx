@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/DepartmentDetail/DepartmentDetail.tsx
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Users, Building2, Phone } from 'lucide-react';
 import Loading from '../../../../shared/components/Loading';

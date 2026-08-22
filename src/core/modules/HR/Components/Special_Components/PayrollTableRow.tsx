@@ -1,4 +1,3 @@
-// core/modules/HR/Components/Special_Components/PayrollTableRow.tsx
 import React from "react";
 import { Eye, Edit, DollarSign, FileText, CheckCircle } from "lucide-react";
 import type { PayrollRecord, PayrollStatus } from "../../types/payroll.types";

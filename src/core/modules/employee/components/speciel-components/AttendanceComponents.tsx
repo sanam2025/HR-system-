@@ -324,9 +324,7 @@ export function LeaveBalanceCard({ balance, isLoading, errorMessage }: LeaveBala
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-2">
             {entries.map((b, index) => {
               const total = b.total_days || 0;
-              const remaining = b.remaining_days ?? total;
-              // Percentage represents how much is remaining (100% = full balance)
-              const fraction = total > 0 ? remaining / total : 0;
+              const remaining = b.remaining_days ?? total;              const fraction = total > 0 ? remaining / total : 0;
               const percentage = Math.min(100, Math.max(0, fraction * 100));
               
               return (

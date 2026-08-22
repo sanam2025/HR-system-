@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/JobPostings/JobPostingsCard.tsx
 import { Eye, Edit, XCircle, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { JobPosting } from "../../../../../api/service/HrService/Types/JobPostingsService.types";

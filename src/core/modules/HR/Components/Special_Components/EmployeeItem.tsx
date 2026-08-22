@@ -1,4 +1,3 @@
-// core/modules/HR/components/EmployeeItem.tsx
 import React from "react";
 import { Users } from "lucide-react";
 

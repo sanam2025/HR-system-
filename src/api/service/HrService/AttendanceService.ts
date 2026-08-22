@@ -1,4 +1,3 @@
-// src/api/service/HrService/AttendanceService.ts
 import { apiClient } from '../../client';
 
 export interface AttendanceRecord {
@@ -18,14 +17,6 @@ export interface AttendanceStats {
   late: number;
 }
 
-export const AttendanceService = {
-  // ✅ جلب حضور اليوم
-  getToday: () => apiClient.get<{ data: AttendanceRecord[] }>('/attendance-today'),
-
-  // ✅ جلب تحليل الحضور
-  getAnalysis: () => apiClient.get<{ data: AttendanceStats }>('/attendance-today-analysis'),
-
-  // ✅ جلب الحضور المفلتر
-  getFiltered: (from: string, to: string) =>
+export const AttendanceService = {  getToday: () => apiClient.get<{ data: AttendanceRecord[] }>('/attendance-today'),  getAnalysis: () => apiClient.get<{ data: AttendanceStats }>('/attendance-today-analysis'),  getFiltered: (from: string, to: string) =>
     apiClient.get<{ data: AttendanceRecord[] }>(`/attendance-filter?from=${from}&to=${to}`),
 };

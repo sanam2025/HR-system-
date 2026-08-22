@@ -1,7 +1,5 @@
 import apiClient from './axios';
 
-// ── Types ──
-
 export interface CreateTaskPayload {
   title: string;
   description?: string;
@@ -45,8 +43,6 @@ export interface Task {
     created_at?: string;
   };
 }
-
-// ── API Functions ──
 
 /**
  * جلب جميع المهام (للمدير والموظف)

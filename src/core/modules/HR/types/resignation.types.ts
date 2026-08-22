@@ -1,4 +1,3 @@
-// core/modules/HR/types/resignation.types.ts
 
 export type ResignationType = "standard" | "immediate";
 export type ResignationStatus = "pending" | "approved" | "rejected" | "withdrawn";
@@ -15,9 +14,7 @@ export interface ResignationRequest {
   reason: string;
   status: ResignationStatus;
   approvedDate?: string;
-  notes?: string;
-  // Compensation details
-  baseSalary: number;
+  notes?: string;  baseSalary: number;
   yearsOfService: number;
   compensationAmount?: number;
 }

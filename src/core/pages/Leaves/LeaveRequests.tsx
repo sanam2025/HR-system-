@@ -32,11 +32,7 @@ export default function LeaveRequests() {
   const [subType, setSubType] = useState<'daily' | 'hourly'>('daily');
 
   return (
-    <div className="space-y-6">
-      
-
-      {/* Main Header & Tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6">      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-extrabold text-dark">{lv.title}</h2>
           <p className="text-sm text-brown mt-1">{lv.subtitle}</p>
@@ -55,10 +51,7 @@ export default function LeaveRequests() {
             {lv.mainTabs.myLeaves}
           </button>
         </div>
-      </div>
-
-      {/* Sub-type Toggle (Daily / Hourly) */}
-      <div className="flex justify-center sm:justify-start">
+      </div>      <div className="flex justify-center sm:justify-start">
         <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
           <button
             onClick={() => setSubType('daily')}
@@ -82,10 +75,7 @@ export default function LeaveRequests() {
       )}
     </div>
   );
-}
-
-// ── Sub-component: Team Leaves ──
-function TeamLeavesView({ lv, lang, subType }: { lv: any; lang: string; subType: 'daily' | 'hourly' }) {
+}function TeamLeavesView({ lv, lang, subType }: { lv: any; lang: string; subType: 'daily' | 'hourly' }) {
   const queryClient = useQueryClient();
   const location = useLocation();
   const isHR = location.pathname.toLowerCase().startsWith('/hr');
@@ -159,7 +149,9 @@ function TeamLeavesView({ lv, lang, subType }: { lv: any; lang: string; subType:
       setConfirm(null);
     },
     onError: (err: any) => {
-      const msg = err?.response?.data?.message || err?.response?.data?.error || 'حدث خطأ أثناء الموافقة على الطلب';
+      const msg = err?.response?.data?.errors 
+        ? Object.values(err.response.data.errors).flat().join('\n') 
+        : (err?.response?.data?.message || err?.response?.data?.error || 'حدث خطأ أثناء الموافقة على الطلب');
       toast.error(msg);
       setConfirm(null);
     }
@@ -174,7 +166,9 @@ function TeamLeavesView({ lv, lang, subType }: { lv: any; lang: string; subType:
       setConfirm(null);
     },
     onError: (err: any) => {
-      const msg = err?.response?.data?.message || err?.response?.data?.error || 'حدث خطأ أثناء رفض الطلب';
+      const msg = err?.response?.data?.errors 
+        ? Object.values(err.response.data.errors).flat().join('\n') 
+        : (err?.response?.data?.message || err?.response?.data?.error || 'حدث خطأ أثناء رفض الطلب');
       toast.error(msg);
       setConfirm(null);
     }
@@ -276,10 +270,7 @@ function TeamLeavesView({ lv, lang, subType }: { lv: any; lang: string; subType:
             </div>
           ))}
         </div>
-      )}
-
-      {/* Confirm Dialog */}
-      {confirm && (
+      )}      {confirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-modal p-6 max-w-sm w-full text-center">
             <div className="text-4xl mb-3">{confirm.action === 'approve' ? '✅' : '❌'}</div>
@@ -304,21 +295,10 @@ function TeamLeavesView({ lv, lang, subType }: { lv: any; lang: string; subType:
       )}
     </div>
   );
-}
-
-// ── Sub-component: My Leaves ──
-function MyLeavesView({ myLv, lv, lang, subType }: { myLv: any; lv: any; lang: string; subType: 'daily' | 'hourly' }) {
+}function MyLeavesView({ myLv, lv, lang, subType }: { myLv: any; lv: any; lang: string; subType: 'daily' | 'hourly' }) {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
-  const queryKey = subType === 'daily' ? 'my-leave-requests' : 'my-hourly-leave-requests';
-  
-  // Daily Form State
-  const [dailyForm, setDailyForm] = useState({ start_date: '', type: 'annual', days_count: 1, reason: '' });
-  // Hourly Form State
-  const [hourlyForm, setHourlyForm] = useState({ date: '', start_time: '', end_time: '', reason: '' });
-
-  // Fetch Leave Balance
-  const { data: balanceData } = useQuery({
+  const queryKey = subType === 'daily' ? 'my-leave-requests' : 'my-hourly-leave-requests';  const [dailyForm, setDailyForm] = useState({ start_date: '', type: 'annual', days_count: 1, reason: '' });  const [hourlyForm, setHourlyForm] = useState({ date: '', start_time: '', end_time: '', reason: '' });  const { data: balanceData } = useQuery({
     queryKey: ['my-leave-balance'],
     queryFn: getMyLeaveBalance,
     enabled: subType === 'daily'
@@ -331,10 +311,7 @@ function MyLeavesView({ myLv, lv, lang, subType }: { myLv: any; lv: any; lang: s
     queryFn: () => (subType === 'daily' ? getMyLeaveRequests() : getMyHourlyLeaveRequests())
   });
 
-  const safeRequests = Array.isArray(rawRequests) ? rawRequests : Array.isArray(rawRequests?.data) ? rawRequests.data : [];
-
-  // خصم الإجازات الموافق عليها من الرصيد الأساسي (في حال كان الباك اند يرجع الرصيد الكلي أو القيمة الافتراضية 30)
-  const usedDays = subType === 'daily' ? safeRequests
+  const safeRequests = Array.isArray(rawRequests) ? rawRequests : Array.isArray(rawRequests?.data) ? rawRequests.data : [];  const usedDays = subType === 'daily' ? safeRequests
     .filter((req: any) => {
       const status = req.status?.toString().toLowerCase();
       return status === 'approved' || status === 'موافقة' || status === '1';
@@ -355,7 +332,9 @@ function MyLeavesView({ myLv, lv, lang, subType }: { myLv: any; lv: any; lang: s
       else setHourlyForm({ date: '', start_time: '', end_time: '', reason: '' });
     },
     onError: (err: any) => {
-      const msg = err?.response?.data?.message || err?.response?.data?.error || (err?.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(', ') : 'حدث خطأ أثناء إرسال الطلب');
+      const msg = err?.response?.data?.errors 
+        ? Object.values(err.response.data.errors).flat().join('\n') 
+        : (err?.response?.data?.message || err?.response?.data?.error || 'حدث خطأ أثناء إرسال الطلب');
       toast.error(msg);
     }
   });
@@ -377,9 +356,7 @@ function MyLeavesView({ myLv, lv, lang, subType }: { myLv: any; lv: any; lang: s
   };
 
   return (
-    <div className="space-y-6">
-      {/* Leave Balance Banner for Daily Leaves */}
-      {subType === 'daily' && (
+    <div className="space-y-6">      {subType === 'daily' && (
         <div className="bg-gradient-to-r from-green/10 via-green/5 to-transparent rounded-2xl border border-green/20 p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-green text-white flex items-center justify-center font-bold shadow-md">
@@ -399,9 +376,7 @@ function MyLeavesView({ myLv, lv, lang, subType }: { myLv: any; lv: any; lang: s
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        {/* List of my requests */}
-        <div className="lg:col-span-2 space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">        <div className="lg:col-span-2 space-y-4">
           {isLoading ? (
             <div className="text-center py-10 text-gray-400">
               <Loader2 className="animate-spin mx-auto text-green" size={24} />
@@ -437,10 +412,7 @@ function MyLeavesView({ myLv, lv, lang, subType }: { myLv: any; lv: any; lang: s
               </div>
             ))
           )}
-        </div>
-
-        {/* Form / New Request Panel */}
-        <div className="lg:col-span-1">
+        </div>        <div className="lg:col-span-1">
           {!showForm && subType === 'hourly' ? (
             <button
               onClick={() => setShowForm(true)}

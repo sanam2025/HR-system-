@@ -1,4 +1,3 @@
-// src/api/service/HrService/Types/ContractsService.types.ts
 export interface ContractEmployee {
   id: number;
   full_name: string;

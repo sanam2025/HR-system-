@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Interviews/Interviews.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -8,44 +7,28 @@ import {
 import { apiClient } from '../../../../../api/client';
 import Loading from '../../../../../shared/components/Loading';
 import toast from 'react-hot-toast';
-import type { Interview } from '../../../../../api/service/HrService/Types/InterviewsService.types';
-
-// تعريف نوع البيانات المحلية
-interface LocalInterview extends Interview {
+import type { Interview } from '../../../../../api/service/HrService/Types/InterviewsService.types';interface LocalInterview extends Interview {
   job_title?: string;
 }
 
 export default function InterviewsDashboard() {
   const navigate = useNavigate();
   const [interviews, setInterviews] = useState<LocalInterview[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // حالة الفورم (تنسيق مقابلة)
-  const [showScheduleForm, setShowScheduleForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);  const [showScheduleForm, setShowScheduleForm] = useState(false);
   const [formData, setFormData] = useState({
     candidate_id: '',
     interviewed_by: '',
     scheduled_at: '',
     location_type: 'on_site',
     location_details: '',
-  });
-
-  // جلب كل المقابلات من كل الوظائف
-  const fetchAllInterviews = async () => {
+  });  const fetchAllInterviews = async () => {
     setIsLoading(true);
-    try {
-      // 1. جلب كل الوظائف
-      const jobsRes = await apiClient.get('/HRjob-postings');
-      const jobs = jobsRes.data?.data || [];
-
-      // 2. لكل وظيفة، جلب مقابلاتها
-      const allInterviews: LocalInterview[] = [];
+    try {      const jobsRes = await apiClient.get('/HRjob-postings');
+      const jobs = jobsRes.data?.data || [];      const allInterviews: LocalInterview[] = [];
       for (const job of jobs) {
         try {
           const res = await apiClient.get(`/job-postings/${job.id}/interviews`);
-          const jobInterviews = res.data?.data || [];
-          // إضافة اسم الوظيفة لكل مقابلة
-          jobInterviews.forEach((interview: LocalInterview) => {
+          const jobInterviews = res.data?.data || [];          jobInterviews.forEach((interview: LocalInterview) => {
             interview.job_title = job.job_title;
           });
           allInterviews.push(...jobInterviews);
@@ -63,10 +46,7 @@ export default function InterviewsDashboard() {
 
   useEffect(() => {
     fetchAllInterviews();
-  }, []);
-
-  // دالة تنسيق مقابلة جديدة
-  const handleScheduleInterview = async (e: React.FormEvent) => {
+  }, []);  const handleScheduleInterview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.candidate_id || !formData.interviewed_by || !formData.scheduled_at) {
       toast.error('Please fill in all required fields');
@@ -88,10 +68,7 @@ export default function InterviewsDashboard() {
     } catch {
       toast.error('Failed to schedule interview');
     }
-  };
-
-  // حساب الإحصائيات
-  const stats = {
+  };  const stats = {
     total: interviews.length,
     scheduled: interviews.filter((i) => i.status === 'scheduled').length,
     completed: interviews.filter((i) => i.status === 'done' || i.status === 'completed').length,
@@ -112,10 +89,7 @@ export default function InterviewsDashboard() {
         </button>
         <h1 className="text-2xl font-bold text-gray-900">Interviews & Offers Dashboard</h1>
         <p className="text-gray-500 text-sm mt-1">Manage all interviews, track rankings, and send offers.</p>
-      </div>
-
-      {/* بطاقات الإحصائيات */}
-      <div className="grid grid-cols-5 gap-4 mb-6">
+      </div>      <div className="grid grid-cols-5 gap-4 mb-6">
         <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100 flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500 font-medium">Total</p>
@@ -151,10 +125,7 @@ export default function InterviewsDashboard() {
           </div>
           <XCircle className="w-8 h-8 text-red-500" />
         </div>
-      </div>
-
-      {/* جدول المقابلات */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      </div>      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
@@ -246,10 +217,7 @@ export default function InterviewsDashboard() {
             </tbody>
           </table>
         </div>
-      </div>
-
-      {/*  فورم تنسيق مقابلة */}
-      {showScheduleForm && (
+      </div>      {showScheduleForm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-4">

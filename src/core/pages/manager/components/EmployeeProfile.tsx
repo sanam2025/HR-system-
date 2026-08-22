@@ -7,25 +7,13 @@ import { useAuthStore } from '../../../../store/authStore';
 import EditProfileModal from './EditProfileModal';
 import toast from 'react-hot-toast';
 
-import { TASK_STATUS_COLORS, TASK_STATUS_EN, CHART_MONTHS_EN, ATTENDANCE_STATUS_INFO } from '../../../constants';
-
-// ── Helpers ──
-
+import { TASK_STATUS_COLORS, TASK_STATUS_EN, CHART_MONTHS_EN, ATTENDANCE_STATUS_INFO } from '../../../constants';
 function renderStars(rating: number) {
   const normalizedRating = rating > 5 ? (rating / 20) : rating;
   return Array.from({ length: 5 }, (_, i) => (
     <span key={i} className={`text-lg ${i < Math.round(normalizedRating) ? 'text-gold' : 'text-gray-200'}`}>★</span>
   ));
-}
-
-const ATTENDANCE_COLOR: Record<string, string> = {
-  'حاضر': 'bg-green-50 text-green-700',
-  'غائب': 'bg-red-50 text-red-600',
-  'تأخير': 'bg-yellow-50 text-yellow-700',
-};
-
-// ── Component ──
-
+}
 export default function EmployeeProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -42,6 +30,8 @@ export default function EmployeeProfile() {
   const [performance, setPerformance] = useState<any>(null);
   const [attendance, setAttendance] = useState<any[]>([]);
   const [empTasks, setEmpTasks] = useState<any[]>([]);
+  const [hasPerformanceAccess, setHasPerformanceAccess] = useState(true);
+  const [hasTasksAccess, setHasTasksAccess] = useState(true);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const currentUser = useAuthStore(state => state.currentUser);
@@ -61,10 +51,7 @@ export default function EmployeeProfile() {
       }
 
       let profile = data?.data || data;
-      let isProfileExists = !!profile;
-
-      // Fallback to currentUser if no profile is found in DB for the logged-in user
-      if (!profile && !id && currentUser) {
+      let isProfileExists = !!profile;      if (!profile && !id && currentUser) {
         profile = {
           id: currentUser.id,
           name: currentUser.name || currentUser.full_name || 'بدون اسم',
@@ -72,10 +59,7 @@ export default function EmployeeProfile() {
           job_title: currentUser.role || 'موظف',
           department: currentUser.department || 'الإدارة',
         };
-      }
-
-      // Fallback for when ID is provided (e.g. HR viewing employee) but no profile exists
-      if (!profile && id) {
+      }      if (!profile && id) {
         try {
           const { EmployeesService } = await import('../../../../api/service/HrService/EmployeesService');
           const usersRes = await EmployeesService.getEmployees();
@@ -89,6 +73,16 @@ export default function EmployeeProfile() {
                job_title: targetUser.position || targetUser.role || 'موظف',
                department: targetUser.department?.name || targetUser.department || '',
             };
+            if (targetUser.profile_id) {
+               try {
+                 const realProfile = await getEmployeeProfile(targetUser.profile_id);
+                 if (realProfile?.data || realProfile) {
+                   profile = { ...profile, ...(realProfile.data || realProfile) };
+                 }
+               } catch(e) {
+                 console.warn("Failed to fetch real profile using profile_id");
+               }
+            }
           }
         } catch (e) {
           console.warn("Failed to fetch from EmployeesService fallback.");
@@ -120,21 +114,21 @@ export default function EmployeeProfile() {
 
       setEmployee({
         id: profile.id || (id ? Number(id) : 0),
-        name: profile.user_name || profile.name || profile.user?.name || 'بدون اسم',
-        title: profile.job_title || profile.title || 'موظف',
+        name: profile.user_name || profile.name || profile.user?.name || null,
+        title: profile.job_title || profile.title || null,
         department: deptRaw,
         departmentAr: deptAr,
         departmentEn: deptEn,
-        email: profile.user_email || profile.email || profile.user?.email || 'غير متوفر',
-        phone: profile.phone_number || 'غير متوفر',
-        joinDate: profile.hiring_date || profile.join_date || 'غير متوفر',
+        email: profile.user_email || profile.email || profile.user?.email || null,
+        phone: profile.phone_number || null,
+        joinDate: profile.hiring_date || profile.join_date || null,
         gender: profile.gender || '',
         address: profile.address || '',
         birthDate: profile.birth_date || '',
         manager: profile.manager || '',
-        avatar: profile.user_name ? profile.user_name.charAt(0).toUpperCase() : (profile.name ? profile.name.charAt(0).toUpperCase() : 'م'),
+        avatar: profile.user_name ? profile.user_name.charAt(0).toUpperCase() : (profile.name ? profile.name.charAt(0).toUpperCase() : null),
         picture: profile.picture,
-        todayStatus: 'حاضر',
+        todayStatus: 'غائب', // Default to absent until fetched
         avgRating: '0.0',
         leaveBalance: profile.leave_balance || 0,
         isProfileExists,
@@ -160,8 +154,9 @@ export default function EmployeeProfile() {
       try {
         const perfRes = await getEmployeePerformanceSummary(targetUserId);
         setPerformance(perfRes);
-      } catch (e) {
+      } catch (e: any) {
         console.error("Performance fetch error:", e);
+        setHasPerformanceAccess(false);
       }
 
       try {
@@ -169,7 +164,14 @@ export default function EmployeeProfile() {
         const { default: apiClient } = await import('../../../../api/axios');
         const attRes = await apiClient.get(`my-monthly-attendance?user_id=${targetUserId}`);
         const attData = attRes.data?.data || attRes.data;
-        setAttendance(Array.isArray(attData) ? attData : []);
+        const attendanceList = Array.isArray(attData) ? attData : [];
+        setAttendance(attendanceList);        const today = new Date();
+        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        const todayRecord = attendanceList.find((a: any) => a.date === todayStr || a.date?.startsWith(todayStr));
+        
+        if (todayRecord && todayRecord.status) {
+          setEmployee((prev: any) => prev ? { ...prev, todayStatus: todayRecord.status } : prev);
+        }
       } catch (e) {
         console.error("Attendance fetch error:", e);
       }
@@ -182,8 +184,20 @@ export default function EmployeeProfile() {
           (empName && t.assignee?.name && t.assignee.name.toLowerCase() === empName.toLowerCase())
         );
         setEmpTasks(employeeTasks);
-      } catch (e) {
+      } catch (e: any) {
         console.error("Tasks fetch error:", e);
+        setHasTasksAccess(false);
+      }
+
+      try {
+        const { LeaveService } = await import('../../../../api/service/HrService/LeaveService');
+        const balanceRes = await LeaveService.getBalance(targetUserId);
+        const leaveBalance = balanceRes?.data?.annual || (balanceRes as any)?.data?.data?.annual || 0;
+        if (leaveBalance > 0) {
+           setEmployee((prev: any) => prev ? { ...prev, leaveBalance } : prev);
+        }
+      } catch (e) {
+        console.error("Leave balance fetch error:", e);
       }
 
     } catch (err) {
@@ -197,13 +211,14 @@ export default function EmployeeProfile() {
     fetchProfile();
   }, [id]);
 
-  const tasksCount = performance?.tasks_assigned_count || 0;
+  const tasksCount = performance?.tasks_assigned_count || empTasks.length || 0;
   const avgRating = performance?.latest_evaluation?.final_score || employee?.avgRating || '0.0';
 
-  const getAttendanceLabel = (status: string) =>
-    lang === 'ar'
-      ? status
-      : ({ 'حاضر': es.present, 'غائب': es.absent, 'تأخير': es.late } as Record<string, string>)[status] ?? status;
+  const getAttendanceLabel = (status: string) => {
+    const info = ATTENDANCE_STATUS_INFO[status];
+    if (info) return lang === 'ar' ? info.labelAr : info.labelEn;
+    return status;
+  };
 
   if (loading) {
     return (
@@ -225,32 +240,30 @@ export default function EmployeeProfile() {
   }
 
   const todayLabel = getAttendanceLabel(employee.todayStatus);
-  const todayStatusColor = ATTENDANCE_COLOR[employee.todayStatus] ?? 'bg-yellow-50 text-yellow-700';
+  const info = ATTENDANCE_STATUS_INFO[employee.todayStatus];
+  const todayStatusColor = info?.colorClass ?? 'bg-gray-50 text-gray-700';
 
 
 
-  const profileStats = [
-    { label: ep.leaveBalance, value: `${employee.leaveBalance} ${ep.days}`, bg: 'bg-gold/10 text-yellow-800' },
-    { label: ep.totalTasks, value: tasksCount, bg: 'bg-green/10 text-green-700' },
-    { label: ep.avgRating, value: `${avgRating}`, bg: 'bg-brown/10 text-brown' },
-  ];
+  const profileStats = [];
+  
+  if (employee.leaveBalance !== undefined) {
+    profileStats.push({ label: ep.leaveBalance, value: `${employee.leaveBalance} ${ep.days}`, bg: 'bg-gold/10 text-yellow-800' });
+  }
+  if (hasTasksAccess) {
+    profileStats.push({ label: ep.totalTasks, value: tasksCount, bg: 'bg-green/10 text-green-700' });
+  }
+  if (hasPerformanceAccess) {
+    profileStats.push({ label: ep.avgRating, value: `${avgRating}`, bg: 'bg-brown/10 text-brown' });
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Back */}
-      <button
+    <div className="space-y-6">      <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-sm text-brown hover:text-green transition-colors font-semibold"
       >
         <BackIcon size={16} /> {ep.backToList}
-      </button>
-
-      {/* Profile Header */}
-      <div className="bg-gradient-to-br from-white to-slate-50 rounded-3xl border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 relative overflow-hidden">
-
-
-        {/* Decorative background element */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-green/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+      </button>      <div className="bg-gradient-to-br from-white to-slate-50 rounded-3xl border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 relative overflow-hidden">        <div className="absolute top-0 right-0 w-64 h-64 bg-green/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-40 h-40 bg-gold/5 rounded-full blur-2xl -ml-20 -mb-20 pointer-events-none"></div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 relative z-10">
@@ -282,14 +295,15 @@ export default function EmployeeProfile() {
                 />
               )}
               <span className={`avatar-fallback ${employee.picture && !employee.picture.includes('default.jpg') ? 'hidden' : 'flex'} items-center justify-center w-full h-full z-0`}>
-                {employee.avatar}
+                {employee.avatar || (lang === 'ar' ? 'م' : 'U')}
               </span>
             </div>
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-extrabold text-dark tracking-tight">{employee.name}</h2>
-
-            <div className="flex gap-1 mt-3 bg-white/50 w-fit px-3 py-1.5 rounded-full border border-white shadow-sm">{renderStars(Number(avgRating))}</div>
+            <h2 className="text-2xl font-extrabold text-dark tracking-tight">{employee.name || (lang === 'ar' ? 'بدون اسم' : 'Unnamed')}</h2>
+            {hasPerformanceAccess && (
+              <div className="flex gap-1 mt-3 bg-white/50 w-fit px-3 py-1.5 rounded-full border border-white shadow-sm">{renderStars(Number(avgRating))}</div>
+            )}
           </div>
           <div className="flex flex-col sm:flex-row gap-3 items-center sm:items-end w-full sm:w-auto">
             <div className={`px-5 py-2.5 rounded-2xl text-sm font-bold shadow-sm border border-white/50 backdrop-blur-sm ${todayStatusColor}`}>
@@ -305,79 +319,79 @@ export default function EmployeeProfile() {
               </button>
             )}
           </div>
-        </div>
-
-        {/* Contact Details (Phone removed as requested) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mt-8 pt-6 border-t border-gray-100/60 relative z-10">
-          <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
-            <div className="p-2 bg-green/10 rounded-lg text-green"><Mail size={16} /></div>
-            <span className="font-medium truncate">{employee.email}</span>
-          </div>
-          {employee.address && (
-            <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
-              <div className="p-2 bg-green/10 rounded-lg text-green"><MapPin size={16} /></div>
-              <span className="font-medium truncate">{employee.address}</span>
-            </div>
-          )}
-          {employee.manager && (
+        </div>        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mt-8 pt-6 border-t border-gray-100/60 relative z-10">          {employee.department && (
             <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
               <div className="p-2 bg-green/10 rounded-lg text-green"><Briefcase size={16} /></div>
-              <span className="font-medium truncate">{employee.manager}</span>
+              <div className="flex flex-col leading-tight overflow-hidden">
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{lang === 'ar' ? 'القسم' : 'Department'}</span>
+                <span className="font-semibold truncate">{lang === 'ar' ? employee.departmentAr : employee.departmentEn}</span>
+              </div>
             </div>
-          )}
-          <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
+          )}          <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
+            <div className="p-2 bg-green/10 rounded-lg text-green"><Mail size={16} /></div>
+            <div className="flex flex-col leading-tight overflow-hidden">
+              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{lang === 'ar' ? 'البريد الإلكتروني' : 'Email'}</span>
+              <span className="font-semibold truncate">{employee.email || (lang === 'ar' ? 'غير متوفر' : 'Not Available')}</span>
+            </div>
+          </div>          {employee.address && (
+            <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
+              <div className="p-2 bg-green/10 rounded-lg text-green"><MapPin size={16} /></div>
+              <div className="flex flex-col leading-tight overflow-hidden">
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{lang === 'ar' ? 'العنوان' : 'Address'}</span>
+                <span className="font-semibold truncate">{employee.address}</span>
+              </div>
+            </div>
+          )}          {employee.manager && (
+            <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
+              <div className="p-2 bg-green/10 rounded-lg text-green"><User size={16} /></div>
+              <div className="flex flex-col leading-tight overflow-hidden">
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{lang === 'ar' ? 'المدير المباشر' : 'Manager'}</span>
+                <span className="font-semibold truncate">{employee.manager}</span>
+              </div>
+            </div>
+          )}          <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
             <div className="p-2 bg-gold/10 rounded-lg text-gold"><Calendar size={16} /></div>
-            <div className="flex flex-col leading-tight">
+            <div className="flex flex-col leading-tight overflow-hidden">
               <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{ep.joinDate}</span>
-              <span className="font-semibold">{employee.joinDate}</span>
+              <span className="font-semibold truncate">{employee.joinDate || (lang === 'ar' ? 'غير متوفر' : 'Not Available')}</span>
             </div>
-          </div>
-          {employee.birthDate && (
+          </div>          {employee.birthDate && (
+            <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
+              <div className="p-2 bg-gold/10 rounded-lg text-gold"><Calendar size={16} /></div>
+              <div className="flex flex-col leading-tight overflow-hidden">
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{lang === 'ar' ? 'تاريخ الميلاد' : 'Birth Date'}</span>
+                <span className="font-semibold truncate">{employee.birthDate}</span>
+              </div>
+            </div>
+          )}          {employee.gender && (
             <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
               <div className="p-2 bg-gold/10 rounded-lg text-gold"><User size={16} /></div>
-              <span className="font-medium">{employee.birthDate}</span>
+              <div className="flex flex-col leading-tight overflow-hidden">
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{lang === 'ar' ? 'الجنس' : 'Gender'}</span>
+                <span className="font-semibold truncate">
+                  {employee.gender === 'male' || employee.gender === 'ذكر'
+                    ? (isRTL ? 'ذكر' : 'Male')
+                    : employee.gender === 'female' || employee.gender === 'أنثى'
+                      ? (isRTL ? 'أنثى' : 'Female')
+                      : employee.gender}
+                </span>
+              </div>
             </div>
           )}
-          {employee.gender && (
-            <div className="flex items-center gap-3 text-sm text-brown bg-white/60 p-3 rounded-xl shadow-sm border border-white">
-              <div className="p-2 bg-gold/10 rounded-lg text-gold"><User size={16} /></div>
-              <span className="font-medium">
-                {employee.gender === 'male' || employee.gender === 'ذكر'
-                  ? (isRTL ? 'ذكر' : 'Male')
-                  : employee.gender === 'female' || employee.gender === 'أنثى'
-                    ? (isRTL ? 'أنثى' : 'Female')
-                    : employee.gender}
-              </span>
-            </div>
-          )}
-          <div className="flex items-center gap-3 text-sm bg-white/60 p-3 rounded-xl shadow-sm border border-white">
-            <div className="p-2 bg-gold/10 rounded-lg text-gold"><Star size={16} /></div>
-            <div className="flex flex-col leading-tight">
-              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{ep.avgRating}</span>
-              <span className="font-bold text-dark">{avgRating}</span>
-            </div>
-          </div>
         </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      </div>      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {profileStats.map(s => (
           <div key={s.label} className={`rounded-2xl p-5 text-center border border-white/60 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group ${s.bg}`}>
             <div className="absolute inset-0 bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <div className="relative z-10">
-              <div className="text-3xl mb-2 drop-shadow-sm">{s.icon}</div>
               <p className="text-2xl font-black tracking-tight">{s.value}</p>
               <p className="text-xs font-bold mt-1 opacity-70 uppercase tracking-wider">{s.label}</p>
             </div>
           </div>
         ))}
-      </div>
-
-
-      {/* Tasks */}
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
-        <div className="px-6 py-5 border-b border-gray-100 bg-slate-50/50">
+      </div>      {hasTasksAccess && (
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-100 bg-slate-50/50">
           <h3 className="font-extrabold text-dark flex items-center gap-2 text-lg">
             <div className="p-1.5 bg-green/10 rounded-lg"><CheckSquare size={18} className="text-green" /></div>
             {ep.activeTasks}
@@ -435,10 +449,8 @@ export default function EmployeeProfile() {
             ))}
           </div>
         )}
-      </div>
-
-      {/* Attendance */}
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+        </div>
+      )}      <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
         <div className="px-6 py-5 border-b border-gray-100 bg-slate-50/50">
           <h3 className="font-extrabold text-dark flex items-center gap-2 text-lg">
             <div className="p-1.5 bg-gold/10 rounded-lg"><Clock size={18} className="text-gold" /></div>
@@ -480,9 +492,7 @@ export default function EmployeeProfile() {
             })
           )}
         </div>
-      </div>
-      {/* Contract Section */}
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden mt-6">
+      </div>      <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden mt-6">
         <div className="px-6 py-5 border-b border-gray-100 bg-slate-50/50">
           <h3 className="font-extrabold text-dark flex items-center gap-2 text-lg">
             <div className="p-1.5 bg-blue-50 rounded-lg"><FileText size={18} className="text-blue-600" /></div>
@@ -538,10 +548,7 @@ export default function EmployeeProfile() {
             </div>
           </div>
         )}
-      </div>
-
-      {/* Documents Section */}
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden mt-6">
+      </div>      <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden mt-6">
         <div className="px-6 py-5 border-b border-gray-100 bg-slate-50/50">
           <h3 className="font-extrabold text-dark flex items-center gap-2 text-lg">
             <div className="p-1.5 bg-purple-50 rounded-lg"><File size={18} className="text-purple-600" /></div>
@@ -614,10 +621,7 @@ export default function EmployeeProfile() {
         onSuccess={() => {
           fetchProfile(); // Re-fetch data after successful update
         }}
-      />
-
-      {/* Image Preview Lightbox Modal */}
-      {previewImage && (
+      />      {previewImage && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 transition-all duration-300"
           onClick={() => setPreviewImage(null)}

@@ -1,4 +1,3 @@
-// src/api/Types/JobPostingsService.types.ts
 import type { APIResponseWithData } from "./types.types";
 
 export type PostingStatus = 'open' | 'closed';

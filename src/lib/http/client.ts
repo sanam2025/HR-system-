@@ -40,8 +40,6 @@ httpClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   if (token) {
     config.headers.set("Authorization", `Bearer ${token}`);
   }
-  // Let the browser set the multipart boundary itself; a manually-set
-  // Content-Type on FormData bodies silently breaks file uploads.
   if (config.data instanceof FormData) {
     config.headers.delete("Content-Type");
   }

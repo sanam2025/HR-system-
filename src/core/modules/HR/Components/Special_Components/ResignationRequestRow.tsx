@@ -1,4 +1,3 @@
-// core/modules/HR/Components/Special_Components/ResignationRequestRow.tsx
 import React, { useState } from "react";
 import { Eye, CheckCircle, XCircle, Clock, DollarSign } from "lucide-react";
 import type {
@@ -122,10 +121,7 @@ export const ResignationRequestRow: React.FC<ResignationRequestRowProps> = ({
             )}
           </div>
         </td>
-      </tr>
-
-      {/* Compensation Modal */}
-      {showCompensation && (
+      </tr>      {showCompensation && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
           dir="ltr"

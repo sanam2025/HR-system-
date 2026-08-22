@@ -1,4 +1,3 @@
-// shared/types/input.types.ts
 /**
  * Props الخاصة بـ SearchInput Component
  */

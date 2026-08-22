@@ -1,4 +1,3 @@
-// core/modules/HR/Components/common_Components/DataTable.tsx (بدون any)
 import React from 'react';
 
 export interface Column<T> {

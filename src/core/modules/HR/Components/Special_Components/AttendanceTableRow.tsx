@@ -1,4 +1,3 @@
-// core/modules/HR/Components/Special_Components/AttendanceTableRow.tsx
 import React from "react";
 import { Eye, Edit } from "lucide-react";
 import type { AttendanceRecord } from "../../types/attendance.types";
@@ -15,10 +14,7 @@ export const AttendanceTableRow: React.FC<AttendanceTableRowProps> = ({
   onView,
   onEdit,
 }) => {
-  const status = statusConfig[record.status];
-
-  // Format note text
-  const getNoteText = () => {
+  const status = statusConfig[record.status];  const getNoteText = () => {
     if (record.notes) return record.notes;
     if (record.lateMinutes) return `${record.lateMinutes} min late`;
     if (record.earlyLeaveMinutes) return `${record.earlyLeaveMinutes} min early leave`;

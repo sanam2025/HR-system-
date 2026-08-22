@@ -1,4 +1,3 @@
-// core/modules/HR/components/EmployeeActions.tsx
 import React from "react";
 import type { Employee } from "../../types/employee.types";
 

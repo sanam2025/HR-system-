@@ -6,10 +6,7 @@ import { getManagerEmployees, getAttendanceFilter, getAttendanceTodayAnalysis, g
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../../../store/authStore';
-import { EmployeesService } from '../../../api/service/HrService/EmployeesService';
-
-// ── Types ──
-type AttendanceRecord = {
+import { EmployeesService } from '../../../api/service/HrService/EmployeesService';type AttendanceRecord = {
   date: string;
   checkIn: string | null;
   checkOut: string | null;
@@ -24,10 +21,7 @@ type AttendanceRecord = {
   empTitleEn?: string;
 };
 
-type StatusFilter = 'all' | 'present' | 'absent' | 'late';
-
-// ── Helpers ──
-const matchesStatusFilter = (status: string, filter: StatusFilter): boolean => {
+type StatusFilter = 'all' | 'present' | 'absent' | 'late';const matchesStatusFilter = (status: string, filter: StatusFilter): boolean => {
   if (filter === 'all') return true;
   const s = status.toLowerCase();
   if (filter === 'present') return s === 'حاضر' || s === 'present';
@@ -95,24 +89,15 @@ export default function AttendanceView() {
   const { currentUser } = useAuthStore();
 
   const [activeTab, setActiveTab]       = useState<'byEmployee' | 'generalReport' | 'todayLive'>('byEmployee');
-  const qc = useQueryClient();
-  
-  // Data states
-  const [employees, setEmployees] = useState<any[]>([]);
+  const qc = useQueryClient();  const [employees, setEmployees] = useState<any[]>([]);
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [todayStats, setTodayStats] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  // Filter states
-  const [selectedEmp, setSelectedEmp]   = useState<number | null>(null);
+  const [error, setError] = useState('');  const [selectedEmp, setSelectedEmp]   = useState<number | null>(null);
   const [query, setQuery]               = useState('');
   const [startDate, setStartDate]       = useState(new Date().toISOString().split('T')[0]);
   const [endDate, setEndDate]           = useState(new Date().toISOString().split('T')[0]);
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-
-  // 1. Fetch Employees & Today's Analysis on mount
-  useEffect(() => {
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');  useEffect(() => {
     const initFetch = async () => {
       try {
         const userRole = currentUser?.role?.toLowerCase() || '';
@@ -143,17 +128,11 @@ export default function AttendanceView() {
       }
     };
     initFetch();
-  }, []);
-
-  // 2. Fetch records when tab, date, or status changes
-  useEffect(() => {
+  }, []);  useEffect(() => {
     const fetchRecords = async () => {
       try {
         setLoading(true);
-        setError('');
-        
-        // In byEmployee tab, fetch the full current month to show employee history
-        const now = new Date();
+        setError('');        const now = new Date();
         const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toLocaleDateString('en-CA');
         const todayStr = now.toLocaleDateString('en-CA');
 
@@ -222,12 +201,7 @@ export default function AttendanceView() {
   const filteredRecords = records.filter(r => 
     matchesStatusFilter(r.status, statusFilter) &&
     (activeTab === 'generalReport' ? (r.date >= startDate && r.date <= endDate) : true)
-  );
-
-  // If in byEmployee tab, calculate stats specifically for selected employee;
-  // if in generalReport tab, calculate dynamically from filtered records;
-  // otherwise use department todayStats
-  const empPresentCount = employeeRecords.filter(r => r.status === 'present' || r.status === 'حاضر').length;
+  );  const empPresentCount = employeeRecords.filter(r => r.status === 'present' || r.status === 'حاضر').length;
   const empAbsentCount  = employeeRecords.filter(r => r.status === 'absent' || r.status === 'غائب').length;
   const empLateCount    = employeeRecords.filter(r => r.status === 'late' || r.status === 'تأخير').length;
   const empTotalCount   = employeeRecords.length;
@@ -273,13 +247,8 @@ export default function AttendanceView() {
   };
 
   const getStatusColor = (status: string) =>
-    ATTENDANCE_STATUS_INFO[status]?.colorClass ?? 'bg-gray-50 text-gray-700 border border-gray-200';
-
-  // Extract & translate error message from API response
-  const translateApiError = (err: any): string => {
-    const msg: string = err?.response?.data?.message || err?.response?.data?.error || err?.message || '';
-    // Map common English error messages to Arabic
-    if (msg.includes('check in again')) return 'لقد سجّلت حضورك بالفعل هذا اليوم';
+    ATTENDANCE_STATUS_INFO[status]?.colorClass ?? 'bg-gray-50 text-gray-700 border border-gray-200';  const translateApiError = (err: any): string => {
+    const msg: string = err?.response?.data?.message || err?.response?.data?.error || err?.message || '';    if (msg.includes('check in again')) return 'لقد سجّلت حضورك بالفعل هذا اليوم';
     if (msg.includes('check out')) return 'لا يمكن تسجيل الانصراف بدون تسجيل حضور مسبقاً';
     if (msg.includes('already')) return 'تم تسجيل الحضور مسبقاً';
     if (msg.includes('not allowed')) return 'غير مسموح بهذا الإجراء حالياً';
@@ -287,23 +256,12 @@ export default function AttendanceView() {
     if (msg.includes('hourly leave')) return 'تحتاج إلى إجازة بالساعة معتمدة لتسجيل الحضور مرة أخرى';
     if (msg) return msg; // return as-is if no translation found
     return 'حدث خطأ، يرجى المحاولة لاحقاً';
-  };
-
-  // ── Local check status (updates immediately on success) ──
-  const [myCheckStatus, setMyCheckStatus] = useState<'none' | 'checked_in' | 'checked_out'>('none');
+  };  const [myCheckStatus, setMyCheckStatus] = useState<'none' | 'checked_in' | 'checked_out'>('none');
   const [checkInTime, setCheckInTime] = useState<string>('');
-  const [checkOutTime, setCheckOutTime] = useState<string>('');
-
-  // Fetch today's OWN attendance from API to initialize status
-  const { data: myMonthlyAttendance = [] } = useQuery({
+  const [checkOutTime, setCheckOutTime] = useState<string>('');  const { data: myMonthlyAttendance = [] } = useQuery({
     queryKey: ['my-monthly-attendance'],
-    queryFn: getMyMonthlyAttendance,
-    // Always fetch so we know status on any tab
-    staleTime: 60_000,
-  });
-
-  // Initialize status from API data when loaded
-  useEffect(() => {
+    queryFn: getMyMonthlyAttendance,    staleTime: 60_000,
+  });  useEffect(() => {
     if (!Array.isArray(myMonthlyAttendance) || myMonthlyAttendance.length === 0) return;
     const todayDate = new Date().toISOString().split('T')[0];
     const rec = (myMonthlyAttendance as any[]).find(
@@ -318,10 +276,7 @@ export default function AttendanceView() {
       setMyCheckStatus('checked_in');
       setCheckInTime(rec.check_in || '');
     }
-  }, [myMonthlyAttendance]);
-
-  // Check-in/out mutations
-  const checkInMutation = useMutation({
+  }, [myMonthlyAttendance]);  const checkInMutation = useMutation({
     mutationFn: () => submitCheckIn(),
     onSuccess: (data: any) => {
       const time = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
@@ -332,9 +287,7 @@ export default function AttendanceView() {
       qc.invalidateQueries({ queryKey: ['my-monthly-attendance'] });
     },
     onError: (err: any) => {
-      const msg: string = err?.response?.data?.message || err?.response?.data?.error || err?.message || '';
-      // If already checked in, switch UI to checked_in state automatically
-      if (msg.includes('check in again') || msg.includes('already') || msg.includes('hourly leave')) {
+      const msg: string = err?.response?.data?.message || err?.response?.data?.error || err?.message || '';      if (msg.includes('check in again') || msg.includes('already') || msg.includes('hourly leave')) {
         setMyCheckStatus('checked_in');
         const time = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
         if (!checkInTime) setCheckInTime(time);
@@ -355,26 +308,17 @@ export default function AttendanceView() {
       qc.invalidateQueries({ queryKey: ['my-monthly-attendance'] });
     },
     onError: (err: any) => toast.error(translateApiError(err), { duration: 6000 }),
-  });
-
-  // Today's live attendance list
-  const { data: todayList = [], isLoading: todayLoading } = useQuery({
+  });  const { data: todayList = [], isLoading: todayLoading } = useQuery({
     queryKey: ['attendance-today'],
     queryFn: getAttendanceToday,
     enabled: activeTab === 'todayLive',
   });
 
   return (
-    <div className="space-y-6">
-      
-      {/* Header */}
-      <div className="text-start">
+    <div className="space-y-6">      <div className="text-start">
         <h2 className="text-xl font-extrabold text-dark">{t.attendance.title}</h2>
         <p className="text-sm text-brown mt-1">{t.attendance.subtitle}</p>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex gap-2 border-b border-gray-200">
+      </div>      <div className="flex gap-2 border-b border-gray-200">
         {(['byEmployee', 'generalReport', 'todayLive'] as const).map(tab => (
           <button
             key={tab}
@@ -392,10 +336,7 @@ export default function AttendanceView() {
                 : (lang === 'ar' ? 'حضور اليوم' : "Today's Live")}
           </button>
         ))}
-      </div>
-
-      {/* Summary Stats (Today) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      </div>      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {summaryCards.map(s => (
           <div key={s.label} className={`rounded-2xl p-5 ${s.bg} flex items-center justify-between shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200`}>
             <div className="text-start">
@@ -407,10 +348,7 @@ export default function AttendanceView() {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* General Report Filters */}
-      {activeTab === 'generalReport' && (
+      </div>      {activeTab === 'generalReport' && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5 flex flex-wrap gap-6 items-end">
           <div className="flex-1 min-w-[200px] text-start">
             <label className="block text-xs font-bold text-brown uppercase mb-2">{t.attendance.filter.fromDate}</label>
@@ -450,13 +388,8 @@ export default function AttendanceView() {
             </div>
           </div>
         </div>
-      )}
-
-      {/* ── Today Live Tab ── */}
-      {activeTab === 'todayLive' && (
-        <div className="space-y-4">
-          {/* Today's Attendance List */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden">
+      )}      {activeTab === 'todayLive' && (
+        <div className="space-y-4">          <div className="bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <h3 className="font-bold text-dark">
                 {lang === 'ar' ? 'سجل حضور الموظفين اليوم' : "Today's Employees Attendance Log"}
@@ -527,17 +460,12 @@ export default function AttendanceView() {
             )}
           </div>
         </div>
-      )}
-
-      {/* Tab Contents */}
-      {activeTab !== 'todayLive' && loading ? (
+      )}      {activeTab !== 'todayLive' && loading ? (
         <div className="flex justify-center items-center py-20 text-green">
           <Loader2 className="w-8 h-8 animate-spin" />
         </div>
       ) : activeTab === 'byEmployee' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Employee Selector */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-4 h-fit">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">          <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-4 h-fit">
             <div className="flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 mb-3 focus-within:border-green focus-within:ring-2 focus-within:ring-green/10">
               <Search size={14} className="text-gray-400" />
               <input
@@ -574,10 +502,7 @@ export default function AttendanceView() {
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* Table */}
-          <div className="lg:col-span-3 bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden">
+          </div>          <div className="lg:col-span-3 bg-white rounded-2xl border border-gray-100 shadow-card overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100">
               <h3 className="font-bold text-dark text-start">
                 {t.attendance.recordsTitle}{' '}

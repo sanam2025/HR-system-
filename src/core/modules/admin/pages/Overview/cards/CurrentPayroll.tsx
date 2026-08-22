@@ -1,4 +1,3 @@
-// core/modules/Admin/components/cards/CurrentPayroll.tsx
 import type { CurrentPayroll as CurrentPayrollType } from '../../../types/types';
 import { Users, CheckCircle, Clock, Award, MinusCircle } from 'lucide-react';
 import { useLanguage } from '../../../../../../i18n/translations/LanguageContext';
@@ -51,10 +50,7 @@ function CurrentPayroll({
       icon: MinusCircle,
       color: "red",
     },
-  ];
-
-  // Handle loading/undefined state
-  if (!currentPayroll) {
+  ];  if (!currentPayroll) {
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div className="flex items-center justify-center h-64">

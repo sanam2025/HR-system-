@@ -42,9 +42,7 @@ apiClient.interceptors.response.use(
             }
         }
 
-        if(response?.status === 403){
-            // console.warn("Access denied: Account pending approval.");
-        }
+        if(response?.status === 403){        }
 
         return Promise.reject(error);
     }

@@ -1,11 +1,8 @@
-// src/core/modules/HR/pages/Performance/Performance.tsx
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { usePendingEvaluations } from '../../hooks/usePerformance';
 import Loading from '../../../../../shared/components/Loading';
-import type { PerformanceEvaluation } from '../../types/PerformanceService.types';
-//  إضافة استيراد النوع
-
+import type { PerformanceEvaluation } from '../../types/PerformanceService.types';
 export default function Performance() {
   const navigate = useNavigate();
   const { evaluations, isLoading } = usePendingEvaluations();

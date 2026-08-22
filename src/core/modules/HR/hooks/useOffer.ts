@@ -2,13 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { OfferService } from '../../../../api/service/HrService/OfferService';
 import type { CreateOfferData } from '../../../../api/service/HrService/Types/OfferService.types';
-import { AxiosError } from 'axios';
-
-//  دالة استخراج الخطأ بدقة
-const getErrorMessage = (err: unknown): string => {
-  if (err instanceof AxiosError && err.response) {
-    // طباعة تفاصيل الـ 422 للتصحيح (اكتبها في الـ Console)
-    if (err.response.status === 422) {
+import { AxiosError } from 'axios';const getErrorMessage = (err: unknown): string => {
+  if (err instanceof AxiosError && err.response) {    if (err.response.status === 422) {
       console.log(' Validation Errors:', err.response.data);
       
       const data = err.response.data as Record<string, string[]>;
@@ -16,17 +11,12 @@ const getErrorMessage = (err: unknown): string => {
       if (firstKey && data[firstKey]?.[0]) {
         return ` ${data[firstKey][0]}`;
       }
-    }
-    // باقي الأخطاء
-    const data = err.response?.data as { message?: string };
+    }    const data = err.response?.data as { message?: string };
     return data?.message || err.message || 'Request failed';
   }
   if (err instanceof Error) return err.message;
   return 'Request failed';
-};
-
-//  هوك إرسال العرض
-export const useSendOffer = (jobPostingId?: number) => {
+};export const useSendOffer = (jobPostingId?: number) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -45,10 +35,7 @@ export const useSendOffer = (jobPostingId?: number) => {
       toast.error(getErrorMessage(err));
     },
   });
-};
-
-//  هوك العروض
-export const useOffers = (jobPostingId?: number) => {
+};export const useOffers = (jobPostingId?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['offers', jobPostingId],
     queryFn: async () => {

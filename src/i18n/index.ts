@@ -1,13 +1,10 @@
-// src/i18n/index.ts
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 const resources = {
   en: {
-    translation: {
-      // القائمة الجانبية
-      dashboard: 'Dashboard',
+    translation: {      dashboard: 'Dashboard',
       employee: 'Employee',
       recruitment: 'Recruitment',
       applicants: 'Applicants',
@@ -34,10 +31,7 @@ const resources = {
       evaluation: 'Evaluation',
       complaints: 'Complaints',
       holidays: 'Holidays',
-      termination: 'Terminations',
-      
-      // Dashboard
-            systemName: 'Masar HR',
+      termination: 'Terminations',            systemName: 'Masar HR',
       university: 'University of Damascus',
       managerRole: 'Department Manager',
       userName: 'Ahmad Front',
@@ -69,10 +63,7 @@ const resources = {
       payrollCost: 'Payroll Cost',
       attendanceRate: 'Attendance Rate',
       departmentsOverview: 'Departments Overview',
-      fillTitleContent: 'Please fill in title and content',
-      
-      // Page titles
-      payrollManagement: 'Payroll Management',
+      fillTitleContent: 'Please fill in title and content',      payrollManagement: 'Payroll Management',
       managePayroll: 'Manage employee salaries, deductions, and bonuses.',
       employeeTermination: 'Employee Termination',
       manageTerminations: 'Manage employee termination, contract end, and compensation.',
@@ -82,37 +73,22 @@ const resources = {
       newContract: 'New Contract',
       acceptedCandidatesTitle: 'Accepted Candidates',
       manageAcceptedCandidates: 'Manage candidates who passed the manager interview',
-      backToRecruitmentLink: 'Back to Recruitment',
-      
-      // Table columns
-      contractNum: '# Contract',
+      backToRecruitmentLink: 'Back to Recruitment',      contractNum: '# Contract',
       period: 'Period',
       salary: 'Salary',
       position: 'Position',
       employee: 'Employee',
       department: 'Department',
-      effectiveDate: 'Effective Date',
-      
-      // Notifications
-      notifications: 'Notifications',
+      effectiveDate: 'Effective Date',      notifications: 'Notifications',
       markAllAsRead: 'Mark all as read',
       noNewNotifications: 'No new notifications',
-      viewAllNotifications: 'View all notifications',
-
-      // General Data
-      totalRequests: 'Total Requests',
+      viewAllNotifications: 'View all notifications',      totalRequests: 'Total Requests',
       processed: 'Processed',
       draft: 'Draft',
-      pending: 'Pending',
-
-      // More columns
-      candidate: 'Candidate',
+      pending: 'Pending',      candidate: 'Candidate',
       interviewDate: 'Interview Date',
       offerStatus: 'Offer Status',
-      noAcceptedCandidates: 'No accepted candidates found',
-
-      // Complaints
-      complaintsManagement: 'Complaints Management',
+      noAcceptedCandidates: 'No accepted candidates found',      complaintsManagement: 'Complaints Management',
       viewManageComplaints: 'View and manage all complaints from employees and managers',
       titleStar: 'Title *',
       complainant: 'Complainant',
@@ -135,10 +111,7 @@ const resources = {
       rejected: 'Rejected',
       sendResponse: 'Send Response',
       hrResponse: 'HR Response',
-      pleaseWriteResponse: 'Please write a response',
-
-      // Resignations
-      resignationRequests: 'Resignation Requests',
+      pleaseWriteResponse: 'Please write a response',      resignationRequests: 'Resignation Requests',
       manageResignationRequests: 'Manage standard and immediate resignation requests.',
       standard: 'Standard',
       immediate: 'Immediate',
@@ -151,50 +124,31 @@ const resources = {
       reject: 'Reject',
       approved: 'Approved',
       rejectedStatus: 'Rejected',
-      noResignationRequestsFound: 'No resignation requests found',
-
-      // الصفحات
-
+      noResignationRequestsFound: 'No resignation requests found',
       allApplicants: 'All Applicants',
       noApplicants: 'No applicants found for this job posting',
       noApplicantsApplied: 'No applicants have applied for this position yet.',
       backToRecruitment: 'Back to Recruitment',
       noJobSelected: 'No job selected',
       selectJobPostingToView: 'Please select a job posting to view applicants',
-      goToJobPostings: 'Go to Job Postings',
-
-      // Departments / Employees
-      departmentsPageTitle: 'Departments',
+      goToJobPostings: 'Go to Job Postings',      departmentsPageTitle: 'Departments',
       browseEmployeesByDept: 'Browse employees by department',
-      noDepartmentsFound: 'No departments found',
-      
-      // Attendance
-      manageEmployeeAttendance: 'Manage employee attendance',
+      noDepartmentsFound: 'No departments found',      manageEmployeeAttendance: 'Manage employee attendance',
       applyFilter: 'Apply Filter',
       searchByName: 'Search by name...',
       late: 'Late',
       absent: 'Absent',
       present: 'Present',
       attendanceRecords: 'Attendance Records',
-      noAttendanceRecords: 'No attendance records found',
-      
-      // Leaves
-      manageLeaveRequests: 'Manage employee leave requests',
+      noAttendanceRecords: 'No attendance records found',      manageLeaveRequests: 'Manage employee leave requests',
       totalRequests: 'Total Requests',
       filtersApplied: 'Filters applied',
       allTypes: 'All Types',
       allStatus: 'All Status',
       leaveRequestsRecords: 'Leave Requests',
-      noLeaveRequests: 'No leave requests found',
-      
-      // Hourly Leaves
-      manageHourlyLeaveRequests: 'Manage hourly leave requests',
+      noLeaveRequests: 'No leave requests found',      manageHourlyLeaveRequests: 'Manage hourly leave requests',
       hourlyLeaveRequestsRecords: 'Requests',
-      noHourlyLeaveRequests: 'No hourly leave requests found',
-
-
-      // الأزرار
-      scheduleInterview: 'Schedule Interview',
+      noHourlyLeaveRequests: 'No hourly leave requests found',      scheduleInterview: 'Schedule Interview',
       viewDetails: 'View Details',
       approve: 'Approve',
       reject: 'Reject',
@@ -202,10 +156,7 @@ const resources = {
       edit: 'Edit',
       delete: 'Delete',
       refresh: 'Refresh',
-      search: 'Search',
-
-      // الحالات
-      status: 'Status',
+      search: 'Search',      status: 'Status',
       pending: 'Pending',
       reviewed: 'Reviewed',
       accepted: 'Accepted',
@@ -216,10 +167,7 @@ const resources = {
       completed: 'Completed',
       cancelled: 'Cancelled',
       open: 'Open',
-      closed: 'Closed',
-
-      // الجدول
-      applicant: 'Applicant',
+      closed: 'Closed',      applicant: 'Applicant',
       contact: 'Contact',
       experience: 'Experience',
       skills: 'Skills',
@@ -228,31 +176,19 @@ const resources = {
       jobTitle: 'Job Title',
       department: 'Department',
       requester: 'Requester',
-      exp: 'Exp',
-
-      // المقابلات
-      manageInterviews: 'Manage interviews for this job posting',
+      exp: 'Exp',      manageInterviews: 'Manage interviews for this job posting',
       candidate: 'Candidate',
       scheduledAt: 'Scheduled At',
       location: 'Location',
       interviewer: 'Interviewer',
-      total: 'Total',
-
-      // عام
-      loading: 'Loading...',
+      total: 'Total',      loading: 'Loading...',
       error: 'Error',
       tryAgain: 'Try Again',
       noData: 'No data found',
-      noResults: 'No results found',
-
-      // الإعدادات
-      settings: 'Settings',
+      noResults: 'No results found',      settings: 'Settings',
       language: 'Language',
       arabic: 'Arabic',
-      english: 'English',
-      
-      // المفقودة
-      backToDashboard: 'Back to Dashboard',
+      english: 'English',      backToDashboard: 'Back to Dashboard',
       clearFilter: 'Clear Filter',
       noManager: 'No Manager',
       approved: 'Approved',
@@ -281,10 +217,7 @@ const resources = {
       rejectRequestConfirm: 'Are you sure you want to reject this request?',
       recruitmentRequests: 'Recruitment Requests',
       manageRecruitmentRequests: 'Manage Recruitment Requests',
-      noRecruitmentRequests: 'No recruitment requests available.',
-      
-      // Admin Dashboard
-      adminPortal: 'Masar HR',
+      noRecruitmentRequests: 'No recruitment requests available.',      adminPortal: 'Masar HR',
       administration: 'Administration',
       adminMenu: 'ADMINMENU',
       welcome: 'Welcome',
@@ -383,9 +316,7 @@ const resources = {
       mar: 'Mar',
       apr: 'Apr',
       may: 'May',
-      jun: 'Jun',
-      // Profile
-      editProfile: 'Edit Profile',
+      jun: 'Jun',      editProfile: 'Edit Profile',
       personalDetails: 'Personal Details',
       documents: 'Documents',
       employmentStatus: 'Employment Status',
@@ -420,9 +351,7 @@ const resources = {
     },
   },
   ar: {
-    translation: {
-      // القائمة الجانبية
-      dashboard: 'لوحة التحكم',
+    translation: {      dashboard: 'لوحة التحكم',
       employee: 'الموظفين',
       recruitment: 'التوظيف',
       applicants: 'المتقدمين',
@@ -448,10 +377,7 @@ const resources = {
       evaluation: 'التقييم الدوري',
       complaints: 'الشكاوي',
       holidays: 'العطل الرسمية',
-      termination: 'إنهاء الخدمة',
-
-      // Dashboard
-            systemName: 'Masar HR',
+      termination: 'إنهاء الخدمة',            systemName: 'Masar HR',
       university: 'جامعة دمشق',
       managerRole: 'مدير القسم',
       userName: 'أحمد محمد الصالح',
@@ -483,10 +409,7 @@ const resources = {
       payrollCost: 'تكلفة الرواتب',
       attendanceRate: 'معدل الحضور',
       departmentsOverview: 'نظرة عامة على الأقسام',
-      fillTitleContent: 'يرجى ملء العنوان والمحتوى',
-
-      // عناوين الصفحات
-      payrollManagement: 'إدارة الرواتب',
+      fillTitleContent: 'يرجى ملء العنوان والمحتوى',      payrollManagement: 'إدارة الرواتب',
       managePayroll: 'إدارة رواتب الموظفين والخصومات والمكافآت.',
       employeeTermination: 'إنهاء الخدمة',
       manageTerminations: 'إدارة إنهاء خدمة الموظفين وانتهاء العقود والتعويضات.',
@@ -496,10 +419,7 @@ const resources = {
       newContract: 'عقد جديد',
       acceptedCandidatesTitle: 'المرشحون المقبولون',
       manageAcceptedCandidates: 'إدارة المرشحين الذين اجتازوا مقابلة المدير',
-      backToRecruitmentLink: 'العودة إلى التوظيف',
-
-      // أعمدة الجدول
-      contractNum: '# العقد',
+      backToRecruitmentLink: 'العودة إلى التوظيف',      contractNum: '# العقد',
       period: 'الفترة',
       salary: 'الراتب',
       position: 'المنصب',
@@ -508,28 +428,16 @@ const resources = {
       effectiveDate: 'تاريخ السريان',
       actions: 'الإجراءات',
       status: 'الحالة',
-      type: 'النوع',
-
-      // الإحصائيات
-      totalRequests: 'إجمالي الطلبات',
+      type: 'النوع',      totalRequests: 'إجمالي الطلبات',
       processed: 'تم المعالجة',
       draft: 'مسودة',
-      pending: 'قيد الانتظار',
-
-      // Notifications
-      notifications: 'الإشعارات',
+      pending: 'قيد الانتظار',      notifications: 'الإشعارات',
       markAllAsRead: 'تحديد الكل كمقروء',
       noNewNotifications: 'لا توجد إشعارات جديدة',
-      viewAllNotifications: 'عرض كل الإشعارات',
-
-      // General Dataإضافية
-      candidate: 'المرشح',
+      viewAllNotifications: 'عرض كل الإشعارات',      candidate: 'المرشح',
       interviewDate: 'تاريخ المقابلة',
       offerStatus: 'حالة العرض',
-      noAcceptedCandidates: 'لا يوجد مرشحون مقبولون',
-
-      // الشكاوى
-      complaintsManagement: 'إدارة الشكاوى',
+      noAcceptedCandidates: 'لا يوجد مرشحون مقبولون',      complaintsManagement: 'إدارة الشكاوى',
       viewManageComplaints: 'عرض وإدارة جميع شكاوى الموظفين والمدراء',
       titleStar: 'العنوان *',
       complainant: 'مقدم الشكوى',
@@ -552,10 +460,7 @@ const resources = {
       rejected: 'مرفوض',
       sendResponse: 'إرسال الرد',
       hrResponse: 'رد الموارد البشرية',
-      pleaseWriteResponse: 'يرجى كتابة رد',
-
-      // الاستقالات
-      resignationRequests: 'طلبات الاستقالة',
+      pleaseWriteResponse: 'يرجى كتابة رد',      resignationRequests: 'طلبات الاستقالة',
       manageResignationRequests: 'إدارة طلبات الاستقالة العادية والفورية.',
       standard: 'عادي',
       immediate: 'فوري',
@@ -568,48 +473,30 @@ const resources = {
       reject: 'رفض',
       approved: 'تمت الموافقة',
       rejectedStatus: 'مرفوض',
-      noResignationRequestsFound: 'لا توجد طلبات استقالة',
-
-      // الصفحات
-      allApplicants: 'جميع المتقدمين',
+      noResignationRequestsFound: 'لا توجد طلبات استقالة',      allApplicants: 'جميع المتقدمين',
       noApplicants: 'لا يوجد متقدمين لهذه الوظيفة',
       noApplicantsApplied: 'لم يتقدم أي شخص لهذه الوظيفة بعد.',
       backToRecruitment: 'العودة إلى التوظيف',
       noJobSelected: 'لم يتم تحديد وظيفة',
       selectJobPostingToView: 'يرجى تحديد إعلان وظيفي لعرض المتقدمين',
-      goToJobPostings: 'الذهاب إلى الإعلانات الوظيفية',
-
-      // Departments / Employees
-      departmentsPageTitle: 'الأقسام',
+      goToJobPostings: 'الذهاب إلى الإعلانات الوظيفية',      departmentsPageTitle: 'الأقسام',
       browseEmployeesByDept: 'تصفح الموظفين حسب القسم',
-      noDepartmentsFound: 'لم يتم العثور على أقسام',
-      
-      // Attendance
-      manageEmployeeAttendance: 'إدارة حضور الموظفين',
+      noDepartmentsFound: 'لم يتم العثور على أقسام',      manageEmployeeAttendance: 'إدارة حضور الموظفين',
       applyFilter: 'تطبيق الفلتر',
       searchByName: 'ابحث بالاسم...',
       late: 'متأخر',
       absent: 'غائب',
       present: 'حاضر',
       attendanceRecords: 'سجلات الحضور',
-      noAttendanceRecords: 'لم يتم العثور على سجلات حضور',
-      
-      // Leaves
-      manageLeaveRequests: 'إدارة طلبات إجازة الموظفين',
+      noAttendanceRecords: 'لم يتم العثور على سجلات حضور',      manageLeaveRequests: 'إدارة طلبات إجازة الموظفين',
       totalRequests: 'إجمالي الطلبات',
       filtersApplied: 'الفلاتر المطبقة',
       allTypes: 'جميع الأنواع',
       allStatus: 'جميع الحالات',
       leaveRequestsRecords: 'طلبات الإجازة',
-      noLeaveRequests: 'لم يتم العثور على طلبات إجازة',
-      
-      // Hourly Leaves
-      manageHourlyLeaveRequests: 'إدارة طلبات الإجازة الساعية',
+      noLeaveRequests: 'لم يتم العثور على طلبات إجازة',      manageHourlyLeaveRequests: 'إدارة طلبات الإجازة الساعية',
       hourlyLeaveRequestsRecords: 'الطلبات',
-      noHourlyLeaveRequests: 'لم يتم العثور على طلبات إجازة ساعية',
-
-      // الأزرار
-      scheduleInterview: 'جدولة مقابلة',
+      noHourlyLeaveRequests: 'لم يتم العثور على طلبات إجازة ساعية',      scheduleInterview: 'جدولة مقابلة',
       viewDetails: 'عرض التفاصيل',
       approve: 'موافقة',
       reject: 'رفض',
@@ -617,10 +504,7 @@ const resources = {
       edit: 'تعديل',
       delete: 'حذف',
       refresh: 'تحديث',
-      search: 'بحث',
-
-      // الحالات
-      status: 'الحالة',
+      search: 'بحث',      status: 'الحالة',
       pending: 'قيد الانتظار',
       reviewed: 'تم المراجعة',
       accepted: 'مقبول',
@@ -631,10 +515,7 @@ const resources = {
       completed: 'مكتملة',
       cancelled: 'ملغية',
       open: 'مفتوحة',
-      closed: 'مغلقة',
-
-      // الجدول
-      applicant: 'المتقدم',
+      closed: 'مغلقة',      applicant: 'المتقدم',
       contact: 'جهة الاتصال',
       experience: 'الخبرة',
       skills: 'المهارات',
@@ -643,30 +524,19 @@ const resources = {
       jobTitle: 'المسمى الوظيفي',
       department: 'القسم',
       requester: 'الطالب',
-      exp: 'خبرة',
-
-      // المقابلات
-      manageInterviews: 'إدارة المقابلات لهذه الوظيفة',
+      exp: 'خبرة',      manageInterviews: 'إدارة المقابلات لهذه الوظيفة',
       candidate: 'المرشح',
       scheduledAt: 'وقت المقابلة',
       location: 'المكان',
       interviewer: 'المحاور',
-      total: 'الإجمالي',
-
-      // عام
-      loading: 'جاري التحميل...',
+      total: 'الإجمالي',      loading: 'جاري التحميل...',
       error: 'خطأ',
       tryAgain: 'حاول مرة أخرى',
       noData: 'لا توجد بيانات',
-      noResults: 'لا توجد نتائج',
-
-      // الإعدادات
-      settings: 'الإعدادات',
+      noResults: 'لا توجد نتائج',      settings: 'الإعدادات',
       language: 'اللغة',
       arabic: 'العربية',
-      english: 'الإنجليزية',
-      // المفقودة
-      backToDashboard: 'العودة للرئيسية',
+      english: 'الإنجليزية',      backToDashboard: 'العودة للرئيسية',
       clearFilter: 'مسح الفلتر',
       noManager: 'بدون مدير',
       approved: 'موافق عليه',
@@ -695,10 +565,7 @@ const resources = {
       rejectRequestConfirm: 'هل أنت متأكد من رفض هذا الطلب؟',
       recruitmentRequests: 'طلبات التوظيف',
       manageRecruitmentRequests: 'إدارة طلبات التوظيف',
-      noRecruitmentRequests: 'لا توجد طلبات توظيف متاحة.',
-      
-      // Admin Dashboard
-      adminPortal: 'Masar HR',
+      noRecruitmentRequests: 'لا توجد طلبات توظيف متاحة.',      adminPortal: 'Masar HR',
       administration: 'الإدارة',
       adminMenu: 'قائمة الإدارة',
       welcome: 'مرحباً',
@@ -797,9 +664,7 @@ const resources = {
       mar: 'مارس',
       apr: 'أبريل',
       may: 'مايو',
-      jun: 'يونيو',
-      // Profile
-      editProfile: 'تعديل الملف الشخصي',
+      jun: 'يونيو',      editProfile: 'تعديل الملف الشخصي',
       personalDetails: 'التفاصيل الشخصية',
       documents: 'المستندات',
       employmentStatus: 'الحالة الوظيفية',

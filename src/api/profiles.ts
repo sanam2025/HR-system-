@@ -33,11 +33,6 @@ export async function updateProfile(
   payload: UpdateProfilePayload,
   options?: RequestOptions
 ): Promise<Profile> {
-  // Laravel does not populate `$request->file()` for multipart bodies sent
-  // with a real PUT/PATCH verb (PHP itself only parses multipart on POST),
-  // so a picture update has to travel as a POST with Laravel's `_method`
-  // verb-spoofing field rather than an actual PUT. Text-only updates keep
-  // using a real PUT with a JSON body, which Laravel decodes fine.
   if (payload.picture) {
     const form = toProfileForm(payload);
     form.append("_method", "PUT");

@@ -29,15 +29,7 @@ apiClient.interceptors.request.use(
 )
 
 apiClient.interceptors.response.use(
-    (response) => {
-        // if (response.data?.data?.Token) {
-        //     localStorage.setItem('token', response.data.data.Token);
-
-        //     if (response.data.data.user) {
-        //         localStorage.setItem('user', JSON.stringify(response.data.data.user));
-        //     }
-        // }
-        
+    (response) => {        
         if (response.data?.Token) {
             const token = response.data.Token;
             const isRemember = localStorage.getItem('remember_me') === 'true';

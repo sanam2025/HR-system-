@@ -17,31 +17,18 @@ export const endpoints = {
   auth: {
     login: "login",
     logout: "logout",
-    // NOTE: named "putPassword" in the collection but is a GET with no
-    // password field — see CHANGELOG.md ("auth/putPassword does nothing").
     user: "user",
     changePassword: "change-password",
   },
 
   onboarding: {
     upload: "onboarding/upload",
-    // CONFIRMED via scripts/probe_api.py against the live deployment: this
-    // route exists (returns 401 Unauthenticated, not 404) despite the
-    // Postman collection request for it ("onboarding status e") having no
-    // URL at all. Response shape is still unknown — no valid test
-    // credentials have gotten past login yet. See CHANGELOG.md.
     status: "onboarding/status",
   },
 
   documents: {
     myContract: "my/contract",
-    // CONFIRMED via live backend testing: this route exists but currently
-    // returns a real server error payload: {"success": false, "message": "Model Not Found"}.
-    // That indicates a backend model/data relationship bug rather than a missing route.
     downloadMyContract: "my/contract/download",
-    // CONFIRMED via scripts/probe_api.py: returns 404 Route Not Found on
-    // the live deployment — this route genuinely does not exist. See
-    // CHANGELOG.md.
     myDocuments: "my-documents",
     downloadDocument: (id: number | string) => `my-documents/${id}/download`,
   },
@@ -56,39 +43,20 @@ export const endpoints = {
   attendance: {
     checkIn: "check-in",
     checkOut: "check-out",
-    // CONFIRMED via live backend testing (2026-08-18, employee-role
-    // account): this route works and returns real records — the earlier
-    // "500 due to invalid ORDER BY" note no longer reproduces.
     myMonthly: "my-monthly-attendance",
-    // NOTE: `attendance-today-analysis` and `attendance-percentage` were
-    // in this object in an earlier pass but CONFIRMED via live testing
-    // (2026-08-18) to 403 "User does not have the right roles." for a real
-    // employee account — they're manager/HR-only, not self-service, so
-    // they were removed along with the frontend code that called them.
-    // `attendance-today` (all-employees daily roster) and
-    // `attendance-filter` (date-range query) were never wired to begin
-    // with and are almost certainly the same manager/HR scope as those
-    // two, going by the naming — left out for the same reason.
   },
 
   leaveRequests: {
-    // NOTE: camelCase (`leaveRequests`) while every sibling collection in
-    // this API is kebab-case — see CHANGELOG.md ("Inconsistent route
-    // casing").
     create: "leaveRequests",
     list: "leaveRequests",
     show: (id: number | string) => `leaveRequests/${id}`,
     update: (id: number | string) => `leaveRequests/${id}`,
     remove: (id: number | string) => `leaveRequests/${id}`,
     mine: "my-leave-request",
-    // Added to the collection since the last pass — a genuine self-service
-    // balance route now exists, closing the gap noted in CHANGELOG.md
-    // ("No self-service leave balance endpoint").
     myBalance: "my-leave-balance",
   },
 
   hourlyLeaveRequests: {
-    // NOTE: capital "R" in "Requests" here...
     create: "hourly-leave-Requests",
     list: "hourly-leave-Requests",
     show: (id: number | string) => `hourly-leave-Requests/${id}`,
@@ -102,10 +70,6 @@ export const endpoints = {
     show: (id: number | string) => `tasks/${id}`,
     start: (id: number | string) => `tasks/${id}/start`,
     submit: (id: number | string) => `tasks/${id}/submit`,
-    // CONFIRMED via live backend testing (2026-08-18, employee-role
-    // account): 404 "Route Not Found" — genuinely doesn't exist despite
-    // being in the collection. Not called anywhere; left out entirely
-    // rather than wired to a route that can't work.
   },
 
   payroll: {
@@ -146,9 +110,7 @@ export const endpoints = {
   },
 
   resignations: {
-    // The create endpoint is correctly named
     create: "resignations",
-    // The backend route for fetching my resignations has a typo "resigna/mine"
     mine: "resigna/mine",
   },
 } as const;

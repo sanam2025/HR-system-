@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/AllApplicants/ApplicantCard.tsx
 import React from 'react';
 import { Calendar } from 'lucide-react';
 import type { Candidate } from '../../../../../api/service/HrService/Types/CandidatesService.types';
@@ -20,9 +19,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
   candidate,
   jobId,
   onScheduleInterview,
-}) => {
-  //  تغيير الحالة من rejected إلى applied
-  const displayStatus = candidate.status === 'rejected' ? 'applied' : candidate.status;
+}) => {  const displayStatus = candidate.status === 'rejected' ? 'applied' : candidate.status;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -44,13 +41,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
   }).filter(Boolean) || [];
   
   const experience = candidate.experience || 0;
-  const status = displayStatus as string;
-
-  //  إظهار أيقونة التقويم فقط لـ applied
-  const showScheduleButton = jobId && status === 'applied';
-  
-  //  تم حذف أيقونة Offer من هنا (نقلت لصفحة JobPostingDetail)
-
+  const status = displayStatus as string;  const showScheduleButton = jobId && status === 'applied';
   return (
     <tr className="hover:bg-gray-50">
       <td className="px-6 py-4">
@@ -98,9 +89,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
         </div>
       </td>
       <td className="px-6 py-4">
-        <div className="flex items-center justify-end">
-          {/*  أيقونة التقويم (لـ applied فقط) */}
-          {showScheduleButton && (
+        <div className="flex items-center justify-end">          {showScheduleButton && (
             <button
               onClick={() => onScheduleInterview(candidate.id)}
               className="p-2 text-purple-500 hover:text-purple-700 transition-colors"
@@ -108,9 +97,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
             >
               <Calendar className="w-5 h-5" />
             </button>
-          )}
-          {/*  تم حذف أيقونة Offer */}
-        </div>
+          )}        </div>
       </td>
     </tr>
   );

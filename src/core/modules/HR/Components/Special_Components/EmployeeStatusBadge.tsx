@@ -1,4 +1,3 @@
-// core/modules/HR/components/EmployeeStatusBadge.tsx
 import React from "react";
 import type { EmployeeStatus } from "../../types/employee.types";
 

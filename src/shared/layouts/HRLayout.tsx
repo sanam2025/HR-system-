@@ -1,4 +1,3 @@
-// src/shared/layouts/HRLayout.tsx
 import AppLayout from './AppLayout';
 import { useLanguage } from '../../i18n/translations/LanguageContext';
 import {

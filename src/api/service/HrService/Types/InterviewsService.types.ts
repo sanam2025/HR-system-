@@ -1,4 +1,3 @@
-// src/api/service/HrService/Types/InterviewsService.types.ts
 export interface Interview {
   id: number;
   candidate_id: number;

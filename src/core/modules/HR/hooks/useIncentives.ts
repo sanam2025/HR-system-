@@ -1,4 +1,3 @@
-// src/core/modules/HR/hooks/useIncentives.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { IncentivesService } from '../../../../api/service/HrService/IncentivesService';
@@ -8,9 +7,7 @@ export const useIncentives = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['incentives'],
     queryFn: async () => {
-      const res = await IncentivesService.getAll();
-      //  إرجاع البيانات مباشرة بدون استخدام as
-      return res.data?.data || [];
+      const res = await IncentivesService.getAll();      return res.data?.data || [];
     },
   });
 

@@ -13,12 +13,7 @@ import {
   getCompletedTasksCount,
   type Task,
 } from '../../../api/tasks';
-import { useLanguage } from '../../../i18n/translations/LanguageContext';
-
-// ── Helpers & Config ──
-
-// API status -> display
-const STATUS_MAP: Record<string, { label: string; labelEn: string; color: string; badge: string }> = {
+import { useLanguage } from '../../../i18n/translations/LanguageContext';const STATUS_MAP: Record<string, { label: string; labelEn: string; color: string; badge: string }> = {
   pending:    { label: 'جديدة',        labelEn: 'New',         color: '#3b82f6', badge: '#eff6ff' },
   in_progress:{ label: 'قيد التنفيذ',  labelEn: 'In Progress', color: '#f59e0b', badge: '#fffbeb' },
   submitted:  { label: 'قيد المراجعة', labelEn: 'Under Review',color: '#8b5cf6', badge: '#f5f3ff' },
@@ -56,24 +51,15 @@ function StarRating({ value, onChange }: StarRatingProps) {
       ))}
     </div>
   );
-}
-
-// ── Component ──
-
+}
 export default function TasksBoard() {
   const { t, dir, lang } = useLanguage();
-  const qc = useQueryClient();
-
-  // ── State ──
-  const [showCreate, setShowCreate] = useState(false);
+  const qc = useQueryClient();  const [showCreate, setShowCreate] = useState(false);
   const [reviewTask, setReviewTask] = useState<Task | null>(null);
   const [reviewScore, setReviewScore] = useState(0);
   const [reviewComment, setReviewComment] = useState('');
   const [reviewStatus, setReviewStatus] = useState<'approved' | 'rejected'>('approved');
-  const [form, setForm] = useState({ title: '', assigned_to: '', priority: 'high', due_date: '', description: '' });
-
-  // ── Queries ──
-  const { data: tasks = [], isLoading } = useQuery<Task[]>({
+  const [form, setForm] = useState({ title: '', assigned_to: '', priority: 'high', due_date: '', description: '' });  const { data: tasks = [], isLoading } = useQuery<Task[]>({
     queryKey: ['tasks'],
     queryFn: () => getTasks(),
   });
@@ -95,10 +81,7 @@ export default function TasksBoard() {
     enabled: !!reviewTask,
   });
 
-  const activeReviewTask = reviewTaskDetails || reviewTask;
-
-  // ── Mutations ──
-  const createMutation = useMutation({
+  const activeReviewTask = reviewTaskDetails || reviewTask;  const createMutation = useMutation({
     mutationFn: createTask,
     onSuccess: () => {
       toast.success(t.tasks.createModal.success);
@@ -129,10 +112,7 @@ export default function TasksBoard() {
       setReviewComment('');
     },
     onError: () => toast.error('فشل في إرسال المراجعة'),
-  });
-
-  // ── Handlers ──
-  const handleCreate = (e: React.FormEvent) => {
+  });  const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.assigned_to || !form.due_date) {
       toast.error(t.tasks.createModal.requiredError);
@@ -161,10 +141,7 @@ export default function TasksBoard() {
       
       const a = document.createElement('a');
       a.href = objectUrl;
-      a.target = '_blank';
-      
-      // Determine file extension from type if possible
-      const type = blob.type;
+      a.target = '_blank';      const type = blob.type;
       let ext = '';
       if (type.includes('png')) ext = '.png';
       else if (type.includes('jpeg') || type.includes('jpg')) ext = '.jpg';
@@ -198,10 +175,7 @@ export default function TasksBoard() {
         comment: reviewComment || undefined,
       },
     });
-  };
-
-  // ── Column grouping ──
-  const grouped = useMemo(() => {
+  };  const grouped = useMemo(() => {
     const map: Record<string, Task[]> = { pending: [], in_progress: [], submitted: [], completed: [] };
     tasks.forEach(tk => {
       let st = (tk.status || 'pending').toLowerCase().trim();
@@ -230,11 +204,7 @@ export default function TasksBoard() {
   }
 
   return (
-    <div dir={dir}>
-      
-
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+    <div dir={dir}>      <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-extrabold text-dark">{t.tasks.boardTitle}</h2>
           <p className="text-sm text-gray-500 mt-1">
@@ -253,10 +223,7 @@ export default function TasksBoard() {
           <Plus size={16} strokeWidth={2.5} />
           {t.tasks.newTask}
         </button>
-      </div>
-
-      {/* Kanban Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 pb-4">
+      </div>      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 pb-4">
         {STATUSES.map(statusKey => {
           const cfg = STATUS_MAP[statusKey];
           const colTasks = grouped[statusKey] || [];
@@ -265,9 +232,7 @@ export default function TasksBoard() {
               key={statusKey}
               className="bg-[#f8fafc] rounded-2xl p-4 flex flex-col gap-3"
               style={{ borderTop: `4px solid ${cfg.color}` }}
-            >
-              {/* Column Header */}
-              <div className="flex items-center justify-between">
+            >              <div className="flex items-center justify-between">
                 <span className="font-bold text-sm text-dark">
                   {lang === 'ar' ? cfg.label : cfg.labelEn}
                 </span>
@@ -281,10 +246,7 @@ export default function TasksBoard() {
 
               {colTasks.length === 0 && (
                 <p className="text-center text-gray-300 text-sm py-5">{t.tasks.noTasks}</p>
-              )}
-
-              {/* Task Cards */}
-              {colTasks.map(task => (
+              )}              {colTasks.map(task => (
                 <div
                   key={task.id}
                   className="bg-white rounded-2xl border border-gray-200 p-3.5 shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200"
@@ -308,36 +270,23 @@ export default function TasksBoard() {
                       <Clock size={11} />
                       {task.due_date}
                     </div>
-                  </div>
-
-                  {/* Priority badge */}
-                  <div className="mt-2">
+                  </div>                  <div className="mt-2">
                     <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
                       style={{ background: PRIORITY_MAP[task.priority] + '20', color: PRIORITY_MAP[task.priority] || '#9ca3af' }}>
                       {priorityLabel(task.priority)}
                     </span>
-                  </div>
-
-                  {/* Submission score if reviewed */}
-                  {task.submission?.score != null && (
+                  </div>                  {task.submission?.score != null && (
                     <div className="mt-2 text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-1 rounded-lg">
                       {'★'.repeat(Math.round(task.submission.score / 20))}{'☆'.repeat(5 - Math.round(task.submission.score / 20))} {task.submission.score}/100
                     </div>
-                  )}
-
-                  {/* Actions */}
-                  <div className="mt-3 flex gap-2">
-                    {/* Review button for submitted tasks */}
-                    {(task.status === 'submitted' || task.status === 'قيد المراجعة') && (
+                  )}                  <div className="mt-3 flex gap-2">                    {(task.status === 'submitted' || task.status === 'قيد المراجعة') && (
                       <button
                         onClick={() => { setReviewTask(task); setReviewScore(0); setReviewComment(''); setReviewStatus('approved'); }}
                         className="flex-1 flex items-center justify-center gap-1 text-xs font-bold bg-purple-50 text-purple-700 border border-purple-100 rounded-xl py-1.5 hover:bg-purple-100 transition-colors"
                       >
                         <ClipboardList size={13} /> {t.tasks.reviewTask}
                       </button>
-                    )}
-                    {/* Cancel button only for pending tasks */}
-                    {['pending', 'جديدة', 'جديد', 'معلقة'].includes((task.status || '').toLowerCase().trim()) && (
+                    )}                    {['pending', 'جديدة', 'جديد', 'معلقة'].includes((task.status || '').toLowerCase().trim()) && (
                       <button
                         onClick={() => handleCancel(task)}
                         disabled={cancelMutation.isPending}
@@ -352,10 +301,7 @@ export default function TasksBoard() {
             </div>
           );
         })}
-      </div>
-
-      {/* ── Create Task Modal ── */}
-      {showCreate && (
+      </div>      {showCreate && (
         <div className="fixed inset-0 bg-black/45 flex items-center justify-center z-50 p-4">
           <div dir={dir} className="bg-white rounded-2xl w-full max-w-lg shadow-modal overflow-hidden animate-slide-up">
             <div className="flex items-center justify-between px-6 pt-5">
@@ -431,10 +377,7 @@ export default function TasksBoard() {
             </form>
           </div>
         </div>
-      )}
-
-      {/* ── Review Submission Modal ── */}
-      {reviewTask && (
+      )}      {reviewTask && (
         <div className="fixed inset-0 bg-black/45 flex items-center justify-center z-50 p-4">
           <div dir={dir} className="bg-white rounded-2xl w-full max-w-md shadow-modal overflow-hidden">
             <div className="flex items-center justify-between px-6 pt-5">
@@ -451,15 +394,10 @@ export default function TasksBoard() {
                   <Loader2 className="animate-spin text-purple-600" size={32} />
                 </div>
               ) : (
-                <>
-                  {/* Task Info */}
-                  <div className="bg-[#f8fafc] rounded-xl p-3.5">
+                <>                  <div className="bg-[#f8fafc] rounded-xl p-3.5">
                     <p className="font-semibold text-dark">{activeReviewTask?.title}</p>
                     <p className="text-sm text-gray-500 mt-1">{activeReviewTask && getAssigneeName(activeReviewTask)}</p>
-                  </div>
-
-                  {/* Submission Details */}
-                  {activeReviewTask?.latest_submission && (
+                  </div>                  {activeReviewTask?.latest_submission && (
                     <div className="bg-blue-50 border border-blue-100 rounded-xl p-3.5 text-sm">
                       <p className="font-semibold text-blue-900 mb-2">{t.tasks.reviewModal.submissionDetails}</p>
                       
@@ -488,10 +426,7 @@ export default function TasksBoard() {
                         </div>
                       </div>
                     </div>
-                  )}
-
-                  {/* Approve / Reject Toggle */}
-                  <div>
+                  )}                  <div>
                     <label className="form-label mb-2 block">{t.tasks.reviewModal.decision}</label>
                     <div className="flex gap-3">
                       <button
@@ -509,10 +444,7 @@ export default function TasksBoard() {
                         <XCircle size={15} /> {t.tasks.reviewModal.reject}
                       </button>
                     </div>
-                  </div>
-
-                  {/* Score (only for approved) */}
-                  {reviewStatus === 'approved' && (
+                  </div>                  {reviewStatus === 'approved' && (
                     <div>
                       <label className="form-label">{t.tasks.rateModal.rating}</label>
                       <StarRating value={reviewScore} onChange={setReviewScore} />
@@ -530,10 +462,7 @@ export default function TasksBoard() {
                       <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
                       {t.tasks.reviewModal.rejectNotice}
                     </div>
-                  )}
-
-                  {/* Comment */}
-                  <div>
+                  )}                  <div>
                     <label className="form-label">{t.tasks.rateModal.notes}</label>
                     <textarea
                       className="form-input resize-none h-20"

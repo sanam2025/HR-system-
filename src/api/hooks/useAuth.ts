@@ -16,11 +16,7 @@ export function useLogout() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () => authApi.logout(),
-    onSettled: () => {
-      // Regardless of whether the server call succeeded, the session is
-      // over locally: clear the token and every cached query so the next
-      // sign-in never shows a previous user's stale data.
-      clearSession();
+    onSettled: () => {      clearSession();
       queryClient.clear();
     },
   });

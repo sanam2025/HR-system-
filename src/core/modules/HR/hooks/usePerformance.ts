@@ -1,11 +1,7 @@
-// src/core/modules/HR/hooks/usePerformance.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { PerformanceService } from '../../../../api/service/HrService/PerformanceService';
-import { AxiosError } from 'axios';
-
-// جلب التقييمات المعلقة
-export const usePendingEvaluations = () => {
+import { AxiosError } from 'axios';export const usePendingEvaluations = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['pending-evaluations'],
     queryFn: async () => {
@@ -14,10 +10,7 @@ export const usePendingEvaluations = () => {
     },
   });
   return { evaluations: data || [], isLoading, error: error?.message, refetch };
-};
-
-// جلب تفاصيل تقييم معين
-export const useEvaluationDetails = (id: number) => {
+};export const useEvaluationDetails = (id: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['evaluation', id],
     queryFn: async () => {
@@ -27,10 +20,7 @@ export const useEvaluationDetails = (id: number) => {
     enabled: !!id,
   });
   return { evaluation: data, isLoading, error: error?.message, refetch };
-};
-
-// اعتماد التقييم (إضافة ملاحظات HR)
-export const useApproveEvaluation = () => {
+};export const useApproveEvaluation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, hr_notes }: { id: number; hr_notes: string }) =>

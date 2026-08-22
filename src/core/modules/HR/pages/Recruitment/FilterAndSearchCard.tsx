@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Recruitment/FilterAndSearchCard.tsx
 import { Search, RefreshCw } from "lucide-react";
 import type { FilterStatus } from "./Recruitment";
 import { useLanguage } from '../../../../../i18n/translations/LanguageContext';

@@ -1,4 +1,3 @@
-// core/modules/HR/types/acceptedCandidates.types.ts
 
 export type OfferStatus = "pending" | "sent" | "accepted" | "declined";
 export type EmploymentStatus = "pending" | "converted";

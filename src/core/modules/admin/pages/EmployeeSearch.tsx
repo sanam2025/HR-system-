@@ -1,4 +1,3 @@
-// core/modules/Admin/pages/Search.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../../../i18n/translations/LanguageContext";
@@ -28,17 +27,12 @@ export default function EmployeeSearch() {
   const topRated = [...employees].sort((a, b) => b.rating - a.rating).slice(0, 3);
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Header */}
-      <div className="mb-8">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>      <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">{t.adminEmployeeSearch?.title || 'Employee Search'}</h1>
         <p className="text-gray-500 mt-1 text-sm">
           {t.adminEmployeeSearch?.subtitle || 'Search and filter staff members'}
         </p>
-      </div>
-
-      {/* Search Bar */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
+      </div>      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
         <div className="flex gap-3">
           <div className="flex-1 relative">
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
@@ -53,10 +47,7 @@ export default function EmployeeSearch() {
             {t.adminEmployeeSearch?.filter || 'Filter'}
           </button>
         </div>
-      </div>
-
-      {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+      </div>      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
@@ -92,10 +83,7 @@ export default function EmployeeSearch() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Top Rated Employees */}
-      <div className="mb-8">
+      </div>      <div className="mb-8">
         <div className="flex items-center gap-2 mb-4">
           <Award className="w-5 h-5 text-yellow-500" />
           <h2 className="text-lg font-semibold text-gray-800">{t.adminEmployeeSearch?.topRated || 'Top Rated Employees'}</h2>
@@ -126,10 +114,7 @@ export default function EmployeeSearch() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* All Employees List */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      </div>      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100">
           <h3 className="text-lg font-semibold text-gray-800">{t.adminEmployeeSearch?.allEmployees || 'All Employees'}</h3>
         </div>

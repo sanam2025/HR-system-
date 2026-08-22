@@ -1,4 +1,3 @@
-// core/modules/Admin/pages/Organization.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../../../i18n/translations/LanguageContext";
@@ -50,9 +49,7 @@ export default function Organization() {
   ];
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>      <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t.adminOrganization?.title || 'Organization Structure'}</h1>
           <p className="text-gray-500 mt-1 text-sm">
@@ -63,10 +60,7 @@ export default function Organization() {
           <Plus className="w-4 h-4" />
           {t.adminOrganization?.addDepartment || 'Add Department'}
         </button>
-      </div>
-
-      {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+      </div>      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
@@ -102,10 +96,7 @@ export default function Organization() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Departments Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      </div>      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {departments.map((dept) => (
           <div key={dept.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
             <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">

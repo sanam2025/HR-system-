@@ -1,7 +1,3 @@
-// ============================================================
-// Mocked Announcements API  (swap the functions bodies for
-// real axios calls once the backend is ready)
-// ============================================================
 
 export type Priority    = 'urgent' | 'normal' | 'info';
 export type AudienceType = 'all' | 'department' | 'managers';
@@ -21,10 +17,7 @@ export interface Announcement {
   status: AnnouncementStatus;
   created_at: string;
   updated_at: string;
-}
-
-// ── in-memory mock store ──────────────────────────────────
-const DEFAULT_STORE: Announcement[] = [
+}const DEFAULT_STORE: Announcement[] = [
   {
     id: 1,
     title: 'تحديث سياسة الإجازات',
@@ -72,10 +65,7 @@ const DEFAULT_STORE: Announcement[] = [
   },
 ];
 
-const STORAGE_KEY = 'hr_system_announcements';
-
-// Helper to get store
-const getStore = (): Announcement[] => {
+const STORAGE_KEY = 'hr_system_announcements';const getStore = (): Announcement[] => {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
     if (data) return JSON.parse(data);
@@ -83,10 +73,7 @@ const getStore = (): Announcement[] => {
     console.error('Failed to parse announcements from localStorage', e);
   }
   return DEFAULT_STORE;
-};
-
-// Helper to save store
-const saveStore = (store: Announcement[]) => {
+};const saveStore = (store: Announcement[]) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
   } catch (e) {
@@ -96,10 +83,7 @@ const saveStore = (store: Announcement[]) => {
 
 let nextId = getStore().reduce((max, a) => Math.max(max, a.id), 0) + 1;
 
-const wait = () => new Promise<void>(r => setTimeout(r, 350));
-
-// GET /announcements/active  — filtered for current manager role
-export const getActiveAnnouncements = async (): Promise<Announcement[]> => {
+const wait = () => new Promise<void>(r => setTimeout(r, 350));export const getActiveAnnouncements = async (): Promise<Announcement[]> => {
   await wait();
   const store = getStore();
   const now = new Date().toISOString();
@@ -109,16 +93,10 @@ export const getActiveAnnouncements = async (): Promise<Announcement[]> => {
       a.starts_at <= now &&
       (!a.ends_at || a.ends_at > now),
   );
-};
-
-// GET /announcements  — all statuses (management view)
-export const getAnnouncements = async (): Promise<Announcement[]> => {
+};export const getAnnouncements = async (): Promise<Announcement[]> => {
   await wait();
   return getStore();
-};
-
-// POST /announcements
-export const createAnnouncement = async (
+};export const createAnnouncement = async (
   data: Omit<Announcement, 'id' | 'created_by' | 'role_of_creator' | 'created_at' | 'updated_at'>,
 ): Promise<Announcement> => {
   await wait();
@@ -135,10 +113,7 @@ export const createAnnouncement = async (
   store.push(ann);
   saveStore(store);
   return ann;
-};
-
-// PUT /announcements/:id
-export const updateAnnouncement = async (
+};export const updateAnnouncement = async (
   id: number,
   data: Partial<Announcement>,
 ): Promise<Announcement> => {
@@ -149,17 +124,11 @@ export const updateAnnouncement = async (
   store[idx] = { ...store[idx], ...data, updated_at: new Date().toISOString() };
   saveStore(store);
   return store[idx];
-};
-
-// DELETE /announcements/:id
-export const deleteAnnouncement = async (id: number): Promise<void> => {
+};export const deleteAnnouncement = async (id: number): Promise<void> => {
   await wait();
   const store = getStore();
   saveStore(store.filter(a => a.id !== id));
-};
-
-// PATCH /announcements/:id/publish  — Publish Now
-export const publishAnnouncementNow = async (id: number): Promise<Announcement> => {
+};export const publishAnnouncementNow = async (id: number): Promise<Announcement> => {
   await wait();
   const store = getStore();
   const idx = store.findIndex(a => a.id === id);

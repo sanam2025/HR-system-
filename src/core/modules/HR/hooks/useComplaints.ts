@@ -1,14 +1,10 @@
-// src/core/modules/HR/hooks/useComplaints.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { ComplaintsService } from '../../../../api/service/HrService/ComplaintsService';
 import type {
   
   RespondComplaintData,
-} from '../../../../api/service/HrService/Types/ComplaintsService.types';
-
-//  Get all complaints
-export const useComplaints = () => {
+} from '../../../../api/service/HrService/Types/ComplaintsService.types';export const useComplaints = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['complaints'],
     queryFn: async () => {
@@ -23,10 +19,7 @@ export const useComplaints = () => {
     error: error?.message || null,
     refetch,
   };
-};
-
-//  Get single complaint
-export const useComplaint = (id?: number) => {
+};export const useComplaint = (id?: number) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['complaint', id],
     queryFn: async () => {
@@ -43,10 +36,7 @@ export const useComplaint = (id?: number) => {
     error: error?.message || null,
     refetch,
   };
-};
-
-//  Mark as under review
-export const useMarkUnderReview = () => {
+};export const useMarkUnderReview = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -61,10 +51,7 @@ export const useMarkUnderReview = () => {
       toast.error(errorMessage);
     },
   });
-};
-
-//  Respond to complaint
-export const useRespondComplaint = () => {
+};export const useRespondComplaint = () => {
   const queryClient = useQueryClient();
 
   return useMutation({

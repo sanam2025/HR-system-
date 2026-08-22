@@ -1,4 +1,3 @@
-// core/modules/HR/types/contract.types.ts
 
 export type ContractStatus = "active" | "expired" | "renewed" | "terminated";
 export type RenewalStatus = "pending" | "approved" | "rejected" | "expired";

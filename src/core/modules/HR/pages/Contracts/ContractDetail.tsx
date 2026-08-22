@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Contracts/ContractDetail.tsx
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Download } from 'lucide-react';
 import { useContract, useDownloadContract } from '../../hooks/useContracts';
@@ -43,17 +42,12 @@ export default function ContractDetail() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Back Button */}
-      <button
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>      <button
         onClick={() => navigate('/Hr/contracts')}
         className={`flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-4 transition-colors ${lang === 'ar' ? 'flex-row-reverse w-fit' : ''}`}
       >
         <ArrowLeft className={`w-4 h-4 ${lang === 'ar' ? 'rotate-180' : ''}`} /> {t.hrContracts?.detail?.back || 'Back to Contracts'}
-      </button>
-
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      </button>      <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">{t.hrContracts?.detail?.title || 'Contract Details'}</h1>
         <button
           onClick={handleDownload}
@@ -63,10 +57,7 @@ export default function ContractDetail() {
           <Download className="w-4 h-4" />
           {downloadMutation.isPending ? (t.hrContracts?.detail?.downloading || 'Downloading...') : (t.hrContracts?.detail?.downloadPdf || 'Download PDF')}
         </button>
-      </div>
-
-      {/* Contract Details Card */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      </div>      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="text-xs text-gray-500 uppercase tracking-wider">{t.hrContracts?.detail?.contractNumber || 'Contract Number'}</label>

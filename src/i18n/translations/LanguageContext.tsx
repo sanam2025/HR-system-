@@ -26,9 +26,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         return (stored === 'en' ? 'en' : 'ar');
     });
 
-    useEffect(() => {
-        // Sync i18next initial language
-        if (i18next.language !== lang) {
+    useEffect(() => {        if (i18next.language !== lang) {
             i18next.changeLanguage(lang);
         }
     }, []);
@@ -42,10 +40,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         setLang(next);
         localStorage.setItem('lang', next);
         i18next.changeLanguage(next);
-    };
-
-    // Update document direction and font when language changes
-    useEffect(() => {
+    };    useEffect(() => {
         document.documentElement.dir = dir;
         document.documentElement.lang = lang;
         document.body.style.fontFamily = isRTL

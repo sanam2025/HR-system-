@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Complaints/Complaints.tsx
 import { useNavigate } from 'react-router-dom';
 import { Eye, RefreshCw } from 'lucide-react';
 import { useComplaints } from '../../hooks/useComplaints';

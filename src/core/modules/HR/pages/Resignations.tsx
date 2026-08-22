@@ -1,4 +1,3 @@
-// core/modules/HR/pages/Resignations.tsx
 import { useState } from "react";
 import { Eye, Zap, Search, LogOut, Loader2 } from "lucide-react";
 import { useLanguage } from '../../../../i18n/translations/LanguageContext';
@@ -28,7 +27,6 @@ export default function Resignations() {
 
   return (
     <div className="space-y-6 p-6" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Header */}
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -38,8 +36,6 @@ export default function Resignations() {
           <p className="text-gray-500 mt-1">{t('manageResignationRequests') || 'Manage standard and immediate resignation requests.'}</p>
         </div>
       </div>
-
-      {/* Toolbar */}
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex bg-gray-50 p-1 rounded-xl w-full md:w-auto">
           <button
@@ -72,8 +68,6 @@ export default function Resignations() {
           <Search className={`absolute ${lang === 'ar' ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-gray-400`} size={18} />
         </div>
       </div>
-
-      {/* Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">

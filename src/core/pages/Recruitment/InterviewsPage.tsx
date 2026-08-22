@@ -4,11 +4,7 @@ import { Send, Loader2, User, Trophy, ChevronUp, ChevronDown, ClipboardList, Sea
 import toast from 'react-hot-toast';
 import { useLanguage } from '../../../i18n/translations/LanguageContext';
 import { submitInterviewResult, submitCandidatesRanking, getJobRequisitions } from '../../../api/recruitment';
-import apiClient from '../../../api/axios';
-
-
-// ── Star Rating Widget ──
-function StarRating({ value, onChange, max = 5 }: { value: number; onChange?: (v: number) => void; max?: number }) {
+import apiClient from '../../../api/axios';function StarRating({ value, onChange, max = 5 }: { value: number; onChange?: (v: number) => void; max?: number }) {
   const [hover, setHover] = useState(0);
   return (
     <div className="flex gap-0.5">
@@ -36,10 +32,7 @@ const medalColors = [
   'bg-gradient-to-br from-amber-400 to-yellow-500 text-white shadow-lg shadow-amber-200',
   'bg-gradient-to-br from-gray-300 to-gray-400 text-white shadow-lg shadow-gray-200',
   'bg-gradient-to-br from-amber-600 to-amber-700 text-white shadow-lg shadow-amber-300',
-];
-
-// ── Helper: extract full name from any object shape ──
-function getFullName(c: any): string {
+];function getFullName(c: any): string {
   if (c?.full_name) return c.full_name;
   if (c?.first_name || c?.last_name) return `${c.first_name || ''} ${c.last_name || ''}`.trim();
   if (c?.name) return c.name;
@@ -48,10 +41,7 @@ function getFullName(c: any): string {
   if (c?.candidate?.first_name || c?.candidate?.last_name)
     return `${c.candidate.first_name || ''} ${c.candidate.last_name || ''}`.trim();
   return '—';
-}
-
-// ── Helper: normalise interview object so candidate fields are at top level ──
-function normalizeInterview(iv: any) {
+}function normalizeInterview(iv: any) {
   if (!iv.candidate) return iv;
   return {
     ...iv,
@@ -63,36 +53,18 @@ function normalizeInterview(iv: any) {
 export default function InterviewsPage() {
   const { t, lang } = useLanguage();
   const iv = t.interviews;
-  const { jobPostingId: urlJobPostingId } = useParams<{ jobPostingId: string }>();
-
-  // ── Job picker state ──
-  const [jobsLoading, setJobsLoading] = useState(false);
+  const { jobPostingId: urlJobPostingId } = useParams<{ jobPostingId: string }>();  const [jobsLoading, setJobsLoading] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<number | null>(urlJobPostingId ? Number(urlJobPostingId) : null);
-  const [mergedJobs, setMergedJobs] = useState<any[]>([]);
-
-  // ── RIGHT panel: pending interviews from my-interviews ──
-  const [pendingInterviews, setPendingInterviews] = useState<any[]>([]);
-  const [pendingLoading, setPendingLoading] = useState(false);
-
-  // ── LEFT panel: ranked interviews from job-postings/{id}/interviews/ranked-by-rate ──
-  const [rankedInterviews, setRankedInterviews] = useState<any[]>([]);
+  const [mergedJobs, setMergedJobs] = useState<any[]>([]);  const [pendingInterviews, setPendingInterviews] = useState<any[]>([]);
+  const [pendingLoading, setPendingLoading] = useState(false);  const [rankedInterviews, setRankedInterviews] = useState<any[]>([]);
   const [rankedLoading, setRankedLoading] = useState(false);
 
-  const [fetchError, setFetchError] = useState<string | null>(null);
-
-  // ratings applied locally on pending (right panel)
-  const [ratings, setRatings] = useState<Record<number, number>>({});
+  const [fetchError, setFetchError] = useState<string | null>(null);  const [ratings, setRatings] = useState<Record<number, number>>({});
   const [order, setOrder] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [isSubmittingAll, setIsSubmittingAll] = useState(false);
   const [rankingSent, setRankingSent] = useState(false);
-  const [selectedCandidate, setSelectedCandidate] = useState<any | null>(null);
-
-  // ── Effective job posting id ──
-  const jobPostingId = urlJobPostingId ? Number(urlJobPostingId) : selectedJobId;
-
-  // ── Fetch job list for picker ──
-  useEffect(() => {
+  const [selectedCandidate, setSelectedCandidate] = useState<any | null>(null);  const jobPostingId = urlJobPostingId ? Number(urlJobPostingId) : selectedJobId;  useEffect(() => {
     if (urlJobPostingId) return;
     setJobsLoading(true);
 
@@ -113,10 +85,7 @@ export default function InterviewsPage() {
         ? (Array.isArray(postingsResult.value.data) ? postingsResult.value.data : (postingsResult.value.data?.data || []))
         : [];
 
-      const jobMap = new Map<number, any>();
-
-      // from pending interviews
-      interviews.forEach((item: any) => {
+      const jobMap = new Map<number, any>();      interviews.forEach((item: any) => {
         const jpId = item.job_posting_id || item.job_posting?.id || item.candidate?.job_posting_id;
         if (jpId && !jobMap.has(jpId)) {
           const matchedReq = reqs.find((r: any) =>
@@ -132,10 +101,7 @@ export default function InterviewsPage() {
             hasPosting: true,
           });
         }
-      });
-
-      // from job-postings list (to include jobs that are posted but have no pending interviews)
-      postings.forEach((p: any) => {
+      });      postings.forEach((p: any) => {
         if (!jobMap.has(p.id)) {
           const matchedReq = reqs.find((r: any) =>
             r.job_posting_id === p.id ||
@@ -150,10 +116,7 @@ export default function InterviewsPage() {
             hasPosting: true,
           });
         }
-      });
-
-      // remaining unmatched requisitions
-      const processedJobs = Array.from(jobMap.values());
+      });      const processedJobs = Array.from(jobMap.values());
       const unmatchedReqs = reqs.filter((r: any) =>
         !processedJobs.some(j => j.job_title.toLowerCase() === (r.job_title || '').toLowerCase())
       ).map((r: any) => {
@@ -178,20 +141,14 @@ export default function InterviewsPage() {
         setSelectedJobId(clickable[0].id);
       }
     }).finally(() => setJobsLoading(false));
-  }, [urlJobPostingId]);
-
-  // ── Fetch pending interviews (my-interviews) + auto-detect jobPostingId ──
-  useEffect(() => {
+  }, [urlJobPostingId]);  useEffect(() => {
     setPendingLoading(true);
     setFetchError(null);
     apiClient.get('my-interviews')
       .then(res => {
         const all: any[] = Array.isArray(res.data)
           ? res.data
-          : (Array.isArray(res.data?.data) ? res.data.data : []);
-
-        // استخراج job_posting_id تلقائياً من بيانات المرشح إذا لم يكن محدداً
-        if (!selectedJobId && all.length > 0) {
+          : (Array.isArray(res.data?.data) ? res.data.data : []);        if (!selectedJobId && all.length > 0) {
           const firstInterview = all[0];
           const extractedJobId =
             firstInterview.job_posting_id ||
@@ -213,10 +170,7 @@ export default function InterviewsPage() {
         setFetchError(msg);
       })
       .finally(() => setPendingLoading(false));
-  }, [lang]);
-
-  // ── Fetch LEFT panel: ranked-by-rate ──
-  useEffect(() => {
+  }, [lang]);  useEffect(() => {
     if (!jobPostingId) return;
     setRankedLoading(true);
     apiClient.get(`job-postings/${jobPostingId}/interviews/ranked-by-rate`)
@@ -231,19 +185,13 @@ export default function InterviewsPage() {
   const interviewsForJob = pendingInterviews.filter(c => {
     const cJobId = c.job_posting_id || c.job_posting?.id || c.candidate?.job_posting_id || c.candidate?.job_posting?.id;
     return !jobPostingId || cJobId === jobPostingId;
-  });
-
-  // ── Filter for search ──
-  const filtered = interviewsForJob.filter(c => {
+  });  const filtered = interviewsForJob.filter(c => {
     const name = getFullName(c).toLowerCase();
     const q = search.toLowerCase();
     return name.includes(q);
   });
 
-  const allRated = interviewsForJob.length > 0 && interviewsForJob.every(c => (ratings[c.id] || 0) > 0);
-
-  // ── Ranking order (right panel local sort) ──
-  const displayRanked = useMemo(() => {
+  const allRated = interviewsForJob.length > 0 && interviewsForJob.every(c => (ratings[c.id] || 0) > 0);  const displayRanked = useMemo(() => {
     const combinedMap = new Map();
     rankedInterviews.forEach(c => combinedMap.set(String(c.id), c));
     interviewsForJob.forEach(c => {
@@ -327,13 +275,9 @@ export default function InterviewsPage() {
   const handleSendAll = async () => {
     if (!allRated) { toast.error(iv.toasts.rateFirst); return; }
     setIsSubmittingAll(true);
-    try {
-      // أولاً: أرسل نتائج التقييم لكل مقابلة
-      await Promise.all(localRanked.map(c =>
+    try {      await Promise.all(localRanked.map(c =>
         submitInterviewResult(c.id, { rate: ratings[c.id], notes: 'تم التقييم من النظام' })
-      ));
-      // ثانياً: أرسل الترتيب فقط إذا كان jobPostingId متوفراً
-      if (jobPostingId) {
+      ));      if (jobPostingId) {
         const rankingPayload = localRanked.map((c, i) => ({ interview_id: c.id, rank: i + 1 }));
         await submitCandidatesRanking(jobPostingId, { ranking: rankingPayload });
       }
@@ -355,10 +299,7 @@ export default function InterviewsPage() {
       rejected: { label: iv.statusRejected, cls: 'bg-red-50 text-red-600 border-red-200' },
     };
     return map[effectiveStatus] || map.scheduled;
-  };
-
-  // ── Job Picker screen — اعرض فقط إذا لم تكن هناك مقابلات محملة ──
-  if (!jobPostingId && interviewsForJob.length === 0) return (
+  };  if (!jobPostingId && interviewsForJob.length === 0) return (
     <div className="space-y-6">
       
       <div>
@@ -441,20 +382,13 @@ export default function InterviewsPage() {
   );
 
   return (
-    <div className="space-y-6">
-      
-
-      {/* ── Header ── */}
-      <div className="flex items-start justify-between flex-wrap gap-4">
+    <div className="space-y-6">      <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <div className="flex items-center gap-4 mb-2">
             <h2 className="text-xl font-extrabold text-dark flex items-center gap-2">
               <ClipboardList size={22} className="text-green" />
               {iv.title}
-            </h2>
-            
-            {/* ── Job indicator + change button ── */}
-            {!urlJobPostingId && jobPostingId && (
+            </h2>            {!urlJobPostingId && jobPostingId && (
               <div className="flex items-center gap-2 bg-green/5 border border-green/20 rounded-lg px-3 py-1.5">
                 <Briefcase size={14} className="text-green" />
                 <span className="text-xs font-semibold text-green flex-1">
@@ -475,10 +409,7 @@ export default function InterviewsPage() {
           <p className="text-sm text-brown mt-1">
             {interviewsForJob.length} {iv.candidatesCount} · {interviewsForJob.filter(c => (ratings[c.id] || 0) > 0).length} {iv.ratedCount}
           </p>
-        </div>
-
-        {/* زر إرسال التقييم — يظهر دائماً عند وجود مرشحين */}
-        {interviewsForJob.length > 0 && (
+        </div>        {interviewsForJob.length > 0 && (
           <button
             onClick={handleSendAll}
             disabled={!allRated || isSubmittingAll || rankingSent}
@@ -497,16 +428,7 @@ export default function InterviewsPage() {
         <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-amber-700 text-sm font-medium">
           ⚠️ {iv.rateAllWarning}
         </div>
-      )}
-
-      {/* ── Main Grid ── */}
-      <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
-
-        {/* ── LEFT: Pending Evaluation Panel (from my-interviews) ── */}
-        <div className="xl:col-span-3 space-y-4">
-
-          {/* Search */}
-          <div className="relative">
+      )}      <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">        <div className="xl:col-span-3 space-y-4">          <div className="relative">
             <Search size={16} className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               className="w-full ps-9 pe-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-green transition-colors bg-white"
@@ -540,9 +462,7 @@ export default function InterviewsPage() {
                   key={c.id}
                   onClick={() => setSelectedCandidate(isSelected ? null : c)}
                   className={`bg-white rounded-2xl border shadow-card p-5 cursor-pointer transition-all hover:shadow-card-hover ${isSelected ? 'border-green ring-2 ring-green/20' : 'border-gray-100'}`}
-                >
-                  {/* Top Row */}
-                  <div className="flex items-start gap-4">
+                >                  <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green/20 to-green/10 flex items-center justify-center text-green font-extrabold text-lg flex-shrink-0">
                       {name[0]?.toUpperCase() || '?'}
                     </div>
@@ -563,10 +483,7 @@ export default function InterviewsPage() {
                         </p>
                       )}
                     </div>
-                  </div>
-
-                  {/* Rating Row */}
-                  <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between gap-4">
+                  </div>                  <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between gap-4">
                     <div>
                       <p className="text-xs text-brown font-semibold mb-1.5">{iv.interviewRating}</p>
                       <StarRating
@@ -579,10 +496,7 @@ export default function InterviewsPage() {
                     ) : (
                       <span className="text-2xl font-extrabold text-amber-500">{rating}<span className="text-sm text-gray-400">/5</span></span>
                     )}
-                  </div>
-
-                  {/* Notes (expanded) */}
-                  {isSelected && c.notes && (
+                  </div>                  {isSelected && c.notes && (
                     <div className="mt-3 bg-gray-50 rounded-xl px-4 py-3 text-sm text-brown border border-gray-100">
                       <span className="font-semibold text-dark">{iv.notes}: </span>{c.notes}
                     </div>
@@ -591,19 +505,13 @@ export default function InterviewsPage() {
               );
             })
           )}
-        </div>
-
-        {/* ── RIGHT: Ranked Panel — يتحدث فوراً مع كل تقييم ── */}
-        <div className="xl:col-span-2">
+        </div>        <div className="xl:col-span-2">
           <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5 sticky top-4">
             <div className="flex items-center gap-2 mb-1">
               <Trophy size={18} className="text-amber-500" />
               <h3 className="font-bold text-dark">{iv.rankingPanel}</h3>
             </div>
-            <p className="text-[11px] text-gray-400 mb-5">{iv.rankingSubtitle}</p>
-
-            {/* الترتيب المحلي الفوري مدمج مع ترتيب السيرفر */}
-            {(() => {
+            <p className="text-[11px] text-gray-400 mb-5">{iv.rankingSubtitle}</p>            {(() => {
               if (displayRanked.length === 0) {
                 return (
                   <div className="text-center py-10 text-gray-400">

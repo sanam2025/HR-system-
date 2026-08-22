@@ -1,4 +1,3 @@
-// src/App.tsx
 import AppRouter from './AppRouter';
 import { LanguageProvider } from './i18n/translations/LanguageContext';
 import { Toaster } from 'react-hot-toast';

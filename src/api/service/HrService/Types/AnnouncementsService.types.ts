@@ -1,4 +1,3 @@
-// src/api/service/HrService/Types/AnnouncementsService.types.ts
 
 export type AnnouncementStatus = 'active' | 'scheduled' | 'draft' | 'expired';
 export type Priority = 'low' | 'medium' | 'high';

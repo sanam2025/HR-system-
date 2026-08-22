@@ -1,4 +1,3 @@
-// core/modules/Admin/pages/Holidays.tsx
 import React, { useState } from "react";
 import { useLanguage } from "../../../../i18n/translations/LanguageContext";
 import {
@@ -37,10 +36,7 @@ const initialHolidays: Holiday[] = [
 ];
 
 function isUpcoming(dateStr: string) { return new Date(dateStr) > today; }
-function isPassed(dateStr: string) { return new Date(dateStr) <= today; }
-
-// ─── Modal ──────────────────────────────────────────────────────────────────
-interface ModalProps {
+function isPassed(dateStr: string) { return new Date(dateStr) <= today; }interface ModalProps {
   onClose: () => void;
   onSave: (h: Omit<Holiday, "id" | "updatedAt">) => void;
   initial?: Holiday | null;
@@ -133,10 +129,7 @@ function HolidayModal({ onClose, onSave, initial }: ModalProps) {
       </div>
     </div>
   );
-}
-
-// ─── Main Page ───────────────────────────────────────────────────────────────
-export default function Holidays() {
+}export default function Holidays() {
   const { t, lang } = useLanguage();
 
   const [holidays, setHolidays] = useState<Holiday[]>(initialHolidays);
@@ -164,9 +157,7 @@ export default function Holidays() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      {/* ── Header ── */}
-      <div className="flex justify-between items-start mb-8">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>      <div className="flex justify-between items-start mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
             {t.adminHolidays?.title || "Holidays"}
@@ -182,10 +173,7 @@ export default function Holidays() {
           <Plus className="w-4 h-4" />
           {t.adminHolidays?.addHoliday || "Add Holiday"}
         </button>
-      </div>
-
-      {/* ── Stats ── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+      </div>      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
         <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">{t.adminHolidays?.totalHolidays || "Total Holidays"}</p>
@@ -215,10 +203,7 @@ export default function Holidays() {
             <CheckCircle className="w-5 h-5" />
           </div>
         </div>
-      </div>
-
-      {/* ── List ── */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      </div>      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100">
           <h3 className="text-lg font-semibold text-gray-800">
             {t.adminHolidays?.allHolidays || "All Holidays"}
@@ -281,10 +266,7 @@ export default function Holidays() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* ── Modal ── */}
-      {showModal && (
+      </div>      {showModal && (
         <HolidayModal
           onClose={() => { setShowModal(false); setEditing(null); }}
           onSave={editing ? handleEdit : handleAdd}

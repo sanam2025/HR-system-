@@ -1,9 +1,5 @@
-// src/core/modules/HR/hooks/useAttendance.ts
 import { useQuery } from '@tanstack/react-query';
-import { AttendanceService } from '../../../../api/service/HrService/AttendanceService';
-
-//  جلب حضور اليوم
-export const useTodayAttendance = () => {
+import { AttendanceService } from '../../../../api/service/HrService/AttendanceService';export const useTodayAttendance = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['attendance-today'],
     queryFn: async () => {
@@ -18,10 +14,7 @@ export const useTodayAttendance = () => {
     error: error?.message || null,
     refetch,
   };
-};
-
-//  جلب تحليل الحضور
-export const useAttendanceAnalysis = () => {
+};export const useAttendanceAnalysis = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['attendance-analysis'],
     queryFn: async () => {
@@ -36,10 +29,7 @@ export const useAttendanceAnalysis = () => {
     error: error?.message || null,
     refetch,
   };
-};
-
-//  جلب الحضور المفلتر
-export const useFilteredAttendance = (from: string, to: string) => {
+};export const useFilteredAttendance = (from: string, to: string) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['attendance-filter', from, to],
     queryFn: async () => {

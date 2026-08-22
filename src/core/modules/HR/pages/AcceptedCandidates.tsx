@@ -1,4 +1,3 @@
-// core/modules/HR/pages/AcceptedCandidates.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
@@ -8,10 +7,7 @@ import JobOfferModal from "../Components/Special_Components/JobOfferModal";
 import type {
   AcceptedCandidate,
   JobOfferData,
-} from "../types/acceptedCandidates.types";
-
-// ============= DATA =============
-const INITIAL_CANDIDATES: AcceptedCandidate[] = [
+} from "../types/acceptedCandidates.types";const INITIAL_CANDIDATES: AcceptedCandidate[] = [
   {
     id: "1",
     name: "Ahmed Mansour",
@@ -61,10 +57,7 @@ const COLUMNS_KEYS = [
   { key: "interviewDate", label: "Interview Date" },
   { key: "offerStatus", label: "Offer Status" },
   { key: "actions", label: "Actions" },
-];
-
-// ============= MAIN =============
-export default function AcceptedCandidates() {
+];export default function AcceptedCandidates() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [candidates, setCandidates] =
@@ -124,10 +117,7 @@ export default function AcceptedCandidates() {
         <p className="text-gray-500 text-sm mt-1">
           {t('manageAcceptedCandidates') || 'Manage candidates who passed the manager interview.'}
         </p>
-      </div>
-
-      {/* Candidates Table - بدون بوردرات */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      </div>      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">

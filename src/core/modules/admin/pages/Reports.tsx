@@ -1,4 +1,3 @@
-// core/modules/Admin/pages/Reports.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../../../i18n/translations/LanguageContext";
@@ -43,10 +42,7 @@ export default function Reports() {
     { title: t.adminReports?.employeeTurnover || 'Employee Turnover', value: "8%", change: "-2%", color: "blue", icon: Users },
     { title: t.adminReports?.payrollSummary || 'Payroll Summary', value: t.adminReports?.sar485k || 'SAR 485K', change: "+5%", color: "purple", icon: DollarSign },
     { title: t.adminReports?.leaveUsage || 'Leave Usage', value: t.adminReports?.days156 || '156 Days', change: "+12%", color: "orange", icon: Calendar },
-  ];
-
-  // Chart Data
-  const attendanceTrendData = [
+  ];  const attendanceTrendData = [
     { week: t.adminReports?.week1 || 'Week 1', rate: 88, target: 90 },
     { week: t.adminReports?.week2 || 'Week 2', rate: 92, target: 90 },
     { week: t.adminReports?.week3 || 'Week 3', rate: 85, target: 90 },
@@ -96,9 +92,7 @@ export default function Reports() {
   const COLORS = ["#3b82f6", "#f59e0b", "#8b5cf6", "#10b981", "#ef4444"];
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-6 bg-gray-50 min-h-screen" dir={lang === 'ar' ? 'rtl' : 'ltr'}>      <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t.adminReports?.reportsAnalytics || 'Reports & Analytics'}</h1>
           <p className="text-gray-500 mt-1 text-sm">
@@ -109,10 +103,7 @@ export default function Reports() {
           <Download className="w-4 h-4" />
           {t.adminReports?.exportAll || 'Export All'}
         </button>
-      </div>
-
-      {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+      </div>      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         {reports.map((report, idx) => {
           const Icon = report.icon;
           const colorClasses = {
@@ -136,12 +127,7 @@ export default function Reports() {
             </div>
           );
         })}
-      </div>
-
-      {/* Chart Section - Row 1 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* Attendance Trend - Line Chart with Target */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      </div>      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-semibold text-gray-800">{t.adminReports?.attendanceTrendTarget || 'Attendance Trend vs Target'}</h3>
             <LineChart className="w-5 h-5 text-gray-400" />
@@ -172,10 +158,7 @@ export default function Reports() {
               />
             </ReLineChart>
           </ResponsiveContainer>
-        </div>
-
-        {/* {t('departmentDistribution')} - Pie Chart */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        </div>        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-semibold text-gray-800">{t.adminReports?.departmentDistribution || 'Department Distribution'}</h3>
             <PieChart className="w-5 h-5 text-gray-400" />
@@ -200,12 +183,7 @@ export default function Reports() {
             </RePieChart>
           </ResponsiveContainer>
         </div>
-      </div>
-
-      {/* Chart Section - Row 2 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* Payroll Summary - Composed Chart */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      </div>      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-semibold text-gray-800">{t.adminReports?.payrollBonusTrends || 'Payroll & Bonus Trends'}</h3>
             <DollarSign className="w-5 h-5 text-gray-400" />
@@ -230,10 +208,7 @@ export default function Reports() {
               />
             </ComposedChart>
           </ResponsiveContainer>
-        </div>
-
-        {/* Leave Usage - Stacked Bar Chart */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        </div>        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-semibold text-gray-800">{t.adminReports?.leaveUsageByDept || 'Leave Usage by Department'}</h3>
             <Calendar className="w-5 h-5 text-gray-400" />
@@ -251,12 +226,7 @@ export default function Reports() {
             </ReBarChart>
           </ResponsiveContainer>
         </div>
-      </div>
-
-      {/* Chart Section - Row 3 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* {t('employeeSatisfaction')} - Area Chart */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      </div>      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-semibold text-gray-800">{t.adminReports?.employeeSatisfaction || 'Employee Satisfaction'}</h3>
             <TrendingUp className="w-5 h-5 text-gray-400" />
@@ -277,10 +247,7 @@ export default function Reports() {
               />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
-
-        {/* {t('applicantPipeline')} - Scatter Chart */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        </div>        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-semibold text-gray-800">{t.adminReports?.applicantPipeline || 'Applicant Pipeline'}</h3>
             <Users className="w-5 h-5 text-gray-400" />
@@ -313,10 +280,7 @@ export default function Reports() {
             </ScatterChart>
           </ResponsiveContainer>
         </div>
-      </div>
-
-      {/* Full Width Chart - {t('deptPerformanceComparison')} */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      </div>      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-semibold text-gray-800">{t.adminReports?.deptPerformanceComparison || 'Department Performance Comparison'}</h3>
           <BarChart className="w-5 h-5 text-gray-400" />

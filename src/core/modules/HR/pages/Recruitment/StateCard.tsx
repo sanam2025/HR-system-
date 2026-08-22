@@ -1,4 +1,3 @@
-// src/core/modules/HR/pages/Recruitment/StateCard.tsx
 import { Briefcase, CheckCircle, Clock, XCircle } from "lucide-react";
 import type { JobRequisition } from "../../../../../api/service/HrService/Types/HRService.types";
 import { useLanguage } from '../../../../../i18n/translations/LanguageContext';

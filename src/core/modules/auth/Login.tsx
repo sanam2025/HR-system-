@@ -8,10 +8,7 @@ import ForgotPasswordModal from './components/ForgotPasswordModal';
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
-    const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
-    // const [email, setEmail] = useState('');
-    // const [password, setPassword] = useState('');
-
+    const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
     const { mutateAsync: login, isPending: isLoading } = useLogin();
     const navigate = useNavigate();
     const setToken = useAuthStore(state => state.setToken);
@@ -48,26 +45,15 @@ function Login() {
             const user = response.data?.data?.user;
             const token = response.data?.Token;
 
-            if (user && token) {
-                // Save remember_me choice first, so the store knows where to save
-                localStorage.setItem('remember_me', rememberMe ? 'true' : 'false');
-                localStorage.setItem('login_timestamp', Date.now().toString());
-
-                // Save token and user to the store and localStorage/sessionStorage
-                setToken(token);
-
-                // Determine user role from the new backend response structure
-                const userRole = (response.data.data.role || user.role || user.job_title || 'employee').toLowerCase();
+            if (user && token) {                localStorage.setItem('remember_me', rememberMe ? 'true' : 'false');
+                localStorage.setItem('login_timestamp', Date.now().toString());                setToken(token);                const userRole = (response.data.data.role || user.role || user.job_title || 'employee').toLowerCase();
                 const userWithRole = {
                     ...user,
                     role: userRole,
                     role_id: response.data.data.role_id
                 };
 
-                setCurrentUser(userWithRole);
-
-                // Redirect based on role
-                if (userRole.includes('admin') || userRole.includes('ceo')) {
+                setCurrentUser(userWithRole);                if (userRole.includes('admin') || userRole.includes('ceo')) {
                     navigate('/admin');
                 } else if (userRole.includes('hr')) {
                     navigate('/Hr');
@@ -103,9 +89,7 @@ function Login() {
     }, [loginData])
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#4A7C59] via-[#4A4E4A] to-[#6B6358] relative overflow-hidden" dir="ltr">
-            {/* Decorative background elements */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#4A7C59] via-[#4A4E4A] to-[#6B6358] relative overflow-hidden" dir="ltr">            <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-[#C4A66A] opacity-20 blur-[100px]"></div>
                 <div className="absolute top-[60%] -right-[10%] w-[40%] h-[60%] rounded-full bg-[#4A7C59] opacity-40 blur-[120px]"></div>
                 <div className="absolute bottom-0 left-[20%] w-[30%] h-[30%] rounded-full bg-[#C4A66A] opacity-10 blur-[80px]"></div>
@@ -205,10 +189,7 @@ function Login() {
                                 </div>
                             }
                         </button>
-                    </form>
-
-                    {/* Guest / Careers Portal Button */}
-                    <div className="mt-5 pt-4 border-t border-white/15 text-center">
+                    </form>                    <div className="mt-5 pt-4 border-t border-white/15 text-center">
                         <button
                             type="button"
                             onClick={() => navigate('/careers')}

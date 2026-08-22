@@ -19,16 +19,10 @@ export default function Recruitment() {
   });
   const [selectedSkill, setSelectedSkill] = useState('');
   const [customSkill, setCustomSkill] = useState('');
-  const [editingId, setEditingId] = useState<number | null>(null);
-
-  // Query: get existing requisitions
-  const { data: rawRequisitions = [], isLoading: isRequisitionsLoading } = useQuery({
+  const [editingId, setEditingId] = useState<number | null>(null);  const { data: rawRequisitions = [], isLoading: isRequisitionsLoading } = useQuery({
     queryKey: ['my-job-requisitions'],
     queryFn: getJobRequisitions
-  });
-
-  // Query: get skills
-  const { data: skillsList = [] } = useQuery({
+  });  const { data: skillsList = [] } = useQuery({
     queryKey: ['skills'],
     queryFn: getSkills
   });
@@ -156,9 +150,7 @@ export default function Recruitment() {
         <p className="text-sm text-brown mt-1">{r.subtitle || 'إرسال طلبات الاحتياج الوظيفي ومتابعة حالات الاعتماد من إدارة الموارد البشرية'}</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        {/* Form Panel */}
-        <form onSubmit={handleSubmit} className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-card p-6 space-y-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">        <form onSubmit={handleSubmit} className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-card p-6 space-y-5">
           <h3 className="font-bold text-dark text-lg flex items-center justify-between gap-2 mb-4 border-b border-gray-100 pb-3">
             <div className="flex items-center gap-2">
               <ClipboardList className="text-green" size={20} />
@@ -169,10 +161,7 @@ export default function Recruitment() {
                 {lang === 'ar' ? 'إلغاء التعديل' : 'Cancel Edit'}
               </button>
             )}
-          </h3>
-
-          {/* Job Title */}
-          <div>
+          </h3>          <div>
             <label className="form-label">{v.positionTitle || 'المسمى الوظيفي المطلوب'} <span className="text-red-500">*</span></label>
             <input
               className="form-input"
@@ -181,10 +170,7 @@ export default function Recruitment() {
               value={form.title}
               onChange={e => setForm({ ...form, title: e.target.value })}
             />
-          </div>
-
-          {/* Description */}
-          <div>
+          </div>          <div>
             <label className="form-label">{v.description || 'الوصف الوظيفي والمسؤوليات'} <span className="text-red-500">*</span></label>
             <textarea
               className="form-input resize-none h-24"
@@ -193,10 +179,7 @@ export default function Recruitment() {
               value={form.description}
               onChange={e => setForm({ ...form, description: e.target.value })}
             />
-          </div>
-
-          {/* Experience */}
-          <div>
+          </div>          <div>
             <label className="form-label">{v.experience || 'سنوات الخبرة المطلوبة'} <span className="text-red-500">*</span></label>
             <input
               type="number"
@@ -207,10 +190,7 @@ export default function Recruitment() {
               value={form.experience}
               onChange={e => setForm({ ...form, experience: parseInt(e.target.value) || 0 })}
             />
-          </div>
-
-          {/* Skills */}
-          <div>
+          </div>          <div>
             <label className="form-label">{v.requirements || 'المهارات والاشتراطات المطلوبة'}</label>
 
             {form.skills.length > 0 && (
@@ -289,10 +269,7 @@ export default function Recruitment() {
             {(createMutation.isPending || updateMutation.isPending) ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
             {(createMutation.isPending || updateMutation.isPending) ? (lang === 'ar' ? 'جاري الإرسال...' : 'Sending...') : editingId ? (lang === 'ar' ? 'حفظ التعديلات' : 'Save Changes') : (v.submitBtn || (lang === 'ar' ? 'إرسال طلب الاحتياج' : 'Submit Requisition'))}
           </button>
-        </form>
-
-        {/* Existing Job Requisitions List Panel */}
-        <div className="lg:col-span-1 space-y-4">
+        </form>        <div className="lg:col-span-1 space-y-4">
           <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5">
             <h3 className="font-bold text-dark text-base flex items-center gap-2 mb-4 border-b border-gray-100 pb-3">
               <Briefcase size={18} className="text-green" />

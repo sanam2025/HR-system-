@@ -1,4 +1,3 @@
-// core/modules/HR/types/leaves.types.ts
 
 export type LeaveStatus = "pending" | "approved" | "rejected";
 export type LeaveType = "annual" | "sick" | "emergency" | "unpaid";
