@@ -310,6 +310,7 @@ export default function Topbar({
                   try {
                     await submitCheckIn();
                     updateAttendanceState('checked_in');
+                    queryClient.invalidateQueries({ queryKey: ['attendance'] });
                     toast.success(lang === 'ar' ? 'تم تسجيل الحضور بنجاح ✅' : 'Checked in successfully ✅');
                   } catch (error: any) {
                     let msg: string = error.response?.data?.message || error.response?.data?.error || error.message || '';
@@ -324,6 +325,7 @@ export default function Topbar({
                       error.response?.status === 422
                     ) {
                       updateAttendanceState('checked_in');
+                      queryClient.invalidateQueries({ queryKey: ['attendance'] });
                       toast.info(msg, { duration: 5000 });
                     } else {
                       toast.error(msg || (lang === 'ar' ? 'خطأ في تسجيل الحضور' : 'Check-in error'));
@@ -348,6 +350,7 @@ export default function Topbar({
                   try {
                     await submitCheckOut();
                     updateAttendanceState('completed');
+                    queryClient.invalidateQueries({ queryKey: ['attendance'] });
                     toast.success(lang === 'ar' ? 'تم تسجيل الانصراف بنجاح! اكتمل يوم عملك 🎉' : 'Checked out successfully! Work day completed 🎉');
                   } catch (error: any) {
                     let msg: string = error.response?.data?.message || error.response?.data?.error || error.message || '';
@@ -361,6 +364,7 @@ export default function Topbar({
                       error.response?.status === 422
                     ) {
                       updateAttendanceState('completed');
+                      queryClient.invalidateQueries({ queryKey: ['attendance'] });
                       toast.info(msg, { duration: 5000 });
                     } else {
                       toast.error(msg ? (lang === 'ar' ? `خطأ انصراف: ${msg}` : `Check-out error: ${msg}`) : (lang === 'ar' ? 'خطأ في تسجيل الانصراف' : 'Check-out error'));

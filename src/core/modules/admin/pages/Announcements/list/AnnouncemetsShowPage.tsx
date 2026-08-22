@@ -1,6 +1,6 @@
-
 import { Calendar, Clock, Users, User, FileText, X} from 'lucide-react'
 import type { Announcements } from '../../../types/types'
+import { createPortal } from 'react-dom'
 import { formatDate, formatTime, getPriorityStyles, getStatusStyles, getTargetAudienceLabel } from '../../../util/utils'
 import { useLanguage } from "../../../../../../i18n/translations/LanguageContext";
 
@@ -18,9 +18,9 @@ function AnnouncementsShow({
     const { t, lang } = useLanguage();
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[999] flex items-center justify-center p-4"
             onClick={() => setIsModalOpen(false)}
         >
             <div 
@@ -124,7 +124,8 @@ function AnnouncementsShow({
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
 

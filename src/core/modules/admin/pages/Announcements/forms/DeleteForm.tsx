@@ -1,4 +1,5 @@
 import { Trash2 } from 'lucide-react'
+import { createPortal } from 'react-dom'
 import Loading from '../../../../../../shared/components/Loading'
 import type { Announcements } from '../../../types/types'
 import toast from 'react-hot-toast';
@@ -54,8 +55,8 @@ function DeleteForm({
         }
     };
 
-    return (
-        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50'>
+    return createPortal(
+        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-[999]'>
             <div className='bg-white rounded-xl p-6 max-w-md w-full mx-4'>
                 <div className='flex items-start gap-3 mb-4'>
                     <div className='bg-red-100 rounded-full p-2'>
@@ -90,7 +91,8 @@ function DeleteForm({
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     )
 }
 

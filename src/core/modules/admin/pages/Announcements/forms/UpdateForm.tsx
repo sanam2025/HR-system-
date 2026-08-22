@@ -1,5 +1,6 @@
 import { CalendarIcon, Edit, FileText, Tag, X, Users, AlertCircle, Clock } from 'lucide-react'
 import React, { useState } from 'react'
+import { createPortal } from 'react-dom'
 import toast from 'react-hot-toast';
 import Loading from '../../../../../../shared/components/Loading'
 import { useUpdateAnnouncement } from '../../../hooks/Announcements/useAnnouncementsMutation'
@@ -132,9 +133,9 @@ function UpdateAnnouncementForm({
         }
     }
 
-    return (
+    return createPortal(
         <div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[999] flex items-center justify-center p-4"
             onClick={() => setIsModalOpen(false)}
         >
             <div 
@@ -342,8 +343,9 @@ function UpdateAnnouncementForm({
                     </div>
                 </div>
             </div>
-        </div>
-    )
+        </div>,
+        document.body
+    );
 }
 
 export default UpdateAnnouncementForm

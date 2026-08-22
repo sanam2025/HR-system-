@@ -1,5 +1,6 @@
 import { CalendarIcon, FileText, Plus, Tag, X, Users, AlertCircle, Clock } from 'lucide-react'
-import { useState } from 'react'
+import React, { useState } from 'react'
+import { createPortal } from 'react-dom'
 import toast from 'react-hot-toast';
 import { useCreateAnnouncemet } from '../../../hooks/Announcements/useAnnouncementsMutation'
 import type { CreateAnnouncemetPayload } from '../../../types/types'
@@ -109,9 +110,9 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[999] flex items-center justify-center p-4"
             onClick={() => setIsModalOpen(false)}
         >
             <div 
@@ -319,8 +320,9 @@ function AddAnnouncementForm({ isOpen, setIsModalOpen }: AddAnnouncementProps) {
                     </div>
                 </form>
             </div>
-        </div>
-    )
+        </div>,
+        document.body
+    );
 }
 
 export default AddAnnouncementForm
