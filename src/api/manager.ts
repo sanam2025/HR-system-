@@ -161,48 +161,39 @@ export async function getMyMonthlyAttendance() {
   const response = await apiClient.get('my-monthly-attendance');
   const raw = response.data?.data || response.data;
   return Array.isArray(raw) ? raw : [];
-}
+}
 /**
  * عرض طلبات إجازة القسم
  */
 export async function getDepartmentLeaveRequests(status?: string): Promise<any[]> {
   if (!status || status === 'all') {
-    const [pending, approved, rejected] = await Promise.all([
-      getDepartmentLeaveRequests('pending'),
-      getDepartmentLeaveRequests('approved'),
-      getDepartmentLeaveRequests('rejected')
-    ]);
-    return [...pending, ...approved, ...rejected];
+    const statuses = ['pending', 'approved', 'rejected'];
+    const results = await Promise.all(
+      statuses.map(s => apiClient.get(`department-leave-request?status=${s}`).catch(() => ({ data: { data: [] } })))
+    );
+    const combined = results.flatMap(res => {
+      const data = res.data?.data || res.data;
+      return Array.isArray(data) ? data : [];
+    });
+    // Deduplicate by ID to prevent React key duplication errors
+    const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
+    return unique;
   }
-
-  const url = `department-leave-request?status=${encodeURIComponent(status)}`;
+  
+  let url = `department-leave-request?status=${encodeURIComponent(status)}`;
   const response = await apiClient.get(url);
-  const raw = response.data;
-  let arr: any[] = [];
-  if (Array.isArray(raw)) arr = raw;
-  else if (Array.isArray(raw?.data)) arr = raw.data;
-  else if (Array.isArray(raw?.data?.data)) arr = raw.data.data;
-  else if (Array.isArray(raw?.leave_requests)) arr = raw.leave_requests;
-  else if (Array.isArray(raw?.requests)) arr = raw.requests;
-  else if (Array.isArray(raw?.department_leaves)) arr = raw.department_leaves;
-
-  return arr;
+  const data = response.data?.data || response.data;
+  return Array.isArray(data) ? data : [];
 }
 
 /**
  * عرض كل طلبات إجازة الشركة (للـ HR)
  */
 export async function getAllLeaveRequests(status?: string): Promise<any[]> {
-  if (!status || status === 'all') {
-    const [pending, approved, rejected] = await Promise.all([
-      getAllLeaveRequests('pending'),
-      getAllLeaveRequests('approved'),
-      getAllLeaveRequests('rejected')
-    ]);
-    return [...pending, ...approved, ...rejected];
+  let url = 'all-leave-request';
+  if (status && status !== 'all') {
+    url += `?status=${encodeURIComponent(status)}`;
   }
-
-  const url = `all-leave-request?status=${encodeURIComponent(status)}`;
   const response = await apiClient.get(url);
   const raw = response.data;
   let arr: any[] = [];
@@ -236,21 +227,22 @@ export async function rejectLeaveRequest(id: number) {
  */
 export async function getMyLeaveRequests(status?: string): Promise<any[]> {
   if (!status || status === 'all') {
-    const [pending, approved, rejected] = await Promise.all([
-      getMyLeaveRequests('pending'),
-      getMyLeaveRequests('approved'),
-      getMyLeaveRequests('rejected')
-    ]);
-    return [...pending, ...approved, ...rejected];
+    const statuses = ['pending', 'approved', 'rejected'];
+    const results = await Promise.all(
+      statuses.map(s => apiClient.get(`my-leave-request?status=${s}`).catch(() => ({ data: { data: [] } })))
+    );
+    const combined = results.flatMap(res => {
+      const data = res.data?.data || res.data;
+      return Array.isArray(data) ? data : [];
+    });
+    const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
+    return unique;
   }
 
-  const url = `leaveRequests?status=${encodeURIComponent(status)}`;
+  let url = `my-leave-request?status=${encodeURIComponent(status)}`;
   const response = await apiClient.get(url);
-  const raw = response.data;
-  if (Array.isArray(raw)) return raw;
-  if (Array.isArray(raw?.data)) return raw.data;
-  if (Array.isArray(raw?.data?.data)) return raw.data.data;
-  return Array.isArray(response.data?.data) ? response.data.data : [];
+  const data = response.data?.data || response.data;
+  return Array.isArray(data) ? data : [];
 }
 
 /**
@@ -258,7 +250,9 @@ export async function getMyLeaveRequests(status?: string): Promise<any[]> {
  */
 export async function submitLeaveRequest(data: { start_date: string; type: string; days_count: number; reason?: string }) {
   const formData = new FormData();
-  formData.append('start_date', data.start_date);
+  // Ensure date format is YYYY/MM/DD for backend validation
+  const formattedDate = data.start_date.replace(/-/g, '/');
+  formData.append('start_date', formattedDate);
   formData.append('type', data.type);
   formData.append('days_count', data.days_count.toString());
   if (data.reason) {
@@ -277,47 +271,38 @@ export async function submitLeaveRequest(data: { start_date: string; type: strin
 export async function getMyLeaveBalance() {
   const response = await apiClient.get('my-leave-balance');
   return response.data?.data || response.data;
-}
+}
 /**
  * عرض طلبات المغادرة (بالساعة) للقسم
  */
 export async function getDepartmentHourlyLeaveRequests(status?: string): Promise<any[]> {
   if (!status || status === 'all') {
-    const [pending, approved, rejected] = await Promise.all([
-      getDepartmentHourlyLeaveRequests('pending'),
-      getDepartmentHourlyLeaveRequests('approved'),
-      getDepartmentHourlyLeaveRequests('rejected')
-    ]);
-    return [...pending, ...approved, ...rejected];
+    const statuses = ['pending', 'approved', 'rejected'];
+    const results = await Promise.all(
+      statuses.map(s => apiClient.get(`department-hourly-leave-request?status=${s}`).catch(() => ({ data: { data: [] } })))
+    );
+    const combined = results.flatMap(res => {
+      const data = res.data?.data || res.data;
+      return Array.isArray(data) ? data : [];
+    });
+    const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
+    return unique;
   }
 
-  const url = `department-hourly-leave-request?status=${encodeURIComponent(status)}`;
+  let url = `department-hourly-leave-request?status=${encodeURIComponent(status)}`;
   const response = await apiClient.get(url);
-  const raw = response.data;
-  let arr: any[] = [];
-  if (Array.isArray(raw)) arr = raw;
-  else if (Array.isArray(raw?.data)) arr = raw.data;
-  else if (Array.isArray(raw?.data?.data)) arr = raw.data.data;
-  else if (Array.isArray(raw?.hourly_leaves)) arr = raw.hourly_leaves;
-  else if (Array.isArray(raw?.requests)) arr = raw.requests;
-
-  return arr;
+  const data = response.data?.data || response.data;
+  return Array.isArray(data) ? data : [];
 }
 
 /**
  * عرض كل طلبات المغادرة (بالساعة) للشركة (للـ HR)
  */
 export async function getAllHourlyLeaveRequests(status?: string): Promise<any[]> {
-  if (!status || status === 'all') {
-    const [pending, approved, rejected] = await Promise.all([
-      getAllHourlyLeaveRequests('pending'),
-      getAllHourlyLeaveRequests('approved'),
-      getAllHourlyLeaveRequests('rejected')
-    ]);
-    return [...pending, ...approved, ...rejected];
+  let url = 'all-hourly-leave-request';
+  if (status && status !== 'all') {
+    url += `?status=${encodeURIComponent(status)}`;
   }
-
-  const url = `all-hourly-leave-request?status=${encodeURIComponent(status)}`;
   const response = await apiClient.get(url);
   const raw = response.data;
   let arr: any[] = [];
@@ -350,16 +335,10 @@ export async function rejectHourlyLeaveRequest(id: number) {
  * عرض طلبات المغادرة (بالساعة) للمدير نفسه
  */
 export async function getMyHourlyLeaveRequests(status?: string): Promise<any[]> {
-  if (!status || status === 'all') {
-    const [pending, approved, rejected] = await Promise.all([
-      getMyHourlyLeaveRequests('pending'),
-      getMyHourlyLeaveRequests('approved'),
-      getMyHourlyLeaveRequests('rejected')
-    ]);
-    return [...pending, ...approved, ...rejected];
+  let url = 'my-hourly-leave-request';
+  if (status && status !== 'all') {
+    url += `?status=${encodeURIComponent(status)}`;
   }
-
-  const url = `hourly-leave-Requests?status=${encodeURIComponent(status)}`;
   const response = await apiClient.get(url);
   return response.data?.data || response.data;
 }
@@ -369,7 +348,9 @@ export async function getMyHourlyLeaveRequests(status?: string): Promise<any[]> 
  */
 export async function submitHourlyLeaveRequest(data: { date: string; start_time: string; end_time: string; reason: string }) {
   const formData = new FormData();
-  formData.append('date', data.date);
+  // Ensure date format is YYYY/MM/DD for backend validation
+  const formattedDate = data.date.replace(/-/g, '/');
+  formData.append('date', formattedDate);
   formData.append('start_time', data.start_time);
   formData.append('end_time', data.end_time);
   formData.append('reason', data.reason);
@@ -378,7 +359,7 @@ export async function submitHourlyLeaveRequest(data: { date: string; start_time:
     headers: { 'Content-Type': 'multipart/form-data' }
   });
   return response.data;
-}
+}
 /**
  * Helper to get current location
  */
@@ -554,13 +535,7 @@ export async function getDepartmentPerformance() {
  * عدد المهام المنجزة خلال الشهر الحالي
  */
 export async function getCompletedTasksCountThisMonth() {
-  try {
-    const response = await apiClient.get('counttasks/completed-count-this-month');
-    return response.data?.data || response.data;
-  } catch (error: any) {
-    if (error?.response?.status === 404) return null; // الـ endpoint غير موجود بعد
-    throw error;
-  }
+  return null; // Bypassed to prevent 404 network errors until endpoint is ready
 }
 
 /**

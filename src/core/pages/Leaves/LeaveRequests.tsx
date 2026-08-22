@@ -98,10 +98,10 @@ export default function LeaveRequests() {
                            activeKey === 'موافقة' ? 'approved' : 'rejected';
 
   const { data: rawRequests, isLoading } = useQuery({
-    queryKey: [queryKey, activeTabIdx, subType, isHR],
+    queryKey: [queryKey, subType, isHR],
     queryFn: () => (subType === 'daily' 
-      ? (isHR ? getAllLeaveRequests(currentApiStatus) : getDepartmentLeaveRequests(currentApiStatus))
-      : (isHR ? getAllHourlyLeaveRequests(currentApiStatus) : getDepartmentHourlyLeaveRequests(currentApiStatus))),
+      ? (isHR ? getAllLeaveRequests() : getDepartmentLeaveRequests())
+      : (isHR ? getAllHourlyLeaveRequests() : getDepartmentHourlyLeaveRequests())),
   });
 
   const safeRequests = Array.isArray(rawRequests) 

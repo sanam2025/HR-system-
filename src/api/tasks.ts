@@ -91,13 +91,7 @@ export async function reviewTaskSubmission(submissionId: number, data: ReviewSub
  * إحصائيات عدد المهام المكتملة هذا الشهر
  */
 export async function getCompletedTasksCount() {
-  try {
-    const response = await apiClient.get('counttasks/completed-count-this-month');
-    return response.data?.data || response.data || { count: 0 };
-  } catch (err: any) {
-    if (err?.response?.status === 404) return { count: 0 };
-    throw err;
-  }
+  return { count: 0 }; // Bypassed to prevent 404 network errors until endpoint is ready
 }
 
 /**
